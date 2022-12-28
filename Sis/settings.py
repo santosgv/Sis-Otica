@@ -66,7 +66,7 @@ WSGI_APPLICATION = 'Sis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-AUTH_USER_MODEL= "Autenticacao.Usuario"
+AUTH_USER_MODEL= "Autenticacao.USUARIO"
 
 DATABASES = {
     'default': {
