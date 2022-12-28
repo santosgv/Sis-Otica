@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from Unidades.models import UNIDADE
 
 
-class Usuario(AbstractUser):
+class USUARIO(AbstractUser):
 
     CHOICES_SITUACAO =(
         ('A','Ativo'),
@@ -30,7 +30,7 @@ class Usuario(AbstractUser):
 
 class Ativacao(models.Model):
     token = models.CharField(max_length=64)
-    user = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     ativo = models.BooleanField(default=False)
 
     def __str__(self):

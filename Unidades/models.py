@@ -1,6 +1,6 @@
 from django.db import models
 import datetime
-from Autenticacao.models import Usuario
+from Autenticacao.models import USUARIO
 
 
 class UNIDADE(models.Model):
@@ -26,7 +26,7 @@ class CUSTO(models.Model):
     PERIODO =models.IntegerField()
 
 class SALARIO(models.Model):
-    COLABORADOR = models.ForeignKey(Usuario,on_delete=models.DO_NOTHING)
+    COLABORADOR = models.ForeignKey(USUARIO,on_delete=models.DO_NOTHING)
     VALOR = models.FloatField()
     DISCRIMINAÇAO = models.CharField(max_length=200,blank=True, null=True)
     DATA = models.DateTimeField()
