@@ -72,8 +72,7 @@ class CLIENTE(models.Model):
     CPF = models.CharField(max_length=14)
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
-    LONGE = models.ForeignKey(LONGE , on_delete=models.CASCADE, blank=True, null=True)
-    PERTO = models.ForeignKey(PERTO, on_delete=models.CASCADE, blank=True, null=True)
+    EXAME = models.ForeignKey('CLIENTE_EXAME' , on_delete=models.CASCADE, blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
 
     def __str__(self) -> str:
@@ -85,5 +84,4 @@ class CLIENTE_EXAME(models.Model):
     PERTO = models.ForeignKey(PERTO, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return str(self.CLIENTE)
-    
+        return str(self.id)
