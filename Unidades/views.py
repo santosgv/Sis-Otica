@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from Autenticacao.models import ORDEN
 
-# Create your views here.
+def home(request):
+    OS = ORDEN.objects.all()
+    return render(request,'home.html',{'OS':OS})
