@@ -1,0 +1,172 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  
+  body {
+    background-color: #770000;
+    background-position: center;
+  }
+  
+  .header {
+    background-image: linear-gradient(to right, #ff1a1a, #990000);
+    padding: 10px;
+  }
+  .itens {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .logo {
+    border-radius: 50%;
+    width: 7%;
+  }
+  
+  .all-botons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+  .boton {
+    width: 120px;
+    height: 50px;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    transition: 0.5s;
+    cursor: pointer;
+  }
+  
+  .boton:hover {
+    border: 2px solid white;
+    background-color: white;
+    color: #770000;
+  }
+  
+  
+  #menu {
+    width: 200px;
+    height: 100%;
+    padding-top: 100px;
+    background-color: transparent;
+    display: flex;
+    gap: 30px 150px;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    float: left;
+    margin: 10px;
+  }
+  
+  .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #ff1a1a;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+  }
+  
+  .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: white;
+  }
+  
+  .cta svg {
+    position: relative;
+    top: 0;
+    margin-left: 10px;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: white;
+    stroke-width: 2;
+    transform: translateX(-5px);
+    transition: all 0.3s ease;
+  }
+  
+  .cta:hover:before {
+    width: 100%;
+    background: #ff1a1a;
+  }
+  
+  .cta:hover svg {
+    transform: translateX(0);
+  }
+  
+  .cta:active {
+    transform: scale(0.95);
+  }
+  
+
+  
+  .all-cards {
+    padding: 5%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column: auto;
+    grid-area: auto;
+    gap: 30px 25px;
+    grid-auto-rows: minmax(200px, 180px);
+  }
+  
+  .card {
+    padding: 10px;
+    border-radius: 10px;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+  }
+  
+  .title-content {
+    font-family: "Times New Roman", Times, serif;
+    text-align-last: center;
+    font-size: 32px;
+    padding-bottom: 20px;
+  }
+  .text-content {
+    font-size: 22px;
+    padding: 2px;
+  }
+  .service {
+    font-size: 25px;
+    padding-top: 10px;
+    color: #770b0b;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  .card:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    -webkit-box-shadow: 0px 0px 31px 4px rgba(255, 255, 255, 0.48);
+    -moz-box-shadow: 0px 0px 31px 4px rgba(255, 255, 255, 0.48);
+    box-shadow: 0px 0px 31px 4px rgba(255, 255, 255, 0.48);
+  }
