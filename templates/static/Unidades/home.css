@@ -1,0 +1,15 @@
+:root{
+    --primeira : orange;
+    --segundaria : black;
+    --terceira : #fff;
+}
+
+
+
+.agenda {
+    margin-right: 15px;
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    justify-content: center;
+}

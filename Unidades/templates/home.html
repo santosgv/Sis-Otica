@@ -1,61 +1,92 @@
 {% extends 'base.html' %}
-{% load static %} 
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/home.css' %}">
+{% endblock %}
+
 {% block 'body'%}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
 </head>
+
 <body>
-    <section>
-        <div class="all-cards">
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">Maria Silva</h1>
-            <p class="text-content"><b>Serviço:</b> Ajuste no grau</p>
-            <p class="text-content"><b>Hora:</b> 14:30H</p>
-            <p class="service">PENDENTE</p>
+  <section class="container-fluid text-center">
+    <div class="container">
+      <div class="row">
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
           </div>
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">João Henrique</h1>
-            <p class="text-content"><b>Serviço:</b> Nova armação</p>
-            <p class="text-content"><b>Hora:</b> 10:00H</p>
-            <p class="service">PENDENTE</p>
-          </div>
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">Lucas Alberto</h1>
-            <p class="text-content"><b>Serviço:</b> Exame semanal</p>
-            <p class="text-content"><b>Hora:</b> 19:00H</p>
-            <p class="service">PENDENTE</p>
-          </div>
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">Juliana Nascimento</h1>
-            <p class="text-content"><b>Serviço:</b> Aumento de grau</p>
-            <p class="text-content"><b>Hora:</b> 9:45H</p>
-            <p class="service">RESOLVIDO</p>
-          </div>
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">Roberto Toronto</h1>
-            <p class="text-content"><b>Serviço:</b> Entrega de oculos</p>
-            <p class="text-content"><b>Hora:</b> 7:20H</p>
-            <p class="service">CANCELADO</p>
-          </div>
-          <div class="card">
-            <img src="" alt="" />
-            <h1 class="title-content">Bruno Gomes</h1>
-            <p class="text-content"><b>Serviço:</b> Devolução de oculos</p>
-            <p class="text-content"><b>Hora:</b> 15:00H</p>
-            <p class="service">PENDENTE</p>
-          </div>
+          <span class="badge badge-danger">CANCELADO</span>
         </div>
-      </section>
+
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">NOME CLIENTE</h5>
+            <h6 class="card-subtitle mb-2 text-muted">VENDEDOR 11/11/1111</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
+          </div>
+          <span class="badge badge-primary">EM ABERTO</span>
+        </div>
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
+          </div>
+          <span class="badge badge-success">Success</span>
+        </div>
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
+          </div>
+          <span class="badge badge-danger">CANCELADO</span>
+        </div>
+
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
+          </div>
+          <span class="badge badge-primary">EM ABERTO</span>
+        </div>
+        <div class="card agenda" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            <a href="#" class="card-link">Card link</a>
+          </div>
+          <span class="badge badge-success">Success</span>
+        </div>
+      </div>
+    </div>
+  </section>
 </body>
+
 </html>
 {% endblock %}
