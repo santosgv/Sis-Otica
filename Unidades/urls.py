@@ -6,7 +6,8 @@ from Unidades import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente')
+    path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
+    path('clientes',views.clientes,name='clientes')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

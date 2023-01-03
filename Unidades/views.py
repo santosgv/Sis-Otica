@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from Autenticacao.models import ORDEN
+from Autenticacao.models import ORDEN,CLIENTE
 from Unidades.models import CLIENTE_EXAME
 from django.contrib.auth.decorators import login_required
 
@@ -8,15 +8,16 @@ def home(request):
     return render(request,'home.html',{'OS':OS})
 
 
+def clientes(request):
+    clientes = CLIENTE.objects.all()
+    return render(request,'clientes.html',{'clientes':clientes})
 
 @login_required(login_url='logar')
 def cadastro_cliente(request):
 
     if request.method == "GET":
-        print(request.method)
         return render(request, 'cadastro_cliente.html')
-        
-    elif request.method == "POST":
+    else:
         exames = CLIENTE_EXAME.objects.all()
         NOME = request.POST.get('NOME')
         LOGRADOURO = request.POST.get('LOGRADOURO')
@@ -31,7 +32,8 @@ def cadastro_cliente(request):
         FOTO =  request.POST.get('FOTO')       
        
 
-        ordem =ORDEN(NOME=NOME,LOGRADOURO=LOGRADOURO,NUMERO=NUMERO,BAIRRO=BAIRRO,CIDADE=CIDADE,TELEFONE=TELEFONE,CPF=CPF,DATA_NASCIMENTO=DATA_NASCIMENTO,EMAIL=EMAIL,EXAME=EXAME,FOTO=FOTO)
-        ordem.save()
-        print(request.method)
+        cliente =CLIENTE(NOME=NOME,LOGRADOURO=LOGRADOURO,NUMERO=NUMERO,BAIRRO=BAIRRO,CIDADE=CIDADE,TELEFONE=TELEFONE,CPF=CPF,DATA_NASCIMENTO=DATA_NASCIMENTO,EMAIL=EMAIL,EXAME=EXAME,FOTO=FOTO)
+        cliente.save()
+        
+        print(NOME)
         return render(request,'cadastro_cliente.html',{'exames':exames})

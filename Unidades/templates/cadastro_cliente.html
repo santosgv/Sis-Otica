@@ -19,7 +19,7 @@
 <body>
     <section class="container-fluid text-center">
         <div class="container">
-            <form method="GET" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
+            <form method="POST" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
                 <div class="form-group">
                     <label for="exampleFormControlFile1">Anexa Foto</label>
                     <input type="file" class="form-control-file" id="FOTO">
@@ -36,50 +36,46 @@
                 </div>
                 <div class="form-group">
                     <label for="NOME">Nome</label>
-                    <input type="text" class="form-control" name="=NOME" id="NOME" placeholder="Ex: Joao">
+                    <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao">
                   </div>
                 <div class="form-row">
                   <div class="form-group col-md-4">
                     <label for="inputEmail4">Email</label>
-                    <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
+                    <input type="email" class="form-control" name="EMAIL" id="EMAIL" placeholder="Email">
                   </div>
                   <div class="form-group col-md-4">
                     <label for="Telefone">Telefone</label>
-                    <input type="password" class="form-control" id="TELEFONE" placeholder="Telefone">
+                    <input type="password" class="form-control" id="TELEFONE" name="TELEFONE" placeholder="Telefone">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="CPF">CPF</label>
-                    <input type="text" class="form-control" id="CPF" placeholder="CPF">
+                    <input type="text" class="form-control" id="CPF" name="CPF" placeholder="CPF">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="DATA_NASCIMENTO">Data Nascimento</label>
-                    <input type="text" class="form-control" id="DATA_NASCIMENTO" placeholder="01/01/2022">
+                    <input type="text" class="form-control" id="DATA_NASCIMENTO" name="DATA_NASCIMENTO" placeholder="01/01/2022">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="LOGRADOURO">Logradouro</label>
-                  <input type="text" class="form-control" id="LOGRADOURO" placeholder="1234 Main St">
+                  <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="1234 Main St">
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-2">
                         <label for="NUMERO">Numero</label>
-                        <input type="text" class="form-control" id="NUMERO">
+                        <input type="text" class="form-control" id="NUMERO" name="NUMERO">
                       </div>
                   <div class="form-group col-md-4">
                     <label for="BAIRRO">Bairo</label>
-                    <input type="text" class="form-control" id="BAIRRO">
+                    <input type="text" class="form-control" id="BAIRRO" name="BAIRRO">
                   </div>
-                  <div class="form-group col-md-4">
+                  <div class="form-group col-md-6">
                     <label for="CIDADE">Cidade</label>
-                    <select id="CIDADE" class="form-control">
+                    <select id="CIDADE" name="CIDADE" class="form-control">
                       <option selected>Belo Horizonte</option>
                       <option>...</option>
                       <option>...</option>
                     </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="Cep">Cep</label>
-                    <input type="text" class="form-control" id="CEP">
                   </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Cadastrar</button>

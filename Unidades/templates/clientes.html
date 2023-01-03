@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/cadastro_cliente.css' %}">
+{% endblock %}
+
+{% block 'body'%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+</head>
+<body>
+    <body>
+        <section class="container-fluid text-center">
+            <div class="container">
+                <table class="table table-striped">
+                    <tr class="thead-dark">
+                        <th scope="col">NOME</th>
+                        <th scope="col">LOGRADOURO</th>
+                        <th scope="col">NUMERO</th>
+                        <th scope="col">BAIRRO</th>
+                        <th scope="col">CPF</th>
+                      </tr>
+                      {% for cliente in clientes %}
+                      <tbody>
+                        <tr>
+                          <th hidden id="id" name="id">{{cliente.id}}</th>
+                          <th scope="row">{{cliente.NOME}}</th>
+                          <td>{{cliente.LOGRADOURO}}</td>
+                          <td>{{cliente.NUMERO}}</td>
+                          <td>{{cliente.BAIRRO}}</td>
+                          <td>{{cliente.CPF}}</td>
+                         
+                         
+                        </tr>
+                
+                      </tbody>
+                      {% endfor%}
+                </table>
+            </div>
+        </section>
+</body>
+</html>
+{% endblock %}
