@@ -19,14 +19,24 @@
 <body>
     <section class="container-fluid text-center">
         <div class="container">
-            <form>
+            <form method="GET" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
                 <div class="form-group">
                     <label for="exampleFormControlFile1">Anexa Foto</label>
                     <input type="file" class="form-control-file" id="FOTO">
                   </div>
+                  <div class="text-center">
+                    <label for="">Selecione Exame : </label>
+                    
+                    <select class="select" name="EXAME" id="EXAME">
+                        {% for exame in exames %}
+                     
+                        <option value="{{exame.id}}">{{exame}}</option>
+                        {% endfor%}
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="NOME">Nome</label>
-                    <input type="text" class="form-control" id="NOME" placeholder="Ex: Joao">
+                    <input type="text" class="form-control" name="=NOME" id="NOME" placeholder="Ex: Joao">
                   </div>
                 <div class="form-row">
                   <div class="form-group col-md-4">
@@ -62,7 +72,8 @@
                   <div class="form-group col-md-4">
                     <label for="CIDADE">Cidade</label>
                     <select id="CIDADE" class="form-control">
-                      <option selected>Choose...</option>
+                      <option selected>Belo Horizonte</option>
+                      <option>...</option>
                       <option>...</option>
                     </select>
                   </div>
@@ -71,7 +82,7 @@
                     <input type="text" class="form-control" id="CEP">
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Sign in</button>
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
               </form>
               
               
