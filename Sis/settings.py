@@ -18,6 +18,10 @@ SECRET_KEY ='ikn!qabtd-#v956@d!2g!-s29!*n0!_#p^pkx@6w(&-y87(r1n'
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
+USE_L10N = False
+
+DATE_FORMAT = "Y-m-d"
+
 
 # Application definition
 
