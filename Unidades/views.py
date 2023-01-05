@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from Autenticacao.models import ORDEN,CLIENTE
 from Unidades.models import CLIENTE_EXAME
 from django.contrib.auth.decorators import login_required
-from datetime import date
+
 
 def home(request):
     OS = ORDEN.objects.all()
@@ -40,11 +40,10 @@ def cadastro_cliente(request):
         CIDADE=CIDADE,
         TELEFONE=TELEFONE,
         CPF=CPF,
-        DATA_NASCIMENTO=int(date(DATA_NASCIMENTO).isoformat()),
+        DATA_NASCIMENTO=DATA_NASCIMENTO,
         EMAIL=EMAIL,
         EXAME=CLIENTE_EXAME.objects.get(id=EXAME)
         ,FOTO=FOTO)
         cliente.save()
-        
-        
+
         return render(request,'cadastro_cliente.html')
