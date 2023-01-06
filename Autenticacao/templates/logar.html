@@ -17,20 +17,24 @@
 {% endfor %}
 {% endif %}
 
-    <div class="box text-center">
+    <div class="box text-center logar">
         <form action="{% url 'logar' %}" method="post">{% csrf_token %}
-
+            <div class="logar-form">
             <h1 class="titulo font-degrade borda-bottom-degrade">LOGAR</h2>
             <br>
-            <span class="span-descricao">Nome de usuário:</span>
-            <input type="text" class="form-control input-cadastro" name="username">
+            <label class="span-descricao"></label>
+            <input type="text" class="form-control input-cadastro bnt" name="username" placeholder="Digite Seu Usuario">
+            
+            <label class="span-descricao"></label>
+            <input type="password" class="form-control input-cadastro bnt" name="password" placeholder="Senha">
             <br>
-            <span class="span-descricao">Senha:</span>
-            <input type="password" class="form-control input-cadastro" name="password">
-            <br>
-            <input  type="submit" value="LOGAR" class="btn btn-success btn-lg">
-            <a href="{% url 'cadastro' %}" class="btn btn-primary btn-lg">CADASTRO</a> 
-            <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+        </div>
+            <input  type="submit" value="LOGAR" class="bto-success bto-group-lg bto-lg">
+            
+            <div>
+            <label for="">Nâo Possui uma Conta ?</label>
+            <a href="{% url 'cadastro' %}">Cadastre-se</a>
+        </div>
         </form>
             
     </div>
