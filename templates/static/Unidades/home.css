@@ -5,6 +5,7 @@
 }
 
 
+/* css da agenda */
 
 .agenda {
     margin-right: 15px;
@@ -13,6 +14,8 @@
     margin-top: 20px;
     justify-content: center;
 }
+
+/* css da paginaçao */
 
 .pagination {
     margin-bottom: 20px;
