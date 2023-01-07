@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from Autenticacao.models import ORDEN,CLIENTE
 from Unidades.models import CLIENTE_EXAME
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -10,7 +11,14 @@ def home(request):
 
 
 def clientes(request):
-    clientes = CLIENTE.objects.all()
+    cliente_lista = CLIENTE.objects.all().order_by('NOME')
+
+    pagina = Paginator(cliente_lista, 15)
+
+    page = request.GET.get('page')
+
+    clientes = pagina.get_page(page)
+
     return render(request,'clientes.html',{'clientes':clientes})
 
 @login_required(login_url='logar')
