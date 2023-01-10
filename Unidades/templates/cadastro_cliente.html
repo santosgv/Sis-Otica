@@ -5,19 +5,13 @@
 {% block 'head' %}
 
 <link rel="stylesheet" href="{% static 'Unidades/home.css' %}">
+
+<title>{% block 'title' %}
+ Cadastro de Cliente
+   {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro Cliente</title>
-</head>
-<body>
     <section class="container-fluid text-center">
         <div class="container">
             <form method="POST" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
@@ -25,7 +19,7 @@
                     <label for="exampleFormControlFile1">Anexa Foto</label>
                     <input type="file" class="form-control-file" id="FOTO">
                   </div>
-                  <div class="text-center">
+              <!--    <div class="text-center">
                     <label for="">Selecione Exame : </label>
                     
                     <select class="select" name="EXAME" id="EXAME">
@@ -33,6 +27,7 @@
                         <option value="{{exame}}">{{exame}}</option>
                         {% endfor%}
                     </select>
+                    -->
                 </div>
                 <div class="form-group">
                     <label for="NOME">Nome</label>
@@ -84,13 +79,13 @@
               
         </div>
     </section>
-</body>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 	<script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
 
-</html>
+
 {% endblock %}
 
