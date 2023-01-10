@@ -4,83 +4,69 @@
 
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'Unidades/home.css' %}">
+<title>{% block 'title' %}
+ Pagina Principal
+  {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-</head>
-
-<body>
-  <section class="container-fluid text-center">
-    <div class="container">
-      <div class="row">
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
-          <span class="badge badge-danger">CANCELADO</span>
+<div class="card">
+  <div class="card-body">
+    <div class="row centralizar">
+      <!--
+        Comecar o For aqui
+      -->
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
         </div>
-
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">NOME CLIENTE</h5>
-            <h6 class="card-subtitle mb-2 text-muted">VENDEDOR 11/11/1111</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
-          <span class="badge badge-primary">EM ABERTO</span>
+        <div class="text-center">
+          <span class="badge badge-primary">Primary</span>
         </div>
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
+      </div>
+
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
+        </div>
+        <div class="text-center">
           <span class="badge badge-success">Success</span>
         </div>
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
-          <span class="badge badge-danger">CANCELADO</span>
-        </div>
+      </div>
 
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
-          <span class="badge badge-primary">EM ABERTO</span>
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
         </div>
-        <div class="card agenda" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-              content.</p>
-            <a href="#" class="card-link">Card link</a>
-          </div>
+        <div class="text-center">
+          <span class="badge badge-danger">Danger</span>
+        </div>
+      </div>
+
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
+        </div>
+        <div class="text-center">
+          <span class="badge badge-primary">Primary</span>
+        </div>
+      </div>
+
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
+        </div>
+        <div class="text-center">
           <span class="badge badge-success">Success</span>
         </div>
            <div class="card agenda" style="width: 18rem;">
@@ -146,6 +132,7 @@
           <span class="badge badge-success">Success</span>
         </div>
       </div>
+<<<<<<< Updated upstream
     </div>
     <div class="pagination">
       <samp class="step-links">
@@ -164,6 +151,22 @@
     </div>
   </section>
 </body>
+=======
+>>>>>>> Stashed changes
 
-</html>
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="card-link">Go somewhere</a>
+        </div>
+        <div class="text-center">
+          <span class="badge badge-danger">Danger</span>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+</div>
 {% endblock %}
