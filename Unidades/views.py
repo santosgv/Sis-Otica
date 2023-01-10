@@ -13,7 +13,7 @@ def home(request):
 def clientes(request):
     cliente_lista = CLIENTE.objects.all().order_by('NOME')
 
-    pagina = Paginator(cliente_lista, 15)
+    pagina = Paginator(cliente_lista, 10)
 
     page = request.GET.get('page')
 
