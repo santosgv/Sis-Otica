@@ -3,46 +3,41 @@
 {% load static %}
 
 {% block 'head' %}
-<link rel="stylesheet" href="{% static 'Unidades/cadastro_cliente.css' %}">
+<link rel="stylesheet" href="{% static 'Unidades/home.css' %}">
+<title>{% block 'title' %}
+  Clientes
+  {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
-</head>
-<body>
-    <body>
-        <section class="container-fluid text-center">
-            <div class="container">
+<div class="text-center">
                 <table class="table table-striped">
-                    <tr class="thead-dark">
+                    <tr class="thead">
                         <th scope="col">NOME</th>
+                        <th scope="col">CPF</th>
+                        <th scope="col">TELEFONE</th>
                         <th scope="col">LOGRADOURO</th>
                         <th scope="col">NUMERO</th>
                         <th scope="col">BAIRRO</th>
-                        <th scope="col">CPF</th>
+                        <th scope="col">CIDADE</th>
                       </tr>
                       {% for cliente in clientes %}
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
                           <th scope="row">{{cliente.NOME}}</th>
+                          <td>{{cliente.CPF}}</td>
+                          <td>{{cliente.TELEFONE}}</td>
                           <td>{{cliente.LOGRADOURO}}</td>
                           <td>{{cliente.NUMERO}}</td>
                           <td>{{cliente.BAIRRO}}</td>
-                          <td>{{cliente.CPF}}</td>
-                         
-                         
+                          <td>{{cliente.CIDADE}}</td>
                         </tr>
                 
                       </tbody>
                       {% endfor%}
                 </table>
+<<<<<<< Updated upstream
             </div>
             <div class="pagination">
               <samp class="step-links">
@@ -62,4 +57,9 @@
         </section>
 </body>
 </html>
+=======
+              </div>
+
+
+>>>>>>> Stashed changes
 {% endblock %}
