@@ -26,7 +26,6 @@ def cadastro_cliente(request):
 
     if request.method == "GET":
         exames = CLIENTE_EXAME.objects.all()
-        print(exames)
         return render(request, 'cadastro_cliente.html',{'exames':exames})
     else:
         NOME = request.POST.get('NOME')
@@ -50,8 +49,8 @@ def cadastro_cliente(request):
         CPF=CPF,
         DATA_NASCIMENTO=DATA_NASCIMENTO,
         EMAIL=EMAIL,
-        EXAME=CLIENTE_EXAME.objects.get(id=EXAME)
-        ,FOTO=FOTO)
+       
+        FOTO=FOTO)
         cliente.save()
 
         return render(request,'cadastro_cliente.html')
