@@ -6,6 +6,10 @@
     padding-top: 10px;
 }
 
+.btn-continuar {
+    float: right;
+}
+
 /* css da paginaçao */
 
 .pagination {
