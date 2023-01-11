@@ -4,8 +4,7 @@
 
 {% block 'head' %}
 
-<link rel="stylesheet" href="{% static 'Unidades/home.css' %}">
-
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 <title>{% block 'title' %}
  Cadastro de Cliente
    {% endblock %}</title>
@@ -13,77 +12,70 @@
 
 {% block 'body'%}
     <section class="container-fluid text-center">
-        <div class="container">
-            <form method="POST" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
-                <div class="form-group">
-                    <label for="exampleFormControlFile1">Anexa Foto</label>
-                    <input type="file" class="form-control-file" id="FOTO">
+      <div class="form_">
+        <div class="text-center">
+          <form method="POST" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
+            <div class="form-group">
+                <label for="exampleFormControlFile1">Anexa Foto</label>
+                <input type="file" class="form-control-file" id="FOTO">
+              </div>
+
+            </div>
+            <div class="form-group">
+                <label for="NOME">Nome</label>
+                <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao">
+              </div>
+            <div class="row">
+              <div class="form-group col-md-4">
+                <label for="inputEmail4">Email</label>
+                <input type="email" class="form-control" name="EMAIL" id="EMAIL" placeholder="Email">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="Telefone">Telefone</label>
+                <input type="text" class="form-control" data-mask="(00)00000-0000" id="TELEFONE" name="TELEFONE" placeholder="Telefone">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="CPF">CPF</label>
+                <input type="text" class="form-control" data-mask="000.000.000-00" id="CPF" name="CPF" placeholder="CPF">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="DATA_NASCIMENTO">Data Nascimento</label>
+                <input type="date" class="form-control"  id="DATA_NASCIMENTO" name="DATA_NASCIMENTO">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="LOGRADOURO">Logradouro</label>
+              <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="1234 Main St">
+            </div>
+            <div class="row">
+                <div class="form-group col-md-2">
+                    <label for="NUMERO">Numero</label>
+                    <input type="text" class="form-control" id="NUMERO" name="NUMERO">
                   </div>
-              <!--    <div class="text-center">
-                    <label for="">Selecione Exame : </label>
-                    
-                    <select class="select" name="EXAME" id="EXAME">
-                        {% for exame in exames %}
-                        <option value="{{exame}}">{{exame}}</option>
-                        {% endfor%}
-                    </select>
-                    -->
-                </div>
-                <div class="form-group">
-                    <label for="NOME">Nome</label>
-                    <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao">
-                  </div>
-                <div class="form-row">
-                  <div class="form-group col-md-4">
-                    <label for="inputEmail4">Email</label>
-                    <input type="email" class="form-control" name="EMAIL" id="EMAIL" placeholder="Email">
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label for="Telefone">Telefone</label>
-                    <input type="text" class="form-control" data-mask="(00)00000-0000" id="TELEFONE" name="TELEFONE" placeholder="Telefone">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="CPF">CPF</label>
-                    <input type="text" class="form-control" data-mask="000.000.000-00" id="CPF" name="CPF" placeholder="CPF">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="DATA_NASCIMENTO">Data Nascimento</label>
-                    <input type="date" class="form-control"  id="DATA_NASCIMENTO" name="DATA_NASCIMENTO">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="LOGRADOURO">Logradouro</label>
-                  <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="1234 Main St">
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-2">
-                        <label for="NUMERO">Numero</label>
-                        <input type="text" class="form-control" id="NUMERO" name="NUMERO">
-                      </div>
-                  <div class="form-group col-md-4">
-                    <label for="BAIRRO">Bairo</label>
-                    <input type="text" class="form-control" id="BAIRRO" name="BAIRRO">
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="CIDADE">Cidade</label>
-                    <select id="CIDADE" name="CIDADE" class="form-control">
-                      <option selected>Belo Horizonte</option>
-                      <option>...</option>
-                      <option>...</option>
-                    </select>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
-              </form>
-              
-              
+              <div class="form-group col-md-4">
+                <label for="BAIRRO">Bairo</label>
+                <input type="text" class="form-control" id="BAIRRO" name="BAIRRO">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="CIDADE">Cidade</label>
+                <select id="CIDADE" name="CIDADE" class="form-control">
+                  <option selected>Belo Horizonte</option>
+                  <option>...</option>
+                  <option>...</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-form">
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+          </div>
+          </form>   
         </div>
+      </div>
     </section>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-
 	<script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
 
 

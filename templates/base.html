@@ -1,111 +1,73 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    {% block 'head' %}
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{% block 'title' %}
+            {% endblock %}</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'Unidades/assets/favicon.ico' %}" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'Unidades/css/styles.css' %}" rel="stylesheet" />
+        {% block 'head' %}
     
-    {% endblock %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
-    <title>{% block 'title' %}
-      {% endblock %}</title>
-  </head>
-  <div class="d-flex" id="wrapper">
-    <!-- Sidebar-->
-    <div class="border-end bg-white" id="sidebar-wrapper">
-        <div class="sidebar-heading border-bottom bg-cor"><img src="{% static 'home/img/logo-preto-amarelo.jpeg' %}" height="200px" alt="logo"></div>
-        <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'home'%}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAsElEQVR4nO3SLW4CQQCG4QdCMCQYBBqDq+IGOHQdl2iCwXKFHgDXM9RVY7gApq4JtklFK9rBzCabDdv9TRDsl7z2mcxkuLdtYq2vhx1C7Bn9tvAB9ik86QXDpvgIr1fwpDeM6+ITHP7Bk46YVsVnOJXAk94xL4s/4KMCHmJnLIrwJT5r4CH2hVUe/ojvBniI/WCdxZ/w2wIeYn/Y5t2kKV64mx2QXXeA7olu94u6Se8COwHf2dlByCEAAAAASUVORK5CYII=">INICIO</a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Caixa</a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'cadastro_cliente'%}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABe0lEQVR4nO2WwUrDQBCGP0SrB40oItSexEcQfACfQA+iXvoAVdvX8Ch48Gk8GqtoW6mHisVDL16EorUHRagszEIIyWYXNyriD0NDM9kvszM7E/jXL9UkUAXqwKuYut4HCnlBS0ALGKVYU3y8R9oyQLU1fEdetYBq2/MJvnAAn/sEDxzAytebRo72IxE/+wTXHcChT/CBA7ji+xw3LaDXeXSwUgZcQZfISQXpy6EU3ECuK3n26ixNATXgEhj++QFyI4A7YBMIgBlgA+h8ZYCMA+vAasK9mizcBeYT7s8BPdcBsgwcAU/y4AdwIi8xFhsg24Z1tmwHyCxwLKC0vE3H2umCYb1AfF5M0BXgIaNRvEX8NVjlNE2L4qMqPVVty9aooohutSqkNO3YbPWjJXgt9nXSkUJKirYrPmUTeBfoW4API8epIf/1pJACybmK9D6SniKeVczo4+/y25Yd8KoJOaehfAwMJadleTFdO7d5wE1SMA2/+k6whp8Bp5/EjvbVVDx4CwAAAABJRU5ErkJggg==">Clientes</a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Financeiro</a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Custos</a>
-            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'sair'%}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAqElEQVR4nO3UPQrCQBCG4b1F5v2SA1hoZ6UXMHhv9RxRFK3iCZQlgk0W3MQpAvlgut15YH8mhDk5KctyD1wkvYYUcDazOgnEBUOb64s0SWBsc31qOgBwBFoXADjEPUVRLCXdPYA2Nu9D/nkHj6qqVnEvsACuQ4BN+DFmts4GgK0roIwjknSbziXj/UzVISdJT7efLO9RoVzAfVybWT0GARoz2yWBOaEnb7IUckng9DI/AAAAAElFTkSuQmCC">SAIR</a>
-        </div>
-    </div>
-    <!-- Page content wrapper-->
-    <div id="page-content-wrapper">
-        <!-- Top navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light bg-cor border-bottom">
-            <div class="container-fluid">
+        {% endblock %}
+    </head>
+    <body>
+        <div class="d-flex" id="wrapper">
+            <!-- Sidebar-->
+            <div class="border-end bg-white" id="sidebar-wrapper">
+                <div class="sidebar-heading border-bottom bg-light"><img src="{% static 'home/img/logo-preto-amarelo.jpeg' %}" height="200px" alt="logo"></div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'home'%}">Inicio</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Caixa</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Venda</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Pesquisa</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Dashboard</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Outros</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Minhas Vendas</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'clientes'%}">Clientes</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'sair'%}">Sair</a>
+                </div>
             </div>
-            <div class="form-inline my-2 my-lg-0">
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{user}}</a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{% url 'cadastro_cliente'%}">Cadastrar Cliente</a>
-                            <a class="dropdown-item" href="{% url 'clientes'%}">Visualizar Clientes</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'sair'%}">Sair</a>
+            <!-- Page content wrapper-->
+            <div id="page-content-wrapper">
+                <!-- Top navigation-->
+                <nav class="navbar navbar-expand-lg navbar-light bg-nav border-bottom">
+                    <div class="container-fluid">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNUlEQVR4nO2WvUoDQRSFv5ewUBOxtIiVKfUBBA0+R0zis9gpBgtLe3/eJCv2inZu7ExQFm4giDN75u5GUuTAKXaZ4eP+zJ2BlZZQW0AfeAQy4NOc2b8e0KwTuAlcAhPgu8RT4BbYrgo9AcYC8LdzoOOFnlkEqdD56AeeSKcVoPNwOfKGM72xtG8o4OsaoTNfKUemrHvfgD1gPwE8sUwG1RegLVvbToz6NAZ+EKEt+04B38XAz4FN78CurdkBXh11zmLgPLCpqKmqUO3zRYMPPOAnMdUvjlSPlrK5egs8Tt0YuCkOkHakln/5q2yAFBo66lfmC8SLP9TdHn8A64g6FF8cyrV4rEJnGtTwEChmv0sdZ9qL9B5RUWvAuXWmEuVNSk0VNexqu7cpNDaPbDh0lSOzEv+tH+YHlQGe3ZAGAAAAAElFTkSuQmCC" id="sidebarToggle" ></img>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                                {% if user.is_authenticated %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAADlklEQVR4nO2ZyU8UQRTGfxCiETUxbnBRFi+uYY0mHgn+CTJ4dCMcBAUTEbebuN2EeDPqxXhwARQYNKjEiRC8EvFg/Au8cDBhEcZUfJO8NN3T1dM9M4TwJS+Bmlf1fdVd9erVa1jH2kIxUAs0A21Al1ibtNWKz6rCPuAmkAAWgKSPGZ8vwA2gMp/CTwAfgWUL0V62DIwBjbkUfgj47CFoCZgBXgO9wF2xXmmbER+3vp+Ag9kUXgh0uywT838/cBLYYTHOTiAGDHiMdRUoiFr8FmDYhewhsCfEuHuBPpeJvBPOSGCe2DcHgdmEB6Ii4P/SSTg4poQ7FLY6xJtNdxsoInoUAXccQWEqzJsodCybv8BZy76lEvc7gQ7527TZ4LxwpXjfZronuh1P3kZ8HTDqEWlMWxyosZxEUtmVTEKl3lhm2fjhkuPJedki0G4x3j3VZz7onht3bNgiC/FBDzG/SRjOr8rfHHjWJ2yQmddZPnm3N1HtM/Zhx0posJnAmOpg4rwf4iFSiWGL8R8p/w82iVkqjC1YHFKlaVIDG1sCSnw4ytRbMNrK0znfUoOb9MAPzSHEp6zJgmdQ+V9L55gIOPDlCCbQacFzSvmbAOOKYvWqliwTs1xNYJda2iawbHJzqlWDfscOuVpCBj9Un2o/MW+wQxSbeLcl14DfpNsChs8URkJMYCgAT5/qd8Ev9+kJMHCNHEpBxZs+VQF4elRfo3UFriuH+wTDxQwm4PoU0+CBXyjV+cxTgqPd8k0sZiDe4JlfHhXLcG1qVEt64JVODwVcNl57zdy/V6BeOfwkHErkgXSINQWINl74pfSZkL8CG4E55ZQ258gxypSuOdHqCp1/nw5RWoy5lBZj8pvrKeqDM477iSd0KDVpsg0qJYIl5Jj328Tz4msiSYUlx6jt9bJcRZJluVp6oVEGDltajPtcVI4ojkVZTmnxQhE8dvnd3NDehxDtZXFgvwvfE+XzHAvUO0LfcWk3pY0W4E8WxCfVBu2Sko7BMcd19SiW0PWgaWAb8CqLwpMOeymc045yY6Ca5azq/DuH4pMunLOZ1GBb8iA66WHnyAAFci/Ot/j+MOV2czBN5lH8ZBTf1LYDE3kQPyHckWCzo7SRbRsUzkhRIBUEm3QhU5sXjsg/MTlPYp2bRGWjEX/18UWDXDLC5kIjtkXbbKFCjv/xANnouPSpYJVhg1wZzQ2sVd0HWqWtSnzWsWbwD+k2XbPQpe5oAAAAAElFTkSuQmCC">{{user}}</a>
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{% url 'cadastro_cliente'%}">Action</a>
+                                        <a class="dropdown-item" href="{% url 'clientes'%}">Another action</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{% url 'sair'%}">Something else here</a>
+                                    </div>
+                                </li>
+                                {% endif %}
+                            </ul>
                         </div>
-                    </li>
-                    {% endif %}
-                </ul>
+                    </div>
+                </nav>
+                <!-- Page content-->
+                <div class="container-fluid">
+                    {% block 'body' %}
+        
+                    {% endblock %}
+                </div>
             </div>
-          </div>
-        </nav>
-        <!-- Page content-->
-        
-          {% block 'body' %}
-        
-          {% endblock %}
-       
-    </div>
-</div>
-  
-   <!-- Footer -->
-<footer class="page-footer font-small teal pt-4">
-
-  <!-- Footer Text -->
-  <div class="container-fluid text-center text-md-left">
-
-    <!-- Grid row -->
-    <div class="row">
-
-      <!-- Grid column -->
-      <div class="col-md-6 mt-md-0 mt-3">
-
-        <!-- Content -->
-
-
-      </div>
-      <!-- Grid column -->
-
-      <hr class="clearfix w-100 d-md-none pb-3">
-
-      <!-- Grid column -->
-      <div class="col-md-6 mb-md-0 mb-3">
-
-        <!-- Content -->
-
-   
-
-      </div>
-      <!-- Grid column -->
-
-    </div>
-    <!-- Grid row -->
-
-  </div>
-  <!-- Footer Text -->
-
-  <!-- Copyright -->
-  <div class="footer-copyright text-center py-3">© 2022 Copyright:
-    <a href="https://github.com/santosgv" target="_blank"> https://github.com/santosgv</a>
-  </div>
-  <!-- Copyright -->
-
-</footer>
-<!-- Footer -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </body>
+        </div>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'Unidades/js/scripts.js' %}"></script>
+    </body>
 </html>

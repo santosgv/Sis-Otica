@@ -53,4 +53,4 @@ def cadastro_cliente(request):
         FOTO=FOTO)
         cliente.save()
 
-        return render(request,'cadastro_cliente.html')
+        return render(request,'clientes.html',{'clientes':clientes})
