@@ -12,7 +12,7 @@
 
 {% block 'body'%}
 <nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
     <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
     <li class="breadcrumb-item"><a href="{% url 'clientes'%}">Clientes</a></li>
     <li class="breadcrumb-item active" aria-current="page">Cadastro de Clientes</li>
@@ -21,13 +21,10 @@
     <section class="container-fluid text-center">
       <div class="form_">
         <div class="text-center">
-          <form method="POST" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
-            <div class="form-group">
-                <label for="exampleFormControlFile1">Anexa Foto</label>
-                <input type="file" class="form-control-file" id="FOTO">
-              </div>
-
-            </div>
+          <label for="" class="titulo">Cadastro cliente</label>
+        </div>
+          <form method="POST" class="form_cliente" action="{% url 'cadastro_cliente'%}">{% csrf_token %}
+            
             <div class="form-group">
                 <label for="NOME">Nome</label>
                 <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao">

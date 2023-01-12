@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 
 <title>{% block 'title' %}
-  Clientes
+  O.S
   {% endblock %}</title>
 {% endblock %}
 
@@ -14,7 +14,7 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
     <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Clientes</li>
+    <li class="breadcrumb-item active" aria-current="page">O.S</li>
   </ol>
 </nav>
 <div class="text-center">
@@ -27,36 +27,45 @@
                 <table id="myTable" class="table table-hover">
                     <tr class="thead">
                         <th scope="col">ID</th>
-                        <th scope="col">NOME</th>
-                        <th scope="col">LOGRADOURO</th>
-                        <th scope="col">NUMERO</th>
-                        <th scope="col">BAIRRO</th>
-                        <th scope="col">CIDADE</th>
-                        <th scope="col">CPF</th>
-                        <th scope="col">EMAIL</th>
-                        <th scope="col">TELEFONE</th>
+                        <th scope="col">TRATAMENTO</th>
+                        <th scope="col">CLIENTE</th>
+                        <th scope="col">VENDEDOR</th>
+                        <th scope="col">LENTES</th>
+                        <th scope="col">DATA</th>
+                        <th scope="col">STATUS</th>
+                        <th scope="col">OBSERVAÇAO</th>
+                        <th scope="col">PREVISÂO ENTREGA</th>
                       </tr>
-                      {% for cliente in clientes %}
+                      {% for Os in Ordem_servicos %}
                       <tbody>
                         <tr>
-                          <th hidden id="id" name="id">{{cliente.id}}</th>
-                          <th scope="row"><a href="{% url 'cliente' cliente.id  %}">{{cliente.id}}</a></th>
-                          <td >{{cliente.NOME}}</td>
-                          <td>{{cliente.LOGRADOURO}}</td>
-                          <td>{{cliente.NUMERO}}</td>
-                          <td>{{cliente.BAIRRO}}</td>
-                          <td>{{cliente.CIDADE}}</td>
-                          <td>{{cliente.CPF}}</td>
-                          <td>{{cliente.EMAIL}}</td>
-                          <td>{{cliente.TELEFONE}}</td>
+                          <th hidden id="id" name="id">{{Os.id}}</th>
+                          <th scope="row">{{Os.id}}</th>
+                          <td >{{Os.TRATAMENTO}}</td>
+                          <td>{{Os.CLIENTE}}</td>
+                          <td>{{Os.VENDEDOR}}</td>
+                          <td>{{Os.LENTES}}</td>
+                          <td>{{Os.DATA}}</td>
+                          <td>
+                            {% if Os.STATUS == "A" %}
+                            <span class="badge badge-info">EM ABERTO</span>
+                            {% endif %}
+
+                            {% if Os.STATUS == "E" %}
+                            <span class="badge badge-success">ENCERRADO</span>
+                             {% endif %}
+
+                             {% if Os.STATUS == "C" %}
+                             <span class="badge badge-danger">CANCELADO</span>
+                             {% endif %}
+                          </td>
+                          <td>{{Os.OBSERVAÇAO}}</td>
+                          <td>{{Os.PREVISAO_ENTREGA}}</td>
                         </tr>
                 
                       </tbody>
                       {% endfor%}
                 </table>
-            </div>
-            <div class="btn-continuar">
-              <a type="button" class="btn btn-primary" href="{% url 'cadastro_cliente'%}">Continuar</a>
             </div>
             <div class="pagination">
               

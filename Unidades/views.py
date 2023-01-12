@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from Autenticacao.models import ORDEN,CLIENTE
 from Unidades.models import CLIENTE_EXAME
@@ -8,7 +9,6 @@ from django.core.paginator import Paginator
 def home(request):
     OS = ORDEN.objects.all()
     return render(request,'home.html',{'OS':OS})
-
 
 def clientes(request):
     cliente_lista = CLIENTE.objects.all().order_by('NOME')
@@ -37,8 +37,7 @@ def cadastro_cliente(request):
         CPF = request.POST.get('CPF')
         DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
         EMAIL = request.POST.get('EMAIL')
-        EXAME = request.POST.get('EXAME')
-        FOTO =  request.POST.get('FOTO')       
+             
        
         cliente =CLIENTE(NOME=NOME,
         LOGRADOURO=LOGRADOURO,
@@ -48,9 +47,22 @@ def cadastro_cliente(request):
         TELEFONE=TELEFONE,
         CPF=CPF,
         DATA_NASCIMENTO=DATA_NASCIMENTO,
-        EMAIL=EMAIL,
-       
-        FOTO=FOTO)
+        EMAIL=EMAIL)
         cliente.save()
 
         return render(request,'clientes.html',{'clientes':clientes})
+
+def Cliente(request,id):
+    cliente = CLIENTE.objects.get(id=id)
+    return render(request,'cliente.html',{'cliente':cliente})
+
+def Lista_Os(request):
+    Lista_os = ORDEN.objects.all().order_by('id')
+
+    pagina = Paginator(Lista_os, 10)
+
+    page = request.GET.get('page')
+
+    Ordem_servicos = pagina.get_page(page)
+
+    return render(request,'Lista_Os.html',{'Ordem_servicos':Ordem_servicos})

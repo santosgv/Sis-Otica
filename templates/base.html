@@ -11,6 +11,7 @@
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{% static 'Unidades/assets/favicon.ico' %}" />
         <!-- Core theme CSS (includes Bootstrap)-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="{% static 'Unidades/css/styles.css' %}" rel="stylesheet" />
         {% block 'head' %}
     
@@ -25,7 +26,7 @@
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'home'%}">Inicio</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Caixa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Venda</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Pesquisa</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Lista_Os'%}">Pesquisa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Dashboard</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Outros</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Minhas Vendas</a>
