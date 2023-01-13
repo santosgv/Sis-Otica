@@ -75,7 +75,7 @@ class ORDEN(models.Model):
     FILIAL= models.ForeignKey(UNIDADE, on_delete=models.DO_NOTHING)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.DO_NOTHING)
-    DATA = models.DateTimeField(default=datetime.datetime.now())
+    DATA = models.DateTimeField(default=datetime.date.today())
     LENTES = models.CharField(max_length=500)
     LONGE = models.ForeignKey(LONGE, on_delete=models.DO_NOTHING)
     PERTO = models.ForeignKey(PERTO, on_delete=models.DO_NOTHING)

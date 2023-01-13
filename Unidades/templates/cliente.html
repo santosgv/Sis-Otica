@@ -11,7 +11,73 @@
 {% endblock %}
 
 {% block 'body'%}
-<div class="text-center">
-    <p class="card-text">{{cliente.NOME}}</p>
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'clientes'%}">Clientes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Editar Cliente</li>
+  </ol>
+</nav>
+<section class="container-fluid text-center">
+  <div class="form_">
+    <div class="text-center">
+      <label for="" class="titulo">Cadastro cliente</label>
+    </div>
+      <form method="POST" class="form_cliente" action="{% url 'Edita_cliente' cliente.id %}">{% csrf_token %}
+        <div class="col-sm-10">
+          <input type="text" readonly class="form-control-plaintext" name="ID" id="ID" value="{{cliente.id}}">
+        </div>
+        <div class="form-group">
+            <label for="NOME">Nome</label>
+            <input type="text" class="form-control" name="NOME" id="NOME" value="{{cliente.NOME}}" placeholder="Ex: Joao">
+          </div>
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label for="inputEmail4">Email</label>
+            <input type="email" class="form-control" name="EMAIL" id="EMAIL" value="{{cliente.EMAIL}}" placeholder="Email">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="Telefone">Telefone</label>
+            <input type="text" class="form-control" data-mask="(00)00000-0000" id="TELEFONE" value="{{cliente.TELEFONE}}" name="TELEFONE" placeholder="Telefone">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="CPF">CPF</label>
+            <input type="text" class="form-control" data-mask="000.000.000-00" id="CPF"  value="{{cliente.CPF}}" name="CPF" placeholder="CPF">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="DATA_NASCIMENTO">Data Nascimento</label>
+            <input type="date" class="form-control"  id="DATA_NASCIMENTO" value="{{cliente.DATA_NASCIMENTO}}" name="DATA_NASCIMENTO">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="LOGRADOURO">Logradouro</label>
+          <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" value="{{cliente.LOGRADOURO}}" placeholder="1234 Main St">
+        </div>
+        <div class="row">
+            <div class="form-group col-md-2">
+                <label for="NUMERO">Numero</label>
+                <input type="text" class="form-control" id="NUMERO" value="{{cliente.NUMERO}}" name="NUMERO">
+              </div>
+          <div class="form-group col-md-4">
+            <label for="BAIRRO">Bairo</label>
+            <input type="text" class="form-control" id="BAIRRO" value="{{cliente.BAIRRO}}" name="BAIRRO">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="CIDADE">Cidade</label>
+            <select id="CIDADE" name="CIDADE"  class="form-control">
+              <option selected>{{cliente.BAIRRO}}</option>
+              <option>Contagem</option>
+              <option>...</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-form">
+          <a href="{% url 'Edita_cliente' cliente.id  %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'excluir_cliente' cliente.id  %}" class="btn btn-primary">Excluir</a>
+      </div>
+      </form>   
+    </div>
+  </div>
+</section>
+
 {% endblock %}

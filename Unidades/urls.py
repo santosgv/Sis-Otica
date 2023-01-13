@@ -9,6 +9,8 @@ urlpatterns = [
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
+    path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
+    path('excluir_cliente/<int:id>',views.excluir_cliente,name='excluir_cliente'),
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
 ]
 
