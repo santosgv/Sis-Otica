@@ -27,7 +27,7 @@
             
             <div class="form-group">
                 <label for="NOME">Nome</label>
-                <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao">
+                <input type="text" class="form-control" name="NOME" id="NOME" placeholder="Ex: Joao" required>
               </div>
             <div class="row">
               <div class="form-group col-md-4">
@@ -36,11 +36,11 @@
               </div>
               <div class="form-group col-md-4">
                 <label for="Telefone">Telefone</label>
-                <input type="text" class="form-control" data-mask="(00)00000-0000" id="TELEFONE" name="TELEFONE" placeholder="Telefone">
+                <input type="text" class="form-control" data-mask="(00)00000-0000" id="TELEFONE" name="TELEFONE" placeholder="Telefone" required>
               </div>
               <div class="form-group col-md-2">
                 <label for="CPF">CPF</label>
-                <input type="text" class="form-control" data-mask="000.000.000-00" id="CPF" name="CPF" placeholder="CPF">
+                <input type="text" class="form-control" data-mask="000.000.000-00" id="CPF" name="CPF" placeholder="CPF" required>
               </div>
               <div class="form-group col-md-2">
                 <label for="DATA_NASCIMENTO">Data Nascimento</label>
@@ -49,28 +49,24 @@
             </div>
             <div class="form-group">
               <label for="LOGRADOURO">Logradouro</label>
-              <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="1234 Main St">
+              <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="Main St" required>
             </div>
             <div class="row">
                 <div class="form-group col-md-2">
                     <label for="NUMERO">Numero</label>
-                    <input type="text" class="form-control" id="NUMERO" name="NUMERO">
+                    <input type="text" class="form-control" id="NUMERO" name="NUMERO" placeholder="1234" required>
                   </div>
               <div class="form-group col-md-4">
-                <label for="BAIRRO">Bairo</label>
-                <input type="text" class="form-control" id="BAIRRO" name="BAIRRO">
+                <label for="BAIRRO">Bairro</label>
+                <input type="text" class="form-control" id="BAIRRO" name="BAIRRO"  placeholder="Centro" required>
               </div>
               <div class="form-group col-md-6">
                 <label for="CIDADE">Cidade</label>
-                <select id="CIDADE" name="CIDADE" class="form-control">
-                  <option selected>Belo Horizonte</option>
-                  <option>...</option>
-                  <option>...</option>
-                </select>
+                <input id="CIDADE" name="CIDADE" class="form-control" placeholder="Ex .: Belo Horizonte"  required>
               </div>
             </div>
             <div class="btn-form">
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="submit" class="btn btn-success">Cadastrar</button>
           </div>
           </form>   
         </div>

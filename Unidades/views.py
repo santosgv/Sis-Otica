@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render,get_object_or_404
 from Autenticacao.models import ORDEN,CLIENTE
-from Unidades.models import CLIENTE_EXAME
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
@@ -50,7 +49,7 @@ def cadastro_cliente(request):
         DATA_NASCIMENTO=DATA_NASCIMENTO,
         EMAIL=EMAIL)
         cliente.save()
-
+        messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/clientes')
 
 @login_required(login_url='logar')
@@ -63,21 +62,24 @@ def Cliente(request,id):
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
-        return render(request,'cliente.html',{'cliente':cliente})
-
+        print('GET')
+        return render(request,'edita_cliente.html',{'cliente':cliente})
     else:
-        cliente_edita = CLIENTE.objects.get(id=id)
-        cliente_edita.NOME = request.POST.get('NOME')
-        cliente_edita.LOGRADOURO = request.POST.get('LOGRADOURO')
-        cliente_edita.NUMERO = request.POST.get('NUMERO')
-        cliente_edita.BAIRRO = request.POST.get('BAIRRO')
-        cliente_edita.CIDADE = request.POST.get('CIDADE')
-        cliente_edita.TELEFONE = request.POST.get('TELEFONE')
-        cliente_edita.CPF = request.POST.get('CPF')
-        cliente_edita.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
-        cliente_edita.EMAIL = request.POST.get('EMAIL')
-        cliente_edita.save()
-        return render(request,'cliente.html',{'cliente':cliente})
+        cliente = CLIENTE.objects.get(id=id)
+        cliente.NOME = request.POST.get('NOME')
+        cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
+        cliente.NUMERO = request.POST.get('NUMERO')
+        cliente.BAIRRO = request.POST.get('BAIRRO')
+        cliente.CIDADE = request.POST.get('CIDADE')
+        cliente.TELEFONE = request.POST.get('TELEFONE')
+        cliente.CPF = request.POST.get('CPF')
+        cliente.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
+        cliente.EMAIL = request.POST.get('EMAIL')
+        cliente.save()
+        messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
+    return render(request,'edita_cliente.html',{'cliente':cliente})
+
+
 
 @login_required(login_url='logar')
 def excluir_cliente(request,id):

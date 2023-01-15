@@ -1,6 +1,7 @@
 from django.db import models
-import datetime
+
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import now
 from Unidades.models import UNIDADE,CLIENTE,PERTO,LONGE
 
 
@@ -75,7 +76,7 @@ class ORDEN(models.Model):
     FILIAL= models.ForeignKey(UNIDADE, on_delete=models.DO_NOTHING)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.DO_NOTHING)
-    DATA = models.DateTimeField(default=datetime.date.today())
+    DATA = models.DateTimeField(default=now)
     LENTES = models.CharField(max_length=500)
     LONGE = models.ForeignKey(LONGE, on_delete=models.DO_NOTHING)
     PERTO = models.ForeignKey(PERTO, on_delete=models.DO_NOTHING)

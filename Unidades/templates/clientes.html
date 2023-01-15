@@ -20,10 +20,19 @@
 <div class="text-center">
   <nav class="navbar navbar-light bg-white">
     <form class="form-inline">
-      <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Usuario" aria-label="Search">
+      <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Nome" aria-label="Search">
  
     </form>
   </nav>
+            <div class="text-center">
+              {% if messages %}
+                  {% for message in messages %}
+                      <div class="alert {{message.tags}}">
+                          {{message}}
+                      </div>
+                  {% endfor %}
+              {% endif %}
+          </div>
                 <table id="myTable" class="table table-hover">
                     <tr class="thead">
                         <th scope="col">ID</th>
