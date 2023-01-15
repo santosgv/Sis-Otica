@@ -79,8 +79,6 @@ def Edita_cliente(request,id):
         messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
     return render(request,'edita_cliente.html',{'cliente':cliente})
 
-
-
 @login_required(login_url='logar')
 def excluir_cliente(request,id):
     excluir = CLIENTE.objects.get(id=id)
@@ -89,6 +87,7 @@ def excluir_cliente(request,id):
 
 @login_required(login_url='logar')
 def Lista_Os(request):
+
     Lista_os = ORDEN.objects.all().order_by('id')
 
     pagina = Paginator(Lista_os, 10)
@@ -98,3 +97,7 @@ def Lista_Os(request):
     Ordem_servicos = pagina.get_page(page)
 
     return render(request,'Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+
+
+def Cadastrar_os(request):
+    return render(request,'cadastrar_os.html')
