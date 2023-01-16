@@ -3,13 +3,96 @@
 {% load static %}
 
 {% block 'head' %}
-<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 <title>{% block 'title' %}
-  Cadastro de O.S
-  {% endblock %}</title>
+Cadastrar O.S
+   {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
-<h1>Teste</h1>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Lista_Os'%}">O.S</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cadastro de O.S</li>
+  </ol>
+</nav>
+    <section class="container-fluid text-center">
+      <div class="form_">
+        <div class="text-center">
+          <label for="" class="titulo">Cadastrar O.S</label>
+        </div>
+          <form method="POST" class="form_cliente" action="{% url 'Cadastrar_os'%}">{% csrf_token %}
+            <div class="form-row align-items-center">
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInput">FILIAL</label>
+              <input type="text" class="form-control mb-2" value="{{user.UNIDADE}}" placeholder="filial" id="FILIAL" name="FILIAL" readonly>
+            </div>
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInput">VENDEDOR</label>
+              <input type="text" class="form-control mb-2" value="{{user}}" placeholder="VENDEDOR" id="VENDEDOR" name="VENDEDOR" readonly>
+            </div>
+            <select class="custom-select mb-2" id="inlineFormCustomSelect">
+              <option selected>Choose...</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="inputEmail4">LENTES</label>
+              <input type="email" class="form-control" id="inputEmail4">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="inputPassword4">ARMACAO</label>
+              <input type="text" class="form-control" id="inputPassword4">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputAddress">TRATAMENTO</label>
+            <input type="text" class="form-control" id="inputAddress">
+          </div>
+          <div class="form-group">
+            <label for="inputAddress2">OBSERVACAO</label>
+            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="inputCity">VALOR</label>
+              <input type="text" class="form-control" id="inputCity">
+            </div>
+            <div class="form-group col-md-4">
+              <label for="inputState">FORMA DE PAGAMENTO</label>
+              <select id="inputState" class="form-control">
+                <option selected>Choose...</option>
+                <option>...</option>
+              </select>
+            </div>
+            <div class="form-group col-md-2">
+              <label for="inputZip">Zip</label>
+              <input type="text" class="form-control" id="inputZip">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gridCheck">
+              <label class="form-check-label" for="gridCheck">
+                Check me out
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Sign in</button>
+          </form>   
+        </div>
+      </div>
+    </section>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+	<script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
+
+
 {% endblock %}
