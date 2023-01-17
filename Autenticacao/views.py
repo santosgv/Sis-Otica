@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
+from .models import USUARIO
 from django.contrib import auth
 import os
 from django.conf import settings
@@ -32,7 +33,7 @@ def cadastro(request):
             messages.add_message(request, constants.ERROR, 'Preencha todos os campos')
             return redirect('/auth/cadastro')
         
-        user = User.objects.filter(username=username)
+        user = USUARIO.objects.filter(username=username)
         
         if user.exists():
             messages.add_message(request, constants.ERROR, 'Já existe um usário com esse username')
