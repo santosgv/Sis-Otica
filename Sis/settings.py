@@ -20,7 +20,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 USE_L10N = False
 
-DATE_FORMAT = "d-m-Y"
+DATE_FORMAT = "Y-m-d"
 
 
 # Application definition
