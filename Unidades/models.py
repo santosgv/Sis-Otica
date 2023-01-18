@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils.timezone import now
 
 
 
@@ -73,14 +73,8 @@ class CLIENTE(models.Model):
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
+    DATA_CADASTRO = models.DateField(default=now)
 
     def __str__(self) -> str:
         return str(self.NOME)
 
-class CLIENTE_EXAME(models.Model):
-    CLIENTE = models.ForeignKey (CLIENTE,on_delete=models.CASCADE)
-    LONGE = models.ForeignKey(LONGE , on_delete=models.CASCADE)
-    PERTO = models.ForeignKey(PERTO, on_delete=models.CASCADE)
-
-    def __str__(self) -> str:
-        return str(self.id)

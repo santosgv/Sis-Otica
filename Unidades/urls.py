@@ -12,7 +12,7 @@ urlpatterns = [
     path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
     path('excluir_cliente/<int:id>',views.excluir_cliente,name='excluir_cliente'),
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
-    path('Cadastrar_os',views.Cadastrar_os,name='Cadastrar_os')
+    path('Cadastrar_os/<int:id_cliente>',views.Cadastrar_os,name='Cadastrar_os')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -23,7 +23,7 @@ Cadastrar O.S
         <div class="text-center">
           <label for="" class="titulo">Cadastrar O.S</label>
         </div>
-          <form method="POST" class="form_cliente" action="{% url 'Cadastrar_os'%}">{% csrf_token %}
+          <form method="POST" class="form_cliente">{% csrf_token %}
             <div class="form-row align-items-center">
             <div class="col-auto">
               <label class="sr-only" for="inlineFormInput">FILIAL</label>
@@ -33,12 +33,10 @@ Cadastrar O.S
               <label class="sr-only" for="inlineFormInput">VENDEDOR</label>
               <input type="text" class="form-control mb-2" value="{{user}}" placeholder="VENDEDOR" id="VENDEDOR" name="VENDEDOR" readonly>
             </div>
-            <select class="custom-select mb-2" id="inlineFormCustomSelect">
-              <option selected>Choose...</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
-            </select>
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInput">CLIENTE</label>
+              <input type="text" class="form-control mb-2" value="{{cliente.NOME}}" placeholder="VENDEDOR" id="VENDEDOR" name="VENDEDOR" readonly>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group col-md-6">

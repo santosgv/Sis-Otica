@@ -23,6 +23,9 @@
       <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Nome" aria-label="Search">
  
     </form>
+    <div class="btn-continuar">
+      <a type="button" class="btn btn-primary" href="{% url 'cadastro_cliente'%}">Cadastrar cliente</a>
+    </div>
   </nav>
             <div class="text-center">
               {% if messages %}
@@ -35,7 +38,6 @@
           </div>
                 <table id="myTable" class="table table-hover">
                     <tr class="thead">
-                        <th scope="col">ID</th>
                         <th scope="col">NOME</th>
                         <th scope="col">LOGRADOURO</th>
                         <th scope="col">NUMERO</th>
@@ -44,13 +46,13 @@
                         <th scope="col">CPF</th>
                         <th scope="col">EMAIL</th>
                         <th scope="col">TELEFONE</th>
+                        <th scope="col">AÇAO</th>
                       </tr>
                       {% for cliente in clientes %}
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
-                          <th scope="row"><a href="{% url 'cliente' cliente.id  %}">{{cliente.id}}</a></th>
-                          <td >{{cliente.NOME}}</td>
+                          <th scope="row"><a href="{% url 'cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
                           <td>{{cliente.LOGRADOURO}}</td>
                           <td>{{cliente.NUMERO}}</td>
                           <td>{{cliente.BAIRRO}}</td>
@@ -58,15 +60,14 @@
                           <td>{{cliente.CPF}}</td>
                           <td>{{cliente.EMAIL}}</td>
                           <td>{{cliente.TELEFONE}}</td>
+                          <td><a href="{% url 'Cadastrar_os' cliente.id %}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a></td>
                         </tr>
                 
                       </tbody>
                       {% endfor%}
                 </table>
             </div>
-            <div class="btn-continuar">
-              <a type="button" class="btn btn-primary" href="{% url 'cadastro_cliente'%}">Continuar</a>
-            </div>
+            
             <div class="pagination">
               
               <samp class="step-links">

@@ -99,5 +99,7 @@ def Lista_Os(request):
     return render(request,'Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
 
-def Cadastrar_os(request):
-    return render(request,'cadastrar_os.html')
+def Cadastrar_os(request,id_cliente):
+    cliente = CLIENTE.objects.get(id=id_cliente)
+
+    return render(request,'cadastrar_os.html',{'cliente':cliente})

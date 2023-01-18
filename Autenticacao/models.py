@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import now
 from Unidades.models import UNIDADE,CLIENTE,PERTO,LONGE
@@ -19,7 +18,6 @@ class USUARIO(AbstractUser):
         ('G','Gerente'),
     )
 
-    NOME = models.CharField(max_length=100,blank=True, null=True)
     CPF = models.CharField(blank=True, max_length=18)
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     STATUS = models.CharField(max_length=1, choices=CHOICES_SITUACAO, default="A")
@@ -27,7 +25,7 @@ class USUARIO(AbstractUser):
     UNIDADE = models.ForeignKey(UNIDADE,on_delete=models.DO_NOTHING,blank=True, null=True)
 
     def __str__(self) -> str:
-        return str(self.NOME)
+        return str(self.first_name)
 
 
 class Ativacao(models.Model):
