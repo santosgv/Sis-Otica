@@ -10,8 +10,8 @@ Repositório para o Projeto SIS ótica
 
 # Como rodar o projeto?
 
-ˋˋˋ
-git clone https://github.com/santosgv/Sis-Otica.git
+
+`git clone https://github.com/santosgv/Sis-Otica.git`
 cd Sis-Otica
 python -m venv .venv
 source .venv/bin/activate
@@ -19,4 +19,3 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser --username="admin" --email=""
 python manage.py runserver
-ˋˋˋ
