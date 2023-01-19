@@ -24,64 +24,66 @@ Cadastrar O.S
           <label for="" class="titulo">Cadastrar O.S</label>
         </div>
           <form method="POST" class="form_cliente">{% csrf_token %}
-            <div class="form-row align-items-center">
-            <div class="col-auto">
-              <label class="sr-only" for="inlineFormInput">FILIAL</label>
-              <input type="text" class="form-control mb-2" value="{{user.UNIDADE}}" placeholder="filial" id="FILIAL" name="FILIAL" readonly>
+            <div class="form-group">
+              <input type="file" class="form-control-file" id="exampleFormControlFile1">
             </div>
-            <div class="col-auto">
-              <label class="sr-only" for="inlineFormInput">VENDEDOR</label>
-              <input type="text" class="form-control mb-2" value="{{user}}" placeholder="VENDEDOR" id="VENDEDOR" name="VENDEDOR" readonly>
+            <div class="row">
+              <div class="form-group col-md-4">
+                <label for="FILIAL">FILIAL</label>
+                <input readonly class="form-control" id="FILIAL" name="FILIAL" value="{{user.UNIDADE}}" >
+              </div>
+              <div class="form-group col-md-4">
+                <label for="VENDEDOR">VENDEDOR</label>
+                <input readonly class="form-control" id="VENDEDOR" name="VENDEDOR" value="{{user.first_name}}" >
+              </div>
+              <div class="form-group col-md-4">
+                <label for="CLIENTE">CLIENTE</label>
+                <input readonly class="form-control" id="CLIENTE" name="CLIENTE" value="{{cliente.NOME}}" >
+              </div>
+          
             </div>
-            <div class="col-auto">
-              <label class="sr-only" for="inlineFormInput">CLIENTE</label>
-              <input type="text" class="form-control mb-2" value="{{cliente.NOME}}" placeholder="VENDEDOR" id="VENDEDOR" name="VENDEDOR" readonly>
+            
+            <div class="form-group row">
+              <label for="NUMERO">LONGE</label>
+              <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
+              <div class="col-sm-2">
+                <input type="text" class="form-control" placeholder="ESF">
+              </div>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="CIL">
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="inputEmail4">LENTES</label>
-              <input type="email" class="form-control" id="inputEmail4">
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="EIXO">
             </div>
-            <div class="form-group col-md-6">
-              <label for="inputPassword4">ARMACAO</label>
-              <input type="text" class="form-control" id="inputPassword4">
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="DNP">
             </div>
-          </div>
-          <div class="form-group">
-            <label for="inputAddress">TRATAMENTO</label>
-            <input type="text" class="form-control" id="inputAddress">
-          </div>
-          <div class="form-group">
-            <label for="inputAddress2">OBSERVACAO</label>
-            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="inputCity">VALOR</label>
-              <input type="text" class="form-control" id="inputCity">
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="AL">
             </div>
-            <div class="form-group col-md-4">
-              <label for="inputState">FORMA DE PAGAMENTO</label>
-              <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
-              </select>
+            
             </div>
-            <div class="form-group col-md-2">
-              <label for="inputZip">Zip</label>
-              <input type="text" class="form-control" id="inputZip">
+            <div class="form-group row">
+              <label for="NUMERO">PERTO</label>
+              <label for="inputEmail3" class="col-sm-1 col-form-label">OE</label>
+              <div class="col-sm-2">
+                <input type="text" class="form-control" placeholder="ESF">
+              </div>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="CIL">
             </div>
-          </div>
-          <div class="form-group">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="gridCheck">
-              <label class="form-check-label" for="gridCheck">
-                Check me out
-              </label>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="EIXO">
             </div>
-          </div>
-          <button type="submit" class="btn btn-primary">Sign in</button>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="DNP">
+            </div>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" placeholder="AL">
+            </div>
+            
+            </div>
+            <button type="submit" class="btn btn-success">Cadastrar</button>
           </form>   
         </div>
       </div>

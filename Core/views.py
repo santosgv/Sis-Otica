@@ -62,7 +62,6 @@ def Cliente(request,id):
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
-        print('GET')
         return render(request,'edita_cliente.html',{'cliente':cliente})
     else:
         cliente = CLIENTE.objects.get(id=id)
