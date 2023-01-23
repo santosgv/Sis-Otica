@@ -33,9 +33,12 @@ class ORDEN(models.Model):
     )
 
     CHOICES_PAGAMENTO =(
-        ('D','DINHEIRO'),
-        ('C','CARTAO'),
-        ('A','CARNER'),
+        ('A','PIX'),
+        ('B','DINHEIRO'),
+        ('C','DEBITO'),
+        ('D','CREDITO'),
+        ('E','CARNER'),
+        ('F','PERMUTA'),
     )
 
     FILIAL= models.ForeignKey(UNIDADE, on_delete=models.DO_NOTHING)

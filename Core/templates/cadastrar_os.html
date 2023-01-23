@@ -28,11 +28,11 @@ Cadastrar O.S
               <input type="file" class="form-control-file" id="exampleFormControlFile1">
             </div>
             <div class="row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-2">
                 <label for="FILIAL">FILIAL</label>
                 <input readonly class="form-control" id="FILIAL" name="FILIAL" value="{{user.UNIDADE}}" >
               </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-2">
                 <label for="VENDEDOR">VENDEDOR</label>
                 <input readonly class="form-control" id="VENDEDOR" name="VENDEDOR" value="{{user.first_name}}" >
               </div>
@@ -40,25 +40,38 @@ Cadastrar O.S
                 <label for="CLIENTE">CLIENTE</label>
                 <input readonly class="form-control" id="CLIENTE" name="CLIENTE" value="{{cliente.NOME}}" >
               </div>
-          
+              <div class="form-group col-md-2">
+                <label for="DATA_NASCIMENTO">Previsao Entrega</label>
+                <input type="date" class="form-control"  id="DATA_NASCIMENTO" name="DATA_NASCIMENTO">
+              </div>
             </div>
-					
-          <div class="form-group">
-            <label for="exampleFormControlSelect1">Tipo Serviço</label>
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option value="Encomendar">Encomendar</option>
-              <option value="Pronta entrega">Pronta entrega</option>
-            </select>
-
-            <label for="exampleFormControlSelect1">Tipo Serviço</label>
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option value="Encomendar">Óculos de Grau</option>
-              <option value="Pronta entrega">Conserto</option>
-              <option value="Pronta entrega">lente de contato</option>
-            </select>
-          </div>	
+            <hr>
+            <div class="row">
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="inputState">Tipo de Serviço</label>
+                  <select id="inputState" class="form-control">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="inputState">Sub Serviço</label>
+                  <select id="inputState" class="form-control">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="inputState">Serviço</label>
+                  <select id="inputState" class="form-control">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 								
-								<hr>
                 <label for="NUMERO">REICEITA</label>
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
@@ -92,11 +105,40 @@ Cadastrar O.S
                 <input type="text" class="form-control" placeholder="AD">
               </div>
             </div>
+            <div class="form-group">
+              <label for="exampleFormControlTextarea1">Lentes</label>
+              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
             <hr>
             <div class="text center">
+              <div class="row">
               <label for="NUMERO">FINANCEIRO</label>
+              <div class="form-group col-md-2">
+                <label for="inputState">Forma de Pagamento</label>
+                <select id="inputState" class="form-control">
+                  <option value="pix">PIX</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Debito">Debito</option>
+                  <option value="Credito">Credito</option>
+                  <option value="Carne">Carne</option>
+                  <option value="Permuta">Permuta</option>
+                </select>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="inputZip">Valor</label>
+                <input type="text" class="form-control" id="inputZip">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="inputZip">Quantidade de Parcela</label>
+                <input type="text" class="form-control" id="inputZip">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="inputZip">Entrada</label>
+                <input type="text" class="form-control" id="inputZip">
+              </div>
             </div>
-            <button type="submit" class="btn btn-success">Finalizar</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Finalizar</button>
           </form>   
         </div>
       </div>
