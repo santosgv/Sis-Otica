@@ -1,5 +1,5 @@
 # Sis-Otica
-Repositório para o Projeto SIS ótica
+Repositório para o Projeto SIS ótica !
 
 # Este projeto foi feito com:
 
