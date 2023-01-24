@@ -61,23 +61,25 @@ Cadastrar O.S
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="inputState">Tipo de Serviço</label>
-                  <select id="inputState" class="form-control">
-                    <option selected>Choose...</option>
-                    <option value="Encomenda">Encomenda</option>
-                    <option value="Pronta_entrega">Pronta Entrega</option>
+                  <select id="SERVICO" name="SERVICO" onChange="update()" class="form-control">
+                    <option selected>Escolha...</option>
+                     {% for servico in servicos %}
+                     <option value="{{servico.id}}">{{servico}}</option>
+                     {% endfor%}
                   </select>
                 </div>
                 <div class="form-group col-md-6">
                   <label for="inputState">Sub Serviço</label>
-                  <select id="inputState" class="form-control">
-                    <option selected>Choose...</option>
-                    <option>...</option>
+                  <select id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
+                    <option selected>Escolha...</option>
+                    {% for sub in sub_servicos %}
+                    <option value="{{sub}}">{{sub}}</option>
+                    {% endfor%}
                   </select>
                 </div>
               </div>
-             
             </div>
-								
+       
                 <label for="NUMERO">Receita</label>
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
@@ -128,8 +130,9 @@ Cadastrar O.S
               <div class="row">
               <label for="NUMERO">FINANCEIRO</label>
               <div class="form-group col-md-2">
-                <label for="inputState">Forma de Pagamento</label>
+                <label for="inputState">Pagamento</label>
                 <select id="inputState" class="form-control">
+                  <option selected>Escolha...</option>
                   <option value="pix">PIX</option>
                   <option value="Dinheiro">Dinheiro</option>
                   <option value="Debito">Debito</option>

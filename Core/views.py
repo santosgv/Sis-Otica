@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render,get_object_or_404
-from Core.models import ORDEN,CLIENTE
+from Core.models import ORDEN,CLIENTE,SERVICO, SUB_SERVICO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
@@ -99,6 +99,15 @@ def Lista_Os(request):
 
 
 def Cadastrar_os(request,id_cliente):
-    cliente = CLIENTE.objects.get(id=id_cliente)
-
-    return render(request,'cadastrar_os.html',{'cliente':cliente})
+    if request.method == "GET":
+        cliente = CLIENTE.objects.get(id=id_cliente)
+        servicos = SERVICO.objects.all()
+        sub_servicos=SUB_SERVICO.objects.all()
+        context = {'cliente':cliente,
+                    'servicos':servicos,
+                    'sub_servicos':sub_servicos,
+                                                }
+        return render(request,'cadastrar_os.html',context)
+    else:
+        print('salvo')
+        return render(request,'cadastrar_os.html')

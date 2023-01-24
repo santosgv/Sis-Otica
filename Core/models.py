@@ -60,3 +60,17 @@ class ORDEN(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class SERVICO(models.Model):
+    NOME = models.CharField(max_length=500)
+
+    def __str__(self):
+        return str(self.NOME)
+
+class SUB_SERVICO(models.Model):
+    SERVICO = models.ForeignKey(SERVICO,on_delete=models.CASCADE)
+    NOME = models.CharField(max_length=500)
+
+    def __str__(self):
+        return str(self.NOME)
+        
