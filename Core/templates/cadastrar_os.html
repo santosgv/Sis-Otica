@@ -5,17 +5,7 @@
 {% block 'head' %}
 
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
-<style>
-  .dropdown-submenu {
-    position: relative;
-  }
-  
-  .dropdown-submenu .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-top: -1px;
-  }
-  </style>
+
 <title>{% block 'title' %}
 Cadastrar O.S
    {% endblock %}</title>
@@ -64,7 +54,7 @@ Cadastrar O.S
                   <select id="SERVICO" name="SERVICO" onChange="update()" class="form-control">
                     <option selected>Escolha...</option>
                      {% for servico in servicos %}
-                     <option value="{{servico}}">{{servico}}</option>
+                     <option value="{{servico.NOME}}">{{servico.NOME}}</option>
                      {% endfor%}
                   </select>
                 </div>
@@ -72,9 +62,6 @@ Cadastrar O.S
                   <label for="inputState">Sub Serviço</label>
                   <select id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
                     <option selected>Escolha...</option>
-                    {% for sub in sub_servicos %}
-                    <option value="{{sub}}">{{sub}}</option>
-                    {% endfor%}
                   </select>
                 </div>
               </div>
