@@ -107,6 +107,7 @@ def Cadastrar_os(request,id_cliente):
                     'servicos':servicos,
                     'sub_servicos':sub_servicos,
                                                 }
+        print(sub_servicos[0].SERVICO)
         return render(request,'cadastrar_os.html',context)
     else:
         print('salvo')
