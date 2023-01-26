@@ -5,7 +5,8 @@ function update() {
 
 
   if (select.value =='Encomenda'){
-    OptionsList.splice(0,OptionsList.length);
+    Sub_Serviço.empty();
+    
      OptionsList = ["Óculos de Grau", "Conserto", "lente de contato"];
       OptionsList.forEach((opt) => {
       option = new Option(opt, opt.toLowerCase());
@@ -15,7 +16,7 @@ function update() {
   }
 
   if (select.value =='Pronta Entrega'){
-    OptionsList.splice(0,OptionsList.length);
+    Sub_Serviço.empty();
      OptionsList = ["óculos solar", "lente de contato", "outros"];
       OptionsList.forEach((opt) => {
       option = new Option(opt, opt.toLowerCase());

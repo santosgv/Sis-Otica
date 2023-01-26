@@ -1,9 +1,12 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render,get_object_or_404
-from Core.models import ORDEN,CLIENTE,SERVICO, SUB_SERVICO
+from Core.models import ORDEN,CLIENTE,SERVICO
+from Unidades.models import UNIDADE
+from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+import datetime
 
 
 def home(request):
@@ -97,18 +100,61 @@ def Lista_Os(request):
 
     return render(request,'Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
-
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.all()
-        sub_servicos=SUB_SERVICO.objects.all()
         context = {'cliente':cliente,
                     'servicos':servicos,
-                    'sub_servicos':sub_servicos,
                                                 }
-        print(sub_servicos[0].SERVICO)
+        
         return render(request,'cadastrar_os.html',context)
     else:
-        print('salvo')
-        return render(request,'cadastrar_os.html')
+        try:
+            ANEXO = request.POST.get('ANEXO')
+            FILIAL = request.POST.get('FILIAL')
+            VENDEDOR = request.POST.get('VENDEDOR')
+            CLIENTE_POST = request.POST.get('CLIENTE')
+            PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
+            SERVICO_POST =str(request.POST.get('SERVICO'))
+            SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
+            RECEITA = ('OD ESF: ',request.POST.get('OD_ESF'),
+                        'OD CIL:',request.POST.get('OD_CIL'),
+                        'OD EIXO: ',request.POST.get('OD_EIXO'),
+                        'OE ESF: ',request.POST.get('OE_ESF'),
+                        'OE CIL: ',request.POST.get('OE_CIL'),
+                        'OE EIXO: ',request.POST.get('OE_EIXO'),
+                        'AD: ',request.POST.get('AD'))
+            LENTES = request.POST.get('LENTES')
+            ARMACAO = request.POST.get('ARMACAO')
+            OBSERVACAO = request.POST.get('OBSERVACAO')
+            FORMA_PAG = request.POST.get('PAGAMENTO')
+            VALOR = request.POST.get('VALOR')
+            QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+            ENTRADA = request.POST.get('ENTRADA')
+
+            cadastrar_os = ORDEN(
+              ANEXO= ANEXO,
+              FILIAL= UNIDADE.objects.get(NOME=FILIAL),
+              VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
+              CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
+              PREVISAO_ENTREGA= PREVISAO_ENTREGA,
+              SERVICO= SERVICO.objects.get(NOME=SERVICO_POST),
+              SUB_SERVICO= SUB_SERVICO_POST,
+              RECEITA= RECEITA,
+              LENTES= LENTES,
+              ARMACAO= ARMACAO,
+              OBSERVACAO= OBSERVACAO,
+              FORMA_PAG= FORMA_PAG,
+              VALOR= VALOR,
+              QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
+              ENTRADA= ENTRADA     
+            )
+           
+            cadastrar_os.save()
+            messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
+            return render(request,'cadastrar_os.html')
+        except Exception as msg:
+            print(msg)
+            messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
+            return render(request,'cadastrar_os.html')

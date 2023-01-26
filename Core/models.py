@@ -41,22 +41,24 @@ class ORDEN(models.Model):
         ('F','PERMUTA'),
     )
 
+    STATUS = models.CharField(max_length=1 , choices=CHOICES_SITUACAO, default='A')
+    ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
     FILIAL= models.ForeignKey(UNIDADE, on_delete=models.DO_NOTHING)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.DO_NOTHING)
     DATA = models.DateTimeField(default=now)
-    LENTES = models.CharField(max_length=500)
-    RECEITA = models.TextField(max_length=2000)
-    ARMACAO = models.CharField(max_length=500)
-    TRATAMENTO = models.CharField(max_length=500)
-    OBSERVACAO = models.TextField(max_length=1000)
-    VALOR = models.FloatField()
-    FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO)
-    ENTRADA = models.FloatField()
     PREVISAO_ENTREGA = models.DateField()
+    SERVICO = models.ForeignKey('SERVICO',on_delete=models.DO_NOTHING)
+    SUB_SERVICO = models.CharField(max_length=500)
+    RECEITA = models.TextField(max_length=2000)
+    LENTES = models.CharField(max_length=500)
+    ARMACAO = models.CharField(max_length=500)
+    OBSERVACAO = models.TextField(max_length=1000)
+    FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO)
+    VALOR = models.FloatField()
     QUANTIDADE_PARCELA = models.IntegerField()
-    ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
-    STATUS = models.CharField(max_length=1 , choices=CHOICES_SITUACAO, default='A')
+    ENTRADA = models.FloatField()
+    
 
     def __str__(self):
         return str(self.id)
@@ -66,11 +68,3 @@ class SERVICO(models.Model):
 
     def __str__(self):
         return str(self.NOME)
-
-class SUB_SERVICO(models.Model):
-    SERVICO = models.ForeignKey(SERVICO,on_delete=models.CASCADE)
-    NOME = models.CharField(max_length=500)
-
-    def __str__(self):
-        return str(self.NOME)
-        
