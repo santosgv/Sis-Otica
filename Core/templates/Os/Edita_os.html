@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Editar O.S
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+      <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'Lista_Os'%}">Listar O.S</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Editar O.S</li>
+    </ol>
+  </nav>
+  <section class="container-fluid text-center">
+    <div class="text-center">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{message.tags}}">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <form method="POST" class="form_cliente">{% csrf_token %}
+        <div class="form-group">
+          <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
+        </div>
+        <div class="row">
+          <div class="form-group col-md-2">
+            <label for="FILIAL">Filial</label>
+            <input  class="form-control" id="FILIAL" name="FILIAL" value="#" >
+          </div>
+          <div class="form-group col-md-2">
+            <label for="VENDEDOR" >Vendedor</label>
+            <input  class="form-control"  id="VENDEDOR" name="VENDEDOR" value="#" >
+          </div>
+          <div class="form-group col-md-4">
+            <label for="CLIENTE">Cliente</label>
+            <input  class="form-control"  id="CLIENTE" name="CLIENTE" value="#" >
+          </div>
+          <div class="form-group col-md-2">
+            <label for="DATA_NASCIMENTO">Previsao Entrega</label>
+            <input required type="date" class="form-control" value="{{EDITAR_OS.PREVISAO_ENTREGA}}"  id="PREVISAO_ENTREGA" name="PREVISAO_ENTREGA">
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="inputState">Tipo de Serviço</label>
+              <select required id="SERVICO" name="SERVICO" onChange="update()" class="form-control">
+                <option selected>{{EDITAR_OS.SERVICO.NOME}}...</option>
+                        {% for servico in SERVICOS %}
+                     <option value="{{servico.NOME}}">{{servico.NOME}}</option>
+                     {% endfor%}
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="inputState">Sub Serviço</label>
+              <select required id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
+                <option selected>{{EDITAR_OS.SUB_SERVICO}}</option>
+              </select>
+            </div>
+          </div>
+        </div> 
+        <div class="form-group row">
+            <label for="NUMERO">Receita</label>
+          <input required class="form-control" value="{{EDITAR_OS.RECEITA}}"  id="RECEITA" name="RECEITA"  >
+        </div>
+        <div class="form-group col-md-12">
+          <label for="FILIAL">Lentes</label>
+          <input required class="form-control" value="{{EDITAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
+        </div>
+        <div class="form-group col-md-12">
+          <label for="FILIAL">Armação</label>
+          <input required class="form-control" value="{{EDITAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO"  >
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">Obeservaçâo</label>
+          <textarea class="form-control"  id="OBSERVACAO" name="OBSERVACAO" rows="3">{{EDITAR_OS.OBSERVACAO}}</textarea>
+        </div>
+        <hr>
+        <div class="text center">
+          <div class="row">
+          <label for="NUMERO">FINANCEIRO</label>
+          <div class="form-group col-md-2">
+            <label for="inputState">Pagamento</label>
+            <select required id="PAGAMENTO" name="PAGAMENTO" onChange="link()" class="form-control">
+                {% if EDITAR_OS.FORMA_PAG == "A" %}
+                    <option value="A">Pix</option>
+                {% endif%}
+                {% if EDITAR_OS.FORMA_PAG == "B" %}
+                <option value="B">Dinheiro</option>
+                {% endif%}
+                {% if EDITAR_OS.FORMA_PAG == "C" %}
+              <option value="C">Debito</option>
+                {% endif%}
+                {% if EDITAR_OS.FORMA_PAG == "D" %}
+              <option value="D">Credito</option>
+                {% endif%}
+                {% if EDITAR_OS.FORMA_PAG == "E" %}
+              <option value="E">Carne</option>
+                {% endif%}
+                {% if EDITAR_OS.FORMA_PAG == "F" %}
+              <option value="F">Permuta</option>
+                {% endif%}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Valor</label>
+            <input required type="text" value="{{EDITAR_OS.VALOR}}" class="form-control" id="VALOR" name="VALOR">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Parcelas</label>
+            <select required id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control">
+                {% if EDITAR_OS.QUANTIDADE_PARCELA == 1 %}
+                <option value="1">1x</option>
+                {% endif%}
+
+                {% if EDITAR_OS.QUANTIDADE_PARCELA == 2 %}
+              <option value="2">2x</option>
+              {% endif%}
+
+                {% if EDITAR_OS.QUANTIDADE_PARCELA == 3 %}
+              <option value="3">3x</option>
+              {% endif%}
+
+                {% if EDITAR_OS.QUANTIDADE_PARCELA == 4 %}
+              <option value="4">4x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 5 %}
+              <option value="5">5x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 6 %}
+              <option value="6">6x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 7 %}
+              <option value="7">7x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 8 %}
+              <option value="8">8x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 9 %}
+              <option value="9">9x</option>
+              {% endif%}
+
+              {% if EDITAR_OS.QUANTIDADE_PARCELA == 10 %}
+              <option value="10">10x</option>
+              {% endif%}
+            </select>
+          </div>
+          
+          <div class="form-group col-md-2">
+            <label for="inputZip">Entrada</label>
+            <input required type="text" value="{{EDITAR_OS.ENTRADA}}" class="form-control" id="ENTRADA" name="ENTRADA">
+          </div>
+        </div>
+        </div>
+        <div class="alert alert-warning _carner" style="display: none;" role="alert">
+          Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
+        </div>
+        <button type="submit" class="btn btn-primary">Finalizar</button>
+      </form>
+  </section>
+
+
+
+
+
+{%endblock%}

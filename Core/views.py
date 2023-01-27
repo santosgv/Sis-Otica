@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.messages import constants
-from django.shortcuts import redirect, render,get_object_or_404
+from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE,SERVICO
 from Unidades.models import UNIDADE
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-import datetime
+
 
 
 def home(request):
@@ -23,13 +23,13 @@ def clientes(request):
 
     clientes = pagina.get_page(page)
 
-    return render(request,'clientes.html',{'clientes':clientes})
+    return render(request,'Cliente/clientes.html',{'clientes':clientes})
 
 @login_required(login_url='logar')
 def cadastro_cliente(request):
 
     if request.method == "GET":
-        return render(request, 'cadastro_cliente.html')
+        return render(request, 'Cliente/cadastro_cliente.html')
     else:
         NOME = request.POST.get('NOME')
         LOGRADOURO = request.POST.get('LOGRADOURO')
@@ -59,13 +59,13 @@ def cadastro_cliente(request):
 def Cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
-        return render(request,'cliente.html',{'cliente':cliente})
+        return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
 @login_required(login_url='logar')
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
-        return render(request,'edita_cliente.html',{'cliente':cliente})
+        return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
     else:
         cliente = CLIENTE.objects.get(id=id)
         cliente.NOME = request.POST.get('NOME')
@@ -79,7 +79,7 @@ def Edita_cliente(request,id):
         cliente.EMAIL = request.POST.get('EMAIL')
         cliente.save()
         messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-    return render(request,'edita_cliente.html',{'cliente':cliente})
+    return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
 
 @login_required(login_url='logar')
 def excluir_cliente(request,id):
@@ -98,7 +98,7 @@ def Lista_Os(request):
 
     Ordem_servicos = pagina.get_page(page)
 
-    return render(request,'Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+    return render(request,'OS/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
@@ -108,7 +108,7 @@ def Cadastrar_os(request,id_cliente):
                     'servicos':servicos,
                                                 }
         
-        return render(request,'cadastrar_os.html',context)
+        return render(request,'Os/cadastrar_os.html',context)
     else:
         try:
             ANEXO = request.POST.get('ANEXO')
@@ -153,8 +153,22 @@ def Cadastrar_os(request,id_cliente):
            
             cadastrar_os.save()
             messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
-            return render(request,'cadastrar_os.html')
+            return render(request,'Os/cadastrar_os.html')
         except Exception as msg:
             print(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
-            return render(request,'cadastrar_os.html')
+            return render(request,'Os/cadastrar_os.html')
+
+def Editar_os(request,id_os):
+    if request.method == "GET":
+        EDITAR_OS = ORDEN.objects.get(id=id_os)
+        SERVICOS = SERVICO.objects.all()
+        return render(request,'Os/Edita_os.html',{'EDITAR_OS':EDITAR_OS,
+                                                   'SERVICOS':SERVICOS})
+    else:
+        try:
+            pass
+        except Exception as msg:
+            print(msg)
+            messages.add_message(request, constants.ERROR, 'Erro interno ao Editar a OS')
+            return render(request,'Os/Edita_os.html')

@@ -35,6 +35,7 @@
                         <th scope="col">STATUS</th>
                         <th scope="col">OBSERVAÇAO</th>
                         <th scope="col">PREVISÂO ENTREGA</th>
+                        <th scope="col">AÇAO</th>
                       </tr>
                       {% for Os in Ordem_servicos %}
                       <tbody>
@@ -61,8 +62,8 @@
                           </td>
                           <td>{{Os.OBSERVACAO}}</td>
                           <td>{{Os.PREVISAO_ENTREGA}}</td>
+                          <td><a href="{% url 'Editar_os' Os.id  %}">Editar</td>
                         </tr>
-                
                       </tbody>
                       {% endfor%}
                 </table>
