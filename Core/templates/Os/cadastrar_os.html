@@ -62,11 +62,10 @@ Cadastrar O.S
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="inputState">Tipo de Serviço</label>
-                  <select required id="SERVICO" name="SERVICO" onChange="update()" class="form-control">
+                  <select required id="SERVICO" name="SERVICO" class="form-control">
                     <option selected>Escolha...</option>
-                     {% for servico in servicos %}
-                     <option value="{{servico.NOME}}">{{servico.NOME}}</option>
-                     {% endfor%}
+                    <option value="Encomenda">Encomenda</option>
+                    <option value="Pronta Entrega">Pronta Entrega</option>
                   </select>
                 </div>
                 <div class="form-group col-md-6">
