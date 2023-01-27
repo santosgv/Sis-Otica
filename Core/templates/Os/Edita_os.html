@@ -56,17 +56,16 @@ Editar O.S
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="inputState">Tipo de Serviço</label>
-              <select required id="SERVICO" name="SERVICO" onChange="update()" class="form-control">
-                <option selected>{{EDITAR_OS.SERVICO.NOME}}...</option>
-                        {% for servico in SERVICOS %}
-                     <option value="{{servico.NOME}}">{{servico.NOME}}</option>
-                     {% endfor%}
+              <select required id="SERVICO" name="SERVICO" class="form-control">
+                <option selected>Escolha...</option>
+                <option value="Encomenda">Encomenda</option>
+                <option value="Pronta Entrega">Pronta Entrega</option>
               </select>
             </div>
             <div class="form-group col-md-6">
               <label for="inputState">Sub Serviço</label>
               <select required id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
-                <option selected>{{EDITAR_OS.SUB_SERVICO}}</option>
+                <option selected>Escolha...</option>
               </select>
             </div>
           </div>
@@ -177,7 +176,10 @@ Editar O.S
   </section>
 
 
-
+  <script src="{% static 'Unidades/js/os.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
 
 
 {%endblock%}
