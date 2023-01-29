@@ -14,7 +14,8 @@ urlpatterns = [
     path('excluir_cliente/<int:id>',views.excluir_cliente,name='excluir_cliente'),
 
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
-    path('Cadastrar_os/<int:id_cliente>',views.Cadastrar_os,name='Cadastrar_os'),
+    path('Cadastrar_os/<int:id_os>',views.Cadastrar_os,name='Cadastrar_os'),
+    path('Visualizar_os/<int:id_os>',views.Visualizar_os,name='Visualizar_os'),
     path('Editar_os/<int:id_os>',views.Editar_os,name='Editar_os'),
 ]
 

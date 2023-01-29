@@ -30,25 +30,37 @@ Editar O.S
     </div>
     
     <form method="POST" class="form_cliente">{% csrf_token %}
-        <div class="form-group">
-          <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
-        </div>
+      <h1>{{EDITAR_OS.id}}</h1>
+      
+      {% if EDITAR_OS.ANEXO %}
+      <div class="form-group">
+        <img src="/media/{{EDITAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{EDITAR_OS.ANEXO}}"> {{EDITAR_OS.ANEXO}}
+      </div>
+
+      <div class="form-group">
+        <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
+      </div>
+      {% else %}
+      <div class="form-group">
+        <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
+      </div>
+      {% endif %}
         <div class="row">
           <div class="form-group col-md-2">
             <label for="FILIAL">Filial</label>
-            <input  class="form-control" id="FILIAL" name="FILIAL" value="#" >
+            <input  class="form-control"  id="FILIAL"  name="FILIAL" value="{{EDITAR_OS.FILIAL}}" >
           </div>
           <div class="form-group col-md-2">
             <label for="VENDEDOR" >Vendedor</label>
-            <input  class="form-control"  id="VENDEDOR" name="VENDEDOR" value="#" >
+            <input  class="form-control"   id="VENDEDOR" name="VENDEDOR" value="{{EDITAR_OS.VENDEDOR.first_name}}" >
           </div>
           <div class="form-group col-md-4">
             <label for="CLIENTE">Cliente</label>
-            <input  class="form-control"  id="CLIENTE" name="CLIENTE" value="#" >
+            <input  class="form-control"   id="CLIENTE" name="CLIENTE" value="{{EDITAR_OS.CLIENTE}}" >
           </div>
           <div class="form-group col-md-2">
             <label for="DATA_NASCIMENTO">Previsao Entrega</label>
-            <input required type="date" class="form-control" value="{{EDITAR_OS.PREVISAO_ENTREGA}}"  id="PREVISAO_ENTREGA" name="PREVISAO_ENTREGA">
+            <input required type="date"  class="form-control" value="{{EDITAR_OS.PREVISAO_ENTREGA}}"  id="PREVISAO_ENTREGA" name="PREVISAO_ENTREGA">
           </div>
         </div>
         <hr>
@@ -56,35 +68,35 @@ Editar O.S
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="inputState">Tipo de Serviço</label>
-              <select required id="SERVICO" name="SERVICO" class="form-control">
-                <option selected>Escolha...</option>
+              <select required id="SERVICO"  name="SERVICO" class="form-control">
+                <option selected>{{EDITAR_OS.SERVICO}}</option>
                 <option value="Encomenda">Encomenda</option>
                 <option value="Pronta Entrega">Pronta Entrega</option>
               </select>
             </div>
             <div class="form-group col-md-6">
               <label for="inputState">Sub Serviço</label>
-              <select required id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
-                <option selected>Escolha...</option>
+              <select required id="SUB_SERVICO"  name="SUB_SERVICO" class="form-control">
+                <option selected>{{EDITAR_OS.SUB_SERVICO}}</option>
               </select>
             </div>
           </div>
         </div> 
         <div class="form-group row">
             <label for="NUMERO">Receita</label>
-          <input required class="form-control" value="{{EDITAR_OS.RECEITA}}"  id="RECEITA" name="RECEITA"  >
+          <input required class="form-control"  value="{{EDITAR_OS.RECEITA}}"  id="RECEITA" name="RECEITA"  >
         </div>
         <div class="form-group col-md-12">
           <label for="FILIAL">Lentes</label>
-          <input required class="form-control" value="{{EDITAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
+          <input required class="form-control"  value="{{EDITAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
         </div>
         <div class="form-group col-md-12">
           <label for="FILIAL">Armação</label>
-          <input required class="form-control" value="{{EDITAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO"  >
+          <input required class="form-control"  value="{{EDITAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO"  >
         </div>
         <div class="form-group">
           <label for="exampleFormControlTextarea1">Obeservaçâo</label>
-          <textarea class="form-control"  id="OBSERVACAO" name="OBSERVACAO" rows="3">{{EDITAR_OS.OBSERVACAO}}</textarea>
+          <textarea class="form-control"   id="OBSERVACAO" name="OBSERVACAO" rows="3">{{EDITAR_OS.OBSERVACAO}}</textarea>
         </div>
         <hr>
         <div class="text center">
@@ -92,7 +104,7 @@ Editar O.S
           <label for="NUMERO">FINANCEIRO</label>
           <div class="form-group col-md-2">
             <label for="inputState">Pagamento</label>
-            <select required id="PAGAMENTO" name="PAGAMENTO" onChange="link()" class="form-control">
+            <select required id="PAGAMENTO"  name="PAGAMENTO" onChange="link()" class="form-control">
                 {% if EDITAR_OS.FORMA_PAG == "A" %}
                     <option value="A">Pix</option>
                 {% endif%}
@@ -115,11 +127,11 @@ Editar O.S
           </div>
           <div class="form-group col-md-2">
             <label for="inputZip">Valor</label>
-            <input required type="text" value="{{EDITAR_OS.VALOR}}" class="form-control" id="VALOR" name="VALOR">
+            <input required type="text"  value="{{EDITAR_OS.VALOR}}" class="form-control" id="VALOR" name="VALOR">
           </div>
           <div class="form-group col-md-2">
             <label for="inputZip">Parcelas</label>
-            <select required id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control">
+            <select required id="QUANTIDADE_PARCELA"  name="QUANTIDADE_PARCELA" class="form-control">
                 {% if EDITAR_OS.QUANTIDADE_PARCELA == 1 %}
                 <option value="1">1x</option>
                 {% endif%}
@@ -164,14 +176,14 @@ Editar O.S
           
           <div class="form-group col-md-2">
             <label for="inputZip">Entrada</label>
-            <input required type="text" value="{{EDITAR_OS.ENTRADA}}" class="form-control" id="ENTRADA" name="ENTRADA">
+            <input required type="text"  value="{{EDITAR_OS.ENTRADA}}" class="form-control" id="ENTRADA" name="ENTRADA">
           </div>
         </div>
         </div>
         <div class="alert alert-warning _carner" style="display: none;" role="alert">
           Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
         </div>
-        <button type="submit" class="btn btn-primary">Finalizar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alteracao</button>
       </form>
   </section>
 
