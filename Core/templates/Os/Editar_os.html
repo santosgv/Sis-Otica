@@ -29,14 +29,17 @@ Editar O.S
         {% endif %}
     </div>
     
-    <form method="POST" class="form_cliente">{% csrf_token %}
+    <form method="POST" enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
       <h1>{{EDITAR_OS.id}}</h1>
       
       {% if EDITAR_OS.ANEXO %}
       <div class="form-group">
-        <img src="/media/{{EDITAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{EDITAR_OS.ANEXO}}"> {{EDITAR_OS.ANEXO}}
+        <img src="/media/{{EDITAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{EDITAR_OS.ANEXO}}">
+        <div class="form-group">
+          <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
+        </div>
       </div>
-
+      {% elif EDITAR_OS.ANEXO %}
       <div class="form-group">
         <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
       </div>

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,SERVICO
+from Core.models import ORDEN,CLIENTE
 from Unidades.models import UNIDADE
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -103,15 +103,10 @@ def Lista_Os(request):
 def Cadastrar_os(request,id_os):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_os)
-        servicos = SERVICO.objects.all()
-        context = {'cliente':cliente,
-                    'servicos':servicos,
-                                                }
-        
-        return render(request,'Os/cadastrar_os.html',context)
+        return render(request,'Os/cadastrar_os.html',{'cliente':cliente})
     else:
         try:
-            ANEXO = request.POST.get('ANEXO')
+            ANEXO = request.FILES['ANEXO']
             FILIAL = request.POST.get('FILIAL')
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
@@ -119,12 +114,12 @@ def Cadastrar_os(request,id_os):
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             RECEITA = ('OD ESF: ',request.POST.get('OD_ESF'),
-                        'OD CIL:',request.POST.get('OD_CIL'),
-                        'OD EIXO: ',request.POST.get('OD_EIXO'),
-                        'OE ESF: ',request.POST.get('OE_ESF'),
-                        'OE CIL: ',request.POST.get('OE_CIL'),
-                        'OE EIXO: ',request.POST.get('OE_EIXO'),
-                        'AD: ',request.POST.get('AD'))
+                      'OD CIL:',request.POST.get('OD_CIL'),
+                      'OD EIXO: ',request.POST.get('OD_EIXO'),
+                      'OE ESF: ',request.POST.get('OE_ESF'),
+                      'OE CIL: ',request.POST.get('OE_CIL'),
+                      'OE EIXO: ',request.POST.get('OE_EIXO'),
+                      'AD: ',request.POST.get('AD'))
             LENTES = request.POST.get('LENTES')
             ARMACAO = request.POST.get('ARMACAO')
             OBSERVACAO = request.POST.get('OBSERVACAO')
@@ -132,25 +127,25 @@ def Cadastrar_os(request,id_os):
             VALOR = request.POST.get('VALOR')
             QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
             ENTRADA = request.POST.get('ENTRADA')
-
-            cadastrar_os = ORDEN(
-              ANEXO= ANEXO,
-              FILIAL= UNIDADE.objects.get(NOME=FILIAL),
-              VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
-              CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
-              PREVISAO_ENTREGA= PREVISAO_ENTREGA,
-              SERVICO= SERVICO.objects.get(NOME=SERVICO_POST),
-              SUB_SERVICO= SUB_SERVICO_POST,
-              RECEITA= RECEITA,
-              LENTES= LENTES,
-              ARMACAO= ARMACAO,
-              OBSERVACAO= OBSERVACAO,
-              FORMA_PAG= FORMA_PAG,
-              VALOR= VALOR,
-              QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-              ENTRADA= ENTRADA     
-            )
            
+            cadastrar_os = ORDEN(
+            ANEXO= ANEXO,
+            FILIAL= UNIDADE.objects.get(NOME=FILIAL),
+            VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
+            CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
+            PREVISAO_ENTREGA= PREVISAO_ENTREGA,
+            SERVICO= SERVICO_POST,
+            SUB_SERVICO= SUB_SERVICO_POST,
+            RECEITA= RECEITA,
+            LENTES= LENTES,
+            ARMACAO= ARMACAO,
+            OBSERVACAO= OBSERVACAO,
+            FORMA_PAG= FORMA_PAG,
+            VALOR= VALOR,
+            QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
+            ENTRADA= ENTRADA     
+          )
+            
             cadastrar_os.save()
             messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
             return render(request,'Os/cadastrar_os.html')
@@ -176,6 +171,7 @@ def Editar_os(request,id_os):
     else:
         try:
             EDITAR_OS = ORDEN.objects.get(id=id_os)
+            
             RECEITA = ('OD ESF: ',request.POST.get('OD_ESF'),
                       'OD CIL:',request.POST.get('OD_CIL'),
                       'OD EIXO: ',request.POST.get('OD_EIXO'),
@@ -185,10 +181,7 @@ def Editar_os(request,id_os):
                       'AD: ',request.POST.get('AD'))
     
         
-            EDITAR_OS.ANEXO = request.POST.get('ANEXO')
-            EDITAR_OS.FILIAL = request.POST.get('FILIAL')
-            EDITAR_OS.VENDEDOR = request.POST.get('VENDEDOR')
-            EDITAR_OS.CLIENTE = request.POST.get('CLIENTE')
+            EDITAR_OS.ANEXO.UploadedFile = request.FILES['ANEXO']
             EDITAR_OS.PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
             EDITAR_OS.SERVICO = request.POST.get('SERVICO')
             EDITAR_OS.SUB_SERVICO = request.POST.get('SUB_SERVICO')

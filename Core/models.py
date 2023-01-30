@@ -48,7 +48,7 @@ class ORDEN(models.Model):
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.DO_NOTHING)
     DATA = models.DateTimeField(default=now)
     PREVISAO_ENTREGA = models.DateField()
-    SERVICO = models.ForeignKey('SERVICO',on_delete=models.DO_NOTHING)
+    SERVICO = models.CharField(max_length=500)
     SUB_SERVICO = models.CharField(max_length=500)
     RECEITA = models.TextField(max_length=2000)
     LENTES = models.CharField(max_length=500)
@@ -63,8 +63,4 @@ class ORDEN(models.Model):
     def __str__(self):
         return str(self.id)
 
-class SERVICO(models.Model):
-    NOME = models.CharField(max_length=500)
 
-    def __str__(self):
-        return str(self.NOME)
