@@ -23,6 +23,15 @@
       <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar TRATAMENTO" aria-label="Search">
  
     </form>
+    <div class="text-center">
+      {% if messages %}
+          {% for message in messages %}
+              <div class="alert {{message.tags}}">
+                  {{message}}
+              </div>
+          {% endfor %}
+      {% endif %}
+  </div>
   </nav>
                 <table id="myTable" class="table table-hover">
                     <tr class="thead">

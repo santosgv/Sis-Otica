@@ -147,12 +147,14 @@ def Cadastrar_os(request,id_os):
           )
             
             cadastrar_os.save()
+        
+            cliente = CLIENTE.objects.get(id=id_os)
             messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
-            return render(request,'Os/cadastrar_os.html')
+            return render(request,'OS/cadastro_cliente.html',{'cliente':cliente})  
         except Exception as msg:
             print(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
-            return render(request,'Os/cadastrar_os.html')
+            return render(request,'Os/cadastrar_os.html',{'cliente':cliente}) 
 
 def Visualizar_os(request,id_os):
     if request.method == "GET":
@@ -160,44 +162,29 @@ def Visualizar_os(request,id_os):
         return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
     else:
-        return render(request,'Os/Edita_os.html')
+        return render(request,'Os/Visualizar_os.htmll')
 
-def Editar_os(request,id_os):
+def Encerrar_os(request,id_os):
     if request.method == "GET":
-        EDITAR_OS = ORDEN.objects.get(id=id_os)
-        print(EDITAR_OS.ANEXO)
-        return render(request,'Os/Editar_os.html',{'EDITAR_OS':EDITAR_OS,
-                                                   })
-    else:
         try:
-            EDITAR_OS = ORDEN.objects.get(id=id_os)
-            
-            RECEITA = ('OD ESF: ',request.POST.get('OD_ESF'),
-                      'OD CIL:',request.POST.get('OD_CIL'),
-                      'OD EIXO: ',request.POST.get('OD_EIXO'),
-                      'OE ESF: ',request.POST.get('OE_ESF'),
-                      'OE CIL: ',request.POST.get('OE_CIL'),
-                      'OE EIXO: ',request.POST.get('OE_EIXO'),
-                      'AD: ',request.POST.get('AD'))
-    
-        
-            EDITAR_OS.ANEXO.UploadedFile = request.FILES['ANEXO']
-            EDITAR_OS.PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
-            EDITAR_OS.SERVICO = request.POST.get('SERVICO')
-            EDITAR_OS.SUB_SERVICO = request.POST.get('SUB_SERVICO')
-            EDITAR_OS.RECEITA = RECEITA
-            EDITAR_OS.LENTES = request.POST.get('LENTES')
-            EDITAR_OS.ARMACAO = request.POST.get('ARMACAO')
-            EDITAR_OS.OBSERVACAO = request.POST.get('OBSERVACAO')
-            EDITAR_OS.FORMA_PAG = request.POST.get('PAGAMENTO')
-            EDITAR_OS.VALOR = request.POST.get('VALOR')
-            EDITAR_OS.QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
-            EDITAR_OS.ENTRADA = request.POST.get('ENTRADA')
-            EDITAR_OS.save()
-
-            messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-            return render(request,'Os/Edita_os.html',{'EDITAR_OS':EDITAR_OS})
+            Encerrar_OS = ORDEN.objects.get(id=id_os)
+            Encerrar_OS.STATUS = "E"
+            Encerrar_OS.save()
+            messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
+            return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
-            return render(request,'Os/Editar_os.html')        
+            return redirect('/Lista_Os')   
+
+def Cancelar_os(request,id_os):
+    if request.method == "GET":
+        try:
+            CANCELAR_OS = ORDEN.objects.get(id=id_os)
+            CANCELAR_OS.STATUS ="C"
+            CANCELAR_OS.save()
+            messages.add_message(request, constants.SUCCESS, 'O.s Encerrado com sucesso')
+            return redirect('/Lista_Os')  
+        except Exception as msg:
+            print(msg)
+            return redirect('/Lista_Os')        
         

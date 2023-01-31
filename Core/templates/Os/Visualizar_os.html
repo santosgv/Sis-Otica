@@ -167,12 +167,38 @@ Vizualiar O.S
             <label for="inputZip">Entrada</label>
             <input required type="text" readonly value="{{VISUALIZAR_OS.ENTRADA}}" class="form-control" id="ENTRADA" name="ENTRADA">
           </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Status</label>
+            {% if VISUALIZAR_OS.STATUS == "A" %}
+            <h4><span class="badge badge-info">EM ABERTO</span></h4>
+            {% endif %}
+
+            {% if VISUALIZAR_OS.STATUS == "E" %}
+            <h4><span class="badge badge-success">ENCERRADO</span></h4>
+             {% endif %}
+
+             {% if VISUALIZAR_OS.STATUS == "C" %}
+             <h4><span class="badge badge-danger">CANCELADO</span></h4>
+             {% endif %}
+           
+          </div>
         </div>
         </div>
         <div class="alert alert-warning _carner" style="display: none;" role="alert">
           Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
         </div>
-        <a href="{% url 'Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-primary">Editar</a>
+        {% if VISUALIZAR_OS.STATUS == "A" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Encerrar</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "E" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled>Encerrar</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "C" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled >Encerrar</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        {% endif %}
       </form>
   </section>
 
