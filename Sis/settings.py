@@ -18,7 +18,7 @@ SECRET_KEY ='pkx@6w(&-y87(r1n' #config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS =['v35900.vps-kinghost.net','191.252.210.233','*']
+ALLOWED_HOSTS =['v35900.vps-kinghost.net','191.252.210.233','http://v35900.vps-kinghost.net:8000']
 
 USE_L10N = False
 
