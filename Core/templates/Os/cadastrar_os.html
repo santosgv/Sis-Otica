@@ -35,7 +35,7 @@ Cadastrar O.S
       </div>
           <form method="POST"  enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
             <div class="form-group">
-              <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
+              <input type="file" required class="form-control-file" id="ANEXO" name="ANEXO">
             </div>
             <div class="row">
               <div class="form-group col-md-2">
