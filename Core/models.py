@@ -50,14 +50,15 @@ class ORDEN(models.Model):
     PREVISAO_ENTREGA = models.DateField()
     SERVICO = models.CharField(max_length=500)
     SUB_SERVICO = models.CharField(max_length=500)
-    RECEITA = models.TextField(max_length=2000)
-    LENTES = models.CharField(max_length=500)
-    ARMACAO = models.CharField(max_length=500)
-    OBSERVACAO = models.TextField(max_length=1000)
+    RECEITA = models.TextField(max_length=2000,blank=True, null=True)
+    LENTES = models.CharField(max_length=500,blank=True, null=True)
+    ARMACAO = models.CharField(max_length=500, blank=True, null=True)
+    OBSERVACAO = models.TextField(max_length=1000, blank=True, null=True)
     FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO)
     VALOR = models.FloatField()
     QUANTIDADE_PARCELA = models.IntegerField()
     ENTRADA = models.FloatField()
+    DARA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
     
 
     def __str__(self):

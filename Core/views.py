@@ -6,7 +6,7 @@ from Unidades.models import UNIDADE
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
+from datetime import datetime
 
 
 def home(request):
@@ -153,6 +153,7 @@ def Cadastrar_os(request,id_os):
             return render(request,'OS/cadastro_cliente.html',{'cliente':cliente})  
         except Exception as msg:
             print(msg)
+            cliente = CLIENTE.objects.get(id=id_os)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return render(request,'Os/cadastrar_os.html',{'cliente':cliente}) 
 
@@ -169,6 +170,7 @@ def Encerrar_os(request,id_os):
         try:
             Encerrar_OS = ORDEN.objects.get(id=id_os)
             Encerrar_OS.STATUS = "E"
+            Encerrar_OS.DARA_ENCERRAMENTO =datetime.now()
             Encerrar_OS.save()
             messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
             return redirect('/Lista_Os')  

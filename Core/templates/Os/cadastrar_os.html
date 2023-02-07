@@ -34,9 +34,6 @@ Cadastrar O.S
           {% endif %}
       </div>
           <form method="POST"  enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
-            <div class="form-group">
-              <input type="file" required class="form-control-file" id="ANEXO" name="ANEXO">
-            </div>
             <div class="row">
               <div class="form-group col-md-2">
                 <label for="FILIAL">Filial</label>
@@ -62,7 +59,7 @@ Cadastrar O.S
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="inputState">Tipo de Serviço</label>
-                  <select required id="SERVICO" name="SERVICO" class="form-control">
+                  <select id="SERVICO" name="SERVICO" class="form-control" required="required">
                     <option selected>Escolha...</option>
                     <option value="Encomenda">Encomenda</option>
                     <option value="Pronta Entrega">Pronta Entrega</option>
@@ -70,7 +67,7 @@ Cadastrar O.S
                 </div>
                 <div class="form-group col-md-6">
                   <label for="inputState">Sub Serviço</label>
-                  <select required id="SUB_SERVICO" name="SUB_SERVICO" class="form-control">
+                  <select id="SUB_SERVICO" name="SUB_SERVICO" class="form-control" required>
                     <option selected>Escolha...</option>
                   </select>
                 </div>
@@ -109,14 +106,17 @@ Cadastrar O.S
               <div class="col-sm-2">
                 <input type="text" class="form-control" name="AD" id="AD" placeholder="AD">
               </div>
+              <div class="col-sm-8">
+                <input type="file" required class="form-control-file" id="ANEXO" name="ANEXO">
+              </div>
             </div>
             <div class="form-group col-md-12">
               <label for="FILIAL">Lentes</label>
-              <input required class="form-control" id="LENTES" name="LENTES"  >
+              <input  class="form-control" id="LENTES" name="LENTES"  >
             </div>
             <div class="form-group col-md-12">
               <label for="FILIAL">Armação</label>
-              <input required class="form-control" id="ARMACAO" name="ARMACAO"  >
+              <input  class="form-control" id="ARMACAO" name="ARMACAO"  >
             </div>
             <div class="form-group">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
@@ -128,7 +128,7 @@ Cadastrar O.S
               <label for="NUMERO">FINANCEIRO</label>
               <div class="form-group col-md-2">
                 <label for="inputState">Pagamento</label>
-                <select required id="PAGAMENTO" name="PAGAMENTO" onChange="link()" class="form-control">
+                <select id="PAGAMENTO" name="PAGAMENTO" onChange="link()" class="form-control" required>
                   <option selected>Escolha...</option>
                   <option value="A">Pix</option>
                   <option value="B">Dinheiro</option>
@@ -144,7 +144,7 @@ Cadastrar O.S
               </div>
               <div class="form-group col-md-2">
                 <label for="inputZip">Parcelas</label>
-                <select required id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control">
+                <select id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control" required>
                   <option selected>Escolha...</option>
                   <option value="1">1x</option>
                   <option value="2">2x</option>
@@ -168,7 +168,7 @@ Cadastrar O.S
             <div class="alert alert-warning _carner" id="_carner" style="display: none;" role="alert">
               Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
             </div>
-            <button type="submit" class="btn btn-primary">Finalizar</button>
+            <button type="submit" class="btn btn-primary">Finalizar Compra</button>
 
           </form>   
         </div>
