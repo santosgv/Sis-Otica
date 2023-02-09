@@ -8,6 +8,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from datetime import datetime
 
+from reportlab.pdfgen import canvas
+import io
+from django.http import FileResponse
+from reportlab.lib.pagesizes import letter
 
 def home(request):
     OS = ORDEN.objects.all()
@@ -15,15 +19,16 @@ def home(request):
 
 @login_required(login_url='logar')
 def clientes(request):
-    cliente_lista = CLIENTE.objects.all().order_by('NOME')
+    cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO').values()
 
     pagina = Paginator(cliente_lista, 10)
 
     page = request.GET.get('page')
 
     clientes = pagina.get_page(page)
-
-    return render(request,'Cliente/clientes.html',{'clientes':clientes})
+    
+    return render(request,'Cliente/clientes.html',{'clientes':clientes,
+                                                    })
 
 @login_required(login_url='logar')
 def cadastro_cliente(request):
@@ -190,3 +195,32 @@ def Cancelar_os(request,id_os):
             print(msg)
             return redirect('/Lista_Os')        
         
+def Imprimir_os(request,id_os):
+    try:
+        PRINT_OS =ORDEN.objects.get(id=id_os)
+        
+        buffer = io.BytesIO()
+        PDF = canvas.Canvas(buffer,pagesize=letter)
+        PDF.setFont('Helvetica', 15)
+
+        PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
+        PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
+        PDF.drawString(305,750,'O.S : ' +str(PRINT_OS.id))
+        
+        PDF.drawString(300,725,'PREVISAO ENTREGA :')
+        PDF.drawString(500,725,str(PRINT_OS.PREVISAO_ENTREGA))
+        
+        PDF.drawString(30,700,'ASSINATURA DO CLIENTE:')
+       
+        PDF.drawString(30,200,'30,200')
+        PDF.drawString(550,100,'550,100')
+
+        PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
+        PDF.line(250,30,580,30)
+        PDF.showPage()
+        PDF.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
+    except Exception as msg:
+        print(msg)
+        return redirect('/Lista_Os') 

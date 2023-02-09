@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block 'body' %}
+<div id="fundo">
+
     <div class="box text-center logar">
         <form action="{% url  'cadastro' %}" method="POST">{% csrf_token %}
             <div class="logar-form">
@@ -37,4 +39,5 @@
         </form>
             
     </div>
+</div>
 {% endblock %} 

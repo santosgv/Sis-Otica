@@ -58,7 +58,7 @@ class ORDEN(models.Model):
     VALOR = models.FloatField()
     QUANTIDADE_PARCELA = models.IntegerField()
     ENTRADA = models.FloatField()
-    DARA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
+    DATA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
     
 
     def __str__(self):

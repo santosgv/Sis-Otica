@@ -18,6 +18,7 @@ urlpatterns = [
     path('Visualizar_os/<int:id_os>',views.Visualizar_os,name='Visualizar_os'),
     path('Encerrar_os/<int:id_os>',views.Encerrar_os,name='Encerrar_os'),
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
+    path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

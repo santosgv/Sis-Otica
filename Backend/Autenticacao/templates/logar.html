@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block 'body' %}
-
+<div id="fundo">
 {% if messages %}
 <br>
 {% for message in messages %}
@@ -32,9 +32,10 @@
             <input  type="submit" value="Logar" class="bto-success bto-group-lg bto-lg">
             <div>
                 <br>
-           
+           <a href="{% url 'cadastro'%}">cadastrar</a>
         </div>
         </form>
             
     </div>
+</div>
 {% endblock %}
