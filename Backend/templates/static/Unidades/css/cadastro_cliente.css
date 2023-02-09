@@ -1,0 +1,47 @@
+.titulo {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 24px;
+    font-family: 'Montserrat';
+ 
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 29px;
+}
+
+
+.form_cliente {
+    padding: 25px;
+}
+
+.form_ {
+    padding: 15px;
+}
+
+.btn-form {
+    padding-top: 10px;
+}
+
+.btn-continuar {
+    float: right;
+}
+
+/* css da paginaçao */
+
+.pagination {
+    margin-bottom: 20px;
+
+}
+
+.step-links {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.step-links .current {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 20px;
+}
