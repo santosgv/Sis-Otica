@@ -205,15 +205,21 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
-        PDF.drawString(305,750,'O.S : ' +str(PRINT_OS.id))
+        PDF.drawString(300,750,'O.S : ' +str(PRINT_OS.id))
+        PDF.drawString(400,750,'FILIAL : ' +str(PRINT_OS.FILIAL))
         
         PDF.drawString(300,725,'PREVISAO ENTREGA :')
         PDF.drawString(500,725,str(PRINT_OS.PREVISAO_ENTREGA))
+        PDF.line(30,715,580,715)
+        PDF.drawString(250,700,'SERVIÇOS')
+        PDF.drawString(30,650,'SERVIÇO : ' + str(PRINT_OS.SERVICO))
+        PDF.drawString(300,650,'SUB SERVIÇO : ' + str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(250,600,'RECEITA')
+        PDF.drawString(30,550,'LENTES : '+ str(PRINT_OS.LENTES))
+        PDF.drawString(300,550,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
+        PDF.drawString(250,500,'OBSERVAÇÂO')
+        PDF.drawString(30,450,str(PRINT_OS.OBSERVACAO))
         
-        PDF.drawString(30,700,'ASSINATURA DO CLIENTE:')
-       
-        PDF.drawString(30,200,'30,200')
-        PDF.drawString(550,100,'550,100')
 
         PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
         PDF.line(250,30,580,30)
