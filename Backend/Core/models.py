@@ -60,10 +60,10 @@ class ORDEN(models.Model):
     LENTES = models.CharField(max_length=500,blank=True, null=True)
     ARMACAO = models.CharField(max_length=500, blank=True, null=True)
     OBSERVACAO = models.TextField(max_length=1000, blank=True, null=True)
-    FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO)
+    FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO,blank=True, null=True)
     VALOR = models.FloatField()
-    QUANTIDADE_PARCELA = models.IntegerField()
-    ENTRADA = models.FloatField()
+    QUANTIDADE_PARCELA = models.IntegerField(blank=True, null=True)
+    ENTRADA = models.FloatField(blank=True, null=True)
     DATA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
     
 

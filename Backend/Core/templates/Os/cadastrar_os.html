@@ -53,10 +53,7 @@ Cadastrar O.S
             <hr>
             <div class="row">
               <div class="form-row">
-                <div class="form-group col-md-4">
-                  <span for="inputState">Serviços</span>
-                </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-6">
                   <label for="inputState">Tipo de Serviço</label>
                   <select id="SERVICO" name="SERVICO" class="form-control" required="required">
                     <option selected>Escolha...</option>
@@ -64,7 +61,7 @@ Cadastrar O.S
                     <option value="Pronta Entrega">Pronta Entrega</option>
                   </select>
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-6">
                   <label for="inputState">Sub Serviço</label>
                   <select id="SUB_SERVICO" name="SUB_SERVICO" class="form-control" required>
                     <option selected>Escolha...</option>
@@ -141,10 +138,10 @@ Cadastrar O.S
                 <label for="inputZip">Valor</label>
                 <input required type="text" class="form-control" id="VALOR" name="VALOR">
               </div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-md-2" id="_parcela">
                 <label for="inputZip">Parcelas</label>
-                <select id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control" required>
-                  <option selected>Escolha...</option>
+                <select id="QUANTIDADE_PARCELA" name="QUANTIDADE_PARCELA" class="form-control">
+                  <option value="0"selected>Escolha...</option>
                   <option value="1">1x</option>
                   <option value="2">2x</option>
                   <option value="3">3x</option>
@@ -158,9 +155,9 @@ Cadastrar O.S
                 </select>
               </div>
               
-              <div class="form-group col-md-2">
+              <div class="form-group col-md-2" id="_entrada">
                 <label for="inputZip">Entrada</label>
-                <input required type="text" class="form-control" id="ENTRADA" name="ENTRADA">
+                <input  type="text" class="form-control" id="ENTRADA" name="ENTRADA">
               </div>
               <div class="form-group col-md-2">
                 <label for="PREVISAO_ENTREGA">Previsao Entrega</label>

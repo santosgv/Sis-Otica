@@ -131,7 +131,10 @@ def Cadastrar_os(request,id_os):
             FORMA_PAG = request.POST.get('PAGAMENTO')
             VALOR = request.POST.get('VALOR')
             QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
-            ENTRADA = request.POST.get('ENTRADA')
+            if request.POST.get('ENTRADA') == '':
+                ENTRADA =0
+            else:
+                ENTRADA = request.POST.get('ENTRADA')
            
             cadastrar_os = ORDEN(
             ANEXO= ANEXO,
@@ -161,12 +164,12 @@ def Cadastrar_os(request,id_os):
         
             cliente = CLIENTE.objects.get(id=id_os)
             messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
-            return render(request,'OS/cadastro_cliente.html',{'cliente':cliente})  
+            return redirect(request,'Os/Lista_Os.html')  
         except Exception as msg:
             print(msg)
             cliente = CLIENTE.objects.get(id=id_os)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
-            return render(request,'Os/cadastrar_os.html',{'cliente':cliente}) 
+            return redirect(request,'Os/Lista_Os.html')  
 
 def Visualizar_os(request,id_os):
     if request.method == "GET":
@@ -207,25 +210,54 @@ def Imprimir_os(request,id_os):
         
         buffer = io.BytesIO()
         PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Helvetica', 15)
+        PDF.setFont('Courier', 15)
 
         PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
-        PDF.drawString(300,750,'O.S : ' +str(PRINT_OS.id))
-        PDF.drawString(400,750,'FILIAL : ' +str(PRINT_OS.FILIAL))
+        PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
+        PDF.drawString(430,750,'FILIAL : ' +str(PRINT_OS.FILIAL))
         
-        PDF.drawString(300,725,'PREVISAO ENTREGA :')
-        PDF.drawString(500,725,str(PRINT_OS.PREVISAO_ENTREGA))
+        PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
         PDF.line(30,715,580,715)
-        PDF.drawString(250,700,'SERVIÇOS')
+        PDF.drawString(250,695,'SERVIÇOS')
         PDF.drawString(30,650,'SERVIÇO : ' + str(PRINT_OS.SERVICO))
         PDF.drawString(300,650,'SUB SERVIÇO : ' + str(PRINT_OS.SUB_SERVICO))
         PDF.drawString(250,600,'RECEITA')
-        PDF.drawString(30,550,'LENTES : '+ str(PRINT_OS.LENTES))
-        PDF.drawString(300,550,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
-        PDF.drawString(250,500,'OBSERVAÇÂO')
-        PDF.drawString(30,450,str(PRINT_OS.OBSERVACAO))
+
+        PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
+        PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
+        PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
+        PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
+        PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
+        PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
+        PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
+
+        PDF.line(30,490,580,490)
+
+        PDF.drawString(30,450,'LENTES : '+ str(PRINT_OS.LENTES))
+        PDF.drawString(300,450,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
+    
+        PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
+
+        PDF.line(30,360,580,360)
         
+        PDF.drawString(250,340,'FINANCEIRO')
+        if PRINT_OS.FORMA_PAG == 'A':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'PIX')
+        elif PRINT_OS.FORMA_PAG == 'B':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'DINHEIRO')
+        elif PRINT_OS.FORMA_PAG == 'C':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'DEBITO')
+        elif PRINT_OS.FORMA_PAG == 'D':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'CREDITO')
+        elif PRINT_OS.FORMA_PAG == 'E':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'CARNER')
+        elif PRINT_OS.FORMA_PAG == 'F':
+            PDF.drawString(30,300,'PAGAMENTO : ' + 'PERMUTA')
+        
+        PDF.drawString(250,300,'VALOR :'+ str(PRINT_OS.VALOR))
+        PDF.drawString(400,300,'PARCELAS : '+ str(PRINT_OS.QUANTIDADE_PARCELA))
+        PDF.drawString(30,250,'ENTRADA : '+ str(PRINT_OS.ENTRADA))
 
         PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
         PDF.line(250,30,580,30)
