@@ -35,27 +35,27 @@ Vizualiar O.S
           <img src="/media/{{VISUALIZAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
         </div>
         <div class="row">
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-4">
             <label for="FILIAL">Filial</label>
-            <input  class="form-control" readonly id="FILIAL"  name="FILIAL" value="{{VISUALIZAR_OS.FILIAL}}" >
+            <input readonly class="form-control" id="FILIAL" name="FILIAL" value="{{VISUALIZAR_OS.FILIAL}}" >
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-4">
             <label for="VENDEDOR" >Vendedor</label>
-            <input  class="form-control"  readonly id="VENDEDOR" name="VENDEDOR" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}" >
+            <input readonly class="form-control" value="{{user.first_name}}" >
+            <input type="text" id="VENDEDOR" style="display: none;" name="VENDEDOR" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}">
           </div>
           <div class="form-group col-md-4">
             <label for="CLIENTE">Cliente</label>
-            <input  class="form-control"  readonly id="CLIENTE" name="CLIENTE" value="{{VISUALIZAR_OS.CLIENTE}}" >
-          </div>
-          <div class="form-group col-md-2">
-            <label for="DATA_NASCIMENTO">Previsao Entrega</label>
-            <input required type="date" readonly class="form-control" value="{{VISUALIZAR_OS.PREVISAO_ENTREGA}}"  id="PREVISAO_ENTREGA" name="PREVISAO_ENTREGA">
+            <input readonly class="form-control"  id="CLIENTE" name="CLIENTE" value="{{VISUALIZAR_OS.CLIENTE}}" >
           </div>
         </div>
         <hr>
         <div class="row">
           <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
+              <span for="inputState">Serviços</span>
+            </div>
+            <div class="form-group col-md-4">
               <label for="inputState">Tipo de Serviço</label>
               <select required id="SERVICO" readonly name="SERVICO" class="form-control">
                 <option selected>{{VISUALIZAR_OS.SERVICO}}</option>
@@ -63,17 +63,45 @@ Vizualiar O.S
                 <option value="Pronta Entrega">Pronta Entrega</option>
               </select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
               <label for="inputState">Sub Serviço</label>
               <select required id="SUB_SERVICO" readonly name="SUB_SERVICO" class="form-control">
                 <option selected>{{VISUALIZAR_OS.SUB_SERVICO}}</option>
               </select>
             </div>
           </div>
-        </div> 
+        </div>
+      
         <div class="form-group row">
-            <label for="NUMERO">Receita</label>
-          <input required class="form-control" readonly value="{{VISUALIZAR_OS.RECEITA}}"  id="RECEITA" name="RECEITA"  >
+          <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
+          <div class="col-sm-3">
+            <input  type="text" class="form-control" name="OD_ESF" id="OD_ESF" value="{{VISUALIZAR_OS.OD_ESF}}"  readonly>
+          </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control"  name="OD_CIL" id="OD_CIL" value="{{VISUALIZAR_OS.OD_CIL}}"  readonly>
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control"  name="OD_EIXO" id="OD_EIXO" value="{{VISUALIZAR_OS.OD_EIXO}}"  readonly>
+        </div>
+
+        </div>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-1 col-form-label">OE</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="OE_ESF" id="OE_ESF" value="{{VISUALIZAR_OS.OE_ESF}}"  readonly>
+          </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="OE_CIL" id="OE_CIL" value="{{VISUALIZAR_OS.OE_CIL}}"  readonly>
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="OE_EIXO" id="OE_EIXO"  value="{{VISUALIZAR_OS.OE_EIXO}}"  readonly>
+        </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-1 col-form-label">AD</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="AD" id="AD" value="{{VISUALIZAR_OS.AD}}"  readonly>
+          </div>
         </div>
         <div class="form-group col-md-12">
           <label for="FILIAL">Lentes</label>
@@ -170,7 +198,7 @@ Vizualiar O.S
           <div class="form-group col-md-2">
             <label for="inputZip">Status</label>
             {% if VISUALIZAR_OS.STATUS == "A" %}
-            <h4><span class="badge badge-info">EM ABERTO</span></h4>
+            <h4><span class="badge badge-info">SOLICITADO</span></h4>
             {% endif %}
 
             {% if VISUALIZAR_OS.STATUS == "E" %}

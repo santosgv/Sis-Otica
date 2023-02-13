@@ -118,13 +118,13 @@ def Cadastrar_os(request,id_os):
             PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
-            RECEITA = ('OD ESF: ',request.POST.get('OD_ESF'),
-                      'OD CIL:',request.POST.get('OD_CIL'),
-                      'OD EIXO: ',request.POST.get('OD_EIXO'),
-                      'OE ESF: ',request.POST.get('OE_ESF'),
-                      'OE CIL: ',request.POST.get('OE_CIL'),
-                      'OE EIXO: ',request.POST.get('OE_EIXO'),
-                      'AD: ',request.POST.get('AD'))
+            OD_ESF = request.POST.get('OD_ESF')
+            OD_CIL = request.POST.get('OD_CIL')
+            OD_EIXO = request.POST.get('OD_EIXO')
+            OE_ESF = request.POST.get('OE_ESF')
+            OE_CIL = request.POST.get('OE_CIL')
+            OE_EIXO = request.POST.get('OE_EIXO')
+            AD = request.POST.get('AD')
             LENTES = request.POST.get('LENTES')
             ARMACAO = request.POST.get('ARMACAO')
             OBSERVACAO = request.POST.get('OBSERVACAO')
@@ -141,7 +141,13 @@ def Cadastrar_os(request,id_os):
             PREVISAO_ENTREGA= PREVISAO_ENTREGA,
             SERVICO= SERVICO_POST,
             SUB_SERVICO= SUB_SERVICO_POST,
-            RECEITA= RECEITA,
+            OD_ESF= OD_ESF,
+            OD_CIL = OD_CIL,
+            OD_EIXO = OD_EIXO,
+            OE_ESF = OE_ESF,
+            OE_CIL = OE_CIL,
+            OE_EIXO = OE_EIXO,
+            AD = AD,
             LENTES= LENTES,
             ARMACAO= ARMACAO,
             OBSERVACAO= OBSERVACAO,
@@ -189,7 +195,7 @@ def Cancelar_os(request,id_os):
             CANCELAR_OS = ORDEN.objects.get(id=id_os)
             CANCELAR_OS.STATUS ="C"
             CANCELAR_OS.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Encerrado com sucesso')
+            messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)

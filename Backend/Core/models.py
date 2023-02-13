@@ -27,7 +27,7 @@ class CLIENTE(models.Model):
 class ORDEN(models.Model):
 
     CHOICES_SITUACAO =(
-        ('A','EM ABERTO'),
+        ('A','SOLICITADO'),
         ('E','ENCERRADO'),
         ('C','CANCELADO'),
     )
