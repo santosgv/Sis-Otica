@@ -4,9 +4,7 @@ __pycache__/
 *$py.class
 
 #django
-media/
 
-migrations/
 
 # C extensions
 *.so
