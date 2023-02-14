@@ -10,6 +10,7 @@ from django.conf import settings
 from .utils import email_html
 from .models import Ativacao
 from hashlib import sha256
+from Unidades.models import UNIDADE
 
 
 
@@ -17,10 +18,16 @@ def cadastro(request):
     if request.method == "GET":
         if request.user.is_authenticated:
             return redirect('/')
-        return render(request, 'cadastro.html')
+        unidades = UNIDADE.objects.all()
+        return render(request, 'cadastro.html',{'unidades':unidades})
         
     elif request.method == "POST":
         username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
+        unidade = request.POST.get('unidade')
+        funcao = request.POST.get('funcao')
+        cpf = request.POST.get('cpf')
+        data_nascimento = request.POST.get('data_nascimento')
         email = request.POST.get('email')
         senha = request.POST.get('password')
         confirmar_senha = request.POST.get('confirm-password')
@@ -41,7 +48,12 @@ def cadastro(request):
         
         try:
             path_template = os.path.join(settings.BASE_DIR, 'autenticacao/templates/emails/cadastro_confirmado.html')
-            user = User.objects.create_user(username=username,
+            user = USUARIO.objects.create_user(username=username,
+                                            first_name=first_name,
+                                            UNIDADE= UNIDADE.objects.get(id=unidade),
+                                            DATA_NASCIMENTO=data_nascimento,
+                                            CPF=cpf,
+                                            FUNCAO= funcao,
                                             email = email,
                                             password=senha)
             user.save()
@@ -52,7 +64,8 @@ def cadastro(request):
             email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=f"127.0.0.1:8000/auth/ativar_conta/{token}")
             messages.add_message(request, constants.SUCCESS, 'Foi Enviado Para seu email o Link de ativaçao da sua conta')
             return redirect('/auth/logar')
-        except:
+        except Exception as msg:
+            print(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno do sistema')
             return redirect('/auth/cadastro')
 
@@ -79,7 +92,7 @@ def ativar_conta(request, token):
     if token.ativo:
         messages.add_message(request, constants.WARNING, 'Essa token já foi usado')
         return redirect('/auth/logar')
-    user = User.objects.get(username=token.user.username)
+    user = USUARIO.objects.get(username=token.user.username)
     user.is_active = True
     user.save()
     token.ativo = True
