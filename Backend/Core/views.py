@@ -163,13 +163,13 @@ def Cadastrar_os(request,id_os):
             cadastrar_os.save()
         
             cliente = CLIENTE.objects.get(id=id_os)
-            messages.add_message(request, constants.SUCCESS, 'Dados Cadastrado com sucesso')
-            return redirect(request,'Os/Lista_Os.html')  
+            messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
+            return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
             cliente = CLIENTE.objects.get(id=id_os)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
-            return redirect(request,'Os/Lista_Os.html')  
+            return redirect(request,'/Lista_Os')  
 
 def Visualizar_os(request,id_os):
     if request.method == "GET":
@@ -214,8 +214,9 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
+        PDF.drawString(220,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
         PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
-        PDF.drawString(430,750,'FILIAL : ' +str(PRINT_OS.FILIAL))
+        PDF.drawString(430,750,'OTICA : ' +str(PRINT_OS.FILIAL))
         
         PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
         PDF.line(30,715,580,715)
@@ -268,3 +269,8 @@ def Imprimir_os(request,id_os):
     except Exception as msg:
         print(msg)
         return redirect('/Lista_Os') 
+
+def Dashabord(request):
+    
+    return render(request,'dashabord/dashabord.html')
+    

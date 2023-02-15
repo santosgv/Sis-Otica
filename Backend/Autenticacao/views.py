@@ -1,4 +1,3 @@
-
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
