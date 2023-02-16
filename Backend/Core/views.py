@@ -14,25 +14,38 @@ from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 
 def home(request):
-    OS = ORDEN.objects.all()
-    return render(request,'home.html',{'OS':OS})
+    # ALGUMA MENSAGEM PARA O CLIENTE
+    return render(request,'home.html',)
 
 @login_required(login_url='logar')
 def clientes(request):
-    cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO').values()
+    pega_filial =USUARIO.objects.get(id=request.user.id)
 
-    pagina = Paginator(cliente_lista, 10)
+    if request.user.is_superuser ==True:
+        cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO').values()
+        pagina = Paginator(cliente_lista, 10)
 
-    page = request.GET.get('page')
+        page = request.GET.get('page')
 
-    clientes = pagina.get_page(page)
-    
-    return render(request,'Cliente/clientes.html',{'clientes':clientes,
-                                                    })
+        clientes = pagina.get_page(page)
+        
+        return render(request,'Cliente/clientes.html',{'clientes':clientes,
+                                                        })
+    else:
+        cliente_lista = CLIENTE.objects.all().filter(UNIDADE=pega_filial.UNIDADE.id).order_by('NOME').order_by('-DATA_CADASTRO').values()
+
+        pagina = Paginator(cliente_lista, 10)
+
+        page = request.GET.get('page')
+
+        clientes = pagina.get_page(page)
+        
+        return render(request,'Cliente/clientes.html',{'clientes':clientes,
+                                                        })
 
 @login_required(login_url='logar')
 def cadastro_cliente(request):
-
+    pega_filial =USUARIO.objects.get(id=request.user.id)
     if request.method == "GET":
         return render(request, 'Cliente/cadastro_cliente.html')
     else:
@@ -55,7 +68,8 @@ def cadastro_cliente(request):
         TELEFONE=TELEFONE,
         CPF=CPF,
         DATA_NASCIMENTO=DATA_NASCIMENTO,
-        EMAIL=EMAIL)
+        EMAIL=EMAIL,
+        UNIDADE=UNIDADE.objects.get(id=pega_filial.UNIDADE.id))
         cliente.save()
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/clientes')
@@ -94,16 +108,27 @@ def excluir_cliente(request,id):
 
 @login_required(login_url='logar')
 def Lista_Os(request):
+    if request.user.is_superuser ==True:
+        Lista_os = ORDEN.objects.all().order_by('id')
 
-    Lista_os = ORDEN.objects.all().order_by('id')
+        pagina = Paginator(Lista_os, 10)
 
-    pagina = Paginator(Lista_os, 10)
+        page = request.GET.get('page')
 
-    page = request.GET.get('page')
+        Ordem_servicos = pagina.get_page(page)
 
-    Ordem_servicos = pagina.get_page(page)
+        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+    else:
+        pega_filial =USUARIO.objects.get(id=request.user.id)
+        Lista_os = ORDEN.objects.all().filter(FILIAL=pega_filial.UNIDADE.id).order_by('id')
 
-    return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+        pagina = Paginator(Lista_os, 10)
+
+        page = request.GET.get('page')
+
+        Ordem_servicos = pagina.get_page(page)
+
+        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
 def Cadastrar_os(request,id_os):
     if request.method == "GET":
@@ -214,7 +239,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
-        PDF.drawString(220,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
+        PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
         PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
         PDF.drawString(430,750,'OTICA : ' +str(PRINT_OS.FILIAL))
         

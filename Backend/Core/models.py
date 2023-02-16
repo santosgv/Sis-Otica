@@ -9,6 +9,7 @@ from django.utils.timezone import now
 
 
 class CLIENTE(models.Model):
+    UNIDADE = models.ForeignKey(UNIDADE,on_delete=models.DO_NOTHING,blank=True, null=True)
     NOME = models.CharField(max_length=250)
     LOGRADOURO = models.CharField(max_length=250)
     NUMERO = models.CharField(max_length=10)
