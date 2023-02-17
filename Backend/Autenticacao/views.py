@@ -80,6 +80,7 @@ def logar(request):
 
         usuario = auth.authenticate(username=username, password=senha)
 
+
         if not usuario:
             messages.add_message(request, constants.ERROR, 'Username ou senha inválidos')
             return redirect('/auth/logar')
@@ -146,9 +147,12 @@ def alterar_conta(request):
             messages.add_message(request, constants.ERROR, 'Já existe um usário com esse username')
             return redirect('/auth/alterar_conta')
 
-        ###
-
-    return redirect('/auth/alterar_conta')
+        usuario = request.user
+        usuario.set_password(senha)
+        usuario.save()
+        auth.logout(request)
+    messages.add_message(request, constants.SUCCESS, 'Dados de Usuario Alterado com Sucesso, Faça novamente o Login para Validar')
+    return redirect('/auth/logar')
 
 def sair(request):
     auth.logout(request)
