@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'autenticacao/css/autenticacao.css' %}">
+<link rel="stylesheet" href="{% static 'home/css/home.css' %}" >
+{% endblock %}
+
+{% block 'body' %}
+<div id="fundo">
+
+    <div class="box text-center logar">
+        <form method="POST">{% csrf_token %}
+            <div class="logar-form">
+                    {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{message.tags}}">
+                        {{message}}
+                    </div>
+                {% endfor %}
+        {% endif %}
+        
+            <h1 class="titulo font-degrade borda-bottom-degrade">INSCREVA-SE</h2>
+            <br>
+            <input id="data_nascimento" style="width: 30%;" value="{{data_nascimento}}" name="data_nascimento" type="date">
+            <br>
+            <span class="span-descricao"></span>
+            <input type="text" class="form-control input-cadastro" value="{{username}}" name="username" placeholder="Login de usuário">
+            <br>
+            <span class="span-descricao"></span>
+            <input type="text" class="form-control input-cadastro" value="{{first_name}}" name="first_name" placeholder="nome de usuário">
+            <br>
+            <span class="span-descricao"></span>
+            <input type="text" class="form-control input-cadastro"  value="{{cpf}}" name="cpf" id="cpf" placeholder="CPF">
+            <br>
+            <span class="span-descricao"></span>
+            <input type="text" class="form-control input-cadastro" value="{{email}}" name="email" placeholder="Email">
+            <br>
+            <span class="span-descricao"></span>
+            <br>
+            <input type="password" class="form-control input-cadastro" name="password_old" placeholder="Senha Antiga">
+            <br>
+            <br>
+            <input type="password" class="form-control input-cadastro" name="password_new" placeholder="Senha Nova">
+            <br>
+            <span class="span-descricao"></span>
+            <input type="password" class="form-control input-cadastro" name="confirm-password" placeholder="Confirmar senha">
+        </div>
+            <br>
+            <input  type="submit" value="Alterar" class="bto-success bto-group-lg bto-lg">
+            
+        </form>
+            
+    </div>
+</div>
+{% endblock %} 

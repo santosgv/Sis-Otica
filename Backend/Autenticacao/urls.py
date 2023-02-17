@@ -7,6 +7,7 @@ urlpatterns = [
     path('logar/', views.logar, name='logar'),
     path('sair/', views.sair, name="sair"),
     path('ativar_conta/<str:token>/', views.ativar_conta, name="ativar_conta"),
+    path('alterar_conta', views.alterar_conta, name='alterar_conta'),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name="password_reset.html"), name="password_reset"),
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name="password_reset_done.html"), name="password_reset_done"),
