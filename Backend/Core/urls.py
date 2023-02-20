@@ -19,6 +19,7 @@ urlpatterns = [
     path('Encerrar_os/<int:id_os>',views.Encerrar_os,name='Encerrar_os'),
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
     path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
+    path('Imprimir_os_lab/<int:id_os>',views.Imprimir_os_lab,name='Imprimir_os_lab'),
     path('Dashabord',views.Dashabord,name='Dashabord')
 ]
 

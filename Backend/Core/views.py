@@ -22,7 +22,7 @@ def clientes(request):
     pega_filial =USUARIO.objects.get(id=request.user.id)
 
     if request.user.is_superuser ==True:
-        cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO').values()
+        cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO')
         pagina = Paginator(cliente_lista, 10)
 
         page = request.GET.get('page')
@@ -109,7 +109,7 @@ def excluir_cliente(request,id):
 @login_required(login_url='logar')
 def Lista_Os(request):
     if request.user.is_superuser ==True:
-        Lista_os = ORDEN.objects.all().order_by('id')
+        Lista_os = ORDEN.objects.all().order_by('-id')
 
         pagina = Paginator(Lista_os, 10)
 
@@ -141,6 +141,7 @@ def Cadastrar_os(request,id_os):
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
             PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
+            ASSINATURA = request.POST.get('ASSINATURA')
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
@@ -150,12 +151,22 @@ def Cadastrar_os(request,id_os):
             OE_CIL = request.POST.get('OE_CIL')
             OE_EIXO = request.POST.get('OE_EIXO')
             AD = request.POST.get('AD')
+            DNP = request.POST.get('DNP')
+            P = request.POST.get('P')
+            DPA = request.POST.get('DPA')
+            DIAG = request.POST.get('DIAG')
+            V = request.POST.get('V')
+            H = request.POST.get('H')
+            ALT = request.POST.get('ALT')
+            ARM = request.POST.get('ARM')
+            MONTAGEM = request.POST.get('MONTAGEM')
             LENTES = request.POST.get('LENTES')
             ARMACAO = request.POST.get('ARMACAO')
             OBSERVACAO = request.POST.get('OBSERVACAO')
             FORMA_PAG = request.POST.get('PAGAMENTO')
             VALOR = request.POST.get('VALOR')
             QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+
             if request.POST.get('ENTRADA') == '':
                 ENTRADA =0
             else:
@@ -167,6 +178,7 @@ def Cadastrar_os(request,id_os):
             VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
             CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
             PREVISAO_ENTREGA= PREVISAO_ENTREGA,
+            ASSINATURA =ASSINATURA,
             SERVICO= SERVICO_POST,
             SUB_SERVICO= SUB_SERVICO_POST,
             OD_ESF= OD_ESF,
@@ -176,6 +188,15 @@ def Cadastrar_os(request,id_os):
             OE_CIL = OE_CIL,
             OE_EIXO = OE_EIXO,
             AD = AD,
+            DNP = DNP,
+            P = P,
+            DPA = DPA,
+            DIAG = DIAG,
+            V = V,
+            H = H,
+            ALT = ALT,
+            ARM = ARM,
+            MONTAGEM = MONTAGEM,
             LENTES= LENTES,
             ARMACAO= ARMACAO,
             OBSERVACAO= OBSERVACAO,
@@ -286,6 +307,65 @@ def Imprimir_os(request,id_os):
         PDF.drawString(30,250,'ENTRADA : '+ str(PRINT_OS.ENTRADA))
 
         PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
+        PDF.line(250,30,580,30)
+        PDF.showPage()
+        PDF.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
+    except Exception as msg:
+        print(msg)
+        return redirect('/Lista_Os')
+    
+def Imprimir_os_lab(request,id_os):
+    try:
+        PRINT_OS =ORDEN.objects.get(id=id_os)
+        
+        buffer = io.BytesIO()
+        PDF = canvas.Canvas(buffer,pagesize=letter)
+        PDF.setFont('Courier', 15)
+
+        PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
+        PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
+        PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
+        PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
+        PDF.drawString(430,750,'OTICA : ' +str(PRINT_OS.FILIAL))
+        
+        PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
+        PDF.line(30,715,580,715)
+        PDF.drawString(250,695,'SERVIÇOS')
+        PDF.drawString(30,650,'SERVIÇO : ' + str(PRINT_OS.SERVICO))
+        PDF.drawString(300,650,'SUB SERVIÇO : ' + str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(250,600,'RECEITA')
+
+        PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
+        PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
+        PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
+        PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
+        PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
+        PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
+        PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
+
+        PDF.line(30,490,580,490)
+
+        PDF.drawString(30,450,'LENTES : '+ str(PRINT_OS.LENTES))
+        PDF.drawString(300,450,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
+    
+        PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
+
+        PDF.line(30,360,580,360)
+        
+        PDF.drawString(250,340,'LABORATORIO')   
+        PDF.drawString(30,300,'DNP : '+ str(PRINT_OS.DNP))
+        PDF.drawString(250,300,'P : ' + str(PRINT_OS.P))
+        PDF.drawString(400,300,'DPA : ' + str(PRINT_OS.DPA))
+        PDF.drawString(30,280,'DIAG : ' + str(PRINT_OS.DIAG))
+        PDF.drawString(250,280,'V : ' + str(PRINT_OS.V))
+        PDF.drawString(400,280,'H : ' + str(PRINT_OS.H))
+        PDF.drawString(30,260,'ALT :'+ str(PRINT_OS.ALT))
+        PDF.drawString(400,260,'ARM : '+ str(PRINT_OS.ARM))
+        PDF.drawString(30,240,'MONTAGEM : '+ str(PRINT_OS.MONTAGEM))
+
+        PDF.drawString(30,30,'ASSINATURA DO VENDEDOR: ')
         PDF.line(250,30,580,30)
         PDF.showPage()
         PDF.save()

@@ -99,6 +99,41 @@ Vizualiar O.S
             <input type="text" class="form-control" name="AD" id="AD" value="{{VISUALIZAR_OS.AD}}"  readonly>
           </div>
         </div>
+        <hr> 
+            <label for="">Laboratorio</label>
+            <div class="form-row">
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DNP" name="DNP" value="{{VISUALIZAR_OS.DNP}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="P" name="P" value="{{VISUALIZAR_OS.P}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DPA" name="DPA" value="{{VISUALIZAR_OS.DPA}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DIAG" name="DIAG" value="{{VISUALIZAR_OS.DIAG}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="V" name="V" value="{{VISUALIZAR_OS.V}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="H" name="H" value="{{VISUALIZAR_OS.H}}"  readonly>
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="ALT" name="ALT" value="{{VISUALIZAR_OS.ALT}}"  readonly>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="ARM" name="ARM" value="{{VISUALIZAR_OS.ARM}}"  readonly>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="MONTAGEM" name="MONTAGEM" value="{{VISUALIZAR_OS.MONTAGEM}}"  readonly>
+              </div>
+            </div>
+            <hr>
         <div class="form-group col-md-12">
           <label for="FILIAL">Lentes</label>
           <input required class="form-control" readonly value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
@@ -212,6 +247,7 @@ Vizualiar O.S
           Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
         </div>
         <a href="{% url 'Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
+        <a href="{% url 'Imprimir_os_lab' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Imprimir Via Lab</a>
         {% if VISUALIZAR_OS.STATUS == "A" %}
         <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Encerrar</a>
         <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
