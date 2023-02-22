@@ -149,6 +149,7 @@ def alterar_conta(request):
 
         usuario = request.user
         usuario.set_password(senha)
+        usuario.first_name = first_name
         usuario.save()
         auth.logout(request)
     messages.add_message(request, constants.SUCCESS, 'Dados de Usuario Alterado com Sucesso, Faça novamente o Login para Validar')
