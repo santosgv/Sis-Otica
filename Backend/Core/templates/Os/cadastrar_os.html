@@ -55,7 +55,7 @@ Cadastrar O.S
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="inputState">Tipo de Serviço</label>
-                  <select id="SERVICO" name="SERVICO" class="form-control" required="required">
+                  <select id="SERVICO" name="SERVICO" class="form-control"  required="required">
                     <option selected>Escolha...</option>
                     <option value="Encomenda">Encomenda</option>
                     <option value="Pronta Entrega">Pronta Entrega</option>
@@ -63,12 +63,13 @@ Cadastrar O.S
                 </div>
                 <div class="form-group col-md-6">
                   <label for="inputState">Sub Serviço</label>
-                  <select id="SUB_SERVICO" name="SUB_SERVICO" class="form-control" required>
+                  <select id="SUB_SERVICO" name="SUB_SERVICO" onchange="atualizarSegundoSelect()" class="form-control" required>
                     <option selected>Escolha...</option>
                   </select>
                 </div>
               </div>
             </div>
+            <div id="_receita">
                 <label for="NUMERO">Receita</label>
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
@@ -102,10 +103,12 @@ Cadastrar O.S
                 <input type="text" class="form-control" name="AD" id="AD" placeholder="AD">
               </div>
               <div class="col-sm-8">
-                <input type="file" required class="form-control-file" id="ANEXO" name="ANEXO">
+                <input type="file"  class="form-control-file" id="ANEXO" name="ANEXO">
               </div>
             </div>
+            </div>
             <hr> 
+            <div id="_laboratorio">
             <label for="">Laboratorio</label>
             <div class="form-row">
               <div class="col-md-2">
@@ -139,16 +142,17 @@ Cadastrar O.S
                 <input type="text" class="form-control" id="MONTAGEM" name="MONTAGEM" placeholder="Montagem">
               </div>
             </div>
+          </div>
             <hr>
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-12" id="_lentes">
               <label for="FILIAL">Lentes</label>
               <input  class="form-control" id="LENTES" name="LENTES"  >
             </div>
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-12" id="_armacao">
               <label for="FILIAL">Armação</label>
               <input  class="form-control" id="ARMACAO" name="ARMACAO"  >
             </div>
-            <div class="form-group">
+            <div class="form-group" id="_observacao">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
               <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="3"></textarea>
             </div>
@@ -214,6 +218,7 @@ Cadastrar O.S
     </section>
 
     <script src="{% static 'Unidades/js/os.js' %}"></script>
+    <script src="{% static 'Unidades/js/os_Segundo.js' %}"></script>
     <script src="{% static 'Unidades/js/carne.js' %}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
