@@ -136,12 +136,18 @@ def Cadastrar_os(request,id_cliente):
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente})
     else:
         try:
-            ANEXO = request.FILES['ANEXO']
+            if 'ANEXO' in  request.FILES:
+                ANEXO = request.FILES['ANEXO']
+            else:
+                ANEXO = None
             FILIAL = request.POST.get('FILIAL')
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
             PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
-            ASSINATURA = request.FILES['ASSINATURA']
+            if 'ASSINATURA' in request.FILES:
+                ASSINATURA = request.FILES['ASSINATURA']
+            else:
+                ASSINATURA = None 
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
@@ -203,9 +209,10 @@ def Cadastrar_os(request,id_cliente):
             FORMA_PAG= FORMA_PAG,
             VALOR= VALOR,
             QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-            ENTRADA= ENTRADA 
-          )
-           
+            ENTRADA= ENTRADA )
+            
+            print(ANEXO)
+            print(ASSINATURA)
             cadastrar_os.save()
 
             messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
