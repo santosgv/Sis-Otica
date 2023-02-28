@@ -130,9 +130,9 @@ def Lista_Os(request):
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
-def Cadastrar_os(request,id_os):
+def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
-        cliente = CLIENTE.objects.get(id=id_os)
+        cliente = CLIENTE.objects.get(id=id_cliente)
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente})
     else:
         try:
@@ -141,7 +141,7 @@ def Cadastrar_os(request,id_os):
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
             PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
-            ASSINATURA = request.POST.get('ASSINATURA')
+            ASSINATURA = request.FILES['ASSINATURA']
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
@@ -203,17 +203,16 @@ def Cadastrar_os(request,id_os):
             FORMA_PAG= FORMA_PAG,
             VALOR= VALOR,
             QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-            ENTRADA= ENTRADA     
+            ENTRADA= ENTRADA 
           )
-            
+           
             cadastrar_os.save()
-        
-            cliente = CLIENTE.objects.get(id=id_os)
+
             messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
-            cliente = CLIENTE.objects.get(id=id_os)
+            cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
 
