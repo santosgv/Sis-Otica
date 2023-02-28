@@ -210,9 +210,9 @@ def Cadastrar_os(request,id_cliente):
             VALOR= VALOR,
             QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
             ENTRADA= ENTRADA )
-            
-            print(ANEXO)
-            print(ASSINATURA)
+
+
+
             cadastrar_os.save()
 
             messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
