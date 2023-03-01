@@ -7,15 +7,19 @@ from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from datetime import datetime
-
+from notifications.signals import notify
 from reportlab.pdfgen import canvas
 import io
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
+from .notifications import get_unread_notifications
 
 def home(request):
-    # ALGUMA MENSAGEM PARA O CLIENTE
-    return render(request,'home.html',)
+    if request.user.is_authenticated:
+        mensagens = get_unread_notifications(request.user)
+        return render(request,'home.html',{'mensagens':mensagens})
+    else:
+        return render(request,'home.html')
 
 @login_required(login_url='logar')
 def clientes(request):
