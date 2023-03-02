@@ -8,18 +8,24 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from datetime import datetime
 from notifications.signals import notify
+from notifications.models import Notification
 from reportlab.pdfgen import canvas
 import io
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
-from .notifications import get_unread_notifications
+from .notifications import get_unread_notifications, count_notifications_unreade
 
 def home(request):
     if request.user.is_authenticated:
         mensagens = get_unread_notifications(request.user)
-        return render(request,'home.html',{'mensagens':mensagens})
+        count =count_notifications_unreade(request.user)
+        return render(request,'home.html',{'mensagens':mensagens,
+                                           'count':count})
     else:
         return render(request,'home.html')
+def marcar_notificacao_como_lida(request):
+    Notification.objects.mark_all_as_read(recipient=request.user)
+    return redirect('/')
 
 @login_required(login_url='logar')
 def clientes(request):
