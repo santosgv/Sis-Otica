@@ -29,8 +29,10 @@ class ORDEN(models.Model):
 
     CHOICES_SITUACAO =(
         ('A','SOLICITADO'),
-        ('E','ENCERRADO'),
+        ('E','ENTREGUE'),
         ('C','CANCELADO'),
+        ('L','LABORATÓRIO'),
+        ('J','lOJA')
     )
 
     CHOICES_PAGAMENTO =(
