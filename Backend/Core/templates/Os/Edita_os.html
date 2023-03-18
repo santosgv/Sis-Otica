@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Vizualiar O.S
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+      <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'Lista_Os'%}">Listar O.S</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Visualziar O.S</li>
+    </ol>
+  </nav>
+  <section class="container-fluid text-center">
+    <div class="text-center">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{message.tags}}">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <form method="POST" class="form_cliente">{% csrf_token %}
+      <h1>{{VISUALIZAR_OS.id}}</h1>
+        <div class="form-group">
+          <img src="/media/{{VISUALIZAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
+        </div>
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label for="FILIAL">Filial</label>
+            <input readonly class="form-control" id="FILIAL" name="FILIAL" value="{{VISUALIZAR_OS.FILIAL}}" >
+          </div>
+          <div class="form-group col-md-4">
+            <label for="VENDEDOR" >Vendedor</label>
+            <input readonly class="form-control" value="{{user.first_name}}" >
+            <input type="text" id="VENDEDOR" style="display: none;" name="VENDEDOR" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="CLIENTE">Cliente</label>
+            <input readonly class="form-control"  id="CLIENTE" name="CLIENTE" value="{{VISUALIZAR_OS.CLIENTE}}" >
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="inputState">Tipo de Serviço</label>
+              <select required id="SERVICO" readonly name="SERVICO" class="form-control">
+                <option selected>{{VISUALIZAR_OS.SERVICO}}</option>
+                <option value="Encomenda">Encomenda</option>
+                <option value="Pronta Entrega">Pronta Entrega</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="inputState">Sub Serviço</label>
+              <select required id="SUB_SERVICO" readonly name="SUB_SERVICO" class="form-control">
+                <option selected>{{VISUALIZAR_OS.SUB_SERVICO}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
+          <div class="col-sm-3">
+            <input  type="text" class="form-control" name="OD_ESF" id="OD_ESF" value="{{VISUALIZAR_OS.OD_ESF}}"  readonly>
+          </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control"  name="OD_CIL" id="OD_CIL" value="{{VISUALIZAR_OS.OD_CIL}}"  readonly>
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control"  name="OD_EIXO" id="OD_EIXO" value="{{VISUALIZAR_OS.OD_EIXO}}"  readonly>
+        </div>
+
+        </div>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-1 col-form-label">OE</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="OE_ESF" id="OE_ESF" value="{{VISUALIZAR_OS.OE_ESF}}"  readonly>
+          </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="OE_CIL" id="OE_CIL" value="{{VISUALIZAR_OS.OE_CIL}}"  readonly>
+        </div>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="OE_EIXO" id="OE_EIXO"  value="{{VISUALIZAR_OS.OE_EIXO}}"  readonly>
+        </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-1 col-form-label">AD</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="AD" id="AD" value="{{VISUALIZAR_OS.AD}}"  readonly>
+          </div>
+        </div>
+        <hr> 
+            <label for="">Laboratorio</label>
+            <div class="form-row">
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DNP" name="DNP" value="{{VISUALIZAR_OS.DNP}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="P" name="P" value="{{VISUALIZAR_OS.P}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DPA" name="DPA" value="{{VISUALIZAR_OS.DPA}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="DIAG" name="DIAG" value="{{VISUALIZAR_OS.DIAG}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="V" name="V" value="{{VISUALIZAR_OS.V}}"  readonly>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class="form-control" id="H" name="H" value="{{VISUALIZAR_OS.H}}"  readonly>
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="ALT" name="ALT" value="{{VISUALIZAR_OS.ALT}}"  readonly>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="ARM" name="ARM" value="{{VISUALIZAR_OS.ARM}}"  readonly>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="MONTAGEM" name="MONTAGEM" value="{{VISUALIZAR_OS.MONTAGEM}}"  readonly>
+              </div>
+            </div>
+            <hr>
+        <div class="form-group col-md-12">
+          <label for="FILIAL">Lentes</label>
+          <input required class="form-control" readonly value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
+        </div>
+        <div class="form-group col-md-12">
+          <label for="FILIAL">Armação</label>
+          <input required class="form-control" readonly value="{{VISUALIZAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO"  >
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">Obeservaçâo</label>
+          <textarea class="form-control"  readonly id="OBSERVACAO" name="OBSERVACAO" rows="3">{{VISUALIZAR_OS.OBSERVACAO}}</textarea>
+        </div>
+        <hr>
+        <div class="text center">
+          <div class="row">
+          <label for="NUMERO">FINANCEIRO</label>
+          <div class="form-group col-md-2">
+            <label for="inputState">Pagamento</label>
+            <select required id="PAGAMENTO" readonly name="PAGAMENTO" onChange="link()" class="form-control">
+                {% if VISUALIZAR_OS.FORMA_PAG == "A" %}
+                    <option value="A">Pix</option>
+                {% endif%}
+                {% if VISUALIZAR_OS.FORMA_PAG == "B" %}
+                <option value="B">Dinheiro</option>
+                {% endif%}
+                {% if VISUALIZAR_OS.FORMA_PAG == "C" %}
+              <option value="C">Debito</option>
+                {% endif%}
+                {% if VISUALIZAR_OS.FORMA_PAG == "D" %}
+              <option value="D">Credito</option>
+                {% endif%}
+                {% if VISUALIZAR_OS.FORMA_PAG == "E" %}
+              <option value="E">Carne</option>
+                {% endif%}
+                {% if VISUALIZAR_OS.FORMA_PAG == "F" %}
+              <option value="F">Permuta</option>
+                {% endif%}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Valor</label>
+            <input required type="text" readonly value="{{VISUALIZAR_OS.VALOR}}" class="form-control" id="VALOR" name="VALOR">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Parcelas</label>
+            <select required id="QUANTIDADE_PARCELA" readonly name="QUANTIDADE_PARCELA" class="form-control">
+                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 1 %}
+                <option value="1">1x</option>
+                {% endif%}
+
+                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 2 %}
+              <option value="2">2x</option>
+              {% endif%}
+
+                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 3 %}
+              <option value="3">3x</option>
+              {% endif%}
+
+                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 4 %}
+              <option value="4">4x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 5 %}
+              <option value="5">5x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 6 %}
+              <option value="6">6x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 7 %}
+              <option value="7">7x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 8 %}
+              <option value="8">8x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 9 %}
+              <option value="9">9x</option>
+              {% endif%}
+
+              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 10 %}
+              <option value="10">10x</option>
+              {% endif%}
+            </select>
+          </div>
+          
+          <div class="form-group col-md-2">
+            <label for="inputZip">Entrada</label>
+            <input required type="text" readonly value="{{VISUALIZAR_OS.ENTRADA}}" class="form-control" id="ENTRADA" name="ENTRADA">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Status</label>
+            {% if VISUALIZAR_OS.STATUS == "A" %}
+            <h4><span class="badge badge-info">SOLICITADO</span></h4>
+            {% endif %}
+
+            {% if VISUALIZAR_OS.STATUS == "E" %}
+            <h4><span class="badge badge-success">ENTREGUE</span></h4>
+             {% endif %}
+
+             {% if VISUALIZAR_OS.STATUS == "C" %}
+             <h4><span class="badge badge-danger">CANCELADO</span></h4>
+             {% endif %}
+
+             {% if VISUALIZAR_OS.STATUS == "L" %}
+             <h4><span class="badge badge-primary">LABORATÓRIO</span></h4>
+             {% endif %}
+
+             {% if VISUALIZAR_OS.STATUS == "J" %}
+             <h4><span class="badge badge-light">LOJA</span></h4>
+             {% endif %}
+           
+          </div>
+        </div>
+        </div>
+        <div class="alert alert-warning _carner" style="display: none;" role="alert">
+          Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
+        </div>
+        <a href="{% url 'Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
+        <a href="{% url 'Imprimir_os_lab' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Imprimir Via Lab</a>
+        {% if VISUALIZAR_OS.STATUS == "A" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "E" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled>Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "C" %}
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        {% endif %}
+      </form>
+  </section>
+
+
+  <script src="{% static 'Unidades/js/os.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
+
+
+{%endblock%}
