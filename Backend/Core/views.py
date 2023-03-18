@@ -1,4 +1,5 @@
 from django.contrib import messages
+from datetime import datetime
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE
@@ -6,7 +7,7 @@ from Unidades.models import UNIDADE
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from datetime import datetime
+import datetime
 from notifications.signals import notify
 from notifications.models import Notification
 from reportlab.pdfgen import canvas
@@ -386,12 +387,31 @@ def Imprimir_os_lab(request,id_os):
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
+        return FileResponse(buffer, as_attachment=True, filename='OS-LAB.pdf')
     except Exception as msg:
         print(msg)
         return redirect('/Lista_Os') 
 
 def Dashabord(request):
-    
-    return render(request,'dashabord/dashabord.html')
+    date_now  = datetime.datetime.now().date()
+    thirty_days_ago = date_now - datetime.timedelta(days=30)
+    if request.user.is_superuser ==True:
+        Lista_os = ORDEN.objects.all().filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
+        
+        pagina = Paginator(Lista_os, 10)
+
+        page = request.GET.get('page')
+
+        kankan_servicos = pagina.get_page(page)
+
+        return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
+    else:
+        pega_filial =USUARIO.objects.get(id=request.user.id)
+        Lista_os = ORDEN.objects.all().filter(FILIAL=pega_filial.UNIDADE.id).filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
+        pagina = Paginator(Lista_os, 10)
+
+        page = request.GET.get('page')
+
+        kankan_servicos = pagina.get_page(page)
+    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     
