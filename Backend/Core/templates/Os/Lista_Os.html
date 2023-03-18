@@ -62,11 +62,17 @@
                             {% endif %}
 
                             {% if Os.STATUS == "E" %}
-                            <span class="badge badge-success">ENCERRADO</span>
+                            <span class="badge badge-success">ENTREGUE</span>
                              {% endif %}
 
                              {% if Os.STATUS == "C" %}
                              <span class="badge badge-danger">CANCELADO</span>
+                             {% endif %}
+                             {% if Os.STATUS == "L" %}
+                             <span class="badge badge-primary">LABORATÓRIO</span>
+                             {% endif %}
+                             {% if Os.STATUS == "J" %}
+                             <span class="badge badge-light">LOJA</span>
                              {% endif %}
                           </td>
                           <td>{{Os.OBSERVACAO}}</td>
