@@ -9,26 +9,28 @@
 <div class="container-fluid pt-3">
   <h3 class="font-weight-light text-center">Kanban Board ultimos 30 Dias</h3>
   <div class="row flex-row flex-sm-nowrap py-3">
-    {%for kanban in kankan_servicos %}
+
       <div class="col-sm-6 col-md-4 col-xl-3">
           <div class="card bg-light">
               <div class="card-body">
                   <h6 class="card-title text-uppercase text-truncate py-2">Solicitado</h6>
                   <div class="items border border-light">
+                    {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "A" %}
                       <div class="card draggable shadow-sm" id="cd1" >
                           <div class="card-body p-2">
                               <div class="card-title">
                                   <img src="//via.placeholder.com/30" class="rounded-circle float-right">
-                                  <a href="" class="lead font-weight-light">{{kanban}}</a>
+                                  <span href="" class="lead font-weight-light">OS : {{kanban}}</span>
                               </div>
                               <p>
                                   This is a description of a item on the board.
                               </p>
-                              <button class="btn btn-primary btn-sm">View</button>
+                              <a class="btn btn-primary btn-sm" href="{% url 'Visualizar_os' kanban.id  %}">Vizualizar</a>
                           </div>
                       </div> 
                       {% endif %}
+                      {% endfor%}
                   </div>
               </div>
           </div>
@@ -38,20 +40,22 @@
               <div class="card-body">
                   <h6 class="card-title text-uppercase text-truncate py-2">Laboratorio</h6>
                   <div class="items border border-light">
+                    {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "L" %}
                       <div class="card draggable shadow-sm" id="cd2">
                           <div class="card-body p-2">
                               <div class="card-title">
                                   <img src="//via.placeholder.com/30" class="rounded-circle float-right">
-                                  <a href="" class="lead font-weight-light">{{kanban}}</a>
+                                  <span href="" class="lead font-weight-light">OS : {{kanban}}</span>
                               </div>
                               <p>
                                   Another task here that is in progress.
                               </p>
-                              <button class="btn btn-primary btn-sm">View</button>
+                              <a class="btn btn-primary btn-sm" href="{% url 'Visualizar_os' kanban.id  %}">Vizualizar</a>
                           </div>
                       </div>
                       {% endif %}
+                      {% endfor%}
                   </div>
               </div>
           </div>
@@ -61,20 +65,22 @@
               <div class="card-body">
                   <h6 class="card-title text-uppercase text-truncate py-2">Loja</h6>
                   <div class="items border border-light">
+                    {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "J" %}
                       <div class="card draggable shadow-sm" id="cd9">
                           <div class="card-body p-2">
                               <div class="card-title">
                                   <img src="//via.placeholder.com/30" class="rounded-circle float-right">
-                                  <a href="" class="lead font-weight-light">{{kanban}}</a>
+                                  <span href="" class="lead font-weight-light">OS : {{kanban}}</span>
                               </div>
                               <p>
                                   This is a description of a item on the board.
                               </p>
-                              <button class="btn btn-primary btn-sm">View</button>
+                              <a class="btn btn-primary btn-sm" href="{% url 'Visualizar_os' kanban.id  %}">Vizualizar</a>
                           </div>
                       </div>
                       {% endif %}
+                      {% endfor%}
                   </div>
               </div>
           </div>
@@ -84,26 +90,28 @@
               <div class="card-body">
                   <h6 class="card-title text-uppercase text-truncate py-2">Entregue</h6>
                   <div class="items border border-light">
-                    {% if kanban.STATUS == "J" %}
+                    {%for kanban in kankan_servicos %}
+                    {% if kanban.STATUS == "E" %}
                       <div class="card draggable shadow-sm" id="cd12">
                           <div class="card-body p-2">
                               <div class="card-title">
                                   <img src="//via.placeholder.com/30" class="rounded-circle float-right">
-                                  <a href="" class="lead font-weight-light">{{kanban}}</a>
+                                  <span href="" class="lead font-weight-light">OS : {{kanban}}</span>
                               </div>
                               <p>
                                   This is a description of a task item.
                               </p>
-                              <button class="btn btn-primary btn-sm">View</button>
+                              <a class="btn btn-primary btn-sm" href="{% url 'Visualizar_os' kanban.id  %}">Vizualizar</a>
                           </div>
                       </div>
                       
                       {% endif %}
+                      {% endfor%}
                   </div>
               </div>
           </div>
       </div>
-      {% endfor%}
+      
   </div>
 </div>
 

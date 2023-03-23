@@ -32,7 +32,7 @@ class ORDEN(models.Model):
         ('E','ENTREGUE'),
         ('C','CANCELADO'),
         ('L','LABORATÓRIO'),
-        ('J','lOJA')
+        ('J','LOJA')
     )
 
     CHOICES_PAGAMENTO =(
