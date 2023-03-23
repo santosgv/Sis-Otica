@@ -401,9 +401,9 @@ def Dashabord(request):
         pagina = Paginator(Lista_os, 10)
 
         page = request.GET.get('page')
-  
+        
         kankan_servicos = pagina.get_page(page)
-    
+
         return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     else:
         pega_filial =USUARIO.objects.get(id=request.user.id)
