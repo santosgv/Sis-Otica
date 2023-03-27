@@ -150,7 +150,7 @@ def Cadastrar_os(request,id_cliente):
             if 'ANEXO' in  request.FILES:
                 ANEXO = request.FILES['ANEXO']
             else:
-                ANEXO = None
+                ANEXO = 'N/D'
             FILIAL = request.POST.get('FILIAL')
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
@@ -158,7 +158,7 @@ def Cadastrar_os(request,id_cliente):
             if 'ASSINATURA' in request.FILES:
                 ASSINATURA = request.FILES['ASSINATURA']
             else:
-                ASSINATURA = None 
+                ASSINATURA = 'N/D' 
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
@@ -188,7 +188,7 @@ def Cadastrar_os(request,id_cliente):
                 ENTRADA =0
             else:
                 ENTRADA = request.POST.get('ENTRADA')
-           
+            
             cadastrar_os = ORDEN(
             ANEXO= ANEXO,
             FILIAL= UNIDADE.objects.get(NOME=FILIAL),
@@ -225,6 +225,8 @@ def Cadastrar_os(request,id_cliente):
 
 
             cadastrar_os.save()
+            print(request.FILES['ASSINATURA'])
+            print(request.FILES['ANEXO'])
 
             messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
             return redirect('/Lista_Os')  
@@ -390,8 +392,9 @@ def Imprimir_os_lab(request,id_os):
         return FileResponse(buffer, as_attachment=True, filename='OS-LAB.pdf')
     except Exception as msg:
         print(msg)
-        return redirect('/Lista_Os') 
-
+        return redirect('/Lista_Os')
+     
+@login_required(login_url='logar')
 def Dashabord(request):
     date_now  = datetime.datetime.now().date()
     thirty_days_ago = date_now - datetime.timedelta(days=30)
