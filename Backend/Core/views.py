@@ -150,7 +150,7 @@ def Cadastrar_os(request,id_cliente):
             if 'ANEXO' in  request.FILES:
                 ANEXO = request.FILES['ANEXO']
             else:
-                ANEXO = 'N/D'
+                ANEXO = None
             FILIAL = request.POST.get('FILIAL')
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
@@ -158,7 +158,7 @@ def Cadastrar_os(request,id_cliente):
             if 'ASSINATURA' in request.FILES:
                 ASSINATURA = request.FILES['ASSINATURA']
             else:
-                ASSINATURA = 'N/D' 
+                ASSINATURA = None 
             SERVICO_POST =str(request.POST.get('SERVICO'))
             SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
@@ -225,8 +225,6 @@ def Cadastrar_os(request,id_cliente):
 
 
             cadastrar_os.save()
-            print(request.FILES['ASSINATURA'])
-            print(request.FILES['ANEXO'])
 
             messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
             return redirect('/Lista_Os')  
