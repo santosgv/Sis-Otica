@@ -13,7 +13,7 @@
 {% block 'body'%}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
-    <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
     <li class="breadcrumb-item active" aria-current="page">O.S</li>
   </ol>
 </nav>
@@ -77,7 +77,7 @@
                           </td>
                           <td>{{Os.OBSERVACAO}}</td>
                           <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
-                          <td><a href="{% url 'Visualizar_os' Os.id  %}">Visualizar</td>
+                          <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
                         </tr>
                       </tbody>
                       {% endfor%}

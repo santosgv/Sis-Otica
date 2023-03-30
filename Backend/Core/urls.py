@@ -4,6 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from Core import views
 
+
+app_name = 'Core'
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('marcar_notificacao_como_lida/',views.marcar_notificacao_como_lida , name='marcar_notificacao_como_lida'),

@@ -13,7 +13,7 @@
 {% block 'body'%}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
-    <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
     <li class="breadcrumb-item active" aria-current="page">Clientes</li>
   </ol>
 </nav>
@@ -24,7 +24,7 @@
  
     </form>
     <div class="btn-continuar">
-      <a type="button" class="btn btn-primary" href="{% url 'cadastro_cliente'%}">Cadastrar cliente</a>
+      <a type="button" class="btn btn-primary" href="{% url 'Core:cadastro_cliente'%}">Cadastrar cliente</a>
     </div>
   </nav>
             <div class="text-center">
@@ -52,7 +52,7 @@
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
-                          <th scope="row"><a href="{% url 'cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
+                          <th scope="row"><a href="{% url 'Core:cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
                           <td>{{cliente.LOGRADOURO}}</td>
                           <td>{{cliente.NUMERO}}</td>
                           <td>{{cliente.BAIRRO}}</td>
@@ -61,7 +61,7 @@
                           <td>{{cliente.EMAIL}}</td>
                           <td>{{cliente.TELEFONE}}</td>
                           <td>
-                            <a href="{% url 'Cadastrar_os' cliente.id %}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a>
+                            <a href="{% url 'Core:Cadastrar_os' cliente.id %}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a>
                           </td>
                         </tr>
                       </tbody>

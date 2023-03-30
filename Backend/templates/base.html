@@ -23,15 +23,15 @@
             <div class="border-end bg-white" id="sidebar-wrapper">
                 <div class="sidebar-heading border-bottom bg-light"><img src="{% static 'home/img/logo-preto-amarelo.jpeg' %}" height="200px" alt="logo"></div>
                 <div class="list-group list-group-flush">
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'home'%}">Inicio</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:home'%}">Inicio</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Caixa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Venda</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Lista_Os'%}">Pesquisa</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{%url 'Dashabord' %}">Dashboard</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:Lista_Os'%}">Pesquisa</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{%url 'Core:Dashabord' %}">Dashboard</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Outros</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Minhas Vendas</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'clientes'%}">Clientes</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'sair'%}">Sair</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:clientes'%}">Clientes</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Autenticacao:sair'%}">Sair</a>
                 </div>
             </div>
             <!-- Page content wrapper-->
@@ -56,9 +56,9 @@
                                     <span class="badge badge-info">Vendedor</span>
                                     {% endif %}
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="{%url 'alterar_conta' %}">Editar Perfil</a>
+                                        <a class="dropdown-item" href="{%url 'Autenticacao:alterar_conta' %}">Editar Perfil</a>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="{%url 'sair' %}">Sair</a>
+                                        <a class="dropdown-item" href="{%url 'Autenticacao:sair' %}">Sair</a>
                                       </div>
                                 </li>
                                 {% endif %}

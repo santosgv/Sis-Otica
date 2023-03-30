@@ -13,8 +13,8 @@
 {% block 'body'%}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
-    <li class="breadcrumb-item"><a href="{% url 'home'%}">Pagina Principal</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'clientes'%}">Clientes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:clientes'%}">Clientes</a></li>
     <li class="breadcrumb-item active" aria-current="page">Visualizar Cliente</li>
   </ol>
 </nav>
@@ -23,7 +23,7 @@
     <div class="text-center">
       <label for="" class="titulo">Cadastro cliente</label>
     </div>
-      <form method="POST" class="form_cliente" action="{% url 'cliente' cliente.id %}">{% csrf_token %}
+      <form method="POST" class="form_cliente" action="{% url 'Core:cliente' cliente.id %}">{% csrf_token %}
         <div class="col-sm-10">
           <input type="text" readonly class="form-control-plaintext" name="ID" id="ID" value="{{cliente.id}}">
         </div>
@@ -68,8 +68,8 @@
           </div>
         </div>
         <div class="btn-form">
-         <a href="{% url 'Edita_cliente' cliente.id  %}" class="btn btn-primary">Editar</a>
-        <a href="{% url 'excluir_cliente' cliente.id  %}" class="btn btn-danger">Excluir</a>
+         <a href="{% url 'Core:Edita_cliente' cliente.id  %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'Core:excluir_cliente' cliente.id  %}" class="btn btn-danger">Excluir</a>
       </div>
       </form>   
     </div>
