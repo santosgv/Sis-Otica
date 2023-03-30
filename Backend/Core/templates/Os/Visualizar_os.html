@@ -257,19 +257,40 @@ Vizualiar O.S
         <div class="alert alert-warning _carner" style="display: none;" role="alert">
           Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
         </div>
+        {% if user.FUNCAO == "G" %}
+        <a href="{% url 'Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
+        {% endif %}
         <a href="{% url 'Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
         <a href="{% url 'Imprimir_os_lab' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Imprimir Via Lab</a>
         {% if VISUALIZAR_OS.STATUS == "A" %}
+        <a href="{% url 'Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Mover para Loja</a>
+        <a href="{% url 'Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Mover Laboratorio</a>
         <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
         <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
         {% endif %}
         {% if VISUALIZAR_OS.STATUS == "E" %}
-        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled>Entregue</a>
-        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        <a href="{% url 'Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
+        <a href="{% url 'Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "L" %}
+        <a href="{% url 'Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Mover para Loja</a>
+        <a href="{% url 'Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
+        {% endif %}
+        {% if VISUALIZAR_OS.STATUS == "J" %}
+        <a href="{% url 'Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
+        <a href="{% url 'Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Mover Laboratorio</a>
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
         {% endif %}
         {% if VISUALIZAR_OS.STATUS == "C" %}
-        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" disabled >Entregue</a>
-        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" disabled>Cancelar</a>
+        <a href="{% url 'Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
+        <a href="{% url 'Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
+        <a href="{% url 'Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
+        <a href="{% url 'Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
         {% endif %}
       </form>
   </section>

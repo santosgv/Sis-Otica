@@ -12,6 +12,7 @@ from notifications.signals import notify
 from notifications.models import Notification
 from reportlab.pdfgen import canvas
 import io
+from django.utils.timezone import now
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from .notifications import get_unread_notifications, count_notifications_unreade
@@ -237,17 +238,46 @@ def Cadastrar_os(request,id_cliente):
 def Visualizar_os(request,id_os):
     if request.method == "GET":
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+       
         return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
     else:
         return render(request,'Os/Visualizar_os.htmll')
+    
+def Editar_os(request,id_os):
+    if request.method == "GET":
+        VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+        print(VISUALIZAR_OS.ENTRADA)
+        return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                   })
+    else:
+
+        FORMA_PAG = request.POST.get('PAGAMENTO')
+        VALOR = request.POST.get('VALOR')
+        QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+
+        if request.POST.get('ENTRADA') == '':
+            ENTRADA =0
+        else:
+            ENTRADA = request.POST.get('ENTRADA')
+        
+        VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+        VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
+        VISUALIZAR_OS.VALOR=VALOR
+        VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
+        VISUALIZAR_OS.ENTRADA=ENTRADA
+        VISUALIZAR_OS.save()
+        
+        messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
+        return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                   })
 
 def Encerrar_os(request,id_os):
     if request.method == "GET":
         try:
             Encerrar_OS = ORDEN.objects.get(id=id_os)
             Encerrar_OS.STATUS = "E"
-            Encerrar_OS.DARA_ENCERRAMENTO =datetime.now()
+            Encerrar_OS.DARA_ENCERRAMENTO =now()
             Encerrar_OS.save()
             messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
             return redirect('/Lista_Os')  
@@ -265,7 +295,30 @@ def Cancelar_os(request,id_os):
             return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
-            return redirect('/Lista_Os')        
+            return redirect('/Lista_Os')
+def Laboratorio_os(request,id_os):
+    if request.method == "GET":
+        try:
+            Laboratorio_os = ORDEN.objects.get(id=id_os)
+            Laboratorio_os.STATUS ="L"
+            Laboratorio_os.save()
+            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
+            return redirect('/Lista_Os')  
+        except Exception as msg:
+            print(msg)
+            return redirect('/Lista_Os')  
+
+def Loja_os(request,id_os):
+    if request.method == "GET":
+        try:
+            Loja_os = ORDEN.objects.get(id=id_os)
+            Loja_os.STATUS ="J"
+            Loja_os.save()
+            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
+            return redirect('/Lista_Os')  
+        except Exception as msg:
+            print(msg)
+            return redirect('/Lista_Os')      
         
 def Imprimir_os(request,id_os):
     try:

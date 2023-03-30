@@ -17,10 +17,14 @@ urlpatterns = [
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
     path('Cadastrar_os/<int:id_cliente>',views.Cadastrar_os,name='Cadastrar_os'),
     path('Visualizar_os/<int:id_os>',views.Visualizar_os,name='Visualizar_os'),
+    path('Editar_os/<int:id_os>',views.Editar_os,name='Editar_os'),
     path('Encerrar_os/<int:id_os>',views.Encerrar_os,name='Encerrar_os'),
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
+    path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
+    path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
     path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
     path('Imprimir_os_lab/<int:id_os>',views.Imprimir_os_lab,name='Imprimir_os_lab'),
+
     path('Dashabord',views.Dashabord,name='Dashabord')
 ]
 
