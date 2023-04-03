@@ -247,7 +247,7 @@ def Visualizar_os(request,id_os):
 def Editar_os(request,id_os):
     if request.method == "GET":
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
-        print(VISUALIZAR_OS.ENTRADA)
+        
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
     else:
