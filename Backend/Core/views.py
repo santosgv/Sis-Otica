@@ -16,6 +16,7 @@ from django.utils.timezone import now
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from .notifications import get_unread_notifications, count_notifications_unreade
+from Autenticacao.urls import views
 
 def home(request):
     if request.user.is_authenticated:
@@ -29,7 +30,7 @@ def marcar_notificacao_como_lida(request):
     Notification.objects.mark_all_as_read(recipient=request.user)
     return redirect('/')
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def clientes(request):
     pega_filial =USUARIO.objects.get(id=request.user.id)
 
@@ -55,7 +56,7 @@ def clientes(request):
         return render(request,'Cliente/clientes.html',{'clientes':clientes,
                                                         })
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def cadastro_cliente(request):
     pega_filial =USUARIO.objects.get(id=request.user.id)
     if request.method == "GET":
@@ -86,13 +87,13 @@ def cadastro_cliente(request):
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/clientes')
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def Cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
         return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
@@ -112,13 +113,13 @@ def Edita_cliente(request,id):
         messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
     return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def excluir_cliente(request,id):
     excluir = CLIENTE.objects.get(id=id)
     excluir.delete()
     return redirect('/clientes')
 
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def Lista_Os(request):
     if request.user.is_superuser ==True:
         Lista_os = ORDEN.objects.all().order_by('-id')
@@ -142,6 +143,7 @@ def Lista_Os(request):
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
+@login_required(login_url='/auth/logar/')
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
@@ -235,6 +237,7 @@ def Cadastrar_os(request,id_cliente):
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
 
+@login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
     if request.method == "GET":
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
@@ -244,6 +247,7 @@ def Visualizar_os(request,id_os):
     else:
         return render(request,'Os/Visualizar_os.htmll')
     
+@login_required(login_url='/auth/logar/')
 def Editar_os(request,id_os):
     if request.method == "GET":
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
@@ -272,6 +276,7 @@ def Editar_os(request,id_os):
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
 
+@login_required(login_url='/auth/logar/')
 def Encerrar_os(request,id_os):
     if request.method == "GET":
         try:
@@ -285,6 +290,7 @@ def Encerrar_os(request,id_os):
             print(msg)
             return redirect('/Lista_Os')   
 
+@login_required(login_url='/auth/logar/')
 def Cancelar_os(request,id_os):
     if request.method == "GET":
         try:
@@ -296,6 +302,8 @@ def Cancelar_os(request,id_os):
         except Exception as msg:
             print(msg)
             return redirect('/Lista_Os')
+        
+@login_required(login_url='/auth/logar/')
 def Laboratorio_os(request,id_os):
     if request.method == "GET":
         try:
@@ -308,6 +316,7 @@ def Laboratorio_os(request,id_os):
             print(msg)
             return redirect('/Lista_Os')  
 
+@login_required(login_url='/auth/logar/')
 def Loja_os(request,id_os):
     if request.method == "GET":
         try:
@@ -319,7 +328,8 @@ def Loja_os(request,id_os):
         except Exception as msg:
             print(msg)
             return redirect('/Lista_Os')      
-        
+
+@login_required(login_url='/auth/logar/')   
 def Imprimir_os(request,id_os):
     try:
         PRINT_OS =ORDEN.objects.get(id=id_os)
@@ -386,6 +396,7 @@ def Imprimir_os(request,id_os):
         print(msg)
         return redirect('/Lista_Os')
     
+@login_required(login_url='/auth/logar/')
 def Imprimir_os_lab(request,id_os):
     try:
         PRINT_OS =ORDEN.objects.get(id=id_os)
@@ -445,7 +456,7 @@ def Imprimir_os_lab(request,id_os):
         print(msg)
         return redirect('/Lista_Os')
      
-@login_required(login_url='logar')
+@login_required(login_url='/auth/logar/')
 def Dashabord(request):
     date_now  = datetime.datetime.now().date()
     thirty_days_ago = date_now - datetime.timedelta(days=30)
