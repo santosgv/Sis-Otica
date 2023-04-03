@@ -10,7 +10,7 @@
 <div id="fundo">
 
     <div class="box text-center logar">
-        <form action="{% url  'cadastro' %}" method="POST">{% csrf_token %}
+        <form action="{% url  'Autenticacao:cadastro' %}" method="POST">{% csrf_token %}
             <div class="logar-form">
                     {% if messages %}
                 {% for message in messages %}
