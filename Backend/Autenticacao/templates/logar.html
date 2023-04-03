@@ -18,7 +18,7 @@
 {% endif %}
 
     <div class="box text-center logar">
-        <form action="{% url 'Autenticacaologar' %}" method="post">{% csrf_token %}
+        <form action="{% url 'Autenticacao:logar' %}" method="post">{% csrf_token %}
             <div class="logar-form">
             <h1 class="titulo font-degrade borda-bottom-degrade">LOGAR</h2>
             <br>
