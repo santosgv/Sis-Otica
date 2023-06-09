@@ -34,9 +34,35 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'notifications',
     'Autenticacao',
-    'Core'
+    'Core',
+    'Cliente',
+]
+
+SHARED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'Autenticacao',
+        'Core',
+        'Cliente',
+]
+
+TENANT_APPS = [
+    # The following Django contrib apps must be in TENANT_APPS
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    # tenant-specific apps
+     'Core',
+]
+INSTALLED_APPS = list(SHARED_APPS) + [
+    app for app in TENANT_APPS if app not in SHARED_APPS
 ]
 
 MIDDLEWARE = [
@@ -82,6 +108,19 @@ DATABASES = {
     }
 }
 
+DATABASE_ROUTERS = (
+
+    'django_tenants.routers.TenantSyncRouter',
+ )
+
+TENANT_LIMIT_SET_CALLS = True
+
+
+TENANT_MODEL = "Cliente.Cliente"
+
+TENANT_DOMAIN_MODEL = "Cliente.Domain"
+
+TENANT_COLOR_ADMIN_APPS = False
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
