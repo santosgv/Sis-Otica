@@ -3,7 +3,6 @@ from datetime import datetime
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE
-from Unidades.models import UNIDADE
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -45,7 +44,7 @@ def clientes(request):
         return render(request,'Cliente/clientes.html',{'clientes':clientes,
                                                         })
     else:
-        cliente_lista = CLIENTE.objects.all().filter(UNIDADE=pega_filial.UNIDADE.id).order_by('NOME').order_by('-DATA_CADASTRO').values()
+        cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO').values()
 
         pagina = Paginator(cliente_lista, 10)
 
@@ -81,8 +80,7 @@ def cadastro_cliente(request):
         TELEFONE=TELEFONE,
         CPF=CPF,
         DATA_NASCIMENTO=DATA_NASCIMENTO,
-        EMAIL=EMAIL,
-        UNIDADE=UNIDADE.objects.get(id=pega_filial.UNIDADE.id))
+        EMAIL=EMAIL)
         cliente.save()
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/clientes')
@@ -133,7 +131,7 @@ def Lista_Os(request):
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
     else:
         pega_filial =USUARIO.objects.get(id=request.user.id)
-        Lista_os = ORDEN.objects.all().filter(FILIAL=pega_filial.UNIDADE.id).order_by('id')
+        Lista_os = ORDEN.objects.all().order_by('id')
 
         pagina = Paginator(Lista_os, 10)
 
@@ -154,7 +152,6 @@ def Cadastrar_os(request,id_cliente):
                 ANEXO = request.FILES['ANEXO']
             else:
                 ANEXO = None
-            FILIAL = request.POST.get('FILIAL')
             VENDEDOR = request.POST.get('VENDEDOR')
             CLIENTE_POST = request.POST.get('CLIENTE')
             PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
@@ -194,7 +191,6 @@ def Cadastrar_os(request,id_cliente):
             
             cadastrar_os = ORDEN(
             ANEXO= ANEXO,
-            FILIAL= UNIDADE.objects.get(NOME=FILIAL),
             VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
             CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
             PREVISAO_ENTREGA= PREVISAO_ENTREGA,
@@ -342,7 +338,6 @@ def Imprimir_os(request,id_os):
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
         PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
         PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
-        PDF.drawString(430,750,'OTICA : ' +str(PRINT_OS.FILIAL))
         
         PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
         PDF.line(30,715,580,715)
@@ -409,7 +404,6 @@ def Imprimir_os_lab(request,id_os):
         PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
         PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
         PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
-        PDF.drawString(430,750,'OTICA : ' +str(PRINT_OS.FILIAL))
         
         PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
         PDF.line(30,715,580,715)
@@ -472,7 +466,7 @@ def Dashabord(request):
         return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     else:
         pega_filial =USUARIO.objects.get(id=request.user.id)
-        Lista_os = ORDEN.objects.all().filter(FILIAL=pega_filial.UNIDADE.id).filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
+        Lista_os = ORDEN.objects.all().filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
         pagina = Paginator(Lista_os, 10)
 
         page = request.GET.get('page')

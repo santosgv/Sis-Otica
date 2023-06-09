@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'notifications',
     'Autenticacao',
-    'Unidades',
     'Core'
 ]
 

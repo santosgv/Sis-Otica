@@ -1,15 +1,29 @@
 from django.db import models
 from Autenticacao.models import USUARIO
-from Unidades.models import UNIDADE
 from django.utils.timezone import now
 
 
+class CUSTO(models.Model):
+
+    CHOICES_FORMA =(
+        ('S','SEMANAL'),
+        ('M','MENSAL'),
+        ('Q','QUINZENAL'),
+    )
+
+    CONTA = models.CharField(max_length=100, blank=True)
+    VALOR = models.FloatField()
+    VENCIMENTO = models.DateField()
+    FORMA = models.CharField(max_length=1, choices=CHOICES_FORMA, default="M")
+    PERIODO =models.IntegerField()
+
+    def __str__(self) -> str:
+        return str(self.CONTA)
 
 
 
 
 class CLIENTE(models.Model):
-    UNIDADE = models.ForeignKey(UNIDADE,on_delete=models.DO_NOTHING,blank=True, null=True)
     NOME = models.CharField(max_length=250)
     LOGRADOURO = models.CharField(max_length=250)
     NUMERO = models.CharField(max_length=10)
@@ -46,7 +60,6 @@ class ORDEN(models.Model):
     DATA_SOLICITACAO = models.DateField(default=now)
     STATUS = models.CharField(max_length=1 , choices=CHOICES_SITUACAO, default='A')
     ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
-    FILIAL= models.ForeignKey(UNIDADE, on_delete=models.DO_NOTHING)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.DO_NOTHING)
     DATA = models.DateTimeField(default=now)

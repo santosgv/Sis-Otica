@@ -35,16 +35,12 @@ Cadastrar O.S
       </div>
           <form method="POST"  enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
             <div class="row">
-              <div class="form-group col-md-4">
-                <label for="FILIAL">Filial</label>
-                <input readonly class="form-control" id="FILIAL" name="FILIAL" value="{{user.UNIDADE}}" >
-              </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-6">
                 <label for="VENDEDOR" >Vendedor</label>
                 <input readonly class="form-control" value="{{user.first_name}}" >
                 <input type="text" id="VENDEDOR" style="display: none;" name="VENDEDOR" value="{{user.id}}">
               </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-6">
                 <label for="CLIENTE">Cliente</label>
                 <input readonly class="form-control" value="{{cliente.NOME}}">
                 <input readonly class="form-control" style="display: none;" id="CLIENTE" name="CLIENTE" value="{{cliente.id}}" >

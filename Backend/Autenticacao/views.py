@@ -9,7 +9,6 @@ from django.conf import settings
 from .utils import email_html
 from .models import Ativacao
 from hashlib import sha256
-from Unidades.models import UNIDADE
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
@@ -18,13 +17,11 @@ def cadastro(request):
     if request.method == "GET":
         if request.user.is_authenticated:
             return redirect('/')
-        unidades = UNIDADE.objects.all()
-        return render(request, 'cadastro.html',{'unidades':unidades})
+        return render(request, 'cadastro.html')
         
     elif request.method == "POST":
         username = request.POST.get('username')
         first_name = request.POST.get('first_name')
-        unidade = request.POST.get('unidade')
         funcao = request.POST.get('funcao')
         cpf = request.POST.get('cpf')
         data_nascimento = request.POST.get('data_nascimento')
@@ -50,7 +47,6 @@ def cadastro(request):
             path_template = os.path.join(settings.BASE_DIR, 'autenticacao/templates/emails/cadastro_confirmado.html')
             user = USUARIO.objects.create_user(username=username,
                                             first_name=first_name,
-                                            UNIDADE= UNIDADE.objects.get(id=unidade),
                                             DATA_NASCIMENTO=data_nascimento,
                                             CPF=cpf,
                                             FUNCAO= funcao,
