@@ -1,11 +1,14 @@
 from django.db import models
+
+# Create your models here.
+from django.db import models
 from django.utils.timezone import now
-from django.contrib.auth.models import User
+from Autenticacao.models import USUARIO
 from django_tenants.models import DomainMixin, TenantMixin
 from django.utils import timezone
 
 class Cliente(TenantMixin):
-    Usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    Usuario = models.ForeignKey(USUARIO, on_delete=models.SET_NULL, null=True)
     nome = models.CharField(max_length=100)
     pago_ate = models.DateField(default=now)
     on_trial = models.BooleanField(default=True, blank=True)
