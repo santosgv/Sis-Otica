@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY ='pkx@6w(&-y87(r1n' #config('SECRET_KEY')
+SECRET_KEY =config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,11 +77,28 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+       'ENGINE': 'django_tenants.postgresql_backend',
+            'NAME': config('BANCO'),
+        'USER': config('BANCO_USER'),
+        'PASSWORD': config('BANCO_PASSWORD'),
+        'HOST': config('BANCO_HOST'),
+        'PORT': '5432',
     }
 }
 
+DATABASE_ROUTERS = (
+
+    'django_tenants.routers.TenantSyncRouter',
+ )
+
+TENANT_LIMIT_SET_CALLS = True
+
+
+TENANT_MODEL = "Cliente.Cliente"
+
+TENANT_DOMAIN_MODEL = "Cliente.Domain"
+
+TENANT_COLOR_ADMIN_APPS = False
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
