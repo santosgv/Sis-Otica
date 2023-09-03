@@ -34,20 +34,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-      'notifications',
     'Autenticacao',
     'Core',
     'Cliente',
 ]
 
 SHARED_APPS = [
+    'django_tenants', 
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-          'notifications',
         'Autenticacao',
         'Core',
         'Cliente',
@@ -61,7 +60,6 @@ TENANT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     # tenant-specific apps
-      'notifications',
      'Cliente',
      'Core',
 ]
