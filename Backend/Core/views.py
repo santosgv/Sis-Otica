@@ -19,14 +19,10 @@ def home(request):
         return render(request,'home.html',)
     else:
         return render(request,'home.html')
-def marcar_notificacao_como_lida(request):
-    Notification.objects.mark_all_as_read(recipient=request.user)
-    return redirect('/')
+
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
-    pega_filial =USUARIO.objects.get(id=request.user.id)
-
     if request.user.is_superuser ==True:
         cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO')
         pagina = Paginator(cliente_lista, 10)
