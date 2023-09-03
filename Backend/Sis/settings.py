@@ -65,6 +65,7 @@ TENANT_APPS = [
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
+    'Core'
 ]
 
 MIDDLEWARE = [
@@ -106,28 +107,11 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 
 DATABASES = {
     'default': {
-       'ENGINE': 'django_tenants.postgresql_backend',
-            'NAME': config('BANCO'),
-        'USER': config('BANCO_USER'),
-        'PASSWORD': config('BANCO_PASSWORD'),
-        'HOST': config('BANCO_HOST'),
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-DATABASE_ROUTERS = (
-
-    'django_tenants.routers.TenantSyncRouter',
- )
-
-TENANT_LIMIT_SET_CALLS = True
-
-
-TENANT_MODEL = "Cliente.Cliente"
-
-TENANT_DOMAIN_MODEL = "Cliente.Domain"
-
-TENANT_COLOR_ADMIN_APPS = False
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

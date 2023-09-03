@@ -19,7 +19,9 @@ def home(request):
         return render(request,'home.html',)
     else:
         return render(request,'home.html')
-
+def marcar_notificacao_como_lida(request):
+    Notification.objects.mark_all_as_read(recipient=request.user)
+    return redirect('/')
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
@@ -49,7 +51,6 @@ def clientes(request):
 
 @login_required(login_url='/auth/logar/')
 def cadastro_cliente(request):
-    pega_filial =USUARIO.objects.get(id=request.user.id)
     if request.method == "GET":
         return render(request, 'Cliente/cadastro_cliente.html')
     else:
@@ -122,7 +123,6 @@ def Lista_Os(request):
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
     else:
-        pega_filial =USUARIO.objects.get(id=request.user.id)
         Lista_os = ORDEN.objects.all().order_by('id')
 
         pagina = Paginator(Lista_os, 10)
