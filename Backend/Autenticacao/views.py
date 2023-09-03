@@ -115,37 +115,26 @@ def alterar_conta(request):
     else:
         
         usuario = request.user
-        username = request.POST.get('username')
         first_name = request.POST.get('first_name')
         cpf = request.POST.get('cpf')
         data_nascimento = request.POST.get('data_nascimento')
         email = request.POST.get('email')
-        old_senha = request.POST.get('password_old')
-        senha = request.POST.get('password_new')
-        confirmar_senha = request.POST.get('confirm-password')
-
-        if not usuario.check_password(old_senha):
-            messages.add_message(request, constants.ERROR, 'As senhas Antiga esta Incorreta')
-            return redirect('/auth/alterar_conta')
 
 
-        if not senha == confirmar_senha:
-            messages.add_message(request, constants.ERROR, 'As senhas não coincidem')
-            return redirect('/auth/alterar_conta')
-
-        if len(username.strip()) == 0 or len(senha.strip()) == 0 or len(first_name.strip()) == 0  or len(cpf.strip()) == 0 or len(data_nascimento.strip()) == 0 or len(email.strip()) == 0:
+        if len(first_name.strip()) == 0  or len(cpf.strip()) == 0 or len(data_nascimento.strip()) == 0 or len(email.strip()) == 0:
             messages.add_message(request, constants.ERROR, 'Preencha todos os campos')
             return redirect('/auth/alterar_conta')
         
-        user = USUARIO.objects.filter(username=username).exclude(id=request.user.id)
+        user = USUARIO.objects.filter(username=request.user).exclude(id=request.user.id)
         
         if user.exists():
             messages.add_message(request, constants.ERROR, 'Já existe um usário com esse username')
             return redirect('/auth/alterar_conta')
 
         usuario = request.user
-        usuario.set_password(senha)
         usuario.first_name = first_name
+        usuario.DATA_NASCIMENTO = data_nascimento
+        usuario.email = email
         usuario.save()
         auth.logout(request)
     messages.add_message(request, constants.SUCCESS, 'Dados de Usuario Alterado com Sucesso, Faça novamente o Login para Validar')

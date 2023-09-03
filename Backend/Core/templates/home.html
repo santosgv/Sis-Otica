@@ -29,25 +29,8 @@
          
       -->
       {% if user.is_authenticated %}
-    {% if count != 0 %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      <strong>Recados nao lidos : {{count}} !</strong>
-    </div>
-    <a href="marcar_notificacao_como_lida">Marcar todas como lida</a>
-    {% endif %}
-        {% for msg in mensagens %}
-      <div role="alert" aria-live="assertive" aria-atomic="true" class="toast fade show" data-autohide="false">
-        <div class="toast-header">
-          <span class="badge badge-{{msg.level}}">{{msg.level}}</span>
-          <strong class="mr-auto" style="padding-left: 10px; ;">{{msg.actor}}</strong>
-          <small>{{msg.timestamp}}</small>
-        </div>
-        <div class="toast-body">
-          {{msg.verb}}
-          {{msg.target}}
-        </div>
-      </div>
-        {% endfor %}
+
+
       {% endif %}
      
       

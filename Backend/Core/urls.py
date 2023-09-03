@@ -9,8 +9,6 @@ app_name = 'Core'
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('marcar_notificacao_como_lida/',views.marcar_notificacao_como_lida , name='marcar_notificacao_como_lida'),
-    
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
