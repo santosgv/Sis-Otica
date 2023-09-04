@@ -53,12 +53,12 @@
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
                           <th scope="row"><a href="{% url 'Core:cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
-                          <td>{{cliente.LOGRADOURO}}</td>
-                          <td>{{cliente.NUMERO}}</td>
-                          <td>{{cliente.BAIRRO}}</td>
-                          <td>{{cliente.CIDADE}}</td>
-                          <td>{{cliente.CPF}}</td>
-                          <td>{{cliente.EMAIL}}</td>
+                          <td>{{cliente.LOGRADOURO|slice:":10"}}</td>
+                          <td>{{cliente.NUMERO|slice:":5"}}</td>
+                          <td>{{cliente.BAIRRO|slice:":10"}}</td>
+                          <td>{{cliente.CIDADE|slice:":10"}}</td>
+                          <td>{{cliente.CPF|slice:":3"}}</td>
+                          <td>{{cliente.EMAIL|slice:":10"}}</td>
                           <td>{{cliente.TELEFONE}}</td>
                           <td>
                             <a href="{% url 'Core:Cadastrar_os' cliente.id %}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a>
