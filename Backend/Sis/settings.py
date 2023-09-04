@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
 SHARED_APPS = [
     'django_tenants', 
+    'Cliente',
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -49,7 +50,6 @@ SHARED_APPS = [
         'django.contrib.staticfiles',
         'Autenticacao',
         'Core',
-        'Cliente',
 ]
 
 TENANT_APPS = [
@@ -60,7 +60,6 @@ TENANT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     # tenant-specific apps
-     'Cliente',
      'Core',
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
@@ -69,6 +68,7 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 
 MIDDLEWARE = [
      'django_tenants.middleware.main.TenantMainMiddleware',
+        'Sis.middleware.TenantActiveMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,6 +76,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    'localhost',
+    ''
 ]
 
 ROOT_URLCONF = 'Sis.urls'
@@ -126,6 +132,8 @@ TENANT_LIMIT_SET_CALLS = True
 TENANT_MODEL = "Cliente.Cliente"
 
 TENANT_DOMAIN_MODEL = "Cliente.Domain"
+
+TENANT_COLOR_ADMIN_APPS = False
 
 
 
@@ -196,3 +204,27 @@ EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS=True
 EMAIL_PORT =587
 EMAIL_HOST='smtp.gmail.com'
+
+
+CORS_ALLOWED_ORIGINS : True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
