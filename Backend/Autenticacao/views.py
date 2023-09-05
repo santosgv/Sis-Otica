@@ -134,6 +134,7 @@ def alterar_conta(request):
         usuario = request.user
         usuario.first_name = first_name
         usuario.DATA_NASCIMENTO = data_nascimento
+        usuario.CPF = cpf
         usuario.email = email
         usuario.save()
         auth.logout(request)
