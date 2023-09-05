@@ -18,7 +18,7 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS =['v35900.vps-kinghost.net','191.252.210.233','http://v35900.vps-kinghost.net:8000','localhost', '127.0.0.1', '[::8000]']
+ALLOWED_HOSTS =['*']
 
 USE_L10N = False
 
@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Autenticacao',
     'Core',
-    'Cliente',
 ]
 
 SHARED_APPS = [
@@ -61,13 +60,14 @@ TENANT_APPS = [
     'django.contrib.messages',
     # tenant-specific apps
      'Core',
+     'Autenticacao',
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
 ]
 
 MIDDLEWARE = [
-     'django_tenants.middleware.main.TenantMainMiddleware',
+    'django_tenants.middleware.main.TenantMainMiddleware',
         'Sis.middleware.TenantActiveMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
