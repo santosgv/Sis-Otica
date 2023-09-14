@@ -24,7 +24,6 @@ urlpatterns = [
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
     path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
-    path('Imprimir_os_lab/<int:id_os>',views.Imprimir_os_lab,name='Imprimir_os_lab'),
 
     path('Dashabord',views.Dashabord,name='Dashabord')
 ]

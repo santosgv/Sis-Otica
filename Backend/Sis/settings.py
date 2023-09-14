@@ -22,7 +22,7 @@ ALLOWED_HOSTS =['*']
 
 USE_L10N = False
 
-DATE_FORMAT = "Y-m-d"
+DATE_FORMAT = "d-m-Y"
 
 
 # Application definition
