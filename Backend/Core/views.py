@@ -1,3 +1,4 @@
+import os
 from django.contrib import messages
 from datetime import datetime
 from django.contrib.messages import constants
@@ -13,6 +14,8 @@ from django.utils.timezone import now
 from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
+from django.conf import settings
+
 
 def home(request):
     if request.user.is_authenticated:
@@ -23,8 +26,6 @@ def home(request):
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
-    pega_filial =USUARIO.objects.get(id=request.user.id)
-
     if request.user.is_superuser ==True:
         cliente_lista = CLIENTE.objects.all().order_by('NOME').order_by('-DATA_CADASTRO')
         pagina = Paginator(cliente_lista, 10)
@@ -322,57 +323,54 @@ def Imprimir_os(request,id_os):
         
         buffer = io.BytesIO()
         PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Courier', 15)
+        PDF.setFont('Courier', 12)
+        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
 
-        PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
-        PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
-        PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
-        
-        PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
-        PDF.line(30,715,580,715)
-        PDF.drawString(250,695,'SERVIÇOS')
-        PDF.drawString(30,650,'SERVIÇO : ' + str(PRINT_OS.SERVICO))
-        PDF.drawString(300,650,'SUB SERVIÇO : ' + str(PRINT_OS.SUB_SERVICO))
-        PDF.drawString(250,600,'RECEITA')
+        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO))
+        PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
+        PDF.drawString(565,744,str(PRINT_OS.id))
+        PDF.drawString(88,724,str(PRINT_OS.CLIENTE))
+        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA))
+        PDF.drawString(88,665,str(PRINT_OS.SERVICO))
+        PDF.drawString(385,665,str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(88,637,str(PRINT_OS.LENTES))
+        PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
+        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO))
+       # PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
+       # PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
+       # PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
+       # PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
+       # PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
+       # PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
+       # PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
+#
 
-        PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
-        PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
-        PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
-        PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
-        PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
-        PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
-        PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
 
-        PDF.line(30,490,580,490)
-
-        PDF.drawString(30,450,'LENTES : '+ str(PRINT_OS.LENTES))
-        PDF.drawString(300,450,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
-    
-        PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
-
-        PDF.line(30,360,580,360)
-        
-        PDF.drawString(250,340,'FINANCEIRO')
-        if PRINT_OS.FORMA_PAG == 'A':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'PIX')
-        elif PRINT_OS.FORMA_PAG == 'B':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'DINHEIRO')
-        elif PRINT_OS.FORMA_PAG == 'C':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'DEBITO')
-        elif PRINT_OS.FORMA_PAG == 'D':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'CREDITO')
-        elif PRINT_OS.FORMA_PAG == 'E':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'CARNER')
-        elif PRINT_OS.FORMA_PAG == 'F':
-            PDF.drawString(30,300,'PAGAMENTO : ' + 'PERMUTA')
-        
-        PDF.drawString(250,300,'VALOR :'+ str(PRINT_OS.VALOR))
-        PDF.drawString(400,300,'PARCELAS : '+ str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(30,250,'ENTRADA : '+ str(PRINT_OS.ENTRADA))
-
-        PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
-        PDF.line(250,30,580,30)
+    #
+       # PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
+#
+       # PDF.line(30,360,580,360)
+       # 
+       # PDF.drawString(250,340,'FINANCEIRO')
+       # if PRINT_OS.FORMA_PAG == 'A':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'PIX')
+       # elif PRINT_OS.FORMA_PAG == 'B':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'DINHEIRO')
+       # elif PRINT_OS.FORMA_PAG == 'C':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'DEBITO')
+       # elif PRINT_OS.FORMA_PAG == 'D':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'CREDITO')
+       # elif PRINT_OS.FORMA_PAG == 'E':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'CARNER')
+       # elif PRINT_OS.FORMA_PAG == 'F':
+       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'PERMUTA')
+       # 
+       # PDF.drawString(250,300,'VALOR :'+ str(PRINT_OS.VALOR))
+       # PDF.drawString(400,300,'PARCELAS : '+ str(PRINT_OS.QUANTIDADE_PARCELA))
+       # PDF.drawString(30,250,'ENTRADA : '+ str(PRINT_OS.ENTRADA))
+#
+       # PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
+       # PDF.line(250,30,580,30)
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
