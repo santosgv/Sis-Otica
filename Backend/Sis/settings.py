@@ -22,7 +22,7 @@ ALLOWED_HOSTS =['v35900.vps-kinghost.net','191.252.210.233','http://v35900.vps-k
 
 USE_L10N = False
 
-DATE_FORMAT = "Y-m-d"
+DATE_FORMAT = "d-m-Y"
 
 
 # Application definition

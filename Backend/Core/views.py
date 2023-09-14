@@ -260,8 +260,7 @@ def Editar_os(request,id_os):
         VISUALIZAR_OS.save()
         
         messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
-        return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
-                                                   })
+        return redirect('/Lista_Os')  
 
 @login_required(login_url='/auth/logar/')
 def Encerrar_os(request,id_os):
@@ -326,51 +325,60 @@ def Imprimir_os(request,id_os):
         PDF.setFont('Courier', 12)
         PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
 
-        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO))
+        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(565,744,str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE))
-        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA))
+        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
         PDF.drawString(385,665,str(PRINT_OS.SUB_SERVICO))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
         PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
         PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO))
-       # PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
-       # PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
-       # PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
-       # PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
-       # PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
-       # PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
-       # PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
-#
+        if PRINT_OS.FORMA_PAG == 'A':
+            PDF.drawString(109,539,'PIX')
+        elif PRINT_OS.FORMA_PAG == 'B':
+            PDF.drawString(109,539,'DINHEIRO')
+        elif PRINT_OS.FORMA_PAG == 'C':
+            PDF.drawString(109,539,'DEBITO')
+        elif PRINT_OS.FORMA_PAG == 'D':
+            PDF.drawString(109,539,'CREDITO')
+        elif PRINT_OS.FORMA_PAG == 'E':
+            PDF.drawString(109,539,'CARNER')
+        elif PRINT_OS.FORMA_PAG == 'F':
+            PDF.drawString(109,539,'PERMUTA')
+        
+        PDF.drawString(240,539,str(PRINT_OS.VALOR))
+        PDF.drawString(385,539,str(PRINT_OS.QUANTIDADE_PARCELA))
+        PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
+        PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
+        PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
+        PDF.drawString(565,423,str(PRINT_OS.id))
+        PDF.drawString(88,402,str(PRINT_OS.CLIENTE))
+        PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
+        PDF.drawString(88,361,str(PRINT_OS.SERVICO))
+        PDF.drawString(338,361,str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
+        PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
+        PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
+        PDF.drawString(301,282,str(PRINT_OS.OE_CIL))
+        PDF.drawString(472,312,str(PRINT_OS.OD_EIXO))
+        PDF.drawString(472,282,str(PRINT_OS.OE_EIXO))
+        PDF.drawString(64,248,str(PRINT_OS.AD))
+        PDF.drawString(78,215,str(PRINT_OS.LENTES))
+        PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
+        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO))
 
+        PDF.drawString(60,116,str(PRINT_OS.DNP))
+        PDF.drawString(270,116,str(PRINT_OS.P))
+        PDF.drawString(430,116,str(PRINT_OS.DPA))
+        PDF.drawString(66,96,str(PRINT_OS.DIAG))
+        PDF.drawString(270,96,str(PRINT_OS.V))
+        PDF.drawString(415,96,str(PRINT_OS.H))
+        PDF.drawString(60,80,str(PRINT_OS.ALT))
+        PDF.drawString(432,78,str(PRINT_OS.ARM))
+        PDF.drawString(94,60,str(PRINT_OS.MONTAGEM))
 
-    #
-       # PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
-#
-       # PDF.line(30,360,580,360)
-       # 
-       # PDF.drawString(250,340,'FINANCEIRO')
-       # if PRINT_OS.FORMA_PAG == 'A':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'PIX')
-       # elif PRINT_OS.FORMA_PAG == 'B':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'DINHEIRO')
-       # elif PRINT_OS.FORMA_PAG == 'C':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'DEBITO')
-       # elif PRINT_OS.FORMA_PAG == 'D':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'CREDITO')
-       # elif PRINT_OS.FORMA_PAG == 'E':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'CARNER')
-       # elif PRINT_OS.FORMA_PAG == 'F':
-       #     PDF.drawString(30,300,'PAGAMENTO : ' + 'PERMUTA')
-       # 
-       # PDF.drawString(250,300,'VALOR :'+ str(PRINT_OS.VALOR))
-       # PDF.drawString(400,300,'PARCELAS : '+ str(PRINT_OS.QUANTIDADE_PARCELA))
-       # PDF.drawString(30,250,'ENTRADA : '+ str(PRINT_OS.ENTRADA))
-#
-       # PDF.drawString(30,30,'ASSINATURA DO CLIENTE: ')
-       # PDF.line(250,30,580,30)
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
@@ -378,65 +386,7 @@ def Imprimir_os(request,id_os):
     except Exception as msg:
         print(msg)
         return redirect('/Lista_Os')
-    
-@login_required(login_url='/auth/logar/')
-def Imprimir_os_lab(request,id_os):
-    try:
-        PRINT_OS =ORDEN.objects.get(id=id_os)
-        
-        buffer = io.BytesIO()
-        PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Courier', 15)
 
-        PDF.drawString(30,750,'VENDEDOR : ' + str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(30,725,'CLIENTE : '+ str(PRINT_OS.CLIENTE))
-        PDF.drawString(30,775,'DATA DO PEDIDO  ' + str(PRINT_OS.DATA_SOLICITACAO))
-        PDF.drawString(250,750,'N° O.S : ' +str(PRINT_OS.id))
-        
-        PDF.drawString(300,725,'PREVISAO ENTREGA : ' + str(PRINT_OS.PREVISAO_ENTREGA))
-        PDF.line(30,715,580,715)
-        PDF.drawString(250,695,'SERVIÇOS')
-        PDF.drawString(30,650,'SERVIÇO : ' + str(PRINT_OS.SERVICO))
-        PDF.drawString(300,650,'SUB SERVIÇO : ' + str(PRINT_OS.SUB_SERVICO))
-        PDF.drawString(250,600,'RECEITA')
-
-        PDF.drawString(30,580,'OD ESF : ' + str(PRINT_OS.OD_ESF))
-        PDF.drawString(250,580,'OD CIL : ' + str(PRINT_OS.OD_CIL))
-        PDF.drawString(400,580,'OD EIXO : ' + str(PRINT_OS.OD_EIXO))
-        PDF.drawString(30,550,'OE ESF : '+ str(PRINT_OS.OE_ESF))
-        PDF.drawString(250,550,'OE CIL : '+ str(PRINT_OS.OE_CIL))
-        PDF.drawString(400,550,'OE EIXO : '+ str(PRINT_OS.OE_EIXO))
-        PDF.drawString(30,520,'AD : '+ str(PRINT_OS.AD))
-
-        PDF.line(30,490,580,490)
-
-        PDF.drawString(30,450,'LENTES : '+ str(PRINT_OS.LENTES))
-        PDF.drawString(300,450,'ARMACAO : '+ str(PRINT_OS.ARMACAO))
-    
-        PDF.drawString(30,380,'OBSERVAÇÂO : ' +str(PRINT_OS.OBSERVACAO))
-
-        PDF.line(30,360,580,360)
-        
-        PDF.drawString(250,340,'LABORATORIO')   
-        PDF.drawString(30,300,'DNP : '+ str(PRINT_OS.DNP))
-        PDF.drawString(250,300,'P : ' + str(PRINT_OS.P))
-        PDF.drawString(400,300,'DPA : ' + str(PRINT_OS.DPA))
-        PDF.drawString(30,280,'DIAG : ' + str(PRINT_OS.DIAG))
-        PDF.drawString(250,280,'V : ' + str(PRINT_OS.V))
-        PDF.drawString(400,280,'H : ' + str(PRINT_OS.H))
-        PDF.drawString(30,260,'ALT :'+ str(PRINT_OS.ALT))
-        PDF.drawString(400,260,'ARM : '+ str(PRINT_OS.ARM))
-        PDF.drawString(30,240,'MONTAGEM : '+ str(PRINT_OS.MONTAGEM))
-
-        PDF.drawString(30,30,'ASSINATURA DO VENDEDOR: ')
-        PDF.line(250,30,580,30)
-        PDF.showPage()
-        PDF.save()
-        buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='OS-LAB.pdf')
-    except Exception as msg:
-        print(msg)
-        return redirect('/Lista_Os')
      
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
