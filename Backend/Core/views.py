@@ -328,13 +328,13 @@ def Imprimir_os(request,id_os):
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(565,744,str(PRINT_OS.id))
-        PDF.drawString(88,724,str(PRINT_OS.CLIENTE))
+        PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
         PDF.drawString(385,665,str(PRINT_OS.SUB_SERVICO))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
         PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO))
+        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
         if PRINT_OS.FORMA_PAG == 'A':
             PDF.drawString(109,539,'PIX')
         elif PRINT_OS.FORMA_PAG == 'B':
@@ -354,7 +354,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(565,423,str(PRINT_OS.id))
-        PDF.drawString(88,402,str(PRINT_OS.CLIENTE))
+        PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
         PDF.drawString(338,361,str(PRINT_OS.SUB_SERVICO))
@@ -367,7 +367,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(64,248,str(PRINT_OS.AD))
         PDF.drawString(78,215,str(PRINT_OS.LENTES))
         PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO))
+        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO[:69]))
 
         PDF.drawString(60,116,str(PRINT_OS.DNP))
         PDF.drawString(270,116,str(PRINT_OS.P))
