@@ -25,7 +25,8 @@ urlpatterns = [
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
     path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
 
-    path('Dashabord',views.Dashabord,name='Dashabord')
+    path('Dashabord',views.Dashabord,name='Dashabord'),
+    path('Caixa',views.Caixa, name='Caixa'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

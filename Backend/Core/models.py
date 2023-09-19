@@ -1,24 +1,7 @@
 from django.db import models
+from django.db.models import Sum
 from Autenticacao.models import USUARIO
 from django.utils.timezone import now
-
-
-class CUSTO(models.Model):
-
-    CHOICES_FORMA =(
-        ('S','SEMANAL'),
-        ('M','MENSAL'),
-        ('Q','QUINZENAL'),
-    )
-
-    CONTA = models.CharField(max_length=100, blank=True)
-    VALOR = models.FloatField()
-    VENCIMENTO = models.DateField()
-    FORMA = models.CharField(max_length=1, choices=CHOICES_FORMA, default="M")
-    PERIODO =models.IntegerField()
-
-    def __str__(self) -> str:
-        return str(self.CONTA)
 
 
 
@@ -97,3 +80,34 @@ class ORDEN(models.Model):
         return str(self.id)
 
 
+class CAIXA(models.Model):
+
+    CHOICES_PAGAMENTO =(
+        ('A','PIX'),
+        ('B','DINHEIRO'),
+        ('C','DEBITO'),
+        ('D','CREDITO'),
+        ('E','CARNER'),
+        ('F','PERMUTA'),
+    )
+
+    CHOICES_TIPO= (
+        ('E','Entrada'),
+        ('S','Saida')
+    )
+
+    DATA =models.DateField(default=now)
+    DESCRICAO = models.CharField(max_length=255, blank=True)
+    REFERENCIA = models.ForeignKey(ORDEN, blank=True ,on_delete=models.SET_NULL,null=True)
+    TIPO = models.CharField(max_length=1, choices=CHOICES_TIPO, default="E")
+    VALOR = models.FloatField()
+    FORMA = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, default="B")
+
+    def __str__(self) -> str:
+        return str(self.id)
+    
+    def fechar_caixa(self):
+        entradas = CAIXA.objects.filter(DATA=self.DATA, TIPO='E').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+        saidas = CAIXA.objects.filter(DATA=self.DATA, TIPO='S').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+        saldo = entradas - saidas
+        return saldo

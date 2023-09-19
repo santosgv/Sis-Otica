@@ -1,9 +1,9 @@
 import os
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE
+from Core.models import ORDEN,CLIENTE,CAIXA
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -15,6 +15,8 @@ from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
+from django.utils.timezone import now
+from django.db.models import Sum
 
 
 def home(request):
@@ -403,7 +405,6 @@ def Dashabord(request):
 
         return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     else:
-        pega_filial =USUARIO.objects.get(id=request.user.id)
         Lista_os = ORDEN.objects.all().filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
         pagina = Paginator(Lista_os, 10)
 
@@ -412,3 +413,12 @@ def Dashabord(request):
         kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     
+@login_required(login_url='/auth/logar/')
+def Caixa(request):
+    if request.method == "GET":
+        try:
+            dados = CAIXA.objects.all()
+            return render(request,'Caixa/caixa.html',{'dados':dados})
+        except Exception as msg:
+            print(msg)
+    return render(request,'Caixa/caixa.html')
