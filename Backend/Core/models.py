@@ -102,6 +102,7 @@ class CAIXA(models.Model):
     TIPO = models.CharField(max_length=1, choices=CHOICES_TIPO, default="E")
     VALOR = models.FloatField()
     FORMA = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, default="B")
+    FECHADO = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return str(self.id)
