@@ -27,6 +27,7 @@ urlpatterns = [
 
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('Caixa',views.Caixa, name='Caixa'),
+    path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

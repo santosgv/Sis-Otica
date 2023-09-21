@@ -417,8 +417,35 @@ def Dashabord(request):
 def Caixa(request):
     if request.method == "GET":
         try:
-            dados = CAIXA.objects.all()
-            return render(request,'Caixa/caixa.html',{'dados':dados})
+            date_now  = datetime.datetime.now().date()
+            dadoscaixa = CAIXA.objects.filter(DATA=date_now,FECHADO=False).order_by('id')
+
+            entradas = CAIXA.objects.filter(DATA=date_now, TIPO='E',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+            saidas = CAIXA.objects.filter(DATA=date_now, TIPO='S',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+            saldo = entradas - saidas
+
+            entradas_total = CAIXA.objects.filter(DATA=date_now, TIPO='E',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+            saidas_total = CAIXA.objects.filter(DATA=date_now, TIPO='S',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+
+            saldo_total = entradas_total - saidas_total
+
+            pagina = Paginator(dadoscaixa, 20)
+            page = request.GET.get('page')
+            dados = pagina.get_page(page)
+            return render(request,'Caixa/caixa.html',{'dados':dados,
+                                                      'entrada':entradas,
+                                                      'saida':saidas,
+                                                      'saldo':saldo,
+                                                      'saldo_total':saldo_total})
         except Exception as msg:
             print(msg)
     return render(request,'Caixa/caixa.html')
+
+def fechar_caixa(request):
+    date_now  = datetime.datetime.now().date()
+    caixa = CAIXA.objects.filter(DATA=date_now,FECHADO=False).order_by('id')
+    for dado in caixa:
+        dado.fechar_caixa()
+        dado.save()
+    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+    return redirect('/Caixa')

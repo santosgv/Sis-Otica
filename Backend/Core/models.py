@@ -108,7 +108,5 @@ class CAIXA(models.Model):
         return str(self.id)
     
     def fechar_caixa(self):
-        entradas = CAIXA.objects.filter(DATA=self.DATA, TIPO='E').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-        saidas = CAIXA.objects.filter(DATA=self.DATA, TIPO='S').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-        saldo = entradas - saidas
-        return saldo
+        self.FECHADO = True
+        return

@@ -8,3 +8,11 @@
     min-height: 120px;
     margin-bottom: 1rem;
 }
+
+
+.tabela{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    left: ;
+}
