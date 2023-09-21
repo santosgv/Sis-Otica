@@ -10,9 +10,7 @@
 }
 
 
-.tabela{
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    left: ;
+._caixa{
+    margin: 1%;
+    border: 2px rgb(127, 127, 212) solid;
 }

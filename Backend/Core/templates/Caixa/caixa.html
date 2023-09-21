@@ -4,6 +4,7 @@
 
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+<link rel="stylesheet" href="{% static 'Relatorio/css/css.css' %}">
 
 <title>{% block 'title' %}
     Caixa
@@ -37,7 +38,7 @@
         {% endif %}
     </div>
     <div class="row">
-      <div class="col-8">
+      <div class="col-10">
                   <table id="myTable" class="table table-hover">
                       <tr class="thead">
                           <th scope="col">DATA</th>
@@ -52,7 +53,7 @@
                           <tr>
                             <th hidden id="id" name="id">{{dado.id}}</th>
                             <th scope="row">{{dado.DATA}}</th>
-                            <td >{{dado.DESCRICAO}}</td>
+                            <td >{{dado.DESCRICAO|slice:":25"}}</td>
                             {% if dado.REFERENCIA == None %}
                             <td></td>
                             {% else %}
@@ -88,10 +89,19 @@
                        
                   </table>
                 </div>
-                  <div class="col-4">
-                            <h3> Saldo em dinheiro &nbspR$ {{saldo}}</h3> 
-                            <h3> Saldo do Dia &nbspR$ {{saldo_total}}</h3> 
-          
+                  <div class="col-2">
+                    <div class="_caixa">
+                      <span>Saldo em dinheiro</span>
+                    </div>
+                    <div class="_caixa">
+                      <span>&nbspR$ {{saldo}}</span>
+                    </div>
+                    <div class="_caixa">
+                      <span>Saldo do Dia</span>
+                    </div>
+                    <div class="_caixa">
+                      <span>&nbspR$ {{saldo_total}}</span>
+                    </div>
                     </div>
     
                 </div>

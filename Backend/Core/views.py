@@ -412,29 +412,38 @@ def Dashabord(request):
 
         kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
+
+def get_today_data():
+    date_now  = datetime.datetime.now().date()
+    return date_now
+
+def dados_caixa():
+    dado = CAIXA.objects.filter(DATA=get_today_data(),FECHADO=False).order_by('id')
+    return dado
+
+def get_entrada_saida():
+    entradas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo = entradas - saidas
+
+    entradas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo_total = entradas_total - saidas_total
     
+    return entradas,saidas,saldo,saldo_total
+
 @login_required(login_url='/auth/logar/')
 def Caixa(request):
     if request.method == "GET":
         try:
-            date_now  = datetime.datetime.now().date()
-            dadoscaixa = CAIXA.objects.filter(DATA=date_now,FECHADO=False).order_by('id')
-
-            entradas = CAIXA.objects.filter(DATA=date_now, TIPO='E',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-            saidas = CAIXA.objects.filter(DATA=date_now, TIPO='S',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-            saldo = entradas - saidas
-
-            entradas_total = CAIXA.objects.filter(DATA=date_now, TIPO='E',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-            saidas_total = CAIXA.objects.filter(DATA=date_now, TIPO='S',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-
-            saldo_total = entradas_total - saidas_total
-
-            pagina = Paginator(dadoscaixa, 20)
+            dadoscaixa = dados_caixa()
+            entradas,saida,saldo,saldo_total= get_entrada_saida()
+            pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
-                                                      'saida':saidas,
+                                                      'saida':saida,
                                                       'saldo':saldo,
                                                       'saldo_total':saldo_total})
         except Exception as msg:
