@@ -405,7 +405,7 @@ def Dashabord(request):
 
         return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     else:
-        Lista_os = ORDEN.objects.all().filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
+        Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).all().order_by('id')
         pagina = Paginator(Lista_os, 10)
 
         page = request.GET.get('page')
@@ -458,3 +458,6 @@ def fechar_caixa(request):
         dado.save()
     messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
+
+def cadastro_caixa(request):
+    return render(request,'Caixa/caixa_fluxo.html')
