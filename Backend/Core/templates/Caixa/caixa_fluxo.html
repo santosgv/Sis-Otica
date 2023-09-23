@@ -3,6 +3,7 @@
 {% load static %}
 
 {% block 'head' %}
+<html lang="pt-br">
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 <link rel="stylesheet" href="{% static 'Relatorio/css/css.css' %}">
 
@@ -36,28 +37,48 @@
           </div>
             <form method="POST" class="form_cliente" action="#">{% csrf_token %}
                 <div class="form-row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-2">
                     <label for="DATA_NASCIMENTO">Data</label>
-                    <input type="date" class="form-control"  id="DATA" name="DATA" required>
+                    <input class="form-control" type="text" value="{{data}}" name="DATA" id="DATA" readonly>
                   </div>
-                  <div class="form-group col-md-4">
+                  <div class="form-group col-md-2">
                     <label for="inputState">O.S</label>
-                    <select id="inputState" class="form-control">
-                      <option selected>Choose...</option>
-                      <option>...</option>
+                    <select id="REFERENCIA" name="REFERENCIA" class="form-control">
+                      <option selected value="null">..</option>
+                      {% for os in OsS %}
+                      <option value="{{os}}">{{os}}</option>
+                      {% endfor %}
                     </select>
                   </div>
-                  <div class="form-group col-md-4">
+                  <div class="form-group col-md-3">
                     <label for="inputZip">Valor</label>
-                    <input required type="text" class="form-control" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" id="VALOR" name="VALOR">
+                    <input required class="form-control" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" id="VALOR" name="VALOR" required>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="inputState">Forma Pagamento</label>
+                    <select  name="FORMA" id="FORMA" class="form-control" required>
+                      <option value="A">Pix</option>
+                      <option value="B">Dinheiro</option>
+                      <option value="C">Debito</option>
+                      <option value="D">Credito</option>
+                      <option value="E">Carne</option>
+                      <option value="F">Permuta</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputState">TIPO</label>
+                    <select id="TIPO" name="TIPO" class="form-control" required>
+                      <option selected value="E">Entrada</option>
+                      <option value="S">Saida</option>
+                    </select>
                   </div>
                 </div>
                   <div class="form-group">
                     <label for="exampleFormControlTextarea1">DESCRICAO</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    <textarea class="form-control" id="DESCRICAO" name="DESCRICAO" rows="3" required></textarea>
                   </div>
-        
              </div>
+             <button type="submit" class="btn btn-primary">Finalizar Compra</button>
             </form>   
           </div>
         </div>
@@ -68,4 +89,5 @@
       <script src="{% static 'Unidades/js/carne.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+      </html>
   {% endblock %}

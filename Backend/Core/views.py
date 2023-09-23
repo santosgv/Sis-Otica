@@ -2,8 +2,9 @@ import os
 from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,HttpResponse
 from Core.models import ORDEN,CLIENTE,CAIXA
+from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -460,4 +461,35 @@ def fechar_caixa(request):
     return redirect('/Caixa')
 
 def cadastro_caixa(request):
-    return render(request,'Caixa/caixa_fluxo.html')
+    if request.method =="GET":
+        os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()
+        return render(request,'Caixa/caixa_fluxo.html',{
+            'OsS':os_disponiveis,
+            'data':get_today_data()
+        })
+    else:
+        descricao =request.POST.get('DESCRICAO')
+        referencia = request.POST.get('REFERENCIA')
+        tipo= request.POST.get('TIPO')
+        valor_str = request.POST.get('VALOR') 
+        forma= request.POST.get('FORMA')
+
+        if valor_str:
+            valor = float(valor_str.replace(',', '.'))
+        print(valor)
+        
+        if referencia and referencia != 'null':
+            referencia_obj = get_object_or_404(ORDEN, id=referencia)
+        else:
+            referencia_obj = None
+        caixa = CAIXA.objects.create(
+            DATA=get_today_data(),
+            VALOR=valor,
+            DESCRICAO=descricao,
+            REFERENCIA= referencia_obj,
+            TIPO=tipo,
+            FORMA=forma
+        )
+        caixa.save()
+        messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
+        return redirect('/Caixa')
