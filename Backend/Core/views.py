@@ -1,4 +1,5 @@
 import os
+import re
 from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
@@ -419,7 +420,7 @@ def get_today_data():
     return date_now
 
 def dados_caixa():
-    dado = CAIXA.objects.filter(DATA=get_today_data(),FECHADO=False).order_by('id')
+    dado = CAIXA.objects.filter(DATA=get_today_data(),FECHADO=False).order_by('-id')
     return dado
 
 def get_entrada_saida():
@@ -471,12 +472,11 @@ def cadastro_caixa(request):
         descricao =request.POST.get('DESCRICAO')
         referencia = request.POST.get('REFERENCIA')
         tipo= request.POST.get('TIPO')
-        valor_str = request.POST.get('VALOR') 
+        valor_str = request.POST.get('VALOR')
         forma= request.POST.get('FORMA')
 
-        if valor_str:
-            valor = float(valor_str.replace(',', '.'))
-        print(valor)
+        valor_str = valor_str.replace('.', '').replace(',', '.')
+
         
         if referencia and referencia != 'null':
             referencia_obj = get_object_or_404(ORDEN, id=referencia)
@@ -484,7 +484,7 @@ def cadastro_caixa(request):
             referencia_obj = None
         caixa = CAIXA.objects.create(
             DATA=get_today_data(),
-            VALOR=valor,
+            VALOR=valor_str,
             DESCRICAO=descricao,
             REFERENCIA= referencia_obj,
             TIPO=tipo,
