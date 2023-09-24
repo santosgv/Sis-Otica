@@ -8,3 +8,9 @@
     min-height: 120px;
     margin-bottom: 1rem;
 }
+
+
+._caixa{
+    margin: 1%;
+    border: 2px rgb(127, 127, 212) solid;
+}

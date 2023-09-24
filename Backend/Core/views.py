@@ -1,9 +1,11 @@
 import os
+import re
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.messages import constants
-from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE
+from django.shortcuts import redirect, render,HttpResponse
+from Core.models import ORDEN,CLIENTE,CAIXA
+from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -15,6 +17,8 @@ from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
+from django.utils.timezone import now
+from django.db.models import Sum
 
 
 def home(request):
@@ -328,13 +332,13 @@ def Imprimir_os(request,id_os):
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(565,744,str(PRINT_OS.id))
-        PDF.drawString(88,724,str(PRINT_OS.CLIENTE))
+        PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
         PDF.drawString(385,665,str(PRINT_OS.SUB_SERVICO))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
         PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO))
+        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
         if PRINT_OS.FORMA_PAG == 'A':
             PDF.drawString(109,539,'PIX')
         elif PRINT_OS.FORMA_PAG == 'B':
@@ -354,7 +358,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(565,423,str(PRINT_OS.id))
-        PDF.drawString(88,402,str(PRINT_OS.CLIENTE))
+        PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
         PDF.drawString(338,361,str(PRINT_OS.SUB_SERVICO))
@@ -367,7 +371,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(64,248,str(PRINT_OS.AD))
         PDF.drawString(78,215,str(PRINT_OS.LENTES))
         PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO))
+        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO[:69]))
 
         PDF.drawString(60,116,str(PRINT_OS.DNP))
         PDF.drawString(270,116,str(PRINT_OS.P))
@@ -403,12 +407,89 @@ def Dashabord(request):
 
         return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
     else:
-        pega_filial =USUARIO.objects.get(id=request.user.id)
-        Lista_os = ORDEN.objects.all().filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id')
+        Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).all().order_by('id')
         pagina = Paginator(Lista_os, 10)
 
         page = request.GET.get('page')
 
         kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
+
+def get_today_data():
+    date_now  = datetime.datetime.now().date()
+    return date_now
+
+def dados_caixa():
+    dado = CAIXA.objects.filter(DATA=get_today_data(),FECHADO=False).order_by('-id')
+    return dado
+
+def get_entrada_saida():
+    entradas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo = entradas - saidas
+
+    entradas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo_total = entradas_total - saidas_total
     
+    return entradas,saidas,saldo,saldo_total
+
+@login_required(login_url='/auth/logar/')
+def Caixa(request):
+    if request.method == "GET":
+        try:
+            dadoscaixa = dados_caixa()
+            entradas,saida,saldo,saldo_total= get_entrada_saida()
+            pagina = Paginator(dadoscaixa,15)
+            page = request.GET.get('page')
+            dados = pagina.get_page(page)
+            return render(request,'Caixa/caixa.html',{'dados':dados,
+                                                      'entrada':entradas,
+                                                      'saida':saida,
+                                                      'saldo':saldo,
+                                                      'saldo_total':saldo_total})
+        except Exception as msg:
+            print(msg)
+    return render(request,'Caixa/caixa.html')
+
+def fechar_caixa(request):
+    date_now  = datetime.datetime.now().date()
+    caixa = CAIXA.objects.filter(DATA=date_now,FECHADO=False).order_by('id')
+    for dado in caixa:
+        dado.fechar_caixa()
+        dado.save()
+    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+    return redirect('/Caixa')
+
+def cadastro_caixa(request):
+    if request.method =="GET":
+        os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()
+        return render(request,'Caixa/caixa_fluxo.html',{
+            'OsS':os_disponiveis,
+            'data':get_today_data()
+        })
+    else:
+        descricao =request.POST.get('DESCRICAO')
+        referencia = request.POST.get('REFERENCIA')
+        tipo= request.POST.get('TIPO')
+        valor_str = request.POST.get('VALOR')
+        forma= request.POST.get('FORMA')
+
+        valor_str = valor_str.replace('.', '').replace(',', '.')
+
+        
+        if referencia and referencia != 'null':
+            referencia_obj = get_object_or_404(ORDEN, id=referencia)
+        else:
+            referencia_obj = None
+        caixa = CAIXA.objects.create(
+            DATA=get_today_data(),
+            VALOR=valor_str,
+            DESCRICAO=descricao,
+            REFERENCIA= referencia_obj,
+            TIPO=tipo,
+            FORMA=forma
+        )
+        caixa.save()
+        messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
+        return redirect('/Caixa')

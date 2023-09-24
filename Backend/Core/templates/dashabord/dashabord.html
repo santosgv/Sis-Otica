@@ -6,7 +6,7 @@
 <title>{% block 'title' %} Kanban Board {% endblock %}</title>
 {% endblock %} 
 {% block 'body'%}
-<div class="container-fluid pt-3" style="height: 100vh;">
+<div class="container-fluid pt-3">
   <h3 class="font-weight-light text-center">Kanban Board ultimos 30 Dias</h3>
   <div class="row flex-row flex-sm-nowrap py-3">
 
@@ -126,7 +126,7 @@
 <div class="pagination">
               
   <samp class="step-links">
-        {% if clientes.has_previous %}
+        {% if kankan_servicos.has_previous %}
         <a href="?page={{kankan_servicos.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
         {% endif %}
 
@@ -134,7 +134,7 @@
             {{kankan_servicos.number}} de {{kankan_servicos.paginator.num_pages}}
           </samp>
 
-        {% if clientes.has_next %}
+        {% if kankan_servicos.has_next %}
         <a href="?page={{kankan_servicos.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
         {% endif %}
   </samp>

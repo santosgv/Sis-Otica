@@ -24,7 +24,7 @@
                 <div class="sidebar-heading border-bottom bg-light"><img src="{% static 'home/img/logo-preto-amarelo.jpeg' %}" height="200px" alt="logo"></div>
                 <div class="list-group list-group-flush">
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:home'%}">Inicio</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Caixa</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:Caixa'%}">Caixa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Venda</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:Lista_Os'%}">Pesquisa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{%url 'Core:Dashabord' %}">Dashboard</a>
@@ -39,7 +39,7 @@
                 <!-- Top navigation-->
                 <nav class="navbar navbar-expand-lg navbar-light bg-nav border-bottom">
                     <div class="container-fluid">
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNUlEQVR4nO2WvUoDQRSFv5ewUBOxtIiVKfUBBA0+R0zis9gpBgtLe3/eJCv2inZu7ExQFm4giDN75u5GUuTAKXaZ4eP+zJ2BlZZQW0AfeAQy4NOc2b8e0KwTuAlcAhPgu8RT4BbYrgo9AcYC8LdzoOOFnlkEqdD56AeeSKcVoPNwOfKGM72xtG8o4OsaoTNfKUemrHvfgD1gPwE8sUwG1RegLVvbToz6NAZ+EKEt+04B38XAz4FN78CurdkBXh11zmLgPLCpqKmqUO3zRYMPPOAnMdUvjlSPlrK5egs8Tt0YuCkOkHakln/5q2yAFBo66lfmC8SLP9TdHn8A64g6FF8cyrV4rEJnGtTwEChmv0sdZ9qL9B5RUWvAuXWmEuVNSk0VNexqu7cpNDaPbDh0lSOzEv+tH+YHlQGe3ZAGAAAAAElFTkSuQmCC" id="sidebarToggle" ></img>
+                        <img id="sidebarToggle" width="30" height="30" src="https://img.icons8.com/ios/50/menu--v1.png" alt="menu--v1"/> 
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
@@ -78,5 +78,6 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="{% static 'Unidades/js/scripts.js' %}"></script>
+        
     </body>
 </html>
