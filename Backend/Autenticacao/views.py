@@ -62,7 +62,7 @@ def cadastro(request):
             ativacao =Ativacao(token=token, user=user)
             ativacao.save()
             #email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=f"127.0.0.1:8000/auth/ativar_conta/{token}")
-            link_ativacao=f"localhost:8000/auth/auth/ativar_conta/{token}"
+            link_ativacao=f"{settings.URL}/auth/auth/ativar_conta/{token}"
             html_content=render_to_string('emails/cadastro_confirmado.html',{'username':username,'link_ativacao':link_ativacao})
             text_content = strip_tags(html_content)
             email = EmailMultiAlternatives('Cadastro confirmado',text_content,settings.EMAIL_HOST_USER,[email,])
