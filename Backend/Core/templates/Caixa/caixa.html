@@ -57,7 +57,7 @@
                             {% if dado.REFERENCIA == None %}
                             <td></td>
                             {% else %}
-                            <td>{{dado.REFERENCIA}}</td>
+                            <td><a href="{% url 'Core:Visualizar_os' dado.REFERENCIA  %}" rel="noopener noreferrer">{{dado.REFERENCIA}}</a></td>
                             {% endif %}
                             {% if dado.TIPO == "E" %}
                             <td>Entrada</td>

@@ -18,8 +18,15 @@ from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now
-from django.db.models import Sum, F, Case, When, Value ,CharField
+from django.db.models import Sum,Prefetch
 
+def get_today_data():
+    date_now  = datetime.datetime.now().date()
+    return date_now
+
+def thirty_days_ago():
+    data = get_today_data() - datetime.timedelta(days=30)
+    return data
 
 def home(request):
     if request.user.is_authenticated:
@@ -30,7 +37,7 @@ def home(request):
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
-        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').select_related('id').all().values()
+        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').only('id').all().values()
 
         pagina = Paginator(cliente_lista, 10)
 
@@ -97,7 +104,7 @@ def Edita_cliente(request,id):
     return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
 
 @login_required(login_url='/auth/logar/')
-def excluir_cliente(request,id):
+def excluir_cliente(id):
     excluir = CLIENTE.objects.get(id=id)
     excluir.delete()
     return redirect('/clientes')
@@ -298,7 +305,7 @@ def Loja_os(request,id_os):
             return redirect('/Lista_Os')      
 
 @login_required(login_url='/auth/logar/')   
-def Imprimir_os(request,id_os):
+def Imprimir_os(id_os):
     try:
         PRINT_OS =ORDEN.objects.get(id=id_os)
         
@@ -372,42 +379,24 @@ def Imprimir_os(request,id_os):
      
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    date_now  = datetime.datetime.now().date()
-    thirty_days_ago = date_now - datetime.timedelta(days=30)
-    if request.user.is_superuser ==True:
-        Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).order_by('id').all()
-        
-        pagina = Paginator(Lista_os, 10)
-
-        page = request.GET.get('page')
-        
-        kankan_servicos = pagina.get_page(page)
-
-        return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
-    else:
-        Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago,DATA_SOLICITACAO__lte=date_now).all().order_by('id')
-        pagina = Paginator(Lista_os, 10)
-
-        page = request.GET.get('page')
-
-        kankan_servicos = pagina.get_page(page)
+    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago(),DATA_SOLICITACAO__lte=get_today_data()).order_by('id').all()
+    pagina = Paginator(Lista_os, 10)
+    page = request.GET.get('page')
+    kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
-def get_today_data():
-    date_now  = datetime.datetime.now().date()
-    return date_now
 
 def dados_caixa():
-    dado = CAIXA.objects.filter(DATA=get_today_data(),FECHADO=False).order_by('-id')
+    dado = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     return dado
 
 def get_entrada_saida():
-    entradas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    entradas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saldo = entradas - saidas
 
-    entradas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas_total = CAIXA.objects.filter(DATA=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    entradas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saldo_total = entradas_total - saidas_total
 
     return entradas,saidas,saldo,saldo_total
@@ -431,8 +420,7 @@ def Caixa(request):
     return render(request,'Caixa/caixa.html')
 
 def fechar_caixa(request):
-    date_now  = datetime.datetime.now().date()
-    caixa = CAIXA.objects.filter(DATA=date_now,FECHADO=False).order_by('id')
+    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()
