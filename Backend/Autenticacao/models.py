@@ -33,7 +33,7 @@ class Ativacao(models.Model):
     ativo = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.id
+        return str(self.user)
 
 
 class SALARIO(models.Model):

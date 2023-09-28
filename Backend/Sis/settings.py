@@ -18,6 +18,7 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
+
 ALLOWED_HOSTS =['*']
 
 USE_L10N = False
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'Autenticacao',
     'Core',
 ]
@@ -73,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -136,6 +139,13 @@ TENANT_DOMAIN_MODEL = "Cliente.Domain"
 TENANT_COLOR_ADMIN_APPS = False
 
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": 'redis://191.252.210.233:6379/0',
+	    "TIMEOUT": 60,
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -167,7 +177,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+INTERNAL_IPS = [
+    "localhost",
+    "127.0.0.1",
+    
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -196,14 +210,13 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
 }
 
-
+URL=config('URL')
 DEFAULT_FROM_EMAIL='Vitor Dos Santos | Pagamento'
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER= config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS=True
 EMAIL_PORT =587
-EMAIL_HOST='smtp.gmail.com'
 
 
 CORS_ALLOWED_ORIGINS : True
@@ -228,3 +241,4 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+EMAIL_HOST='smtp.office365.com'

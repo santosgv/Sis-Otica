@@ -1,13 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro</title>
 </head>
 <body>
-<h1>Seja bem vindo {{username}}, sua conta foi criada com sucesso.</h1>
-<br>
-<samp>Click no link para ativar sua conta</samp>
 
-    <a href="{{link_ativacao}}">{{link_ativacao}}</a>
-  <br>
-  
+    <h1 class="titulo">Seja bem vindo {{username}}, sua conta foi criada com sucesso!</h1>
+    <br>
+    <samp>Click no link para ativar sua conta</samp>
+    
+        <a href="{{link_ativacao}}">{{link_ativacao}}</a>
+      <br>
+      
+
 </body>
+<style>
+.titulo{
+  color: #d41616;
+}
+</style>
 </html>
