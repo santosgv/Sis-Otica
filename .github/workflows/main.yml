@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+  MAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+  URL: ${{ secrets.URL }}
+
 jobs:
   build:
 
@@ -27,12 +33,7 @@ jobs:
         pip install -r requirements.txt
         - name: Set up environment variables
 
-    - name: set variaveis ambiente
-      env:
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-        EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-        URL: ${{ secrets.URL }}
+    - name: variaveis
 
 
     - name: Run Tests
