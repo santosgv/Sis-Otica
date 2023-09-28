@@ -49,6 +49,7 @@ SHARED_APPS = [
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'debug_toolbar',
         'Autenticacao',
         'Core',
 ]
