@@ -35,4 +35,6 @@ jobs:
 
     - name: Run Tests
       run: |
-        cd ./Backend && python manage.py test && ls -la
+        cd ./Backend
+        python manage.py test
+        ls -la
