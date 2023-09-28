@@ -14,7 +14,6 @@ urlpatterns = [
     path('cliente/<int:id>',views.Cliente,name='cliente'),
     path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
     path('excluir_cliente/<int:id>',views.excluir_cliente,name='excluir_cliente'),
-
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
     path('Cadastrar_os/<int:id_cliente>',views.Cadastrar_os,name='Cadastrar_os'),
     path('Visualizar_os/<int:id_os>',views.Visualizar_os,name='Visualizar_os'),
@@ -24,7 +23,6 @@ urlpatterns = [
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
     path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
-
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),

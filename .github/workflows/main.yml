@@ -25,6 +25,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        - name: Set up environment variables
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+        EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+        URL: ${{ secrets.URL }}
+
+
     - name: Run Tests
       run: |
         cd ./Backend && python manage.py test && ls -la
