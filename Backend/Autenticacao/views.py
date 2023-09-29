@@ -1,17 +1,11 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.models import User
 from .models import USUARIO
 from django.contrib import auth
-import os
 from django.conf import settings
-from .utils import email_html
 from .models import Ativacao
 from hashlib import sha256
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
-
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags

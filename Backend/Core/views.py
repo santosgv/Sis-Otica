@@ -385,7 +385,7 @@ def Dashabord(request):
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
-
+@login_required(login_url='/auth/logar/')
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     return dado
@@ -419,6 +419,7 @@ def Caixa(request):
             print(msg)
     return render(request,'Caixa/caixa.html')
 
+@login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
     caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('id')
     for dado in caixa:
@@ -427,6 +428,7 @@ def fechar_caixa(request):
     messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
 
+@login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
     if request.method =="GET":
         os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()

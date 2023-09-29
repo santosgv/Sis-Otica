@@ -90,6 +90,9 @@ CACHES = {
 	    "TIMEOUT": 60,
     }
 }
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_AGE=604800 # 1 semana
+SESSION_COOKIE_SECURE = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -155,7 +158,7 @@ MESSAGE_TAGS = {
 }
 
 URL=config('URL')
-DEFAULT_FROM_EMAIL='Vitor Dos Santos | Pagamento'
+DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER= config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
