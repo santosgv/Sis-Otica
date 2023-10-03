@@ -461,3 +461,7 @@ def cadastro_caixa(request):
         caixa.save()
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/Caixa')
+
+@login_required(login_url='/auth/logar/')
+def relatorios(request):
+    return render(request,'Relatorio/relatorios.html')

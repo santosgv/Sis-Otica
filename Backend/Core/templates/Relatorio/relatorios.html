@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Relatorios
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+</div>
+{% if user.FUNCAO == "G" %}
+<div class="container-fluid">
+    <h1>Tem permissao</h1>
+    </div>
+    {% else%}
+    <h1>Sem permissao</h1>
+{% endif %}
+{% endblock %}
