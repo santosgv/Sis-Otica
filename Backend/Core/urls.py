@@ -27,6 +27,7 @@ urlpatterns = [
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
     path('cadastro_caixa',views.cadastro_caixa, name='cadastro_caixa'),
+    path('vendas_ultimos_12_meses',views.vendas_ultimos_12_meses,name='vendas_ultimos_12_meses'),
     path('relatorios',views.relatorios, name='relatorios'),
 ]
 
