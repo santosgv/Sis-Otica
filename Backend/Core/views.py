@@ -1,4 +1,5 @@
 import os
+from django.views.decorators.cache import cache_page
 import re
 from django.contrib import messages
 from datetime import datetime, date
@@ -17,8 +18,12 @@ from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
-from django.utils.timezone import now
-from django.db.models import Sum,Prefetch
+from django.utils.timezone import now,timedelta
+from django.db.models import Sum,Count
+from django.db.models.functions import TruncMonth
+import json
+from django.http import HttpResponse ,JsonResponse
+
 
 def get_today_data():
     date_now  = datetime.datetime.now().date()
@@ -39,7 +44,7 @@ def home(request):
 def clientes(request):
         cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').only('id').all().values()
 
-        pagina = Paginator(cliente_lista, 10)
+        pagina = Paginator(cliente_lista, 25)
 
         page = request.GET.get('page')
 
@@ -111,9 +116,9 @@ def excluir_cliente(id):
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
-        Lista_os = ORDEN.objects.order_by('id').all()
+        Lista_os = ORDEN.objects.order_by('-id').all()
 
-        pagina = Paginator(Lista_os, 10)
+        pagina = Paginator(Lista_os, 25)
 
         page = request.GET.get('page')
 
@@ -385,7 +390,6 @@ def Dashabord(request):
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
-
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     return dado
@@ -419,14 +423,16 @@ def Caixa(request):
             print(msg)
     return render(request,'Caixa/caixa.html')
 
+@login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('id')
+    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()
     messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
 
+@login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
     if request.method =="GET":
         os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()
@@ -459,3 +465,24 @@ def cadastro_caixa(request):
         caixa.save()
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/Caixa')
+
+#@cache_page(60 * 15)
+def vendas_ultimos_12_meses(request):
+    hoje = get_today_data()
+    data_limite = hoje - timedelta(days=365)
+
+    vendas = (
+        ORDEN.objects
+        .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
+        .values('mes_venda')
+        .annotate(total_vendas=Count('id'))
+        .filter(DATA_SOLICITACAO__gte=data_limite)
+        .order_by('mes_venda')
+    )
+
+    data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%d-%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
+    return JsonResponse({'data': data_vendas})
+
+@login_required(login_url='/auth/logar/')
+def relatorios(request):
+    return render(request,'Relatorio/relatorios.html')

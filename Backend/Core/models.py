@@ -45,7 +45,6 @@ class ORDEN(models.Model):
     ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.SET_NULL,null=True)
-    DATA = models.DateTimeField(default=now)
     PREVISAO_ENTREGA = models.DateField()
     ASSINATURA = models.ImageField(upload_to='assinatura_img' ,blank=True, null=True)
     SERVICO = models.CharField(max_length=500)

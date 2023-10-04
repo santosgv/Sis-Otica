@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Relatorios
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+</div>
+{% if user.FUNCAO == "G" %}
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-md">
+            <div class="grafico">
+            <canvas id="vendas_12m" width="1000" height="500"></canvas>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="grafico">
+        <canvas id="#" width="1000" height="500" style="background-color: green;"></canvas>
+    </div>
+  </div>
+    </div>
+    {% else%}
+    <h1>Acesso apenas para Gerentes !</h1>
+{% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'Relatorio\js\relatorios.js' %}"></script>
+
+
+<script>
+    window.onload = function(e){
+    renderiza_total_vendas_12_meses('{% url "Core:vendas_ultimos_12_meses" %}')
+    renderiza_fluxo_12_meses('#')
+}
+</script>
+{% endblock %}
