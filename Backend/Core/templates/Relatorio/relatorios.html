@@ -22,18 +22,26 @@ Relatorios
 </div>
 {% if user.FUNCAO == "G" %}
 <div class="container-fluid">
+  <br>
+  <div  class="col-md">
+      <h1 class="text-center">Funcionários do mês</h1>
+    <h3 class="text-center">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAADlElEQVR4nO2aSWgUQRRA30gSFxI1igpBRoVEUCMmCt6CC0pMVLwJ3iIoGNCLqIkJgojEg6fgTU+iXkQPLqggiqIhJG4oxO0geBA0UeNCFJdYUvIbina6ZyazdU/Xg4KZ6lp+/fr/10zXB4slqBwC7gPPgdfAR+AXcJeIcBpQHqWMCLAAWAYsAR66FDCNiFAGXJBFvwOG5XOcCDAeuCwLfg/UAc/k+0KKnKnAdVnsoLiB5p7ULaeIqQaeykLfAouNZweBM8B8ipT1Yu568Y+BOUSEiUA38EcWfwWYTERoBF7Kwr8Du4FxRIBq4KJxtmuTryUCLAJOAj9l4Z9k10s92vf4/CK8Q0goBTYBlww/1wo4AcxK0lclKYFlArBWgtugIfAIcCyNCO+10MApYDawETggUXzEtVNPxNRnpDluKBQwPYFpalN/AHQBSzMYOxQKQI4y/fP1KLAFmEl2CI0CUiXdqF50ClBpRvWiVYAbqwCsBRBKF+jJcVALvAJUjoNaaBTgxioAawFYF+B/bAygSIKgClixCrBYLHl9y9sCDEjGRkWa/TcAt4HP8lr8llyLpUOF/A8ZEFm8XqtnlRJgO/DKFYHPA7EUxzjsE8l1WkwqxGROs6+WaZvImDP2GxPqG9ydkrujv3em0H+dtP0B7AOqpLRJnZKrsmR0SludMLHLuE3WpZ0csgIYlTe+DVLXJHW6NCfp79z56wW7aZNnuo0fzQnmaxCZdN1KckyXCKoztyqlrsPYkRqfvh+knd51N1XybMinf42RJuNYXKXIouuOkAdKgV7D9x2fPCd1L3yUMJSCAnQuUCJqZGx3zHFiQW++AqFmrrETrf9qoNzI5hr2cIdrPi7QLs/0rZKbZmO+R8aps0Pq9EkyjzyzWSb/ZqSxlBuWMCpmap4Oq40g2OYRBFcZ7WMyxqix887ia2VuJbIUhOOG2ccNoTs8hNbs9TkG9xjtKgzzdiszLhmkSm6YC8YkMUktyBug3njWZByRmRS3O9XJXI47aBkKyhTghgj0Rc56MwukP4PF97sCaqPMoWROnU4XCEoMd/gtwSnbbDWySs5K/kGgiEken7N73VlKdko0bqo/uwtCSxZ3SucKn8qxZeWENfJPTwt+c4y+qk+BqzLG1zH8Wyw49Ua07htD/z6P0yVUxDN4aamKJTVeZaiA0KOsArAWoPJoOYFDWQvAWoDKo+UEDmUtgGhbgIUA8xeXHD3/W0MxfwAAAABJRU5ErkJggg=="><span style="margin-left: 15px;" id="vendedor">10</span></h3> 
+    
+</div>
       <div class="row">
         <div class="col-md">
-            <div class="grafico">
-            <canvas id="vendas_12m" width="1000" height="500"></canvas>
-        </div>
+          <h1 class="text-center">Total de Vendas nos ultimos 12 Meses:</h1>
+            <canvas id="vendas_12m" width="250" height="200"></canvas>
+ 
       </div>
       <div class="col-md">
-        <div class="grafico">
-        <canvas id="#" width="1000" height="500" style="background-color: green;"></canvas>
+      <h1 class="text-center">Fluxo de Caixa Mensal nos ultimos 12 Meses:</h1>
+      <canvas id="fluxo_mensal" width="250" height="200"></canvas>
     </div>
-  </div>
-    </div>
+</div>
+
+    
     {% else%}
     <h1>Acesso apenas para Gerentes !</h1>
 {% endif %}
@@ -45,8 +53,9 @@ Relatorios
 
 <script>
     window.onload = function(e){
-    renderiza_total_vendas_12_meses('{% url "Core:vendas_ultimos_12_meses" %}')
-    renderiza_fluxo_12_meses('#')
+      renderiza_total_vendas_12_meses('{% url "Core:vendas_ultimos_12_meses" %}')
+      renderiza_vendedor('{% url "Core:maiores_vendedores_30_dias" %}')
+      renderiza_fluxo_12_meses('{% url "Core:transacoes_mensais" %}')
 }
 </script>
 {% endblock %}

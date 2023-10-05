@@ -32,7 +32,7 @@ function renderiza_total_vendas_12_meses(url){
           labels: labels,
           datasets: [
             {
-              label: "Total de Vendas nos ultimos 12 Meses",
+              label: "Total",
               data: values,
               backgroundColor: cores_vendas_12m[0],
             },
@@ -55,4 +55,67 @@ function renderiza_total_vendas_12_meses(url){
     .catch(error => console.error(error));
 
 
+}
+
+
+function renderiza_vendedor(url){
+  fetch(url, {
+      method: 'get',
+  }).then(function(result){
+      return result.json()
+  }).then(function(data){
+      document.getElementById('vendedor').innerHTML = data.maiores_vendedores_30_dias[0]['VENDEDOR__first_name'];
+  })
+}
+
+
+function renderiza_fluxo_12_meses(url) {
+  fetch(url)
+    .then(response => response.json())  // Converte a resposta em JSON
+    .then(data => {
+      // Extrai as informações relevantes do objeto JSON para gerar o gráfico
+
+      const labels = data.data.map(item => `${item.mes}/${item.ano}`);
+      const saidas = data.data.map(item => item.saida.total);
+      const entradas = data.data.map(item => item.entrada.total);
+      const canvas = document.getElementById('fluxo_mensal').getContext('2d');
+
+      // Configura o gráfico
+      const chart = new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Saída",
+              data: saidas,
+              backgroundColor: "red",
+            },
+            {
+              label: "Entrada",
+              data: entradas,
+              backgroundColor: "green",
+            },
+          ],
+        },
+        options: {
+          title:{
+            display:true,
+            fontSize:20,
+            text:"Fluxo de Caixa Mensal nos ultimos 12 Meses:"
+          },
+          responsive: true,
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          },
+        },
+      });
+    })
+    .catch(error => console.error(error));
 }

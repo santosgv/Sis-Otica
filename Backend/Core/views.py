@@ -20,9 +20,11 @@ from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now,timedelta
 from django.db.models import Sum,Count
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
+
 import json
 from django.http import HttpResponse ,JsonResponse
+
 
 
 def get_today_data():
@@ -482,6 +484,66 @@ def vendas_ultimos_12_meses(request):
 
     data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%d-%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
     return JsonResponse({'data': data_vendas})
+
+def maiores_vendedores_30_dias(request):
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()) \
+        .values('VENDEDOR__first_name') \
+        .annotate(total_pedidos=Count('id')) \
+        .order_by('-total_pedidos')[:3]
+    return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
+
+
+def transacoes_mensais(request):
+    # Realiza uma agregação dos valores das transações por mês e tipo
+    transacoes_mensais = CAIXA.objects.annotate(
+        ano=ExtractYear('DATA'),
+        mes=ExtractMonth('DATA')
+    ).values('ano', 'mes', 'TIPO').annotate(
+        total=Sum('VALOR'),
+        quantidade=Count('id')
+    ).filter(FECHADO=True)
+
+    # Cria um dicionário para armazenar os totais mensais de entradas e saídas
+    dados_mensais = {}
+
+    # Itera sobre as transações agregadas e agrupa os totais por mês, ano e tipo
+    for transacao in transacoes_mensais:
+        ano = transacao['ano']
+        mes = transacao['mes']
+        tipo = transacao['TIPO']
+        total = transacao['total']
+        quantidade = transacao['quantidade']
+
+        # Verifica se já existe um registro para o mês e ano atual
+        if (ano, mes) in dados_mensais:
+            dados = dados_mensais[(ano, mes)]
+        else:
+            dados = {'entrada': {'total': 0, 'quantidade': 0}, 'saida': {'total': 0, 'quantidade': 0}}
+
+        # Atualiza o total correspondente com base no tipo (entrada ou saída)
+        if tipo == 'E':
+            dados['entrada']['total'] += total
+            dados['entrada']['quantidade'] += quantidade
+        elif tipo == 'S':
+            dados['saida']['total'] += total
+            dados['saida']['quantidade'] += quantidade
+
+        # Atualiza o dicionário de dados mensais
+        dados_mensais[(ano, mes)] = dados
+
+    # Formata os dados para a resposta JSON
+    dados_formatados = [
+        {
+            'ano': ano,
+            'mes': mes,
+            'entrada': dados['entrada'],
+            'saida': dados['saida'],
+        }
+        for (ano, mes), dados in dados_mensais.items()
+    ]
+
+    # Retorna os dados como JsonResponse
+    return JsonResponse({'data': dados_formatados}, safe=False)
 
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
