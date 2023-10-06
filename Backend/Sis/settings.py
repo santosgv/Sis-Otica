@@ -2,6 +2,8 @@ import os
 from decouple import config,Csv
 from pathlib import Path
 from django.contrib.messages import constants
+import mimetypes 
+mimetypes.add_type("text/css", ".css", True)
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -165,3 +167,26 @@ EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS=True
 EMAIL_PORT =587
 EMAIL_HOST='smtp.office365.com'
+
+CORS_ALLOWED_ORIGINS : True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
