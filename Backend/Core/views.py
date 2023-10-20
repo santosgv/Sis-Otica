@@ -492,8 +492,6 @@ def maiores_vendedores_30_dias(request):
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .order_by('-total_pedidos')[:5]
-    for i in vendedores:
-        print(i)
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
 
