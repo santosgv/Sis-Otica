@@ -58,14 +58,27 @@ function renderiza_total_vendas_12_meses(url){
 }
 
 
-function renderiza_vendedor(url){
+function renderiza_vendedor(url) {
   fetch(url, {
-      method: 'get',
-  }).then(function(result){
-      return result.json()
-  }).then(function(data){
-      document.getElementById('vendedor').innerHTML = data.maiores_vendedores_30_dias[0]['VENDEDOR__first_name'];
-  })
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const vendedores = data.maiores_vendedores_30_dias;
+    const vendedorContainer = document.getElementById('vendedor');
+
+    vendedores.forEach(function(vendedor) {
+      const vendedorNome = vendedor['VENDEDOR__first_name'];
+      const totalPedidos = vendedor['total_pedidos'];
+      const totalvendas = vendedor['total_valor_vendas'];
+      // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
+      const vendedorElement = document.createElement('div');
+      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos ${totalvendas} em Vendas`;
+
+      // Adicione o elemento à div de vendedores
+      vendedorContainer.appendChild(vendedorElement);
+    });
+  });
 }
 
 

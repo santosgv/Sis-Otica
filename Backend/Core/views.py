@@ -35,6 +35,7 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
+@login_required(login_url='/auth/logar/')  
 def home(request):
     if request.user.is_authenticated:
         return render(request,'home.html')
@@ -489,7 +490,10 @@ def maiores_vendedores_30_dias(request):
     vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()) \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
-        .order_by('-total_pedidos')[:3]
+        .annotate(total_valor_vendas=Sum('VALOR')) \
+        .order_by('-total_pedidos')[:5]
+    for i in vendedores:
+        print(i)
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
 
