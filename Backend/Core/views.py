@@ -483,7 +483,7 @@ def vendas_ultimos_12_meses(request):
         .order_by('mes_venda')
     )
 
-    data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%d-%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
+    data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
     return JsonResponse({'data': data_vendas})
 
 def maiores_vendedores_30_dias(request):
