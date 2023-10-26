@@ -4,7 +4,7 @@ import re
 from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
-from django.shortcuts import redirect, render,HttpResponse
+from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE,CAIXA
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
@@ -19,11 +19,9 @@ from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now,timedelta
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
-
-import json
-from django.http import HttpResponse ,JsonResponse
+from django.http import JsonResponse
 
 
 
@@ -547,6 +545,64 @@ def transacoes_mensais(request):
     # Retorna os dados como JsonResponse
     return JsonResponse({'data': dados_formatados}, safe=False)
 
+def caixa_mes_anterior(request):
+    return render(request, 'Caixa/caixa_mes_anterior.html')
+
+def obter_valores_registros_meses_anteriores(request):
+    if request.method == "GET":
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
+
+        registros = CAIXA.objects.filter(
+                DATA__range=(data_inicio, data_fim),
+                FECHADO=True
+            ).annotate(ano=ExtractYear('DATA'), mes=ExtractMonth('DATA')).values('ano', 'mes').annotate(
+                total_entradas=Sum(
+                    Case(
+                        When(TIPO='E', then='VALOR'),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                quantidade_entradas=Count(
+                    Case(
+                        When(TIPO='E', then='VALOR')
+                    )
+                ),
+                total_saidas=Sum(
+                    Case(
+                        When(TIPO='S', then='VALOR'),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                quantidade_saidas=Count(
+                    Case(
+                        When(TIPO='S', then='VALOR')
+                    )
+                )
+            ).order_by('ano', 'mes')
+
+        resultados = []
+        for registro in registros:
+            resultado = {
+                    'ano': registro['ano'],
+                    'mes': registro['mes'],
+                    'entrada': {
+                        'total': registro['total_entradas'],
+                        'quantidade': registro['quantidade_entradas']
+                    },
+                    'saida': {
+                        'total': registro['total_saidas'],
+                        'quantidade': registro['quantidade_saidas']
+                    }
+                }
+            resultados.append(resultado)
+        return JsonResponse({'data': resultados})
+    
+
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
     return render(request,'Relatorio/relatorios.html')
+
+    

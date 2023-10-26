@@ -31,6 +31,8 @@ urlpatterns = [
     path('maiores_vendedores_30_dias',views.maiores_vendedores_30_dias,name='maiores_vendedores_30_dias'),
     path('transacoes_mensais',views.transacoes_mensais,name='transacoes_mensais'),
     path('relatorios',views.relatorios, name='relatorios'),
+    path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
+    path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
