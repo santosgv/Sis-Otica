@@ -132,3 +132,4 @@ function renderiza_fluxo_12_meses(url) {
     })
     .catch(error => console.error(error));
 }
+

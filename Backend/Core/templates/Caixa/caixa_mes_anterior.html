@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<html lang="pt-br">
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+    Mês Anterior
+    {% endblock %}</title>
+
+  {% endblock %}
+
+  {% block 'body'%}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'Core:Caixa'%}">Caixa</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Fluxo Caixa Mêses Anteriores</li>
+    </ol>
+  </nav>
+      <div class="text-center">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{message.tags}}">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <section class="container-fluid text-center">
+        <div class="form_">
+          <div class="text-center">
+            <label for="" class="titulo">Consultar Mêses</label>
+          </div>
+          <form action="#" method="GET">{% csrf_token %}
+            <label for="data_inicio">Data de Início:</label>
+            <input type="date" id="data_inicio" required name="data_inicio">
+            
+            <label for="data_fim">Data de Término:</label>
+            <input type="date" id="data_fim" required name="data_fim">
+            
+            <input type="submit" value="Obter Valores">
+        </form>
+        <br>
+          </div>
+          <div class="container-fluid">
+            <canvas id="caixa_mensal" width="100vh" height="100%"></canvas>
+        </div>
+        </div>
+      </section>
+
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="{% static 'Relatorio\js\relatorios.js' %}"></script>
+
+      <script>
+        let myChart; // Variável para armazenar o gráfico
+    
+        function meses() {
+            // Obtenha as datas do formulário
+            const data_inicio = document.getElementById('data_inicio').value;
+            const data_fim = document.getElementById('data_fim').value;
+    
+            // Construa a URL com os parâmetros GET
+            const url = '{% url "Core:obter_valores_registros_meses_anteriores" %}' +
+                `?data_inicio=${data_inicio}&data_fim=${data_fim}`;
+    
+            fetch(url)
+                .then(response => response.json())  // Converte a resposta em JSON
+                .then(data => {
+                    // Destrói o gráfico existente, se houver um
+                    if (myChart) {
+                        myChart.destroy();
+                    }
+    
+                    // Extrai as informações relevantes do objeto JSON para gerar o gráfico
+    
+                    const labels = data.data.map(item => `${item.mes}/${item.ano}`);
+                    const saidas = data.data.map(item => item.saida.total);
+                    const entradas = data.data.map(item => item.entrada.total);
+                    const canvas = document.getElementById('caixa_mensal').getContext('2d');
+    
+                    // Configura o gráfico
+                    myChart = new Chart(canvas, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Saída",
+                                    data: saidas,
+                                    backgroundColor: "red",
+                                },
+                                {
+                                    label: "Entrada",
+                                    data: entradas,
+                                    backgroundColor: "green",
+                                },
+                            ],
+                        },
+                        options: {
+                            title: {
+                                display: true,
+                                fontSize: 20,
+                                text: "Fluxo de Caixa Mensal"
+                            },
+                            responsive: true,
+                            scales: {
+                                yAxes: [
+                                    {
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    });
+                })
+                .catch(error => console.error(error));
+        }
+    
+        window.onload = function (e) {
+            // Adicione um ouvinte de evento para o envio do formulário
+            document.querySelector('form').addEventListener('submit', function (e) {
+                e.preventDefault(); // Evite o envio padrão do formulário
+                meses(); // Chame sua função personalizada
+            });
+        }
+    </script>
+      </html>
+  {% endblock %}
