@@ -22,6 +22,7 @@ from django.utils.timezone import now,timedelta
 from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
 from django.http import JsonResponse
+from decimal import Decimal
 
 
 
@@ -43,7 +44,7 @@ def home(request):
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
-        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').only('id').all().values()
+        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').filter(STATUS=1).only('id').all().values()
 
         pagina = Paginator(cliente_lista, 25)
 
@@ -110,9 +111,10 @@ def Edita_cliente(request,id):
     return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
 
 @login_required(login_url='/auth/logar/')
-def excluir_cliente(id):
+def excluir_cliente(request,id):
     excluir = CLIENTE.objects.get(id=id)
-    excluir.delete()
+    excluir.STATUS ='2'
+    excluir.save()
     return redirect('/clientes')
 
 @login_required(login_url='/auth/logar/')
@@ -167,7 +169,8 @@ def Cadastrar_os(request,id_cliente):
             ARMACAO = request.POST.get('ARMACAO')
             OBSERVACAO = request.POST.get('OBSERVACAO')
             FORMA_PAG = request.POST.get('PAGAMENTO')
-            VALOR = request.POST.get('VALOR')
+            valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+            valor = Decimal(valor_str)
             QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
             if request.POST.get('ENTRADA') == '':
@@ -203,7 +206,7 @@ def Cadastrar_os(request,id_cliente):
             ARMACAO= ARMACAO,
             OBSERVACAO= OBSERVACAO,
             FORMA_PAG= FORMA_PAG,
-            VALOR= VALOR,
+            VALOR= valor,
             QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
             ENTRADA= ENTRADA )
 

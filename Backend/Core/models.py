@@ -7,6 +7,12 @@ from django.utils.timezone import now
 
 
 class CLIENTE(models.Model):
+
+    CHOICES_SITUACAO=(
+        ('1','ATIVO'),
+        ('2','INATIVO')
+    )
+    
     NOME = models.CharField(max_length=250)
     LOGRADOURO = models.CharField(max_length=250)
     NUMERO = models.CharField(max_length=10)
@@ -18,6 +24,7 @@ class CLIENTE(models.Model):
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
     DATA_CADASTRO = models.DateField(default=now)
+    STATUS = models.CharField(max_length=1,choices=CHOICES_SITUACAO,default='1')
 
     def __str__(self) -> str:
         return str(self.NOME)
@@ -69,7 +76,7 @@ class ORDEN(models.Model):
     ARMACAO = models.CharField(max_length=500, blank=True, null=True,default='N/D')
     OBSERVACAO = models.TextField(max_length=1000, blank=True, null=True,default='N/D')
     FORMA_PAG = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO,blank=True, null=True,default='N/D')
-    VALOR =  models.CharField(max_length=100,default='N/D')
+    VALOR =  models.DecimalField(max_digits=10, decimal_places=2)
     QUANTIDADE_PARCELA = models.IntegerField(blank=True, null=True,default='N/D')
     ENTRADA = models.CharField(max_length=100)
     DATA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
