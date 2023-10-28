@@ -242,7 +242,8 @@ def Editar_os(request,id_os):
     else:
 
         FORMA_PAG = request.POST.get('PAGAMENTO')
-        VALOR = request.POST.get('VALOR')
+        VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+        VALOR = Decimal(VALOR_str)
         QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
         if request.POST.get('ENTRADA') == '':
