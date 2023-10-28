@@ -4,7 +4,7 @@ import re
 from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
-from django.shortcuts import redirect, render,HttpResponse
+from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE,CAIXA
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
@@ -19,11 +19,10 @@ from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now,timedelta
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
-
-import json
-from django.http import HttpResponse ,JsonResponse
+from django.http import JsonResponse
+from decimal import Decimal
 
 
 
@@ -45,7 +44,7 @@ def home(request):
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
-        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').only('id').all().values()
+        cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').filter(STATUS=1).only('id').all().values()
 
         pagina = Paginator(cliente_lista, 25)
 
@@ -112,9 +111,10 @@ def Edita_cliente(request,id):
     return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
 
 @login_required(login_url='/auth/logar/')
-def excluir_cliente(id):
+def excluir_cliente(request,id):
     excluir = CLIENTE.objects.get(id=id)
-    excluir.delete()
+    excluir.STATUS ='2'
+    excluir.save()
     return redirect('/clientes')
 
 @login_required(login_url='/auth/logar/')
@@ -169,7 +169,8 @@ def Cadastrar_os(request,id_cliente):
             ARMACAO = request.POST.get('ARMACAO')
             OBSERVACAO = request.POST.get('OBSERVACAO')
             FORMA_PAG = request.POST.get('PAGAMENTO')
-            VALOR = request.POST.get('VALOR')
+            valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+            valor = Decimal(valor_str)
             QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
             if request.POST.get('ENTRADA') == '':
@@ -205,7 +206,7 @@ def Cadastrar_os(request,id_cliente):
             ARMACAO= ARMACAO,
             OBSERVACAO= OBSERVACAO,
             FORMA_PAG= FORMA_PAG,
-            VALOR= VALOR,
+            VALOR= valor,
             QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
             ENTRADA= ENTRADA )
 
@@ -241,7 +242,8 @@ def Editar_os(request,id_os):
     else:
 
         FORMA_PAG = request.POST.get('PAGAMENTO')
-        VALOR = request.POST.get('VALOR')
+        VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+        VALOR = Decimal(VALOR_str)
         QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
         if request.POST.get('ENTRADA') == '':
@@ -313,7 +315,7 @@ def Loja_os(request,id_os):
             return redirect('/Lista_Os')      
 
 @login_required(login_url='/auth/logar/')   
-def Imprimir_os(id_os):
+def Imprimir_os(request,id_os):
     try:
         PRINT_OS =ORDEN.objects.get(id=id_os)
         
@@ -428,12 +430,17 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
-    for dado in caixa:
-        dado.fechar_caixa()
-        dado.save()
-    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
-    return redirect('/Caixa')
+    hora = datetime.datetime.now()
+    if hora.hour >= 20:
+        caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+        for dado in caixa:
+            dado.fechar_caixa()
+            dado.save()
+        messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+        return redirect('/Caixa')
+    else:
+        messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
+        return redirect('/Caixa')
 
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
@@ -547,6 +554,64 @@ def transacoes_mensais(request):
     # Retorna os dados como JsonResponse
     return JsonResponse({'data': dados_formatados}, safe=False)
 
+def caixa_mes_anterior(request):
+    return render(request, 'Caixa/caixa_mes_anterior.html')
+
+def obter_valores_registros_meses_anteriores(request):
+    if request.method == "GET":
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
+
+        registros = CAIXA.objects.filter(
+                DATA__range=(data_inicio, data_fim),
+                FECHADO=True
+            ).annotate(ano=ExtractYear('DATA'), mes=ExtractMonth('DATA')).values('ano', 'mes').annotate(
+                total_entradas=Sum(
+                    Case(
+                        When(TIPO='E', then='VALOR'),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                quantidade_entradas=Count(
+                    Case(
+                        When(TIPO='E', then='VALOR')
+                    )
+                ),
+                total_saidas=Sum(
+                    Case(
+                        When(TIPO='S', then='VALOR'),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ),
+                quantidade_saidas=Count(
+                    Case(
+                        When(TIPO='S', then='VALOR')
+                    )
+                )
+            ).order_by('ano', 'mes')
+
+        resultados = []
+        for registro in registros:
+            resultado = {
+                    'ano': registro['ano'],
+                    'mes': registro['mes'],
+                    'entrada': {
+                        'total': registro['total_entradas'],
+                        'quantidade': registro['quantidade_entradas']
+                    },
+                    'saida': {
+                        'total': registro['total_saidas'],
+                        'quantidade': registro['quantidade_saidas']
+                    }
+                }
+            resultados.append(resultado)
+        return JsonResponse({'data': resultados})
+    
+
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
     return render(request,'Relatorio/relatorios.html')
+
+    
