@@ -314,7 +314,7 @@ def Loja_os(request,id_os):
             return redirect('/Lista_Os')      
 
 @login_required(login_url='/auth/logar/')   
-def Imprimir_os(id_os):
+def Imprimir_os(request,id_os):
     try:
         PRINT_OS =ORDEN.objects.get(id=id_os)
         
@@ -429,12 +429,17 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
-    for dado in caixa:
-        dado.fechar_caixa()
-        dado.save()
-    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
-    return redirect('/Caixa')
+    hora = datetime.datetime.now()
+    if hora.hour >= 20:
+        caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+        for dado in caixa:
+            dado.fechar_caixa()
+            dado.save()
+        messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+        return redirect('/Caixa')
+    else:
+        messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
+        return redirect('/Caixa')
 
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
