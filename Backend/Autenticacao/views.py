@@ -5,11 +5,12 @@ from .models import USUARIO
 from django.contrib import auth
 from django.conf import settings
 from .models import Ativacao
+from .utils import email_html
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+import os
 
 def cadastro(request):
     if request.method == "GET":
@@ -42,7 +43,7 @@ def cadastro(request):
             return redirect('/auth/cadastro')
         
         try:
-            #path_template = os.path.join(settings.BASE_DIR, 'Autenticacao/templates/emails/cadastro_confirmado.html')
+            path_template = os.path.join(settings.BASE_DIR, 'Autenticacao/templates/emails/cadastro_confirmado.html')
             user = USUARIO.objects.create_user(username=username,
                                             first_name=first_name,
                                             DATA_NASCIMENTO=data_nascimento,
@@ -55,13 +56,14 @@ def cadastro(request):
 
             ativacao =Ativacao(token=token, user=user)
             ativacao.save()
-            #email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=f"127.0.0.1:8000/auth/ativar_conta/{token}")
-            link_ativacao=f"{settings.URL}/auth/auth/ativar_conta/{token}"
-            html_content=render_to_string('emails/cadastro_confirmado.html',{'username':username,'link_ativacao':link_ativacao})
-            text_content = strip_tags(html_content)
-            email = EmailMultiAlternatives('Cadastro confirmado',text_content,settings.EMAIL_HOST_USER,[email,])
-            email.attach_alternative(html_content,'text/html')
-            email.send()
+            link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/auth/ativar_conta/{token}" 
+            email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=link_ativacao)
+            #link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/auth/ativar_conta/{token}" #ESSE METODO E DO ENVIO DO PROPRIO DJANGO
+            #html_content=render_to_string('emails/cadastro_confirmado.html',{'username':username,'link_ativacao':link_ativacao})
+            #text_content = strip_tags(html_content)
+            #email = EmailMultiAlternatives('Cadastro confirmado',text_content,settings.EMAIL_HOST_USER,[email,])
+            #email.attach_alternative(html_content,'text/html')
+            #email.send()
             messages.add_message(request, constants.SUCCESS, 'Foi Enviado Para seu email o Link de ativaçao da sua conta')
             return redirect('/auth/logar')
         except Exception as msg:

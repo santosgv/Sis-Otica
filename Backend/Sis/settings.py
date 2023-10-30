@@ -20,7 +20,7 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS =['*']
+ALLOWED_HOSTS =['localhost']
 
 USE_L10N = False
 
@@ -159,7 +159,7 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
 }
 
-URL=config('URL')
+
 DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER= config('EMAIL_HOST_USER')
