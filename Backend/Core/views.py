@@ -1,6 +1,5 @@
 import os
 from django.views.decorators.cache import cache_page
-import re
 from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
