@@ -32,6 +32,7 @@ def main():
             VENDEDOR=USUARIO.objects.get(id=1),
             CLIENTE=cliente,
             PREVISAO_ENTREGA=fake.date_between(start_date=start_date, end_date=end_date),
+            DATA_SOLICITACAO=fake.date_between(start_date=start_date, end_date=end_date),
             SERVICO=random.choices(['Encomenda', 'Pronta Entrega']),
             SUB_SERVICO=random.choices(['Óculos de Grau', 'Conserto', 'Lente de Contato', 'Óculos de Sol', 'Lente de Contato Pronta', 'Outros']),
             OBSERVACAO=fake.sentence(nb_words=15),
@@ -46,18 +47,18 @@ def main():
     for _ in range(100):
         valor_com_dolar= fake.pricetag()
         valor_sem_dolar = valor_com_dolar.replace("$", "")
-        valor_float = float(valor_sem_dolar.replace(',', '').replace('.', '', 1))
+        valor_float = valor_sem_dolar.replace('.', '').replace(',', '.')
         start_date = date(2023, 1, 1)
         end_date = date(2023, 12, 31)
         caixa = CAIXA.objects.create(
             DATA=fake.date_between(start_date=start_date, end_date=end_date),
             DESCRICAO=fake.sentence(nb_words=15),
-            TIPO=random.choice(['1', '2']),
+            TIPO=random.choice(['E', 'S']),
             VALOR=valor_float,
             FORMA=random.choice(['A', 'B', 'C', 'D', 'E', 'F']),
             FECHADO=random.choice([True,False])
         )
-        print(f'Caixa criado {caixa} data {caixa.DATA}')
+        print(f'Caixa criado {caixa} data {caixa.TIPO}')
 
 
 if __name__ == '__main__':
