@@ -5,7 +5,7 @@ def main():
     clientes = CLIENTE.objects.all()
     start_date = date(2023, 1, 1)
     end_date = date(2023, 12, 31)
-    for _ in range(100):
+    for _ in range(50):
         pessoa=CLIENTE.objects.create(
             NOME=fake.name(),
             LOGRADOURO=fake.street_address(),
@@ -21,7 +21,7 @@ def main():
         )
         print(f'A pessoal {pessoa.NOME} foi criada')
 
-    for _ in range(100):
+    for _ in range(500):
         start_date = date(2023, 1, 1)
         end_date = date(2023, 12, 31)
         cliente = random.choice(clientes)
@@ -44,7 +44,7 @@ def main():
         )
         print(f'os {os.id} criada')
 
-    for _ in range(100):
+    for _ in range(50):
         valor_com_dolar= fake.pricetag()
         valor_sem_dolar = valor_com_dolar.replace("$", "")
         valor_float = valor_sem_dolar.replace('.', '').replace(',', '.')

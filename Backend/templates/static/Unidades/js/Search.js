@@ -1,21 +1,29 @@
 function myFunction() {
   // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
+  var input, filter, table, tr, td, i, j, txtValue;
   input = document.getElementById("myInput");
   filter = input.value.toUpperCase();
   table = document.getElementById("myTable");
   tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
+  // Loop through all table rows
   for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+    var rowVisible = false;
+    // Loop through all table columns in each row
+    for (j = 0; j < tr[i].getElementsByTagName("td").length; j++) {
+      td = tr[i].getElementsByTagName("td")[j];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          rowVisible = true;
+        }
       }
+    }
+    // Show or hide the row based on whether any column contains the search text
+    if (rowVisible) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
     }
   }
 }
