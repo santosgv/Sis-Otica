@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.14.0
+    container_name: metricbeat
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+    command: metricbeat -e -system.hostfs=/hostfs
+    restart: on-failure
+    depends_on:
+      - kibana
+    networks:
+      - elastic
+
+networks:
+  elastic:
+    driver: bridge
+
+volumes:
+  esdata:
+    driver: local
+

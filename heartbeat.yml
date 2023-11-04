@@ -1,0 +1,17 @@
+heartbeat.monitores:
+  -type: http
+  schedule: '@every 5s'
+  urls:
+    - https://
+    - http://elasticsarch:9200
+    - http://kibana:5601
+  processors:
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+
+  output.elasticsearch:
+    hosts: ["elasticsearch:9200"]
+
+  setup.kibana:
+    host: "kibana:5601"
+    
