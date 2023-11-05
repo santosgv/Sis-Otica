@@ -1,17 +1,17 @@
-heartbeat.monitores:
-  -type: http
-  schedule: '@every 5s'
-  urls:
-    - https://
-    - http://elasticsarch:9200
-    - http://kibana:5601
-  processors:
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
+heartbeat.monitors:
+  - type: http
+    schedule: '@every 5s'
+    urls:
+      - http://meuemenus.com.br/
+      - http://elasticsearch:9200
+      - http://kibana:5601
+      - http://191.252.210.233:5566/
+    processors:
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
 
-  output.elasticsearch:
-    hosts: ["elasticsearch:9200"]
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
 
-  setup.kibana:
-    host: "kibana:5601"
-    
+setup.kibana:
+  host: "kibana:5601"

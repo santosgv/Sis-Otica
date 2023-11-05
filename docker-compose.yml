@@ -39,6 +39,26 @@ services:
       - kibana
     networks:
       - elastic
+    
+  heartbeat:
+      image: docker.elastic.co/beats/heartbeat:7.13.0
+      container_name: heartbeat
+      volumes:
+      - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+      environment:
+      - setup.kibana.host=kibana:5601
+      networks:
+      - elastic
+  apm:
+      image: docker.elastic.co/apm/apm-server-oss:7.13.0
+      container_name: apm
+      volumes:
+      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
+      ports:
+      - "8200:8200"
+      restart: on-failure
+      networks:
+      - elastic
 
 networks:
   elastic:

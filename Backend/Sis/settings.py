@@ -37,11 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'elasticapm.contrib.django',
     'Autenticacao',
     'Core'
 ]
 
 MIDDLEWARE = [
+    'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'elasticapm.contrib.django.context_processors.rum_tracing',
             ],
         },
     },
@@ -84,6 +87,52 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+ELASTIC_APM = {
+    'SERVICE_NAME': 'Sis-Otica',
+    'DEBUG': True,
+    'SERVER_URL': 'http://localhost:8200',
+    'ENVIRONMENT': 'production'
+    }
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'elasticapm': {
+            'level': 'WARNING',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        },
+
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+        'mysite': {
+            'level': 'WARNING',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+       
+        'elasticapm.errors': {
+            'level': 'ERROR',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+    },
+}
+
+
 
 CACHES = {
     "default": {
