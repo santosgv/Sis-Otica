@@ -60,6 +60,20 @@ services:
       networks:
       - elastic
 
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: Otica
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - elastic
+
 networks:
   elastic:
     driver: bridge
@@ -68,3 +82,5 @@ volumes:
   esdata:
     driver: local
 
+  pgdata:
+    driver: local
