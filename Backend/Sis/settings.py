@@ -118,7 +118,7 @@ LOGGING = {
             'handlers': ['elasticapm'],
             'propagate': True,
         },
-        'mysite': {
+        'MyApp': {
             'level': 'WARNING',
             'handlers': ['elasticapm'],
             'propagate': True,
