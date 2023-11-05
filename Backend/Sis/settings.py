@@ -20,7 +20,7 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS =['localhost']
+ALLOWED_HOSTS =['127.0.0.1']
 
 USE_L10N = False
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'elasticapm.contrib.django',
     'Autenticacao',
     'Core',
 ]
@@ -73,6 +74,7 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',
         'Sis.middleware.TenantActiveMiddleware',
+    'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -102,6 +104,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'elasticapm.contrib.django.context_processors.rum_tracing',
             ],
         },
     },
@@ -139,6 +142,50 @@ TENANT_MODEL = "Cliente.Cliente"
 TENANT_DOMAIN_MODEL = "Cliente.Domain"
 
 TENANT_COLOR_ADMIN_APPS = False
+ELASTIC_APM = {
+    'SERVICE_NAME': 'Sis-Otica',
+    'DEBUG': True,
+    'SERVER_URL': 'http://localhost:8200',
+    'ENVIRONMENT': 'production'
+    }
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'elasticapm': {
+            'level': 'WARNING',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        },
+
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+        'MyApp': {
+            'level': 'WARNING',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+       
+        'elasticapm.errors': {
+            'level': 'ERROR',
+            'handlers': ['elasticapm'],
+            'propagate': True,
+        },
+    },
+}
+
 
 
 CACHES = {

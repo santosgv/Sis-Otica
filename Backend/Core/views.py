@@ -22,7 +22,9 @@ from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
 from django.http import JsonResponse
 from decimal import Decimal
+import logging
 
+logger = logging.getLogger('MyApp')
 
 
 def get_today_data():
@@ -217,6 +219,7 @@ def Cadastrar_os(request,id_cliente):
             return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
+            logger.warning(msg)
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
@@ -271,7 +274,7 @@ def Encerrar_os(request,id_os):
             messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
-            print(msg)
+            logger.info(msg)
             return redirect('/Lista_Os')   
 
 @login_required(login_url='/auth/logar/')
@@ -284,7 +287,7 @@ def Cancelar_os(request,id_os):
             messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
-            print(msg)
+            logger.info(msg)
             return redirect('/Lista_Os')
         
 @login_required(login_url='/auth/logar/')
@@ -297,7 +300,7 @@ def Laboratorio_os(request,id_os):
             messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
-            print(msg)
+            logger.info(msg)
             return redirect('/Lista_Os')  
 
 @login_required(login_url='/auth/logar/')
@@ -310,7 +313,7 @@ def Loja_os(request,id_os):
             messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
             return redirect('/Lista_Os')  
         except Exception as msg:
-            print(msg)
+            logger.info(msg)
             return redirect('/Lista_Os')      
 
 @login_required(login_url='/auth/logar/')   
@@ -382,7 +385,7 @@ def Imprimir_os(request,id_os):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
     except Exception as msg:
-        print(msg)
+        logger.warning(msg)
         return redirect('/Lista_Os')
 
      
@@ -424,7 +427,7 @@ def Caixa(request):
                                                       'saldo':saldo,
                                                       'saldo_total':saldo_total})
         except Exception as msg:
-            print(msg)
+            logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
 @login_required(login_url='/auth/logar/')

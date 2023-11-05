@@ -11,6 +11,9 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import os
+import logging
+
+logger = logging.getLogger('MyApp')
 
 def cadastro(request):
     if request.method == "GET":
@@ -56,7 +59,7 @@ def cadastro(request):
 
             ativacao =Ativacao(token=token, user=user)
             ativacao.save()
-            link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/auth/ativar_conta/{token}" 
+            link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/ativar_conta/{token}" 
             email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=link_ativacao)
             #link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/auth/ativar_conta/{token}" #ESSE METODO E DO ENVIO DO PROPRIO DJANGO
             #html_content=render_to_string('emails/cadastro_confirmado.html',{'username':username,'link_ativacao':link_ativacao})
@@ -68,6 +71,7 @@ def cadastro(request):
             return redirect('/auth/logar')
         except Exception as msg:
             print(msg)
+            logger.critical(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno do sistema')
             return redirect('/auth/cadastro')
 
