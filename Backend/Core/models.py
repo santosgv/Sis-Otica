@@ -28,6 +28,12 @@ class CLIENTE(models.Model):
 
     def __str__(self) -> str:
         return str(self.NOME)
+    
+class SERVICO(models.Model):
+    SERVICO = models.CharField(max_length=500)
+    ATIVO = models.BooleanField(default=True)
+    def __str__(self) -> str:
+        return str(self.SERVICO)
 
 class ORDEN(models.Model):
 
@@ -54,8 +60,7 @@ class ORDEN(models.Model):
     CLIENTE = models.ForeignKey(CLIENTE,on_delete=models.SET_NULL,null=True)
     PREVISAO_ENTREGA = models.DateField()
     ASSINATURA = models.ImageField(upload_to='assinatura_img' ,blank=True, null=True)
-    SERVICO = models.CharField(max_length=500)
-    SUB_SERVICO = models.CharField(max_length=500)
+    SERVICO = models.ForeignKey(SERVICO, on_delete=models.DO_NOTHING)
     OD_ESF = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     OD_CIL = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     OD_EIXO = models.CharField(max_length=5,blank=True, null=True,default='N/D')
@@ -84,7 +89,6 @@ class ORDEN(models.Model):
 
     def __str__(self):
         return str(self.id)
-
 
 class CAIXA(models.Model):
 

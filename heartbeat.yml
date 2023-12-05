@@ -2,7 +2,7 @@ heartbeat.monitors:
   - type: http
     schedule: '@every 5s'
     urls:
-      - http://meuemenus.com.br/
+      - https://meuemenus.com.br/
       - http://elasticsearch:9200
       - http://kibana:5601
       - http://191.252.210.233:5566/
