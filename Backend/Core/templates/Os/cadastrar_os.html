@@ -33,7 +33,7 @@ Cadastrar O.S
               {% endfor %}
           {% endif %}
       </div>
-          <form method="POST"  enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
+          <form method="POST"  enctype="multipart/form-data" class="form_cliente container-fluid">{% csrf_token %}
             <div class="row">
               <div class="form-group col-md-6">
                 <label for="VENDEDOR" >Vendedor</label>
@@ -47,25 +47,21 @@ Cadastrar O.S
               </div>
             </div>
             <hr>
-            <div class="row">
+            <div class="row text-center">
               <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col">
                   <label for="inputState">Tipo de Serviço</label>
                   <select id="SERVICO" name="SERVICO" class="form-control"  required="required">
+                    {% for servico in servicos %}
                     <option selected>Escolha...</option>
-                    <option value="Encomenda">Encomenda</option>
-                    <option value="Pronta Entrega">Pronta Entrega</option>
+                    <option value="{{servico.id}}">{{servico}}</option>
+                    {% endfor %}
                   </select>
                 </div>
-                <div class="form-group col-md-6">
-                  <label for="inputState">Sub Serviço</label>
-                  <select id="SUB_SERVICO" name="SUB_SERVICO" onchange="atualizarSegundoSelect()" class="form-control" required>
-                    <option selected>Escolha...</option>
-                  </select>
                 </div>
               </div>
             </div>
-            <div id="_receita" style="display: none;">
+            <div id="_receita">
                 <label for="NUMERO">Receita</label>
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
@@ -104,7 +100,7 @@ Cadastrar O.S
             </div>
             </div>
             <hr> 
-            <div id="_laboratorio" style="display: none;">
+            <div id="_laboratorio">
             <label for="">Laboratorio</label>
             <div class="form-row">
               <div class="col-md-2">
@@ -140,17 +136,17 @@ Cadastrar O.S
             </div>
           </div>
             <hr>
-            <div class="form-group col-md-12" id="_lentes" style="display: none;">
+            <div class="form-group col-md-12" id="_lentes">
               <label for="FILIAL">Lentes</label>
               <input  class="form-control" id="LENTES" name="LENTES" maxlength="15" >
             </div>
-            <div class="form-group col-md-12" id="_armacao" style="display: none;">
+            <div class="form-group col-md-12" id="_armacao" >
               <label for="FILIAL">Armação</label>
               <input  class="form-control" id="ARMACAO" name="ARMACAO" maxlength="15" >
             </div>
-            <div class="form-group" id="_observacao" style="display: none;">
+            <div class="form-group" id="_observacao">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
-              <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="2" maxlength="69"></textarea>
+              <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="2" maxlength="80"></textarea>
             </div>
             <hr>
             <div class="text center">
@@ -158,7 +154,7 @@ Cadastrar O.S
               <label for="NUMERO">FINANCEIRO</label>
               <div class="form-group col-md-2">
                 <label for="inputState">Pagamento</label>
-                <select id="PAGAMENTO" name="PAGAMENTO" onChange="link()" class="form-control">
+                <select id="PAGAMENTO" name="PAGAMENTO" class="form-control">
                   <option value="A">Pix</option>
                   <option value="B" selected >Dinheiro</option>
                   <option value="C">Debito</option>
@@ -201,9 +197,6 @@ Cadastrar O.S
                 <input type="file" class="form-control-file" id="ASSINATURA" name="ASSINATURA">
               </div>
             </div>
-            </div>
-            <div class="alert alert-warning _carner" id="_carner" style="display: none;" role="alert">
-              Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
             </div>
             <button type="submit" class="btn btn-primary">Finalizar Compra</button>
 

@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -134,7 +134,8 @@ def Lista_Os(request):
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
-        return render(request,'Os/cadastrar_os.html',{'cliente':cliente})
+        servicos = SERVICO.objects.filter(ATIVO=True).all()
+        return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos})
     else:
         try:
             if 'ANEXO' in  request.FILES:
@@ -148,8 +149,7 @@ def Cadastrar_os(request,id_cliente):
                 ASSINATURA = request.FILES['ASSINATURA']
             else:
                 ASSINATURA = None 
-            SERVICO_POST =str(request.POST.get('SERVICO'))
-            SUB_SERVICO_POST = request.POST.get('SUB_SERVICO')
+            SERVICO_POST =request.POST.get('SERVICO')
             OD_ESF = request.POST.get('OD_ESF')
             OD_CIL = request.POST.get('OD_CIL')
             OD_EIXO = request.POST.get('OD_EIXO')
@@ -185,8 +185,7 @@ def Cadastrar_os(request,id_cliente):
             CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
             PREVISAO_ENTREGA= PREVISAO_ENTREGA,
             ASSINATURA =ASSINATURA,
-            SERVICO= SERVICO_POST,
-            SUB_SERVICO= SUB_SERVICO_POST,
+            SERVICO= SERVICO.objects.get(id=SERVICO_POST),
             OD_ESF= OD_ESF,
             OD_CIL = OD_CIL,
             OD_EIXO = OD_EIXO,
@@ -332,7 +331,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
-        PDF.drawString(385,665,str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(385,665,str('xxx'))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
         PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
         PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
@@ -358,7 +357,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str(PRINT_OS.SUB_SERVICO))
+        PDF.drawString(338,361,str('xxx'))
         PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
         PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
         PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
@@ -385,6 +384,7 @@ def Imprimir_os(request,id_os):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
     except Exception as msg:
+        print(msg)
         logger.warning(msg)
         return redirect('/Lista_Os')
 
@@ -488,7 +488,7 @@ def vendas_ultimos_12_meses(request):
         .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
         .values('mes_venda')
         .annotate(total_vendas=Count('id'))
-        .filter(DATA_SOLICITACAO__gte=data_limite)
+        .filter(DATA_SOLICITACAO__gte=data_limite).exclude(STATUS='C')
         .order_by('mes_venda')
     )
 
@@ -496,7 +496,7 @@ def vendas_ultimos_12_meses(request):
     return JsonResponse({'data': data_vendas})
 
 def maiores_vendedores_30_dias(request):
-    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()) \
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
