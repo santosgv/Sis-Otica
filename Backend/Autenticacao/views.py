@@ -70,7 +70,6 @@ def cadastro(request):
             messages.add_message(request, constants.SUCCESS, 'Foi Enviado Para seu email o Link de ativaçao da sua conta')
             return redirect('/auth/logar')
         except Exception as msg:
-            print(msg)
             logger.critical(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno do sistema')
             return redirect('/auth/cadastro')
