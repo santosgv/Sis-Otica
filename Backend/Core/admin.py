@@ -1,6 +1,6 @@
 from django.contrib import admin
 from Autenticacao.models import USUARIO,SALARIO,COMISSAO
-from Core.models import CLIENTE,ORDEN,CAIXA,SERVICO
+from Core.models import CLIENTE,ORDEN,CAIXA,SERVICO,EMPRESA
 
 
 
@@ -11,3 +11,4 @@ admin.site.register(SERVICO)
 admin.site.register(ORDEN)
 admin.site.register(USUARIO)
 admin.site.register(SALARIO)
+admin.site.register(EMPRESA)

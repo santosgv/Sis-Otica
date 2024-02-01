@@ -13,8 +13,10 @@ class CLIENTE(models.Model):
         ('2','INATIVO')
     )
     
+
     NOME = models.CharField(max_length=250)
-    LOGRADOURO = models.CharField(max_length=250)
+    LOGRADOURO = models.CharField(max_length=80)
+    CEP = models.CharField(max_length=8)
     NUMERO = models.CharField(max_length=10)
     BAIRRO = models.CharField(max_length=200)
     CIDADE = models.CharField(max_length=200)
@@ -24,6 +26,8 @@ class CLIENTE(models.Model):
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
     DATA_CADASTRO = models.DateField(default=now)
+    ENDERECO_UF=models.CharField(max_length=2)
+    CONTRIBUINTE=models.CharField(max_length=1, default=9)
     STATUS = models.CharField(max_length=1,choices=CHOICES_SITUACAO,default='1')
 
     def __str__(self) -> str:
@@ -120,3 +124,26 @@ class CAIXA(models.Model):
     def fechar_caixa(self):
         self.FECHADO = True
         return
+    
+
+class EMPRESA(models.Model):
+
+    choices_codigo_de_regime_tributario= (
+        (1,'simples nacional'),
+        (3,'Normal')
+    )
+
+    razao_social=models.CharField(max_length=255)
+    nome_fantasia=models.CharField(max_length=255)
+    cnpj=models.IntegerField(),
+    codigo_de_regime_tributario=models.CharField(max_length=1, choices=choices_codigo_de_regime_tributario, default=1)
+    inscricao_estadual=models.IntegerField(),
+    inscricao_municipal=models.IntegerField(),
+    cnae_fiscal=models.IntegerField(),        
+    endereco_logradouro=models.CharField(max_length=80)
+    endereco_numero=models.IntegerField(),
+    endereco_bairro=models.CharField(max_length=255),
+    endereco_municipio=models.CharField(max_length=255),
+    endereco_uf=models.CharField(max_length=2)
+    endereco_cep=models.IntegerField(),
+    endereco_pais=models.IntegerField()
