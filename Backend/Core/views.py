@@ -357,7 +357,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str('xxx'))
+        PDF.drawString(338,361,str('N/D'))
         PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
         PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
         PDF.drawString(301,312,str(PRINT_OS.OD_CIL))

@@ -53,8 +53,7 @@ Cadastrar O.S
                   <label for="inputState">Tipo de Serviço</label>
                   <select id="SERVICO" name="SERVICO" class="form-control"  required="required">
                     {% for servico in servicos %}
-                    <option selected>Escolha...</option>
-                    <option value="{{servico.id}}">{{servico}}</option>
+                    <option selected value="{{servico.id}}">{{servico}}</option>
                     {% endfor %}
                   </select>
                 </div>
