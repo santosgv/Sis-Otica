@@ -115,12 +115,14 @@ def Edita_cliente(request,id):
             messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
         return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def excluir_cliente(request,id):
-    excluir = CLIENTE.objects.get(id=id)
-    excluir.STATUS ='2'
-    excluir.save()
-    return redirect('/clientes')
+    with transaction.atomic():
+        excluir = CLIENTE.objects.get(id=id)
+        excluir.STATUS ='2'
+        excluir.save()
+        return redirect('/clientes')
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
@@ -286,41 +288,47 @@ def Encerrar_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')   
 
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Cancelar_os(request,id_os):
     if request.method == "GET":
         try:
-            CANCELAR_OS = ORDEN.objects.get(id=id_os)
-            CANCELAR_OS.STATUS ="C"
-            CANCELAR_OS.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                CANCELAR_OS = ORDEN.objects.get(id=id_os)
+                CANCELAR_OS.STATUS ="C"
+                CANCELAR_OS.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')
-        
+
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Laboratorio_os(request,id_os):
     if request.method == "GET":
         try:
-            Laboratorio_os = ORDEN.objects.get(id=id_os)
-            Laboratorio_os.STATUS ="L"
-            Laboratorio_os.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Laboratorio_os = ORDEN.objects.get(id=id_os)
+                Laboratorio_os.STATUS ="L"
+                Laboratorio_os.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')  
 
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Loja_os(request,id_os):
     if request.method == "GET":
         try:
-            Loja_os = ORDEN.objects.get(id=id_os)
-            Loja_os.STATUS ="J"
-            Loja_os.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Loja_os = ORDEN.objects.get(id=id_os)
+                Loja_os.STATUS ="J"
+                Loja_os.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')      
@@ -454,6 +462,7 @@ def fechar_caixa(request):
         messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
         return redirect('/Caixa')
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
     if request.method =="GET":
@@ -463,32 +472,33 @@ def cadastro_caixa(request):
             'data':get_today_data()
         })
     else:
-        descricao =request.POST.get('DESCRICAO')
-        referencia = request.POST.get('REFERENCIA')
-        tipo= request.POST.get('TIPO')
-        valor_str = request.POST.get('VALOR')
-        forma= request.POST.get('FORMA')
+        with transaction.atomic():
+            descricao =request.POST.get('DESCRICAO')
+            referencia = request.POST.get('REFERENCIA')
+            tipo= request.POST.get('TIPO')
+            valor_str = request.POST.get('VALOR')
+            forma= request.POST.get('FORMA')
 
-        valor_str = valor_str.replace('.', '').replace(',', '.')
+            valor_str = valor_str.replace('.', '').replace(',', '.')
 
-        
-        if referencia and referencia != 'null':
-            referencia_obj = get_object_or_404(ORDEN, id=referencia)
-        else:
-            referencia_obj = None
-        caixa = CAIXA.objects.create(
-            DATA=get_today_data(),
-            VALOR=valor_str,
-            DESCRICAO=descricao,
-            REFERENCIA= referencia_obj,
-            TIPO=tipo,
-            FORMA=forma
-        )
-        caixa.save()
-        messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
-        return redirect('/Caixa')
+            
+            if referencia and referencia != 'null':
+                referencia_obj = get_object_or_404(ORDEN, id=referencia)
+            else:
+                referencia_obj = None
+            caixa = CAIXA.objects.create(
+                DATA=get_today_data(),
+                VALOR=valor_str,
+                DESCRICAO=descricao,
+                REFERENCIA= referencia_obj,
+                TIPO=tipo,
+                FORMA=forma
+            )
+            caixa.save()
+            messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
+            return redirect('/Caixa')
 
-#@cache_page(60 * 15)
+
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=365)
