@@ -23,6 +23,7 @@ from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
 from django.http import JsonResponse
 from decimal import Decimal
 import logging
+from django.db import transaction
 
 logger = logging.getLogger('MyApp')
 
@@ -56,6 +57,7 @@ def clientes(request):
         return render(request,'Cliente/clientes.html',{'clientes':clientes,
                                                         })
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_cliente(request):
     if request.method == "GET":
@@ -71,7 +73,7 @@ def cadastro_cliente(request):
         DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
         EMAIL = request.POST.get('EMAIL')
              
-       
+    with transaction.atomic():
         cliente =CLIENTE(NOME=NOME,
         LOGRADOURO=LOGRADOURO,
         NUMERO=NUMERO,
@@ -91,25 +93,27 @@ def Cliente(request,id):
         cliente = CLIENTE.objects.get(id=id)
         return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
         return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
     else:
-        cliente = CLIENTE.objects.get(id=id)
-        cliente.NOME = request.POST.get('NOME')
-        cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
-        cliente.NUMERO = request.POST.get('NUMERO')
-        cliente.BAIRRO = request.POST.get('BAIRRO')
-        cliente.CIDADE = request.POST.get('CIDADE')
-        cliente.TELEFONE = request.POST.get('TELEFONE')
-        cliente.CPF = request.POST.get('CPF')
-        cliente.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
-        cliente.EMAIL = request.POST.get('EMAIL')
-        cliente.save()
-        messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-    return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
+        with transaction.atomic():
+            cliente = CLIENTE.objects.get(id=id)
+            cliente.NOME = request.POST.get('NOME')
+            cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
+            cliente.NUMERO = request.POST.get('NUMERO')
+            cliente.BAIRRO = request.POST.get('BAIRRO')
+            cliente.CIDADE = request.POST.get('CIDADE')
+            cliente.TELEFONE = request.POST.get('TELEFONE')
+            cliente.CPF = request.POST.get('CPF')
+            cliente.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
+            cliente.EMAIL = request.POST.get('EMAIL')
+            cliente.save()
+            messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
+        return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
 @login_required(login_url='/auth/logar/')
 def excluir_cliente(request,id):
@@ -130,6 +134,7 @@ def Lista_Os(request):
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
@@ -138,84 +143,85 @@ def Cadastrar_os(request,id_cliente):
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos})
     else:
         try:
-            if 'ANEXO' in  request.FILES:
-                ANEXO = request.FILES['ANEXO']
-            else:
-                ANEXO = None
-            VENDEDOR = request.POST.get('VENDEDOR')
-            CLIENTE_POST = request.POST.get('CLIENTE')
-            PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
-            if 'ASSINATURA' in request.FILES:
-                ASSINATURA = request.FILES['ASSINATURA']
-            else:
-                ASSINATURA = None 
-            SERVICO_POST =request.POST.get('SERVICO')
-            OD_ESF = request.POST.get('OD_ESF')
-            OD_CIL = request.POST.get('OD_CIL')
-            OD_EIXO = request.POST.get('OD_EIXO')
-            OE_ESF = request.POST.get('OE_ESF')
-            OE_CIL = request.POST.get('OE_CIL')
-            OE_EIXO = request.POST.get('OE_EIXO')
-            AD = request.POST.get('AD')
-            DNP = request.POST.get('DNP')
-            P = request.POST.get('P')
-            DPA = request.POST.get('DPA')
-            DIAG = request.POST.get('DIAG')
-            V = request.POST.get('V')
-            H = request.POST.get('H')
-            ALT = request.POST.get('ALT')
-            ARM = request.POST.get('ARM')
-            MONTAGEM = request.POST.get('MONTAGEM')
-            LENTES = request.POST.get('LENTES')
-            ARMACAO = request.POST.get('ARMACAO')
-            OBSERVACAO = request.POST.get('OBSERVACAO')
-            FORMA_PAG = request.POST.get('PAGAMENTO')
-            valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-            valor = Decimal(valor_str)
-            QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+            with transaction.atomic():
+                if 'ANEXO' in  request.FILES:
+                    ANEXO = request.FILES['ANEXO']
+                else:
+                    ANEXO = None
+                VENDEDOR = request.POST.get('VENDEDOR')
+                CLIENTE_POST = request.POST.get('CLIENTE')
+                PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
+                if 'ASSINATURA' in request.FILES:
+                    ASSINATURA = request.FILES['ASSINATURA']
+                else:
+                    ASSINATURA = None 
+                SERVICO_POST =request.POST.get('SERVICO')
+                OD_ESF = request.POST.get('OD_ESF')
+                OD_CIL = request.POST.get('OD_CIL')
+                OD_EIXO = request.POST.get('OD_EIXO')
+                OE_ESF = request.POST.get('OE_ESF')
+                OE_CIL = request.POST.get('OE_CIL')
+                OE_EIXO = request.POST.get('OE_EIXO')
+                AD = request.POST.get('AD')
+                DNP = request.POST.get('DNP')
+                P = request.POST.get('P')
+                DPA = request.POST.get('DPA')
+                DIAG = request.POST.get('DIAG')
+                V = request.POST.get('V')
+                H = request.POST.get('H')
+                ALT = request.POST.get('ALT')
+                ARM = request.POST.get('ARM')
+                MONTAGEM = request.POST.get('MONTAGEM')
+                LENTES = request.POST.get('LENTES')
+                ARMACAO = request.POST.get('ARMACAO')
+                OBSERVACAO = request.POST.get('OBSERVACAO')
+                FORMA_PAG = request.POST.get('PAGAMENTO')
+                valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+                valor = Decimal(valor_str)
+                QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-            if request.POST.get('ENTRADA') == '':
-                ENTRADA =0
-            else:
-                ENTRADA = request.POST.get('ENTRADA')
-            
-            cadastrar_os = ORDEN(
-            ANEXO= ANEXO,
-            VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
-            CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
-            PREVISAO_ENTREGA= PREVISAO_ENTREGA,
-            ASSINATURA =ASSINATURA,
-            SERVICO= SERVICO.objects.get(id=SERVICO_POST),
-            OD_ESF= OD_ESF,
-            OD_CIL = OD_CIL,
-            OD_EIXO = OD_EIXO,
-            OE_ESF = OE_ESF,
-            OE_CIL = OE_CIL,
-            OE_EIXO = OE_EIXO,
-            AD = AD,
-            DNP = DNP,
-            P = P,
-            DPA = DPA,
-            DIAG = DIAG,
-            V = V,
-            H = H,
-            ALT = ALT,
-            ARM = ARM,
-            MONTAGEM = MONTAGEM,
-            LENTES= LENTES,
-            ARMACAO= ARMACAO,
-            OBSERVACAO= OBSERVACAO,
-            FORMA_PAG= FORMA_PAG,
-            VALOR= valor,
-            QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-            ENTRADA= ENTRADA )
+                if request.POST.get('ENTRADA') == '':
+                    ENTRADA =0
+                else:
+                    ENTRADA = request.POST.get('ENTRADA')
+                
+                cadastrar_os = ORDEN(
+                ANEXO= ANEXO,
+                VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
+                CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
+                PREVISAO_ENTREGA= PREVISAO_ENTREGA,
+                ASSINATURA =ASSINATURA,
+                SERVICO= SERVICO.objects.get(id=SERVICO_POST),
+                OD_ESF= OD_ESF,
+                OD_CIL = OD_CIL,
+                OD_EIXO = OD_EIXO,
+                OE_ESF = OE_ESF,
+                OE_CIL = OE_CIL,
+                OE_EIXO = OE_EIXO,
+                AD = AD,
+                DNP = DNP,
+                P = P,
+                DPA = DPA,
+                DIAG = DIAG,
+                V = V,
+                H = H,
+                ALT = ALT,
+                ARM = ARM,
+                MONTAGEM = MONTAGEM,
+                LENTES= LENTES,
+                ARMACAO= ARMACAO,
+                OBSERVACAO= OBSERVACAO,
+                FORMA_PAG= FORMA_PAG,
+                VALOR= valor,
+                QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
+                ENTRADA= ENTRADA )
 
 
 
-            cadastrar_os.save()
+                cadastrar_os.save()
 
-            messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
-            return redirect('/Lista_Os')  
+                messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             print(msg)
             logger.warning(msg)
@@ -233,6 +239,8 @@ def Visualizar_os(request,id_os):
     else:
         return render(request,'Os/Visualizar_os.htmll')
     
+
+@transaction.atomic    
 @login_required(login_url='/auth/logar/')
 def Editar_os(request,id_os):
     if request.method == "GET":
@@ -241,37 +249,39 @@ def Editar_os(request,id_os):
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
     else:
+        with transaction.atomic():
+            FORMA_PAG = request.POST.get('PAGAMENTO')
+            VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+            VALOR = Decimal(VALOR_str)
+            QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-        FORMA_PAG = request.POST.get('PAGAMENTO')
-        VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-        VALOR = Decimal(VALOR_str)
-        QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+            if request.POST.get('ENTRADA') == '':
+                ENTRADA =0
+            else:
+                ENTRADA = request.POST.get('ENTRADA')
+            
+            VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+            VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
+            VISUALIZAR_OS.VALOR=VALOR
+            VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
+            VISUALIZAR_OS.ENTRADA=ENTRADA
+            VISUALIZAR_OS.save()
+            
+            messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
+            return redirect('/Lista_Os')  
 
-        if request.POST.get('ENTRADA') == '':
-            ENTRADA =0
-        else:
-            ENTRADA = request.POST.get('ENTRADA')
-        
-        VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
-        VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
-        VISUALIZAR_OS.VALOR=VALOR
-        VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
-        VISUALIZAR_OS.ENTRADA=ENTRADA
-        VISUALIZAR_OS.save()
-        
-        messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
-        return redirect('/Lista_Os')  
-
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Encerrar_os(request,id_os):
     if request.method == "GET":
         try:
-            Encerrar_OS = ORDEN.objects.get(id=id_os)
-            Encerrar_OS.STATUS = "E"
-            Encerrar_OS.DARA_ENCERRAMENTO =now()
-            Encerrar_OS.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Encerrar_OS = ORDEN.objects.get(id=id_os)
+                Encerrar_OS.STATUS = "E"
+                Encerrar_OS.DARA_ENCERRAMENTO =now()
+                Encerrar_OS.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')   
@@ -382,7 +392,7 @@ def Imprimir_os(request,id_os):
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
+        return FileResponse(buffer, as_attachment=True, filename=f'OS-{PRINT_OS.id}.pdf')
     except Exception as msg:
         print(msg)
         logger.warning(msg)

@@ -32,7 +32,7 @@ Vizualiar O.S
     <form method="POST" class="form_cliente">{% csrf_token %}
       <h1>{{VISUALIZAR_OS.id}}</h1>
         <div class="form-group">
-          <img src="/media/{{VISUALIZAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
+          <img src="{{VISUALIZAR_OS.ANEXO.url}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
         </div>
         <div class="row">
           <div class="form-group col-md-6">
