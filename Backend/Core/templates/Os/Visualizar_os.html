@@ -31,9 +31,11 @@ Vizualiar O.S
     
     <form method="POST" class="form_cliente">{% csrf_token %}
       <h1>{{VISUALIZAR_OS.id}}</h1>
+      {% if VISUALIZAR_OS.ANEXO %}
         <div class="form-group">
           <img src="{{VISUALIZAR_OS.ANEXO.url}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
         </div>
+        {% endif %}
         <div class="row">
           <div class="form-group col-md-6">
             <label for="VENDEDOR" >Vendedor</label>
