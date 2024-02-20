@@ -131,3 +131,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.vs/Sis-Otica/FileContentIndex/e4828745-219b-4e09-8751-cf8f45374145.vsidx
+*.vsidx
+*.wsuo
+*.json
+*.sqlite
