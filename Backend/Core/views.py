@@ -223,9 +223,8 @@ def Cadastrar_os(request,id_cliente):
                 cadastrar_os.save()
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
-                return redirect('/Lista_Os')  
+                return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
         except Exception as msg:
-            print(msg)
             logger.warning(msg)
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
@@ -252,6 +251,14 @@ def Editar_os(request,id_os):
                                                    })
     else:
         with transaction.atomic():
+            if 'ANEXO' in  request.FILES:
+                ANEXO = request.FILES['ANEXO']
+            else:
+                ANEXO = None
+            if 'ASSINATURA' in request.FILES:
+                ASSINATURA = request.FILES['ASSINATURA']
+            else:
+                ASSINATURA = None
             FORMA_PAG = request.POST.get('PAGAMENTO')
             VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
             VALOR = Decimal(VALOR_str)
@@ -261,8 +268,10 @@ def Editar_os(request,id_os):
                 ENTRADA =0
             else:
                 ENTRADA = request.POST.get('ENTRADA')
-            
+
             VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+            VISUALIZAR_OS.ANEXO=ANEXO
+            VISUALIZAR_OS.ASSINATURA=ASSINATURA
             VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
             VISUALIZAR_OS.VALOR=VALOR
             VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
@@ -270,7 +279,7 @@ def Editar_os(request,id_os):
             VISUALIZAR_OS.save()
             
             messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
-            return redirect('/Lista_Os')  
+            return redirect(f'/Visualizar_os/{VISUALIZAR_OS.id}')  
 
 @transaction.atomic 
 @login_required(login_url='/auth/logar/')

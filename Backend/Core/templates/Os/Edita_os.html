@@ -29,11 +29,19 @@ Vizualiar O.S
         {% endif %}
     </div>
     
-    <form method="POST" class="form_cliente">{% csrf_token %}
+    <form method="POST" enctype="multipart/form-data" class="form_cliente">{% csrf_token %}
       <h1>{{VISUALIZAR_OS.id}}</h1>
-        <div class="form-group">
-          <img src="/media/{{VISUALIZAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
+        <div class="row">
+        <div class="col-md-6">
+          <label for="EDITAR_ANEXO">Editar Anexo</label>
+          <input type="file" class="form-control-file" id="ANEXO" name="ANEXO">
         </div>
+
+        <div class="col-md-6">
+          <label for="EDITAR_ASSINATURA">Editar Assinatura</label>
+          <input type="file" class="form-control-file" id="ASSINATURA" name="ASSINATURA">
+        </div>
+      </div>
         <div class="row">
           <div class="form-group col-md-6">
             <label for="VENDEDOR" >Vendedor</label>
@@ -378,9 +386,6 @@ Vizualiar O.S
            
           </div>
         </div>
-        </div>
-        <div class="alert alert-warning _carner" style="display: none;" role="alert">
-          Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
         </div>
         <button type="submit" class="btn btn-primary">Salvar</button>
       </form>

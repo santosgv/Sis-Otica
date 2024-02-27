@@ -31,11 +31,18 @@ Vizualiar O.S
     
     <form method="POST" class="form_cliente">{% csrf_token %}
       <h1>{{VISUALIZAR_OS.id}}</h1>
-      {% if VISUALIZAR_OS.ANEXO %}
-        <div class="form-group">
-          <img src="{{VISUALIZAR_OS.ANEXO.url}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
+        <div class="row">
+        {% if VISUALIZAR_OS.ANEXO %}
+        <div class="form-group col-md-6">
+          <a href="{{VISUALIZAR_OS.ANEXO.url}}" target="_blank">Visualizar Anexo</a>
         </div>
         {% endif %}
+        {% if VISUALIZAR_OS.ASSINATURA %}
+        <div class="form-group col-md-6">
+          <a href="{{VISUALIZAR_OS.ASSINATURA.url}}" target="_blank">Visualizar Assinatura</a>
+        </div>
+        {% endif %}
+      </div>
         <div class="row">
           <div class="form-group col-md-6">
             <label for="VENDEDOR" >Vendedor</label>
@@ -247,15 +254,9 @@ Vizualiar O.S
              {% endif %}
            
           </div>
-          <div class="form-group">
-            <a href="/media/{{VISUALIZAR_OS.ASSINATURA}}" download=>{{VISUALIZAR_OS.ASSINATURA}}</a>
-          </div>
         </div>
         </div>
-        <div class="alert alert-warning _carner" style="display: none;" role="alert">
-          Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
-        </div>
-        {% if user.FUNCAO == "G" %}
+        {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
         {% endif %}
         <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
