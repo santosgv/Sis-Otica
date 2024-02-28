@@ -268,9 +268,11 @@ def Editar_os(request,id_os):
                 ENTRADA =0
             else:
                 ENTRADA = request.POST.get('ENTRADA')
-
             VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
-            VISUALIZAR_OS.ANEXO=ANEXO
+            if ANEXO is not None:
+                VISUALIZAR_OS.ANEXO = ANEXO
+            if ASSINATURA is not None:
+                VISUALIZAR_OS.ASSINATURA = ASSINATURA
             VISUALIZAR_OS.ASSINATURA=ASSINATURA
             VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
             VISUALIZAR_OS.VALOR=VALOR
