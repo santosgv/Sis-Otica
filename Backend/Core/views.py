@@ -21,6 +21,7 @@ from django.utils.timezone import now,timedelta
 from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
 from django.http import JsonResponse
+from django.core.serializers import serialize
 from decimal import Decimal
 import logging
 from django.db import transaction
@@ -509,7 +510,6 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
-
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=365)
@@ -527,13 +527,12 @@ def vendas_ultimos_12_meses(request):
     return JsonResponse({'data': data_vendas})
 
 def maiores_vendedores_30_dias(request):
-    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()).exclude(STATUS='C') \
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_today_data()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .order_by('-total_pedidos')[:5]
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
-
 
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
@@ -642,9 +641,44 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
+def obter_os_em_aberto(request):    
+    hoje = get_today_data()
+    
+    vendas = (
+        ORDEN.objects
+        .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
+        .values('mes_venda')
+        .annotate(total_vendas=Count('id'))
+        .annotate(total_valor=Sum('VALOR'))  # Adicione essa linha para calcular o valor total das vendas
+        .filter(DATA_SOLICITACAO__gte=hoje)
+        .exclude(STATUS='C')
+        .exclude(STATUS='E')
+        .order_by('mes_venda')
+    )
+
+    data_vendas = [{
+        'total_vendas': venda['total_vendas'],
+        'total_valor': venda['total_valor'],  # Inclua o valor total das vendas no resultado
+    } for venda in vendas]
+
+    return JsonResponse({'data':data_vendas})
 
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
     return render(request,'Relatorio/relatorios.html')
+
+@login_required(login_url='/auth/logar/')
+def dados_minhas_vendas(request):
+    id_user = request.user
+    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_today_data(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
+        .values('VENDEDOR__first_name') \
+        .annotate(total_pedidos=Count('id')) \
+        .annotate(total_valor_vendas=Sum('VALOR')) \
+        .order_by('-total_pedidos')[:1]
+    return JsonResponse({'minhas_vendas_mes': list(vendedor)})
+
+@login_required(login_url='/auth/logar/')
+def minhas_vendas(request):
+    return render(request,'minhas_vendas.html')
 
     

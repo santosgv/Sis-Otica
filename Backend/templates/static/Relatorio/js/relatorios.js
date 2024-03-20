@@ -133,3 +133,47 @@ function renderiza_fluxo_12_meses(url) {
     .catch(error => console.error(error));
 }
 
+function obter_os_em_aberto(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalVendas = data.data[0].total_vendas;
+    const totalValor = data.data[0].total_valor;
+
+    const totalVendasContainer = document.getElementById('total_vendas');
+    const totalValorContainer = document.getElementById('total_valor');
+
+    totalVendasContainer.textContent = `Total de Vendas: ${totalVendas}`;
+    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor}`;
+  });
+}
+
+function renderiza_minhas_vendas(url) {
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const vendedores = data.minhas_vendas_mes;
+      const vendedorContainer = document.getElementById('eu');
+
+      vendedores.forEach(vendedor => {
+        const vendedorNome = vendedor['VENDEDOR__first_name'];
+        const totalPedidos = vendedor['total_pedidos'];
+        const totalVendas = vendedor['total_valor_vendas'];
+
+        // Crie um elemento HTML para cada vendedor
+        const vendedorElement = document.createElement('div');
+        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos ${totalVendas} em Vendas`;
+
+        // Adicione o elemento à div de vendedores
+        vendedorContainer.appendChild(vendedorElement);
+      });
+    })
+    .catch(error => {
+      console.error('Erro ao obter dados de vendas:', error);
+    });
+}
+
+// Chame a função passando a URL da sua view Django como argumento
+renderiza_minhas_vendas('{% url "Core:minhas_vendas" %}');

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Minhas Vendas
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+</div>
+
+  <div class="card-body">
+    <div class="row centralizar">
+
+      {% if user.is_authenticated %}
+    
+      <div class="row text-center">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Minhas Vendas no mês</h5>
+            <p class="card-text"><span style="margin-left: 15px;" id="eu"></span> <span style="margin-left: 15px;" id="eu_qtd"></span></p>
+          </div>
+        </div>
+      </div>
+
+      {% endif %}
+     
+      
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'Relatorio\js\relatorios.js' %}"></script>
+    
+    
+    <script>
+        window.onload = function(e){
+            renderiza_minhas_vendas('{% url "Core:dados_minhas_vendas" %}');
+
+    }
+    </script>
+
+{% endblock %}

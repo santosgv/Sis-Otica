@@ -30,7 +30,10 @@ urlpatterns = [
     path('vendas_ultimos_12_meses',views.vendas_ultimos_12_meses,name='vendas_ultimos_12_meses'),
     path('maiores_vendedores_30_dias',views.maiores_vendedores_30_dias,name='maiores_vendedores_30_dias'),
     path('transacoes_mensais',views.transacoes_mensais,name='transacoes_mensais'),
+    path('obter_os_em_aberto',views.obter_os_em_aberto,name='obter_os_em_aberto'),
     path('relatorios',views.relatorios, name='relatorios'),
+    path('dados_minhas_vendas',views.dados_minhas_vendas,name='dados_minhas_vendas'),
+    path('minhas_vendas/',views.minhas_vendas, name='minhas_vendas'),
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')
 ]
