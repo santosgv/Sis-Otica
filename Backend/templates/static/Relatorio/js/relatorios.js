@@ -175,5 +175,18 @@ function renderiza_minhas_vendas(url) {
     });
 }
 
-// Chame a função passando a URL da sua view Django como argumento
-renderiza_minhas_vendas('{% url "Core:minhas_vendas" %}');
+
+function obter_clientes(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalclientes = data.total_clientes;
+
+    const totalclientesContainer = document.getElementById('clientes');
+
+    totalclientesContainer.textContent = `Ativos: ${totalclientes}`;
+
+  });
+}

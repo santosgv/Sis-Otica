@@ -33,6 +33,7 @@ urlpatterns = [
     path('obter_os_em_aberto',views.obter_os_em_aberto,name='obter_os_em_aberto'),
     path('relatorios',views.relatorios, name='relatorios'),
     path('dados_minhas_vendas',views.dados_minhas_vendas,name='dados_minhas_vendas'),
+    path('dados_clientes',views.dados_clientes,name='dados_clientes'),
     path('minhas_vendas/',views.minhas_vendas, name='minhas_vendas'),
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')

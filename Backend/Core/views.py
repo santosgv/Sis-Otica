@@ -24,6 +24,7 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 from decimal import Decimal
 import logging
+from calendar import monthrange
 from django.db import transaction
 
 logger = logging.getLogger('MyApp')
@@ -32,6 +33,16 @@ logger = logging.getLogger('MyApp')
 def get_today_data():
     date_now  = datetime.datetime.now().date()
     return date_now
+
+def primeiro_dia_mes():
+    data_atual = date.today()
+    primeiro_dia = data_atual.replace(day=1)
+    return primeiro_dia
+
+def ultimo_dia_mes():
+    data_atual = date.today()
+    last_date = data_atual.replace(day=1) + timedelta(monthrange(data_atual.year, data_atual.month)[1] - 1)
+    return last_date
 
 def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
@@ -527,7 +538,7 @@ def vendas_ultimos_12_meses(request):
     return JsonResponse({'data': data_vendas})
 
 def maiores_vendedores_30_dias(request):
-    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()).exclude(STATUS='C') \
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
@@ -642,7 +653,6 @@ def obter_valores_registros_meses_anteriores(request):
         return JsonResponse({'data': resultados})
     
 def obter_os_em_aberto(request):    
-    hoje = get_today_data()
     
     vendas = (
         ORDEN.objects
@@ -650,7 +660,7 @@ def obter_os_em_aberto(request):
         .values('mes_venda')
         .annotate(total_vendas=Count('id'))
         .annotate(total_valor=Sum('VALOR'))  # Adicione essa linha para calcular o valor total das vendas
-        .filter(DATA_SOLICITACAO__gte=hoje)
+        .filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes())
         .exclude(STATUS='C')
         .exclude(STATUS='E')
         .order_by('mes_venda')
@@ -670,15 +680,21 @@ def relatorios(request):
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
-    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_today_data(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
+    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .order_by('-total_pedidos')[:1]
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
+
+def dados_clientes(request):
+    total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
+    return JsonResponse({'total_clientes':total_clientes})
+
 @login_required(login_url='/auth/logar/')
 def minhas_vendas(request):
+    
     return render(request,'minhas_vendas.html')
 
     
