@@ -25,6 +25,7 @@ from django.core.serializers import serialize
 from decimal import Decimal
 import logging
 from calendar import monthrange
+from calendar import month_name
 from django.db import transaction
 
 logger = logging.getLogger('MyApp')
@@ -521,6 +522,7 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
+@login_required(login_url='/auth/logar/')
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=365)
@@ -533,10 +535,21 @@ def vendas_ultimos_12_meses(request):
         .filter(DATA_SOLICITACAO__gte=data_limite).exclude(STATUS='C')
         .order_by('mes_venda')
     )
+    meses_portugues = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
 
-    data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
+    # Formata a data para "Nome_do_Mês/Ano"
+    data_vendas = [{
+        'mes_venda': f"{meses_portugues[venda['mes_venda'].month]}/{venda['mes_venda'].year}",
+        'total_vendas': venda['total_vendas']
+    } for venda in vendas]
+
     return JsonResponse({'data': data_vendas})
 
+@login_required(login_url='/auth/logar/')
 def maiores_vendedores_30_dias(request):
     vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
@@ -545,6 +558,7 @@ def maiores_vendedores_30_dias(request):
         .order_by('-total_pedidos')[:5]
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
+@login_required(login_url='/auth/logar/')
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
     transacoes_mensais = CAIXA.objects.annotate(
@@ -557,6 +571,12 @@ def transacoes_mensais(request):
 
     # Cria um dicionário para armazenar os totais mensais de entradas e saídas
     dados_mensais = {}
+
+    # Mapeamento dos nomes dos meses em português
+    meses_portugues = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho',
+        7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
 
     # Itera sobre as transações agregadas e agrupa os totais por mês, ano e tipo
     for transacao in transacoes_mensais:
@@ -587,7 +607,7 @@ def transacoes_mensais(request):
     dados_formatados = [
         {
             'ano': ano,
-            'mes': mes,
+            'mes': meses_portugues[mes],
             'entrada': dados['entrada'],
             'saida': dados['saida'],
         }
@@ -686,7 +706,6 @@ def dados_minhas_vendas(request):
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .order_by('-total_pedidos')[:1]
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
-
 
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']

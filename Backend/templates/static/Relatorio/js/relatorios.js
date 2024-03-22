@@ -73,7 +73,7 @@ function renderiza_vendedor(url) {
       const totalvendas = vendedor['total_valor_vendas'];
       // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
       const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos ${totalvendas} em Vendas`;
+      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas} em Vendas`;
 
       // Adicione o elemento à div de vendedores
       vendedorContainer.appendChild(vendedorElement);
@@ -164,7 +164,7 @@ function renderiza_minhas_vendas(url) {
 
         // Crie um elemento HTML para cada vendedor
         const vendedorElement = document.createElement('div');
-        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos ${totalVendas} em Vendas`;
+        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas} em Vendas`;
 
         // Adicione o elemento à div de vendedores
         vendedorContainer.appendChild(vendedorElement);
