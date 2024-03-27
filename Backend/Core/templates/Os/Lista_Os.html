@@ -18,7 +18,7 @@
   </ol>
 </nav>
 <span class="htmx-indicator"> 
-  <img src="/img/bars.svg"/> Searching... 
+  Pesquisando... 
  </span> 
 <div class="text-center">
   <nav class="navbar navbar-light bg-white">
@@ -42,6 +42,7 @@
   </div>
   </nav>
                 <table id="myTable" class="table table-hover">
+                  <span id="search-results"></span>
                     <tr class="thead">
                         <th scope="col">ID</th>
                         <th scope="col">SERVIÇO</th>
@@ -55,7 +56,7 @@
                         <th scope="col">AÇAO</th>
                       </tr>
                       {% for Os in Ordem_servicos %}
-                      <tbody id="search-results">
+                      <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{Os.id}}</th>
                           <th scope="row">{{Os.id}}</th>

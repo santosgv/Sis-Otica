@@ -433,14 +433,14 @@ def Imprimir_os(request,id_os):
      
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago(),DATA_SOLICITACAO__lte=get_today_data()).order_by('id').all()
+    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
     pagina = Paginator(Lista_os, 10)
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
 def dados_caixa():
-    dado = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
 
 def get_entrada_saida():
