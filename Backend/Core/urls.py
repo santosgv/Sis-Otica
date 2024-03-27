@@ -1,6 +1,7 @@
 
 from django.urls import path
 from django.conf import settings
+from . import htmx_views
 from django.conf.urls.static import static
 from Core import views
 
@@ -39,5 +40,9 @@ urlpatterns = [
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')
 ]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+htmx_patterns =[
+    path('search/',htmx_views.search, name='search'),
+
+]
+
+urlpatterns += htmx_patterns

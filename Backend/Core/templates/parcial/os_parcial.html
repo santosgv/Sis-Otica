@@ -1,0 +1,12 @@
+{% load static %}
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endblock %}
+
+{% if Ordem_servicos %}
+ {% for Os in Ordem_servicos %}
+ {{Os}}
+ {% endfor %}
+{% else %}
+<h1>nao tem</h1>
+{% endif %}

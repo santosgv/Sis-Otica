@@ -17,11 +17,19 @@
     <li class="breadcrumb-item active" aria-current="page">O.S</li>
   </ol>
 </nav>
+<span class="htmx-indicator"> 
+  <img src="/img/bars.svg"/> Searching... 
+ </span> 
 <div class="text-center">
   <nav class="navbar navbar-light bg-white">
     <form class="form-inline">
-      <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar" aria-label="Search">
- 
+      <!-- <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar" aria-label="Search">-->
+      <input class="form-control mr-sm-2" type="search" 
+       name="search" placeholder="Os" 
+       hx-get="search/" 
+       hx-trigger="input changed delay:500ms, search" 
+       hx-target="#search-results" 
+       hx-indicator=".htmx-indicator">
     </form>
     <div class="text-center">
       {% if messages %}
@@ -47,7 +55,7 @@
                         <th scope="col">AÇAO</th>
                       </tr>
                       {% for Os in Ordem_servicos %}
-                      <tbody>
+                      <tbody id="search-results">
                         <tr>
                           <th hidden id="id" name="id">{{Os.id}}</th>
                           <th scope="row">{{Os.id}}</th>
