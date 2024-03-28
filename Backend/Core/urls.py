@@ -42,6 +42,7 @@ urlpatterns = [
 
 htmx_patterns =[
     path('search/',htmx_views.search, name='search'),
+    path('search_cliente/',htmx_views.search_cliente,name='search_cliente')
 
 ]
 

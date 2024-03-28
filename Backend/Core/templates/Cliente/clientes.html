@@ -17,11 +17,22 @@
     <li class="breadcrumb-item active" aria-current="page">Clientes</li>
   </ol>
 </nav>
+<span class="htmx-indicator"> 
+  Pesquisando... 
+ </span> 
 <div class="text-center">
   <nav class="navbar navbar-light bg-white">
-    <form class="form-inline">
+  <!--  <form class="form-inline">
       <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Nome" aria-label="Search">
  
+    </form> -->
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="search" 
+       name="search_cliente" placeholder="Nome" 
+       hx-get="search_cliente/" 
+       hx-trigger="input changed delay:500ms, search" 
+       hx-target="#search-results" 
+       hx-indicator=".htmx-indicator">
     </form>
     <div class="btn-continuar">
       <a type="button" class="btn btn-primary" href="{% url 'Core:cadastro_cliente'%}">Cadastrar cliente</a>
@@ -37,6 +48,7 @@
               {% endif %}
           </div>
                 <table id="myTable" class="table table-hover">
+                  <span id="search-results"></span>
                     <tr class="thead">
                         <th scope="col">NOME</th>
                         <th scope="col">LOGRADOURO</th>

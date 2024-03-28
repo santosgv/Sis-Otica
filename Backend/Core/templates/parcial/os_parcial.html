@@ -5,7 +5,6 @@
 
 {% if Ordem_servicos %}
 
-      {% for Os in Ordem_servicos %}
       <h4>Resultado</h4>
       <table id="myTable" class="table table-hover">
           <tr class="thead">
@@ -58,7 +57,7 @@
       </table>
       <hr>
     </div>
- {% endfor %}
+
 {% else %}
-<span>Sem Resultado</span>
+<span style="color: red; font-weight: bold;">Sem Resultado</span>
 {% endif %}
