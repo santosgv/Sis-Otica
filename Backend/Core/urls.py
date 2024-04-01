@@ -36,6 +36,7 @@ urlpatterns = [
     path('dados_minhas_vendas',views.dados_minhas_vendas,name='dados_minhas_vendas'),
     path('dados_clientes',views.dados_clientes,name='dados_clientes'),
     path('minhas_vendas/',views.minhas_vendas, name='minhas_vendas'),
+    path('receber',views.receber, name='receber'),
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')
 ]

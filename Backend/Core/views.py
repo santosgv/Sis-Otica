@@ -711,6 +711,14 @@ def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
 
+def receber(request):
+    total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
+
+    if total_vendido is None:
+        total_vendido = 0
+    
+    return JsonResponse({'total_vendido_hoje': total_vendido})
+
 @login_required(login_url='/auth/logar/')
 def minhas_vendas(request):
     

@@ -190,3 +190,19 @@ function obter_clientes(url) {
 
   });
 }
+
+
+function recebe_hoje(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalvendahoje = data.total_vendido_hoje;
+
+    const receberdiv = document.getElementById('receber');
+
+    receberdiv.textContent = `R$ ${totalvendahoje}`;
+
+  });
+}

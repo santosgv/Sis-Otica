@@ -33,19 +33,27 @@ Relatorios
   </div>
   <br>
   <div class="row">
-    <div class="col-sm-6">
-      <div class="card w-50 text-center" style="background-color: rgb(58, 134, 58); color: white;">
+    <div class="col">
+      <div class="card text-center text-white bg-primary mb-3">
         <div class="card-body">
           <h5 class="card-title">Ordens De Serviço Em Aberto Mês</h5>
           <p class="card-text" id="total_vendas"></p><p class="card-text" id="total_valor"></p>
         </div>
       </div>
     </div>
-    <div class="col-sm-6">
-      <div class="card w-50 text-center" style="background-color: rgb(48, 48, 167); color: white;">
+    <div class="col">
+      <div class="card text-center text-white bg-warning mb-3">
         <div class="card-body">
           <h5 class="card-title">Total de Clientes Cadastrados</h5>
           <p class="card-text" id="clientes"></p><p class="card-text"></p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-center text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Receber Hoje</h5>
+          <p class="card-text" id="receber"></p><p class="card-text"></p>
         </div>
       </div>
     </div>
@@ -80,6 +88,7 @@ Relatorios
       renderiza_fluxo_12_meses('{% url "Core:transacoes_mensais" %}')
       obter_os_em_aberto('{% url "Core:obter_os_em_aberto" %}');
       obter_clientes('{% url "Core:dados_clientes" %}');
+      recebe_hoje('{% url "Core:receber" %}');
 }
 </script>
 {% endblock %}
