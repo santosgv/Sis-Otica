@@ -444,13 +444,13 @@ def dados_caixa():
     return dado
 
 def get_entrada_saida():
-    entradas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo = entradas - saidas
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo = round(entradas - saidas,2)
 
-    entradas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo_total = entradas_total - saidas_total
+    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo_total = round(entradas_total - saidas_total,2)
 
     return entradas,saidas,saldo,saldo_total
 
