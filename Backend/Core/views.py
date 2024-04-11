@@ -253,7 +253,6 @@ def Visualizar_os(request,id_os):
     else:
         return render(request,'Os/Visualizar_os.htmll')
     
-
 @transaction.atomic    
 @login_required(login_url='/auth/logar/')
 def Editar_os(request,id_os):
@@ -430,7 +429,6 @@ def Imprimir_os(request,id_os):
         logger.warning(msg)
         return redirect('/Lista_Os')
 
-     
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
     Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
@@ -439,10 +437,12 @@ def Dashabord(request):
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
+@login_required(login_url='/auth/logar/')
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
 
+@login_required(login_url='/auth/logar/')
 def get_entrada_saida():
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -707,10 +707,12 @@ def dados_minhas_vendas(request):
         .order_by('-total_pedidos')[:1]
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
+@login_required(login_url='/auth/logar/')
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
 
+@login_required(login_url='/auth/logar/')
 def receber(request):
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
 
@@ -721,7 +723,6 @@ def receber(request):
 
 @login_required(login_url='/auth/logar/')
 def minhas_vendas(request):
-    
     return render(request,'minhas_vendas.html')
 
     
