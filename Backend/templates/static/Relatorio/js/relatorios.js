@@ -73,7 +73,7 @@ function renderiza_vendedor(url) {
       const totalvendas = vendedor['total_valor_vendas'];
       // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
       const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos ${totalvendas} em Vendas`;
+      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas} em Vendas`;
 
       // Adicione o elemento à div de vendedores
       vendedorContainer.appendChild(vendedorElement);
@@ -133,3 +133,76 @@ function renderiza_fluxo_12_meses(url) {
     .catch(error => console.error(error));
 }
 
+function obter_os_em_aberto(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalVendas = data.data[0].total_vendas;
+    const totalValor = data.data[0].total_valor;
+
+    const totalVendasContainer = document.getElementById('total_vendas');
+    const totalValorContainer = document.getElementById('total_valor');
+
+    totalVendasContainer.textContent = `Total de Vendas: ${totalVendas}`;
+    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor}`;
+  });
+}
+
+function renderiza_minhas_vendas(url) {
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const vendedores = data.minhas_vendas_mes;
+      const vendedorContainer = document.getElementById('eu');
+
+      vendedores.forEach(vendedor => {
+        const vendedorNome = vendedor['VENDEDOR__first_name'];
+        const totalPedidos = vendedor['total_pedidos'];
+        const totalVendas = vendedor['total_valor_vendas'];
+
+        // Crie um elemento HTML para cada vendedor
+        const vendedorElement = document.createElement('div');
+        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas} em Vendas`;
+
+        // Adicione o elemento à div de vendedores
+        vendedorContainer.appendChild(vendedorElement);
+      });
+    })
+    .catch(error => {
+      console.error('Erro ao obter dados de vendas:', error);
+    });
+}
+
+
+function obter_clientes(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalclientes = data.total_clientes;
+
+    const totalclientesContainer = document.getElementById('clientes');
+
+    totalclientesContainer.textContent = `Ativos: ${totalclientes}`;
+
+  });
+}
+
+
+function recebe_hoje(url) {
+  fetch(url, {
+    method: 'get',
+  }).then(function(result) {
+    return result.json()
+  }).then(function(data) {
+    const totalvendahoje = data.total_vendido_hoje;
+
+    const receberdiv = document.getElementById('receber');
+
+    receberdiv.textContent = `R$ ${totalvendahoje}`;
+
+  });
+}

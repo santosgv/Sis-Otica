@@ -17,11 +17,19 @@
     <li class="breadcrumb-item active" aria-current="page">O.S</li>
   </ol>
 </nav>
+<span class="htmx-indicator"> 
+  Pesquisando... 
+ </span> 
 <div class="text-center">
   <nav class="navbar navbar-light bg-white">
     <form class="form-inline">
-      <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar" aria-label="Search">
- 
+      <!-- <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar" aria-label="Search">-->
+      <input class="form-control mr-sm-2" type="search" 
+       name="search" placeholder="Cliente" 
+       hx-get="search/" 
+       hx-trigger="input changed delay:500ms, search" 
+       hx-target="#search-results" 
+       hx-indicator=".htmx-indicator">
     </form>
     <div class="text-center">
       {% if messages %}
@@ -34,6 +42,7 @@
   </div>
   </nav>
                 <table id="myTable" class="table table-hover">
+                  <span id="search-results"></span>
                     <tr class="thead">
                         <th scope="col">ID</th>
                         <th scope="col">SERVIÇO</th>
@@ -50,7 +59,7 @@
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{Os.id}}</th>
-                          <th scope="row">{{Os.id}}</th>
+                          <th scope="row">NC{{Os.id}}</th>
                           <td >{{Os.SERVICO|slice:":10"}}</td>
                           <td>{{Os.CLIENTE|slice:":10"}}</td>
                           <td>{{Os.VENDEDOR.first_name|slice:":10"}}</td>

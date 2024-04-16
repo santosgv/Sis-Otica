@@ -55,7 +55,7 @@
           </div>
           <div class="form-group col-md-2">
             <label for="DATA_NASCIMENTO">Data Nascimento</label>
-            <input type="date" class="form-control"  id="DATA_NASCIMENTO" value="{{cliente.DATA_NASCIMENTO}}" name="DATA_NASCIMENTO" required>
+            <input type="date" class="form-control"  id="DATA_NASCIMENTO" value="{{cliente.DATA_NASCIMENTO|date:"d/m/Y"}}" name="DATA_NASCIMENTO" required>
           </div>
         </div>
         <div class="form-group">
@@ -68,7 +68,7 @@
                 <input type="text" class="form-control" id="NUMERO" value="{{cliente.NUMERO}}" name="NUMERO" required>
               </div>
           <div class="form-group col-md-4">
-            <label for="BAIRRO">Bairo</label>
+            <label for="BAIRRO">Bairro</label>
             <input type="text" class="form-control" id="BAIRRO" value="{{cliente.BAIRRO}}" name="BAIRRO" required>
           </div>
           <div class="form-group col-md-6">

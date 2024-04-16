@@ -20,7 +20,7 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS =['127.0.0.1','localhost']
+ALLOWED_HOSTS =['*']
 
 USE_L10N = False
 
@@ -182,16 +182,16 @@ LOGGING = {
 
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": 'redis://191.252.210.233:6379/0',
-	    "TIMEOUT": 60,
-    }
-}
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_AGE=604800 # 1 semana
-SESSION_COOKIE_SECURE = True
+#CACHES = {
+#    "default": {
+#        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#        "LOCATION": 'redis://191.252.210.233:6379/0',
+#	    "TIMEOUT": 60,
+#   }
+#}
+#CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_AGE=604800 # 1 semana
+#SESSION_COOKIE_SECURE = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

@@ -47,6 +47,7 @@ def cadastro(request):
         
         try:
             path_template = os.path.join(settings.BASE_DIR, 'Autenticacao/templates/emails/cadastro_confirmado.html')
+            base_url = request.build_absolute_uri('/')
             user = USUARIO.objects.create_user(username=username,
                                             first_name=first_name,
                                             DATA_NASCIMENTO=data_nascimento,
@@ -60,7 +61,7 @@ def cadastro(request):
             ativacao =Ativacao(token=token, user=user)
             ativacao.save()
             link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/ativar_conta/{token}" 
-            email_html(path_template, 'Cadastro confirmado', [email,], username=username, link_ativacao=link_ativacao)
+            email_html(path_template, 'Cadastro confirmado', [email,], username=username, base_url=base_url ,link_ativacao=link_ativacao)
             #link_ativacao=f"{settings.ALLOWED_HOSTS[0]}/auth/auth/ativar_conta/{token}" #ESSE METODO E DO ENVIO DO PROPRIO DJANGO
             #html_content=render_to_string('emails/cadastro_confirmado.html',{'username':username,'link_ativacao':link_ativacao})
             #text_content = strip_tags(html_content)
@@ -70,7 +71,6 @@ def cadastro(request):
             messages.add_message(request, constants.SUCCESS, 'Foi Enviado Para seu email o Link de ativaçao da sua conta')
             return redirect('/auth/logar')
         except Exception as msg:
-            print(msg)
             logger.critical(msg)
             messages.add_message(request, constants.ERROR, 'Erro interno do sistema')
             return redirect('/auth/cadastro')

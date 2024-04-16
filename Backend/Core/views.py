@@ -21,8 +21,12 @@ from django.utils.timezone import now,timedelta
 from django.db.models import Sum,Count,IntegerField,Case, When,Value
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
 from django.http import JsonResponse
+from django.core.serializers import serialize
 from decimal import Decimal
 import logging
+from calendar import monthrange
+from calendar import month_name
+from django.db import transaction
 
 logger = logging.getLogger('MyApp')
 
@@ -30,6 +34,16 @@ logger = logging.getLogger('MyApp')
 def get_today_data():
     date_now  = datetime.datetime.now().date()
     return date_now
+
+def primeiro_dia_mes():
+    data_atual = date.today()
+    primeiro_dia = data_atual.replace(day=1)
+    return primeiro_dia
+
+def ultimo_dia_mes():
+    data_atual = date.today()
+    last_date = data_atual.replace(day=1) + timedelta(monthrange(data_atual.year, data_atual.month)[1] - 1)
+    return last_date
 
 def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
@@ -56,6 +70,7 @@ def clientes(request):
         return render(request,'Cliente/clientes.html',{'clientes':clientes,
                                                         })
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_cliente(request):
     if request.method == "GET":
@@ -71,7 +86,7 @@ def cadastro_cliente(request):
         DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
         EMAIL = request.POST.get('EMAIL')
              
-       
+    with transaction.atomic():
         cliente =CLIENTE(NOME=NOME,
         LOGRADOURO=LOGRADOURO,
         NUMERO=NUMERO,
@@ -91,32 +106,36 @@ def Cliente(request,id):
         cliente = CLIENTE.objects.get(id=id)
         return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def Edita_cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
         return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
     else:
-        cliente = CLIENTE.objects.get(id=id)
-        cliente.NOME = request.POST.get('NOME')
-        cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
-        cliente.NUMERO = request.POST.get('NUMERO')
-        cliente.BAIRRO = request.POST.get('BAIRRO')
-        cliente.CIDADE = request.POST.get('CIDADE')
-        cliente.TELEFONE = request.POST.get('TELEFONE')
-        cliente.CPF = request.POST.get('CPF')
-        cliente.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
-        cliente.EMAIL = request.POST.get('EMAIL')
-        cliente.save()
-        messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-    return render(request,'Cliente/edita_cliente.html',{'cliente':cliente})
+        with transaction.atomic():
+            cliente = CLIENTE.objects.get(id=id)
+            cliente.NOME = request.POST.get('NOME')
+            cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
+            cliente.NUMERO = request.POST.get('NUMERO')
+            cliente.BAIRRO = request.POST.get('BAIRRO')
+            cliente.CIDADE = request.POST.get('CIDADE')
+            cliente.TELEFONE = request.POST.get('TELEFONE')
+            cliente.CPF = request.POST.get('CPF')
+            cliente.DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
+            cliente.EMAIL = request.POST.get('EMAIL')
+            cliente.save()
+            messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
+        return render(request,'Cliente/cliente.html',{'cliente':cliente})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def excluir_cliente(request,id):
-    excluir = CLIENTE.objects.get(id=id)
-    excluir.STATUS ='2'
-    excluir.save()
-    return redirect('/clientes')
+    with transaction.atomic():
+        excluir = CLIENTE.objects.get(id=id)
+        excluir.STATUS ='2'
+        excluir.save()
+        return redirect('/clientes')
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
@@ -130,6 +149,7 @@ def Lista_Os(request):
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
@@ -138,86 +158,86 @@ def Cadastrar_os(request,id_cliente):
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos})
     else:
         try:
-            if 'ANEXO' in  request.FILES:
-                ANEXO = request.FILES['ANEXO']
-            else:
-                ANEXO = None
-            VENDEDOR = request.POST.get('VENDEDOR')
-            CLIENTE_POST = request.POST.get('CLIENTE')
-            PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
-            if 'ASSINATURA' in request.FILES:
-                ASSINATURA = request.FILES['ASSINATURA']
-            else:
-                ASSINATURA = None 
-            SERVICO_POST =request.POST.get('SERVICO')
-            OD_ESF = request.POST.get('OD_ESF')
-            OD_CIL = request.POST.get('OD_CIL')
-            OD_EIXO = request.POST.get('OD_EIXO')
-            OE_ESF = request.POST.get('OE_ESF')
-            OE_CIL = request.POST.get('OE_CIL')
-            OE_EIXO = request.POST.get('OE_EIXO')
-            AD = request.POST.get('AD')
-            DNP = request.POST.get('DNP')
-            P = request.POST.get('P')
-            DPA = request.POST.get('DPA')
-            DIAG = request.POST.get('DIAG')
-            V = request.POST.get('V')
-            H = request.POST.get('H')
-            ALT = request.POST.get('ALT')
-            ARM = request.POST.get('ARM')
-            MONTAGEM = request.POST.get('MONTAGEM')
-            LENTES = request.POST.get('LENTES')
-            ARMACAO = request.POST.get('ARMACAO')
-            OBSERVACAO = request.POST.get('OBSERVACAO')
-            FORMA_PAG = request.POST.get('PAGAMENTO')
-            valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-            valor = Decimal(valor_str)
-            QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+            with transaction.atomic():
+                if 'ANEXO' in  request.FILES:
+                    ANEXO = request.FILES['ANEXO']
+                else:
+                    ANEXO = None
+                VENDEDOR = request.POST.get('VENDEDOR')
+                CLIENTE_POST = request.POST.get('CLIENTE')
+                PREVISAO_ENTREGA = request.POST.get('PREVISAO_ENTREGA')
+                if 'ASSINATURA' in request.FILES:
+                    ASSINATURA = request.FILES['ASSINATURA']
+                else:
+                    ASSINATURA = None 
+                SERVICO_POST =request.POST.get('SERVICO')
+                OD_ESF = request.POST.get('OD_ESF')
+                OD_CIL = request.POST.get('OD_CIL')
+                OD_EIXO = request.POST.get('OD_EIXO')
+                OE_ESF = request.POST.get('OE_ESF')
+                OE_CIL = request.POST.get('OE_CIL')
+                OE_EIXO = request.POST.get('OE_EIXO')
+                AD = request.POST.get('AD')
+                DNP = request.POST.get('DNP')
+                P = request.POST.get('P')
+                DPA = request.POST.get('DPA')
+                DIAG = request.POST.get('DIAG')
+                V = request.POST.get('V')
+                H = request.POST.get('H')
+                ALT = request.POST.get('ALT')
+                ARM = request.POST.get('ARM')
+                MONTAGEM = request.POST.get('MONTAGEM')
+                LENTES = request.POST.get('LENTES')
+                ARMACAO = request.POST.get('ARMACAO')
+                OBSERVACAO = request.POST.get('OBSERVACAO')
+                FORMA_PAG = request.POST.get('PAGAMENTO')
+                valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+                valor = Decimal(valor_str)
+                QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-            if request.POST.get('ENTRADA') == '':
-                ENTRADA =0
-            else:
-                ENTRADA = request.POST.get('ENTRADA')
-            
-            cadastrar_os = ORDEN(
-            ANEXO= ANEXO,
-            VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
-            CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
-            PREVISAO_ENTREGA= PREVISAO_ENTREGA,
-            ASSINATURA =ASSINATURA,
-            SERVICO= SERVICO.objects.get(id=SERVICO_POST),
-            OD_ESF= OD_ESF,
-            OD_CIL = OD_CIL,
-            OD_EIXO = OD_EIXO,
-            OE_ESF = OE_ESF,
-            OE_CIL = OE_CIL,
-            OE_EIXO = OE_EIXO,
-            AD = AD,
-            DNP = DNP,
-            P = P,
-            DPA = DPA,
-            DIAG = DIAG,
-            V = V,
-            H = H,
-            ALT = ALT,
-            ARM = ARM,
-            MONTAGEM = MONTAGEM,
-            LENTES= LENTES,
-            ARMACAO= ARMACAO,
-            OBSERVACAO= OBSERVACAO,
-            FORMA_PAG= FORMA_PAG,
-            VALOR= valor,
-            QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-            ENTRADA= ENTRADA )
+                if request.POST.get('ENTRADA') == '':
+                    ENTRADA =0
+                else:
+                    ENTRADA = request.POST.get('ENTRADA')
+                
+                cadastrar_os = ORDEN(
+                ANEXO= ANEXO,
+                VENDEDOR = USUARIO.objects.get(id=VENDEDOR),
+                CLIENTE = CLIENTE.objects.get(id=CLIENTE_POST),
+                PREVISAO_ENTREGA= PREVISAO_ENTREGA,
+                ASSINATURA =ASSINATURA,
+                SERVICO= SERVICO.objects.get(id=SERVICO_POST),
+                OD_ESF= OD_ESF,
+                OD_CIL = OD_CIL,
+                OD_EIXO = OD_EIXO,
+                OE_ESF = OE_ESF,
+                OE_CIL = OE_CIL,
+                OE_EIXO = OE_EIXO,
+                AD = AD,
+                DNP = DNP,
+                P = P,
+                DPA = DPA,
+                DIAG = DIAG,
+                V = V,
+                H = H,
+                ALT = ALT,
+                ARM = ARM,
+                MONTAGEM = MONTAGEM,
+                LENTES= LENTES,
+                ARMACAO= ARMACAO,
+                OBSERVACAO= OBSERVACAO,
+                FORMA_PAG= FORMA_PAG,
+                VALOR= valor,
+                QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
+                ENTRADA= ENTRADA )
 
 
 
-            cadastrar_os.save()
+                cadastrar_os.save()
 
-            messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
-            return redirect('/Lista_Os')  
+                messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
+                return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
         except Exception as msg:
-            print(msg)
             logger.warning(msg)
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
@@ -233,6 +253,7 @@ def Visualizar_os(request,id_os):
     else:
         return render(request,'Os/Visualizar_os.htmll')
     
+@transaction.atomic    
 @login_required(login_url='/auth/logar/')
 def Editar_os(request,id_os):
     if request.method == "GET":
@@ -241,76 +262,96 @@ def Editar_os(request,id_os):
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
                                                    })
     else:
+        with transaction.atomic():
+            if 'ANEXO' in  request.FILES:
+                ANEXO = request.FILES['ANEXO']
+            else:
+                ANEXO = None
+            if 'ASSINATURA' in request.FILES:
+                ASSINATURA = request.FILES['ASSINATURA']
+            else:
+                ASSINATURA = None
+            FORMA_PAG = request.POST.get('PAGAMENTO')
+            VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
+            VALOR = Decimal(VALOR_str)
+            QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-        FORMA_PAG = request.POST.get('PAGAMENTO')
-        VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-        VALOR = Decimal(VALOR_str)
-        QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
+            if request.POST.get('ENTRADA') == '':
+                ENTRADA =0
+            else:
+                ENTRADA = request.POST.get('ENTRADA')
+            VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
+            if ANEXO is not None:
+                VISUALIZAR_OS.ANEXO = ANEXO
+            if ASSINATURA is not None:
+                VISUALIZAR_OS.ASSINATURA = ASSINATURA
+            VISUALIZAR_OS.ASSINATURA=ASSINATURA
+            VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
+            VISUALIZAR_OS.VALOR=VALOR
+            VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
+            VISUALIZAR_OS.ENTRADA=ENTRADA
+            VISUALIZAR_OS.save()
+            
+            messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
+            return redirect(f'/Visualizar_os/{VISUALIZAR_OS.id}')  
 
-        if request.POST.get('ENTRADA') == '':
-            ENTRADA =0
-        else:
-            ENTRADA = request.POST.get('ENTRADA')
-        
-        VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
-        VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
-        VISUALIZAR_OS.VALOR=VALOR
-        VISUALIZAR_OS.QUANTIDADE_PARCELA=QUANTIDADE_PARCELA
-        VISUALIZAR_OS.ENTRADA=ENTRADA
-        VISUALIZAR_OS.save()
-        
-        messages.add_message(request, constants.SUCCESS, 'O.S Editada com sucesso')
-        return redirect('/Lista_Os')  
-
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Encerrar_os(request,id_os):
     if request.method == "GET":
         try:
-            Encerrar_OS = ORDEN.objects.get(id=id_os)
-            Encerrar_OS.STATUS = "E"
-            Encerrar_OS.DARA_ENCERRAMENTO =now()
-            Encerrar_OS.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Encerrar_OS = ORDEN.objects.get(id=id_os)
+                Encerrar_OS.STATUS = "E"
+                Encerrar_OS.DARA_ENCERRAMENTO =now()
+                Encerrar_OS.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')   
 
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Cancelar_os(request,id_os):
     if request.method == "GET":
         try:
-            CANCELAR_OS = ORDEN.objects.get(id=id_os)
-            CANCELAR_OS.STATUS ="C"
-            CANCELAR_OS.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                CANCELAR_OS = ORDEN.objects.get(id=id_os)
+                CANCELAR_OS.STATUS ="C"
+                CANCELAR_OS.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Cancelada com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')
-        
+
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Laboratorio_os(request,id_os):
     if request.method == "GET":
         try:
-            Laboratorio_os = ORDEN.objects.get(id=id_os)
-            Laboratorio_os.STATUS ="L"
-            Laboratorio_os.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Laboratorio_os = ORDEN.objects.get(id=id_os)
+                Laboratorio_os.STATUS ="L"
+                Laboratorio_os.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para o Laboratorio com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')  
 
+@transaction.atomic 
 @login_required(login_url='/auth/logar/')
 def Loja_os(request,id_os):
     if request.method == "GET":
         try:
-            Loja_os = ORDEN.objects.get(id=id_os)
-            Loja_os.STATUS ="J"
-            Loja_os.save()
-            messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
-            return redirect('/Lista_Os')  
+            with transaction.atomic():
+                Loja_os = ORDEN.objects.get(id=id_os)
+                Loja_os.STATUS ="J"
+                Loja_os.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Foi Movido para a Loja com sucesso')
+                return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')      
@@ -327,7 +368,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(565,744,str(PRINT_OS.id))
+        PDF.drawString(560,744,'NC'+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
@@ -353,11 +394,11 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(565,423,str(PRINT_OS.id))
+        PDF.drawString(555,423,'NC'+str(PRINT_OS.id))
         PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str('xxx'))
+        PDF.drawString(338,361,str('N/D'))
         PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
         PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
         PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
@@ -382,33 +423,34 @@ def Imprimir_os(request,id_os):
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='OS.pdf')
+        return FileResponse(buffer, as_attachment=True, filename=f'OS-NC{PRINT_OS.id}.pdf')
     except Exception as msg:
         print(msg)
         logger.warning(msg)
         return redirect('/Lista_Os')
 
-     
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago(),DATA_SOLICITACAO__lte=get_today_data()).order_by('id').all()
+    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
     pagina = Paginator(Lista_os, 10)
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
+
 def dados_caixa():
-    dado = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
 
+@login_required(login_url='/auth/logar/')
 def get_entrada_saida():
-    entradas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo = entradas - saidas
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo = round(entradas - saidas,2)
 
-    entradas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas_total = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo_total = entradas_total - saidas_total
+    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saldo_total = round(entradas_total - saidas_total,2)
 
     return entradas,saidas,saldo,saldo_total
 
@@ -444,6 +486,7 @@ def fechar_caixa(request):
         messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
         return redirect('/Caixa')
 
+@transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
     if request.method =="GET":
@@ -453,32 +496,33 @@ def cadastro_caixa(request):
             'data':get_today_data()
         })
     else:
-        descricao =request.POST.get('DESCRICAO')
-        referencia = request.POST.get('REFERENCIA')
-        tipo= request.POST.get('TIPO')
-        valor_str = request.POST.get('VALOR')
-        forma= request.POST.get('FORMA')
+        with transaction.atomic():
+            descricao =request.POST.get('DESCRICAO')
+            referencia = request.POST.get('REFERENCIA')
+            tipo= request.POST.get('TIPO')
+            valor_str = request.POST.get('VALOR')
+            forma= request.POST.get('FORMA')
 
-        valor_str = valor_str.replace('.', '').replace(',', '.')
+            valor_str = valor_str.replace('.', '').replace(',', '.')
 
-        
-        if referencia and referencia != 'null':
-            referencia_obj = get_object_or_404(ORDEN, id=referencia)
-        else:
-            referencia_obj = None
-        caixa = CAIXA.objects.create(
-            DATA=get_today_data(),
-            VALOR=valor_str,
-            DESCRICAO=descricao,
-            REFERENCIA= referencia_obj,
-            TIPO=tipo,
-            FORMA=forma
-        )
-        caixa.save()
-        messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
-        return redirect('/Caixa')
+            
+            if referencia and referencia != 'null':
+                referencia_obj = get_object_or_404(ORDEN, id=referencia)
+            else:
+                referencia_obj = None
+            caixa = CAIXA.objects.create(
+                DATA=get_today_data(),
+                VALOR=valor_str,
+                DESCRICAO=descricao,
+                REFERENCIA= referencia_obj,
+                TIPO=tipo,
+                FORMA=forma
+            )
+            caixa.save()
+            messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
+            return redirect('/Caixa')
 
-#@cache_page(60 * 15)
+@login_required(login_url='/auth/logar/')
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=365)
@@ -491,19 +535,30 @@ def vendas_ultimos_12_meses(request):
         .filter(DATA_SOLICITACAO__gte=data_limite).exclude(STATUS='C')
         .order_by('mes_venda')
     )
+    meses_portugues = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
 
-    data_vendas = [{'mes_venda': venda['mes_venda'].strftime('%m-%Y'), 'total_vendas': venda['total_vendas']} for venda in vendas]
+    # Formata a data para "Nome_do_Mês/Ano"
+    data_vendas = [{
+        'mes_venda': f"{meses_portugues[venda['mes_venda'].month]}/{venda['mes_venda'].year}",
+        'total_vendas': venda['total_vendas']
+    } for venda in vendas]
+
     return JsonResponse({'data': data_vendas})
 
+@login_required(login_url='/auth/logar/')
 def maiores_vendedores_30_dias(request):
-    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=thirty_days_ago()).exclude(STATUS='C') \
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .order_by('-total_pedidos')[:5]
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
-
+@login_required(login_url='/auth/logar/')
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
     transacoes_mensais = CAIXA.objects.annotate(
@@ -516,6 +571,12 @@ def transacoes_mensais(request):
 
     # Cria um dicionário para armazenar os totais mensais de entradas e saídas
     dados_mensais = {}
+
+    # Mapeamento dos nomes dos meses em português
+    meses_portugues = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho',
+        7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
 
     # Itera sobre as transações agregadas e agrupa os totais por mês, ano e tipo
     for transacao in transacoes_mensais:
@@ -546,7 +607,7 @@ def transacoes_mensais(request):
     dados_formatados = [
         {
             'ano': ano,
-            'mes': mes,
+            'mes': meses_portugues[mes],
             'entrada': dados['entrada'],
             'saida': dados['saida'],
         }
@@ -611,9 +672,63 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
+def obter_os_em_aberto(request):    
+    
+    vendas = (
+        ORDEN.objects
+        .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
+        .values('mes_venda')
+        .annotate(total_vendas=Count('id'))
+        .annotate(total_valor=Sum('VALOR'))  # Adicione essa linha para calcular o valor total das vendas
+        .filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes())
+        .exclude(STATUS='C')
+        .exclude(STATUS='E')
+        .order_by('mes_venda')
+    )
+
+    data_vendas = [{
+        'total_vendas': venda['total_vendas'],
+        'total_valor': venda['total_valor'],  # Inclua o valor total das vendas no resultado
+    } for venda in vendas]
+
+    return JsonResponse({'data':data_vendas})
 
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
     return render(request,'Relatorio/relatorios.html')
 
+@login_required(login_url='/auth/logar/')
+def dados_minhas_vendas(request):
+    id_user = request.user
+    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
+        .values('VENDEDOR__first_name') \
+        .annotate(total_pedidos=Count('id')) \
+        .annotate(total_valor_vendas=Sum('VALOR')) \
+        .order_by('-total_pedidos')[:1]
+    return JsonResponse({'minhas_vendas_mes': list(vendedor)})
+
+@login_required(login_url='/auth/logar/')
+def dados_clientes(request):
+    total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
+    return JsonResponse({'total_clientes':total_clientes})
+
+@login_required(login_url='/auth/logar/')
+def receber(request):
+    total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
+
+    if total_vendido is None:
+        total_vendido = 0
     
+    return JsonResponse({'total_vendido_hoje': total_vendido})
+
+@login_required(login_url='/auth/logar/')
+def minhas_vendas(request):
+    return render(request,'minhas_vendas.html')
+
+@login_required(login_url='/auth/logar/')
+def estoque(request):
+    return render(request,'Estoque/estoque.html')
+
+@login_required(login_url='/auth/logar/')
+def cadastro_estoque(request):
+    return render(request,'Estoque/cadastro_estoque.html')

@@ -30,10 +30,19 @@ Vizualiar O.S
     </div>
     
     <form method="POST" class="form_cliente">{% csrf_token %}
-      <h1>{{VISUALIZAR_OS.id}}</h1>
-        <div class="form-group">
-          <img src="/media/{{VISUALIZAR_OS.ANEXO}}" class="card-img-top"  style="width: 10%;" alt="{{VISUALIZAR_OS.ANEXO}}">
+      <h1>OS:NC{{VISUALIZAR_OS.id}}</h1>
+        <div class="row">
+        {% if VISUALIZAR_OS.ANEXO %}
+        <div class="form-group col-md-6">
+          <a href="{{VISUALIZAR_OS.ANEXO.url}}" target="_blank">Visualizar Anexo</a>
         </div>
+        {% endif %}
+        {% if VISUALIZAR_OS.ASSINATURA %}
+        <div class="form-group col-md-6">
+          <a href="{{VISUALIZAR_OS.ASSINATURA.url}}" target="_blank">Visualizar Assinatura</a>
+        </div>
+        {% endif %}
+      </div>
         <div class="row">
           <div class="form-group col-md-6">
             <label for="VENDEDOR" >Vendedor</label>
@@ -46,20 +55,12 @@ Vizualiar O.S
           </div>
         </div>
         <hr>
-        <div class="row">
+        <div class="row text-center">
           <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col">
               <label for="inputState">Tipo de Serviço</label>
-              <select required id="SERVICO" readonly name="SERVICO" class="form-control">
+              <select  id="SERVICO" readonly name="SERVICO" class="form-control">
                 <option selected>{{VISUALIZAR_OS.SERVICO}}</option>
-                <option value="Encomenda">Encomenda</option>
-                <option value="Pronta Entrega">Pronta Entrega</option>
-              </select>
-            </div>
-            <div class="form-group col-md-6">
-              <label for="inputState">Sub Serviço</label>
-              <select required id="SUB_SERVICO" readonly name="SUB_SERVICO" class="form-control">
-                <option selected>{{VISUALIZAR_OS.SUB_SERVICO}}</option>
               </select>
             </div>
           </div>
@@ -245,16 +246,12 @@ Vizualiar O.S
              {% endif %}
            
           </div>
-          <div class="form-group">
-            <a href="/media/{{VISUALIZAR_OS.ASSINATURA}}" download=>{{VISUALIZAR_OS.ASSINATURA}}</a>
-          </div>
         </div>
         </div>
-        <div class="alert alert-warning _carner" style="display: none;" role="alert">
-          Antes de Finalizar Cadastre o Carne: <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZZXRyL25ZIHRUcOxJTRIGD7godA-FvRdAOAwe4G_fg2UP8w/viewform" class="alert-link"> Formulario para Cadastro</a>.
-        </div>
-        {% if user.FUNCAO == "G" %}
+        {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
+        {% if VISUALIZAR_OS.STATUS == "A" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
+        {% endif %}
         {% endif %}
         <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
         {% if VISUALIZAR_OS.STATUS == "A" %}

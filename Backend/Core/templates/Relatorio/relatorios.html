@@ -23,10 +23,41 @@ Relatorios
 {% if user.FUNCAO == "G" %}
 <div class="container-fluid">
   <br>
-  <div  class="col-md">
-      <h1 class="text-center">Funcionários do mês</h1>
-    <h3 class="text-center">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAADlElEQVR4nO2aSWgUQRRA30gSFxI1igpBRoVEUCMmCt6CC0pMVLwJ3iIoGNCLqIkJgojEg6fgTU+iXkQPLqggiqIhJG4oxO0geBA0UeNCFJdYUvIbina6ZyazdU/Xg4KZ6lp+/fr/10zXB4slqBwC7gPPgdfAR+AXcJeIcBpQHqWMCLAAWAYsAR66FDCNiFAGXJBFvwOG5XOcCDAeuCwLfg/UAc/k+0KKnKnAdVnsoLiB5p7ULaeIqQaeykLfAouNZweBM8B8ipT1Yu568Y+BOUSEiUA38EcWfwWYTERoBF7Kwr8Du4FxRIBq4KJxtmuTryUCLAJOAj9l4Z9k10s92vf4/CK8Q0goBTYBlww/1wo4AcxK0lclKYFlArBWgtugIfAIcCyNCO+10MApYDawETggUXzEtVNPxNRnpDluKBQwPYFpalN/AHQBSzMYOxQKQI4y/fP1KLAFmEl2CI0CUiXdqF50ClBpRvWiVYAbqwCsBRBKF+jJcVALvAJUjoNaaBTgxioAawFYF+B/bAygSIKgClixCrBYLHl9y9sCDEjGRkWa/TcAt4HP8lr8llyLpUOF/A8ZEFm8XqtnlRJgO/DKFYHPA7EUxzjsE8l1WkwqxGROs6+WaZvImDP2GxPqG9ydkrujv3em0H+dtP0B7AOqpLRJnZKrsmR0SludMLHLuE3WpZ0csgIYlTe+DVLXJHW6NCfp79z56wW7aZNnuo0fzQnmaxCZdN1KckyXCKoztyqlrsPYkRqfvh+knd51N1XybMinf42RJuNYXKXIouuOkAdKgV7D9x2fPCd1L3yUMJSCAnQuUCJqZGx3zHFiQW++AqFmrrETrf9qoNzI5hr2cIdrPi7QLs/0rZKbZmO+R8aps0Pq9EkyjzyzWSb/ZqSxlBuWMCpmap4Oq40g2OYRBFcZ7WMyxqix887ia2VuJbIUhOOG2ccNoTs8hNbs9TkG9xjtKgzzdiszLhmkSm6YC8YkMUktyBug3njWZByRmRS3O9XJXI47aBkKyhTghgj0Rc56MwukP4PF97sCaqPMoWROnU4XCEoMd/gtwSnbbDWySs5K/kGgiEken7N73VlKdko0bqo/uwtCSxZ3SucKn8qxZeWENfJPTwt+c4y+qk+BqzLG1zH8Wyw49Ua07htD/z6P0yVUxDN4aamKJTVeZaiA0KOsArAWoPJoOYFDWQvAWoDKo+UEDmUtgGhbgIUA8xeXHD3/W0MxfwAAAABJRU5ErkJggg=="><span style="margin-left: 15px;" id="vendedor"></span><span style="margin-left: 15px;" id="qtd"></span> </h3> 
+  <div class="row text-center">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Funcionários do mês</h5>
+        <p class="card-text"><span style="margin-left: 15px;" id="vendedor"></span> <span style="margin-left: 15px;" id="qtd"></span></p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col">
+      <div class="card text-center text-white bg-primary mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Ordens De Serviço Em Aberto Mês</h5>
+          <p class="card-text" id="total_vendas"></p><p class="card-text" id="total_valor"></p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-center text-white bg-warning mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Total de Clientes Cadastrados</h5>
+          <p class="card-text" id="clientes"></p><p class="card-text"></p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-center text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Receber Hoje</h5>
+          <p class="card-text" id="receber"></p><p class="card-text"></p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <br>
       <div class="row">
@@ -40,6 +71,7 @@ Relatorios
       <canvas id="fluxo_mensal" width="250" height="200"></canvas>
     </div>
 </div>
+<br>
     {% else%}
     <h1 class="text-center">Acesso apenas para Gerentes !</h1>
 {% endif %}
@@ -54,6 +86,9 @@ Relatorios
       renderiza_total_vendas_12_meses('{% url "Core:vendas_ultimos_12_meses" %}')
       renderiza_vendedor('{% url "Core:maiores_vendedores_30_dias" %}')
       renderiza_fluxo_12_meses('{% url "Core:transacoes_mensais" %}')
+      obter_os_em_aberto('{% url "Core:obter_os_em_aberto" %}');
+      obter_clientes('{% url "Core:dados_clientes" %}');
+      recebe_hoje('{% url "Core:receber" %}');
 }
 </script>
 {% endblock %}

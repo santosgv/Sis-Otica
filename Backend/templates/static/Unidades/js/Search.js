@@ -16,6 +16,7 @@ function myFunction() {
         txtValue = td.textContent || td.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
           rowVisible = true;
+          break; // Se encontrar um valor correspondente, não é necessário continuar verificando as outras colunas
         }
       }
     }

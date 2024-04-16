@@ -1,6 +1,7 @@
 
 from django.urls import path
 from django.conf import settings
+from . import htmx_views
 from django.conf.urls.static import static
 from Core import views
 
@@ -30,10 +31,22 @@ urlpatterns = [
     path('vendas_ultimos_12_meses',views.vendas_ultimos_12_meses,name='vendas_ultimos_12_meses'),
     path('maiores_vendedores_30_dias',views.maiores_vendedores_30_dias,name='maiores_vendedores_30_dias'),
     path('transacoes_mensais',views.transacoes_mensais,name='transacoes_mensais'),
+    path('obter_os_em_aberto',views.obter_os_em_aberto,name='obter_os_em_aberto'),
     path('relatorios',views.relatorios, name='relatorios'),
+    path('dados_minhas_vendas',views.dados_minhas_vendas,name='dados_minhas_vendas'),
+    path('dados_clientes',views.dados_clientes,name='dados_clientes'),
+    path('minhas_vendas/',views.minhas_vendas, name='minhas_vendas'),
+    path('receber',views.receber, name='receber'),
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
-    path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior')
+    path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior'),
+    path('estoque/',views.estoque, name='estoque'),
+    path('cadastro_estoque/', views.cadastro_estoque, name='cadastro_estoque'),
 ]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+htmx_patterns =[
+    path('search/',htmx_views.search, name='search'),
+    path('search_cliente/',htmx_views.search_cliente,name='search_cliente')
+
+]
+
+urlpatterns += htmx_patterns
