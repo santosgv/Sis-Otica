@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+ Estoque
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+
+  {% if user.FUNCAO == "G" %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Estoque</li>
+    </ol>
+  </nav>
+  <span class="htmx-indicator"> 
+    Pesquisando... 
+   </span> 
+  <div class="text-center">
+    <nav class="navbar navbar-light bg-white">
+    <!--  <form class="form-inline">
+        <input class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Nome" aria-label="Search">
+   
+      </form> -->
+      <form class="form-inline">
+        <input class="form-control mr-sm-2" type="search" 
+         name="search_cliente" placeholder="Nome" 
+         hx-get="search_cliente/" 
+         hx-trigger="input changed delay:500ms, search" 
+         hx-target="#search-results" 
+         hx-indicator=".htmx-indicator">
+      </form>
+      <div class="btn-continuar">
+        <a type="button" class="btn btn-primary" href="{% url 'Core:cadastro_estoque'%}">Adicionar ao Estoque</a>
+      </div>
+    </nav>
+              <div class="text-center">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {{message.tags}}">
+                            {{message}}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+                  <table id="myTable" class="table table-hover">
+                    <span id="search-results"></span>
+                      <tr class="thead">
+                          <th scope="col">NOME</th>
+                          <th scope="col">LOGRADOURO</th>
+                          <th scope="col">NUMERO</th>
+                          <th scope="col">BAIRRO</th>
+                          <th scope="col">CIDADE</th>
+                          <th scope="col">CPF</th>
+                          <th scope="col">EMAIL</th>
+                          <th scope="col">TELEFONE</th>
+                          <th scope="col">AÇAO</th>
+                        </tr>
+                       
+                        <tbody>
+                          <tr>
+                            <th hidden id="id" name="id">1</th>
+                            <th scope="row"><a href="#">Nome</a></th>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>teste</td>
+                            <td>
+                              <a href="#"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a>
+                            </td>
+                          </tr>
+                        </tbody>
+               
+                  </table>
+              </div>
+              
+
+          </section> 
+
+          {% else%}
+          <h1 class="text-center">Acesso apenas para Gerentes!</h1>
+            {% endif%}
+
+</div>
+{% endblock %}

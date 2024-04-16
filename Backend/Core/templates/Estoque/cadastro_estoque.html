@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Cadastro Estoque
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+
+
+  
+
+
+
+</div>
+{% endblock %}

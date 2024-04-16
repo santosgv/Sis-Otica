@@ -368,7 +368,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(565,744,'NC' + str(PRINT_OS.id))
+        PDF.drawString(560,744,'NC'+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
@@ -394,7 +394,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(565,423,'NC'+str(PRINT_OS.id))
+        PDF.drawString(555,423,'NC'+str(PRINT_OS.id))
         PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
@@ -437,7 +437,7 @@ def Dashabord(request):
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
 
-@login_required(login_url='/auth/logar/')
+
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
@@ -725,4 +725,10 @@ def receber(request):
 def minhas_vendas(request):
     return render(request,'minhas_vendas.html')
 
-    
+@login_required(login_url='/auth/logar/')
+def estoque(request):
+    return render(request,'Estoque/estoque.html')
+
+@login_required(login_url='/auth/logar/')
+def cadastro_estoque(request):
+    return render(request,'Estoque/cadastro_estoque.html')
