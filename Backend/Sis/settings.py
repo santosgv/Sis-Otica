@@ -42,19 +42,19 @@ INSTALLED_APPS = [
     'Core',
 ]
 
-SHARED_APPS = [
-    'django_tenants', 
-    'Cliente',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'debug_toolbar',
-        'Autenticacao',
-        'Core',
-]
+#SHARED_APPS = [
+#    'django_tenants', 
+#    'Cliente',
+ #       'django.contrib.admin',
+  #      'django.contrib.auth',
+ #       'django.contrib.contenttypes',
+ #       'django.contrib.sessions',
+ #       'django.contrib.messages',
+#        'django.contrib.staticfiles',
+#        'debug_toolbar',
+#        'Autenticacao',
+#        'Core',
+#]
 
 TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
@@ -67,13 +67,13 @@ TENANT_APPS = [
      'Core',
      'Autenticacao',
 ]
-INSTALLED_APPS = list(SHARED_APPS) + [
-    app for app in TENANT_APPS if app not in SHARED_APPS
-]
+#INSTALLED_APPS = list(SHARED_APPS) + [
+#    app for app in TENANT_APPS if app not in SHARED_APPS
+#]
 
 MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',
-        'Sis.middleware.TenantActiveMiddleware',
+ #   'django_tenants.middleware.main.TenantMainMiddleware',
+ #       'Sis.middleware.TenantActiveMiddleware',
     'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -114,28 +114,24 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 
 DATABASES = {
     'default': {
-       'ENGINE': 'django_tenants.postgresql_backend',
-            'NAME': config('BANCO'),
-        'USER': config('BANCO_USER'),
-        'PASSWORD': config('BANCO_PASSWORD'),
-        'HOST': config('BANCO_HOST'),
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'homolog-db.sqlite3'),
     }
 }
 
-DATABASE_ROUTERS = (
+#DATABASE_ROUTERS = (
+#    'django_tenants.routers.TenantSyncRouter',
+# )
 
-    'django_tenants.routers.TenantSyncRouter',
- )
-
-TENANT_LIMIT_SET_CALLS = True
+#TENANT_LIMIT_SET_CALLS = True
 
 
-TENANT_MODEL = "Cliente.Cliente"
+#TENANT_MODEL = "Cliente.Cliente"
 
-TENANT_DOMAIN_MODEL = "Cliente.Domain"
+#TENANT_DOMAIN_MODEL = "Cliente.Domain"
 
-TENANT_COLOR_ADMIN_APPS = False
+#TENANT_COLOR_ADMIN_APPS = False
+
 ELASTIC_APM = {
     'SERVICE_NAME': 'Sis-Otica',
     'DEBUG': True,
