@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,Fornecedor,TipoUnitario,Produto
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -729,8 +729,12 @@ def minhas_vendas(request):
 def estoque(request):
     fornecedores = Fornecedor.objects.all()
     tipos = TipoUnitario.objects.all()
-    Produtos = Produto.objects.all()
+    Produtos = Produto.objects.all().order_by('-id')
     return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
                                                   'tipos': tipos,
                                                   'Produtos':Produtos}
                                                   )
+
+def produto_estoque(request,id):
+    produto = Produto.objects.get(pk=id)
+    return render(request,'Estoque/estoque_produto.html',{'produto':produto})

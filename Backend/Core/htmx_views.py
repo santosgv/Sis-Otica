@@ -55,7 +55,7 @@ def save_product(request):
     quantidade_minima = int(quantidade_minima),
     tipo_unitario = TipoUnitario.objects.get(id=tipo_unitario)
     )
-    #prod.save()
-    Produtos = Produto.objects.all()
+    prod.save()
+    Produtos = Produto.objects.all().order_by('-id')
     return render(request,'parcial/produto_estoque.html',{'Produtos':Produtos})
     

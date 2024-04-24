@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+
+<title>{% block 'title' %}
+Produto
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<div class="text-center">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert {{message.tags}}">
+              {{message}}
+          </div>
+      {% endfor %}
+  {% endif %}
+
+  <div class="container mt-5">
+    <h2 class="mb-4">Entrada de Produto</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="produto">Produto:</label>
+        <select class="form-control" name="produto" id="produto">
+          
+            <option value="{{ produto.id }}">{{ produto.nome }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" class="form-control" name="quantidade" id="quantidade" min="1" value="{{produto.quantidade}}">
+      </div>
+      <button type="submit" class="btn btn-primary">Realizar Entrada</button>
+    </form>
+  </div>
+
+</div>
+  
+
+
+
+</div>
+{% endblock %}

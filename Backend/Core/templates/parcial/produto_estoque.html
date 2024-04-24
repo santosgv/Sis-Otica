@@ -22,7 +22,7 @@
               <tr>
                 <th hidden id="id" name="id">{{produto.id}}</th>
                 <th scope="row">{{produto.codigo}}</th>
-                <td><a href="">{{produto.nome}}</a></td>
+                <td><a href="{% url 'Core:produto_estoque' produto.id  %}">{{produto.nome}}</a></td>
                 <td>{{produto.fornecedor}}</td>
                 <td>{{produto.preco_unitario}}</td>
                 <td>{{produto.preco_venda}}</td>

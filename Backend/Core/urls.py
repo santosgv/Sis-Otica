@@ -40,6 +40,8 @@ urlpatterns = [
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior'),
     path('estoque/',views.estoque, name='estoque'),
+    path('produto_estoque/<int:id>',views.produto_estoque, name='produto_estoque'),
+
 ]
 
 htmx_patterns =[
