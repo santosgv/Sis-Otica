@@ -1,5 +1,6 @@
-from django.shortcuts import render,HttpResponse
-from Core.models import ORDEN,CLIENTE
+from django.shortcuts import render
+from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario
+from decimal import Decimal
 
 
 
@@ -19,3 +20,42 @@ def search_cliente(request):
     search = request.GET.get('search_cliente')
     clientes = CLIENTE.objects.filter(NOME__icontains=search)
     return render(request,'parcial/cliente_parcial.html',{'clientes':clientes})
+
+
+def all_estoque(request):
+    return render(request,'parcial/produto_estoque.html')
+
+
+def save_product(request):
+    codigo = request.POST.get('Codigo')
+    importado = request.POST.get('importado')
+    nome = request.POST.get('nome')
+    fornecedor = request.POST.get('fornecedor')
+    preco_unitario = request.POST.get('preco_unitario').replace(".", "").replace(",", ".")
+    preco =Decimal(preco_unitario)
+    preco_venda = request.POST.get('preco_venda').replace(".", "").replace(",", ".")
+    venda =Decimal(preco_venda)
+    quantidade = request.POST.get('quantidade')
+    quantidade_minima = request.POST.get('quantidade_minima')
+    tipo_unitario = request.POST.get('tipo_unitario')
+
+    if request.POST.get('importado') == 'true':
+        importado =True
+    else:
+        importado =False
+
+    prod = Produto.objects.create(
+    importado = importado,
+    codigo = codigo,
+    nome = nome,
+    fornecedor =Fornecedor.objects.get(id=fornecedor),
+    preco_unitario =preco,
+    preco_venda =venda,
+    quantidade = int(quantidade),
+    quantidade_minima = int(quantidade_minima),
+    tipo_unitario = TipoUnitario.objects.get(id=tipo_unitario)
+    )
+    #prod.save()
+    Produtos = Produto.objects.all()
+    return render(request,'parcial/produto_estoque.html',{'Produtos':Produtos})
+    

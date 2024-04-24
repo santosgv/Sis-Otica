@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,Fornecedor,TipoUnitario,Produto
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -727,8 +727,10 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
-    return render(request,'Estoque/estoque.html')
-
-@login_required(login_url='/auth/logar/')
-def cadastro_estoque(request):
-    return render(request,'Estoque/cadastro_estoque.html')
+    fornecedores = Fornecedor.objects.all()
+    tipos = TipoUnitario.objects.all()
+    Produtos = Produto.objects.all()
+    return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
+                                                  'tipos': tipos,
+                                                  'Produtos':Produtos}
+                                                  )

@@ -40,12 +40,13 @@ urlpatterns = [
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior'),
     path('estoque/',views.estoque, name='estoque'),
-    path('cadastro_estoque/', views.cadastro_estoque, name='cadastro_estoque'),
 ]
 
 htmx_patterns =[
     path('search/',htmx_views.search, name='search'),
-    path('search_cliente/',htmx_views.search_cliente,name='search_cliente')
+    path('search_cliente/',htmx_views.search_cliente,name='search_cliente'),
+    path('all_estoque',htmx_views.all_estoque,name='all_estoque'),
+    path('save_product',htmx_views.save_product, name='save_product'),
 
 ]
 

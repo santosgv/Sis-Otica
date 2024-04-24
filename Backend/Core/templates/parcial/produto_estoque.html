@@ -1,0 +1,42 @@
+{% load static %}
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endblock %}
+
+{% if Produtos %}
+
+      <table id="myTable" class="table table-hover">
+          <tr class="thead">
+              <th scope="col">Codigo</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Fornecedor</th>
+              <th scope="col">Preco unitario</th>
+              <th scope="col">Preco venda</th>
+              <th scope="col">Qtd</th>
+              <th scope="col">Qtd minimo</th>
+              <th scope="col">tipo</th>
+              <th scope="col">R$</th>
+            </tr>
+          {% for produto in Produtos %}
+            <tbody>
+              <tr>
+                <th hidden id="id" name="id">{{produto.id}}</th>
+                <th scope="row">{{produto.codigo}}</th>
+                <td><a href="">{{produto.nome}}</a></td>
+                <td>{{produto.fornecedor}}</td>
+                <td>{{produto.preco_unitario}}</td>
+                <td>{{produto.preco_venda}}</td>
+                <td>{{produto.quantidade}}</td>
+                <td>{{produto.quantidade_minima}}</td>
+                <td>{{produto.tipo_unitario}}</td>
+                <td>{{produto.valor_total}}</td>
+              </tr>
+            </tbody>
+            {% endfor %}
+      </table>
+      <hr>
+    </div>
+
+{% else %}
+<span style="color: red; font-weight: bold;">Sem Produtos Cadastrados</span>
+{% endif %}
