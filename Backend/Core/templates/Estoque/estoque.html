@@ -32,7 +32,7 @@
       <form>
         {% csrf_token %}
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-2">
             <label for="inputEmail4">Codigo</label>
             <input type="text" class="form-control" id="Codigo" name="Codigo">
           </div>
@@ -40,11 +40,36 @@
             <label for="inputPassword4">Nome</label>
             <input type="text" class="form-control" id="nome" name="nome">
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-2">
             <label for="inputState">Fornecedor</label>
             <select id="fornecedor" name="fornecedor" class="form-control">
+              <option value="" disabled selected>
+              Fornecedor...
+              </option>
               {% for fornecedor in  fornecedores %}
               <option value="{{fornecedor.id}}">{{fornecedor}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputState">Tipo</label>
+            <select id="tipo" name="tipo" class="form-control">
+              <option value="" disabled selected>
+              Tipo...
+              </option>
+              {% for tipo in  tipos %}
+              <option value="{{tipo.id}}">{{tipo}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputState">Estilo</label>
+            <select id="estilo" name="estilo" class="form-control">
+              <option value="" disabled selected>
+                Estilo...
+              </option>
+              {% for estilo in  estilos %}
+              <option value="{{estilo.id}}">{{estilo}}</option>
               {% endfor %}
             </select>
           </div>
@@ -69,8 +94,8 @@
           <div class="form-group col-md-2">
             <label for="inputState">Tipo Unitario</label>
             <select id="tipo_unitario" name="tipo_unitario" class="form-control">
-              {% for tipo in  tipos %}
-              <option value="{{tipo.id}}">{{tipo}}</option>
+              {% for und in  unitarios %}
+              <option value="{{und.id}}">{{und}}</option>
               {% endfor %}
             </select>
           </div>
@@ -84,6 +109,12 @@
             <input class="form-check-input" type="checkbox" id="importado" name="importado" value="true">
             <label class="form-check-label" for="gridCheck">
               Importado
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="conferido" name="conferido" value="true">
+            <label class="form-check-label" for="gridCheck">
+              Conferido
             </label>
           </div>
         </div>

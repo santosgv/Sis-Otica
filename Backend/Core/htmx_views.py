@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario
+from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario,Tipo,Estilo
 from decimal import Decimal
 
 
@@ -29,8 +29,11 @@ def all_estoque(request):
 def save_product(request):
     codigo = request.POST.get('Codigo')
     importado = request.POST.get('importado')
+    conferido = request.POST.get('conferido')
     nome = request.POST.get('nome')
     fornecedor = request.POST.get('fornecedor')
+    tipo = request.POST.get('tipo')
+    estilo = request.POST.get('estilo')
     preco_unitario = request.POST.get('preco_unitario').replace(".", "").replace(",", ".")
     preco =Decimal(preco_unitario)
     preco_venda = request.POST.get('preco_venda').replace(".", "").replace(",", ".")
@@ -44,11 +47,19 @@ def save_product(request):
     else:
         importado =False
 
+    if request.POST.get('conferido') == 'true':
+        conferido =True
+    else:
+        conferido =False
+
     prod = Produto.objects.create(
     importado = importado,
+    conferido =conferido,
     codigo = codigo,
     nome = nome,
     fornecedor =Fornecedor.objects.get(id=fornecedor),
+    Tipo =Tipo.objects.get(id=tipo),
+    Estilo =Estilo.objects.get(id=estilo),
     preco_unitario =preco,
     preco_venda =venda,
     quantidade = int(quantidade),

@@ -16,6 +16,7 @@
               <th scope="col">Qtd minimo</th>
               <th scope="col">tipo</th>
               <th scope="col">R$</th>
+              <th scope="col">Açao</th>
             </tr>
           {% for produto in Produtos %}
             <tbody>
@@ -30,6 +31,7 @@
                 <td>{{produto.quantidade_minima}}</td>
                 <td>{{produto.tipo_unitario}}</td>
                 <td>{{produto.valor_total}}</td>
+                <td><a href="{% url 'Core:produto_estoque' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/ios-filled/50/move-by-trolley.png" alt="move-by-trolley"/></a></td>
               </tr>
             </tbody>
             {% endfor %}

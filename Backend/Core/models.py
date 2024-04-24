@@ -165,12 +165,36 @@ class TipoUnitario(models.Model):
 
     def __str__(self) -> str:
         return str(self.nome)
+    
+class Estilo(models.Model):
+    nome = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Estilo'
+        verbose_name_plural = 'Estilos'
+
+    def __str__(self) -> str:
+        return str(self.nome)
+    
+class Tipo(models.Model):
+    nome = models.CharField(max_length=50)
+
+
+    class Meta:
+        verbose_name = 'Tipo'
+        verbose_name_plural = 'Tipos'
+
+    def __str__(self) -> str:
+        return str(self.nome)
 
 class Produto(models.Model):
     importado =models.BooleanField(default=False)
+    conferido =models.BooleanField(default=False)
     codigo = models.CharField(max_length=50, unique=True)
     nome = models.CharField(max_length=100)
     fornecedor = models.ForeignKey(Fornecedor, on_delete=models.CASCADE)
+    Tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
+    Estilo = models.ForeignKey(Estilo, on_delete=models.CASCADE)
     preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     preco_venda = models.DecimalField(max_digits=10, decimal_places=2)
     quantidade = models.PositiveIntegerField()
@@ -202,6 +226,7 @@ class Produto(models.Model):
         
         # Salvar o objeto
         super().save(*args, **kwargs)
+
         
     def __str__(self) -> str:
         return str(self.nome)

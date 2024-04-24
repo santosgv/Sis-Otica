@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -739,10 +739,14 @@ def minhas_vendas(request):
 @login_required(login_url='/auth/logar/')
 def estoque(request):
     fornecedores = Fornecedor.objects.all()
-    tipos = TipoUnitario.objects.all()
+    unitarios = TipoUnitario.objects.all()
+    tipo = Tipo.objects.all()
+    estilo = Estilo.objects.all()
     Produtos = Produto.objects.all().order_by('-id')
     return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
-                                                  'tipos': tipos,
+                                                  'unitarios': unitarios,
+                                                  'tipos':tipo,
+                                                  'estilos':estilo,
                                                   'Produtos':Produtos}
                                                   )
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from Autenticacao.models import USUARIO,SALARIO,COMISSAO
-from Core.models import CLIENTE,ORDEN,CAIXA,SERVICO,EMPRESA,Fornecedor,TipoUnitario,Produto,EntradaEstoque,SaidaEstoque,MovimentoEstoque
+from Core.models import CLIENTE,ORDEN,CAIXA,SERVICO,EMPRESA,Fornecedor,TipoUnitario,Produto,EntradaEstoque,SaidaEstoque,MovimentoEstoque,Tipo,Estilo
 
 
 
@@ -20,3 +20,5 @@ admin.site.register(Produto)
 admin.site.register(EntradaEstoque)
 admin.site.register(SaidaEstoque)
 admin.site.register(MovimentoEstoque)
+admin.site.register(Estilo)
+admin.site.register(Tipo)
