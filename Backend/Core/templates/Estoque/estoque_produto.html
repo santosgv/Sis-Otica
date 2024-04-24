@@ -22,7 +22,7 @@ Produto
 
   <div class="container mt-5">
     <h2 class="mb-4">Entrada de Produto</h2>
-    <form method="post">
+    <form method="post" action="{% url 'Core:realizar_entrada' %}">
       {% csrf_token %}
       <div class="form-group">
         <label for="produto">Produto:</label>

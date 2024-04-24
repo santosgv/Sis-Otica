@@ -41,7 +41,8 @@ urlpatterns = [
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior'),
     path('estoque/',views.estoque, name='estoque'),
     path('produto_estoque/<int:id>',views.produto_estoque, name='produto_estoque'),
-
+    path('realizar_entrada/',views.realizar_entrada_view,name='realizar_entrada'),
+    path('realizar_saida/<int:produto_id><int:quantidade>',views.realizar_saida,name='realizar_saida'),
 ]
 
 htmx_patterns =[

@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -48,6 +48,14 @@ def ultimo_dia_mes():
 def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
+
+def realizar_saida(produto_id, quantidade):
+    produto = Produto.objects.get(pk=produto_id)
+    saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade)
+    produto.registrar_saida(quantidade)
+    MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
+    print('Fui chamado')
+    return saida_estoque
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
@@ -155,7 +163,10 @@ def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
-        return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos})
+        produtos = Produto.objects.all().order_by('-id')
+        return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
+                                                      'produtos':produtos,
+                                                      })
     else:
         try:
             with transaction.atomic():
@@ -735,6 +746,26 @@ def estoque(request):
                                                   'Produtos':Produtos}
                                                   )
 
+def realizar_entrada(produto_id, quantidade):
+    produto = Produto.objects.get(pk=produto_id)
+    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
+    produto.registrar_entrada(quantidade)
+    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
+    return entrada_estoque
+
+
 def produto_estoque(request,id):
     produto = Produto.objects.get(pk=id)
     return render(request,'Estoque/estoque_produto.html',{'produto':produto})
+
+def realizar_entrada_view(request):
+    if request.method == 'POST':
+        produto_id = request.POST.get('produto')
+        quantidade = int(request.POST.get('quantidade'))
+        realizar_entrada(produto_id, quantidade)
+        messages.add_message(request, constants.SUCCESS, 'Entrada Registrada com sucesso')
+        return redirect('/estoque')  
+    else:
+        messages.add_message(request, constants.ERROR, 'Nao Foi possivei Registrar a Entrada')
+        return redirect('/estoque')
+    
