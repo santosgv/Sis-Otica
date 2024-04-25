@@ -49,8 +49,8 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
-def realizar_saida(produto_id, quantidade):
-    produto = Produto.objects.get(pk=produto_id)
+def realizar_saida(codigo, quantidade):
+    produto = Produto.objects.get(codigo=codigo)
     saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade)
     produto.registrar_saida(quantidade)
     MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
@@ -764,7 +764,7 @@ def realizar_entrada(produto_id, quantidade):
 
 def produto_estoque(request,id):
     produto = Produto.objects.get(pk=id)
-    return render(request,'Estoque/estoque_produto.html',{'produto':produto})
+    return render(request,'Estoque/entrada_produto.html',{'produto':produto})
 
 def realizar_entrada_view(request):
     if request.method == 'POST':
@@ -777,3 +777,16 @@ def realizar_entrada_view(request):
         messages.add_message(request, constants.ERROR, 'Nao Foi possivei Registrar a Entrada')
         return redirect('/estoque')
     
+def editar_produto(request):
+    return render(request,'Estoque/editar_produto_estoque.html')
+
+def movimentacao(request):
+    movimento = MovimentoEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(movimento, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/movimentacao_estoque.html',{'movimentacoes':movimentacoes})

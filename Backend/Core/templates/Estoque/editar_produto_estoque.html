@@ -6,11 +6,21 @@
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 
 <title>{% block 'title' %}
- Estoque
+Editar Produto
   {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
+
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Editar Produto</li>
+  </ol>
+</nav>
+
 <div class="text-center">
   {% if messages %}
       {% for message in messages %}
@@ -20,33 +30,22 @@
       {% endfor %}
   {% endif %}
 
-  {% if user.FUNCAO == "G" %}
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: var(--bs-white);">
-      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Estoque</li>
-      <li class="breadcrumb-item"><a href="{% url 'Core:movimentacao'%}">Movimentaçao</a></li>
-    </ol>
-  </nav>
-
-  <div class="text-center">
-      <form>
+  <div class="container mt-5">
+    <h2 class="mb-4">Editar de Produto</h2>
+    <form  method="POST">
         {% csrf_token %}
         <div class="form-row">
           <div class="form-group col-md-12">
             <label for="inputEmail4">Chave NF</label>
-            <input  type="text" class="form-control" data-mask="00000000000000000000000000000000000000000000" id="chavenfe" name="chavenfe">
+            <input type="text" class="form-control" id="chavenfe" name="chavenfe">
           </div>
           <div class="form-group col-md-4">
             <label for="inputPassword4">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome">
+            <input value="{{produto.nome}}" type="text" class="form-control" id="nome" name="nome">
           </div>
           <div class="form-group col-md-4">
             <label for="inputState">Fornecedor</label>
             <select id="fornecedor" name="fornecedor" class="form-control">
-              <option value="" disabled selected>
-              Fornecedor...
-              </option>
               {% for fornecedor in  fornecedores %}
               <option value="{{fornecedor.id}}">{{fornecedor}}</option>
               {% endfor %}
@@ -55,9 +54,6 @@
           <div class="form-group col-md-2">
             <label for="inputState">Tipo</label>
             <select id="tipo" name="tipo" class="form-control">
-              <option value="" disabled selected>
-              Tipo...
-              </option>
               {% for tipo in  tipos %}
               <option value="{{tipo.id}}">{{tipo}}</option>
               {% endfor %}
@@ -66,8 +62,6 @@
           <div class="form-group col-md-2">
             <label for="inputState">Estilo</label>
             <select id="estilo" name="estilo" class="form-control">
-              <option value="" disabled selected>
-                Estilo...
               </option>
               {% for estilo in  estilos %}
               <option value="{{estilo.id}}">{{estilo}}</option>
@@ -78,19 +72,19 @@
         <div class="form-row">
           <div class="form-group col-md-2">
             <label for="inputCity">Preço unitario</label>
-            <input type="text" class="form-control" id="preco_unitario" name="preco_unitario" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true">
+            <input type="text" value="{{produto.preco_unitario}}" class="form-control" id="preco_unitario" name="preco_unitario" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true">
           </div>
           <div class="form-group col-md-2">
             <label for="inputZip">Preco venda</label>
-            <input type="text" class="form-control" id="preco_venda" name="preco_venda" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true">
+            <input type="text" value="{{produto.preco_venda}}" class="form-control" id="preco_venda" name="preco_venda" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true">
           </div>
           <div class="form-group col-md-4">
             <label for="inputZip">Quantidade</label>
-            <input type="text" class="form-control" id="quantidade" name="quantidade">
+            <input type="text" value="{{produto.quantidade}}" class="form-control" id="quantidade" name="quantidade">
           </div>
           <div class="form-group col-md-2">
             <label for="inputZip">Quantidade minima</label>
-            <input type="text" class="form-control" id="quantidade_minima" name="quantidade_minima">
+            <input type="text" value="{{produto.quantidade_minima}}" class="form-control" id="quantidade_minima" name="quantidade_minima">
           </div>
           <div class="form-group col-md-2">
             <label for="inputState">Tipo Unitario</label>
@@ -102,40 +96,33 @@
           </div>
         </div>
         <div class="form-group">
+            {% if not produto.importado %}
           <div class="form-check-inline">
-            <input class="form-check-input" type="checkbox" id="importado" name="importado" value="true">
+            <input class="form-check-input" type="checkbox" id="importado" name="importado" value="False">
             <label class="form-check-label" for="gridCheck">
-              Importado
+                Importado
             </label>
-          </div>
+        </div>
+        {% endif %}
           <div class="form-check-inline">
-            <input class="form-check-input" type="checkbox" id="conferido" name="conferido" value="true">
+            {% if not produto.conferido %}
+            <input class="form-check-input" type="checkbox" id="conferido" name="conferido" value="False">
             <label class="form-check-label" for="gridCheck">
-              Conferido
+                Conferido
             </label>
+            {% endif %}
           </div>
         </div>
         
-        <button type="submit" class="btn btn-primary"
-        hx-post="{% url 'Core:save_product' %}"
-        hx-trigget="click"
-        hx-target="#list-products"
-        >Cadastrar</button>
+        <button type="submit" class="btn btn-primary">Editar</button>
       </form>
-      <hr>
-      <div id="list-products">
-        {% include 'parcial/produto_estoque.html' %}
-      </div>
-              
-          
-
-        
-
-          {% else%}
-          <h1 class="text-center">Acesso apenas para Gerentes!</h1>
-            {% endif%}
+  </div>
 
 </div>
+  
+
+
+
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>

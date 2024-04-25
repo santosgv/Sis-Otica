@@ -119,7 +119,7 @@ def alterar_conta(request):
                                                 'username':username,
                                                 'first_name':first_name,
                                                 'cpf': cpf,
-                                                'data_nascimento':data_nascimento,
+                                              #  'data_nascimento':data_nascimento,
                                                 'email':email
                                                     })
     else:
@@ -127,11 +127,11 @@ def alterar_conta(request):
         usuario = request.user
         first_name = request.POST.get('first_name')
         cpf = request.POST.get('cpf')
-        data_nascimento = request.POST.get('data_nascimento')
+        #data_nascimento = request.POST.get('data_nascimento')
         email = request.POST.get('email')
 
 
-        if len(first_name.strip()) == 0  or len(cpf.strip()) == 0 or len(data_nascimento.strip()) == 0 or len(email.strip()) == 0:
+        if len(first_name.strip()) == 0  or len(cpf.strip()) == 0 or len(email.strip()) == 0:
             messages.add_message(request, constants.ERROR, 'Preencha todos os campos')
             return redirect('/auth/alterar_conta')
         
@@ -143,7 +143,7 @@ def alterar_conta(request):
 
         usuario = request.user
         usuario.first_name = first_name
-        usuario.DATA_NASCIMENTO = data_nascimento
+      #  usuario.DATA_NASCIMENTO = data_nascimento
         usuario.CPF = cpf
         usuario.email = email
         usuario.save()

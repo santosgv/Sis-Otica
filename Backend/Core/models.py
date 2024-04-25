@@ -190,6 +190,7 @@ class Tipo(models.Model):
 class Produto(models.Model):
     importado =models.BooleanField(default=False)
     conferido =models.BooleanField(default=False)
+    chavenfe= models.CharField(max_length=44, unique=True,null=True, blank=True)
     codigo = models.CharField(max_length=50, unique=True)
     nome = models.CharField(max_length=100)
     fornecedor = models.ForeignKey(Fornecedor, on_delete=models.CASCADE)
@@ -217,7 +218,7 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        codigo = f"NC-{self.fornecedor.nome}-{self.Tipo.nome}-{self.Estilo.nome}-{self.pk}"
+        codigo = f"NC-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
         self.codigo = codigo
         self.valor_total = self.calcular_total()
         

@@ -6,11 +6,21 @@
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 
 <title>{% block 'title' %}
-Produto
+Entrada Produto
   {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
+
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Entrada Estoque</li>
+    </ol>
+  </nav>
+
 <div class="text-center">
   {% if messages %}
       {% for message in messages %}
@@ -26,14 +36,13 @@ Produto
       {% csrf_token %}
       <div class="form-group">
         <label for="produto">Produto:</label>
-        <select class="form-control" name="produto" id="produto">
-          
-            <option value="{{ produto.id }}">{{ produto.nome }}</option>
+        <select readonly class="form-control text-center" name="produto" id="produto">
+            <option  value="{{ produto.id }}">{{ produto.nome }}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="quantidade">Quantidade:</label>
-        <input type="number" class="form-control" name="quantidade" id="quantidade" min="1" value="{{produto.quantidade}}">
+        <input type="number" class="form-control text-center" name="quantidade" id="quantidade" min="1" value="{{produto.quantidade}}">
       </div>
       <button type="submit" class="btn btn-primary">Realizar Entrada</button>
     </form>

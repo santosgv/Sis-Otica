@@ -28,6 +28,7 @@ def all_estoque(request):
 
 def save_product(request):
     codigo = request.POST.get('Codigo')
+    chavenfe = request.POST.get('chavenfe')
     importado = request.POST.get('importado')
     conferido = request.POST.get('conferido')
     nome = request.POST.get('nome')
@@ -55,6 +56,7 @@ def save_product(request):
     prod = Produto.objects.create(
     importado = importado,
     conferido =conferido,
+    chavenfe= chavenfe,
     codigo = codigo,
     nome = nome,
     fornecedor =Fornecedor.objects.get(id=fornecedor),
