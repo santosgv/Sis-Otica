@@ -54,8 +54,8 @@ def realizar_saida(produto_id, quantidade):
     saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade)
     produto.registrar_saida(quantidade)
     MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
-    print('Fui chamado')
     return saida_estoque
+
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
@@ -163,7 +163,7 @@ def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
-        produtos = Produto.objects.all().order_by('-id')
+        produtos = Produto.objects.filter(quantidade__gt=0).order_by('-id')
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
                                                       'produtos':produtos,
                                                       })
@@ -210,6 +210,11 @@ def Cadastrar_os(request,id_cliente):
                     ENTRADA =0
                 else:
                     ENTRADA = request.POST.get('ENTRADA')
+
+                if ARMACAO != None:
+                    realizar_saida(ARMACAO,1)
+                else:
+                    ARMACAO =''
                 
                 cadastrar_os = ORDEN(
                 ANEXO= ANEXO,
@@ -242,8 +247,7 @@ def Cadastrar_os(request,id_cliente):
                 QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
                 ENTRADA= ENTRADA )
 
-
-
+                
                 cadastrar_os.save()
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
@@ -383,7 +387,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
-        PDF.drawString(385,665,str('xxx'))
+        PDF.drawString(385,665,str('N/D'))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
         PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
         PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))

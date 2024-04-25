@@ -136,22 +136,26 @@ Cadastrar O.S
           </div>
             <hr>
             <div class="form-group col-md-12" id="_lentes">
-              <label for="FILIAL">Lentes</label>
+              <label>Lentes</label>
               <input  class="form-control" id="LENTES" name="LENTES" maxlength="150" >
             </div>
-            <div class="form-group col-md-12" id="_armacao" >
-              <div class="form-group col">
-              <label for="FILIAL">Armação</label>
-              <select id="ARMACAO" name="ARMACAO" class="form-control">
-                <option value="" disabled selected>
-                  <i class="fas fa-search"></i> Selecione uma opção
-                </option>
-                {% for produto in produtos %}
-                <option value="{{produto.id}}">{{produto}}</option>
-                {% endfor %}
-              </select>
-            </div>
-            </div>
+            <div class="form-group col-md-12" id="_armacao">
+              <div class="input-group">
+                  <label  class="sr-only">Armação</label>
+                  <div class="input-group-prepend">
+                      <div class="input-group-text">
+                          <i class="fas fa-search"></i>
+                      </div>
+                  </div>
+                  <select id="ARMACAO" name="ARMACAO" class="form-control">
+                      <option value="" disabled selected>Estoque ...</option>
+                      {% for produto in produtos %}
+                      <option value="{{produto.id}}" data-codigo="{{ produto.nome }}" >{{produto.codigo}} - Disponível: {{produto.quantidade}}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+          </div>
+          
             <div class="form-group" id="_observacao">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
               <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="2" maxlength="80"></textarea>

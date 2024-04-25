@@ -19,6 +19,11 @@ admin.site.register(TipoUnitario)
 admin.site.register(Produto)
 admin.site.register(EntradaEstoque)
 admin.site.register(SaidaEstoque)
-admin.site.register(MovimentoEstoque)
+
 admin.site.register(Estilo)
 admin.site.register(Tipo)
+
+
+@admin.register(MovimentoEstoque)
+class MovimentoAdmin(admin.ModelAdmin):
+    list_display = ('produto', 'tipo', 'quantidade', 'data',)

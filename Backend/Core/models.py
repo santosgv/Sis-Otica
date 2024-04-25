@@ -217,7 +217,8 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        # Calcular o total
+        codigo = f"NC-{self.fornecedor.nome}-{self.Tipo.nome}-{self.Estilo.nome}-{self.pk}"
+        self.codigo = codigo
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio
