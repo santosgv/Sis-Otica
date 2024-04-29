@@ -758,30 +758,23 @@ def estoque(request):
         Produtos = Produto.objects.all().order_by('-id')
 
         qtd = request.GET.get('qtd')
-        qtd_minimo = request.GET.get('qtd-minimo')
         fornecedor = request.GET.get('fornecedor')
         conf = request.GET.get('conf')
-        tipo = request.GET.get('tipo')
-        estilo = request.GET.get('estilo')
+        ftipo = request.GET.get('ftipo')
+        festilo = request.GET.get('festilo')
 
-        if qtd or fornecedor or conf or qtd_minimo or tipo or estilo:
+        if qtd or fornecedor or conf or ftipo or festilo:
             if qtd:
-               Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).all()
+                Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).order_by('-id')
 
             if fornecedor:
-                Produtos = Produto.objects.filter(fornecedor=fornecedor).all()
+                Produtos = Produto.objects.filter(fornecedor=fornecedor).order_by('-id')
 
-            if qtd_minimo:
-                Produtos = Produto.objects.filter(quantidade_minima=qtd_minimo).all()
-
-            if tipo:
-                Produtos = Produto.objects.filter(Tipo=tipo).all()
-            
-            if estilo:
-                Produtos = Produto.objects.filter(Estilo=estilo).all()
+            if ftipo:
+                Produtos = Produto.objects.filter(Tipo=ftipo).order_by('-id')
 
             if conf:
-                Produtos = Produto.objects.filter(conferido=conf)
+                Produtos = Produto.objects.filter(conferido=False).order_by('-id')
 
         return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
                                                     'unitarios': unitarios,
@@ -789,8 +782,7 @@ def estoque(request):
                                                     'estilos':estilo,
                                                     'Produtos':Produtos}
                                                     )
-    else:
-        return 'nada'
+
 
 @login_required(login_url='/auth/logar/')
 def produto_estoque(request,id):

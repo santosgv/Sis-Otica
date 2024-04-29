@@ -18,11 +18,8 @@
     <div class="col-md-2">
         <input type="number" class="form-control" id="qtd" name="qtd" placeholder="Qtd">
     </div>
-    <div class="col-md-2">
-      <input type="number" class="form-control" id="qtd-minimo" name="qtd-minimo" placeholder="Qtd minima">
-  </div>
     <div class="col-md">
-      <select id="tipo" name="tipo" class="form-control">
+      <select id="ftipo" name="ftipo" class="form-control">
         <option value="" disabled selected>
         Todos os Tipos
         </option>
@@ -32,7 +29,7 @@
       </select>
   </div>
   <div class="col-md">
-    <select id="estilo" name="estilo" class="form-control">
+    <select id="festilo" name="festilo" class="form-control">
       <option value="" disabled selected>
       Todos os Estilos
       </option>
@@ -84,7 +81,7 @@
                 <td>{{produto.preco_venda}}</td>
                 <td>{{produto.quantidade}}</td>
                 <td>{{produto.quantidade_minima}}</td>
-                <td>{{produto.Tipo.nome}}</td>
+                <td>{{produto.Tipo}}</td>
                 <td>{{produto.valor_total}}</td>
                 <td><a href="{% url 'Core:produto_estoque' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/ios-filled/50/move-by-trolley.png" alt="move-by-trolley"/></a></td>
               </tr>
