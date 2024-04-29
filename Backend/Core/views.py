@@ -13,7 +13,7 @@ import datetime
 from reportlab.pdfgen import canvas
 import io
 from django.utils.timezone import now
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
@@ -49,6 +49,13 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
+def realizar_entrada(produto_id, quantidade):
+    produto = Produto.objects.get(pk=produto_id)
+    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
+    produto.registrar_entrada(quantidade)
+    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
+    return entrada_estoque
+
 def realizar_saida(codigo, quantidade):
     produto = Produto.objects.get(codigo=codigo)
     saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade)
@@ -56,14 +63,12 @@ def realizar_saida(codigo, quantidade):
     MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
     return saida_estoque
 
-
 @login_required(login_url='/auth/logar/')  
 def home(request):
     if request.user.is_authenticated:
         return render(request,'home.html',)
     else:
         return render(request,'home.html')
-
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
@@ -632,9 +637,11 @@ def transacoes_mensais(request):
     # Retorna os dados como JsonResponse
     return JsonResponse({'data': dados_formatados}, safe=False)
 
+@login_required(login_url='/auth/logar/')
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
+@login_required(login_url='/auth/logar/')
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
         data_inicio = request.GET.get('data_inicio')
@@ -687,6 +694,7 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
+@login_required(login_url='/auth/logar/')
 def obter_os_em_aberto(request):    
     
     vendas = (
@@ -742,44 +750,100 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
-    fornecedores = Fornecedor.objects.all()
-    unitarios = TipoUnitario.objects.all()
-    tipo = Tipo.objects.all()
-    estilo = Estilo.objects.all()
-    Produtos = Produto.objects.all().order_by('-id')
-    return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
-                                                  'unitarios': unitarios,
-                                                  'tipos':tipo,
-                                                  'estilos':estilo,
-                                                  'Produtos':Produtos}
-                                                  )
+    if request.method == 'GET':
+        fornecedores = Fornecedor.objects.all()
+        unitarios = TipoUnitario.objects.all()
+        tipo = Tipo.objects.all()
+        estilo = Estilo.objects.all()
+        Produtos = Produto.objects.all().order_by('-id')
 
-def realizar_entrada(produto_id, quantidade):
-    produto = Produto.objects.get(pk=produto_id)
-    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
-    produto.registrar_entrada(quantidade)
-    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
-    return entrada_estoque
+        qtd = request.GET.get('qtd')
+        qtd_minimo = request.GET.get('qtd-minimo')
+        fornecedor = request.GET.get('fornecedor')
+        conf = request.GET.get('conf')
+        tipo = request.GET.get('tipo')
+        estilo = request.GET.get('estilo')
 
+        if qtd or fornecedor or conf or qtd_minimo or tipo or estilo:
+            if qtd:
+               Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).all()
 
+            if fornecedor:
+                Produtos = Produto.objects.filter(fornecedor=fornecedor).all()
+
+            if qtd_minimo:
+                Produtos = Produto.objects.filter(quantidade_minima=qtd_minimo).all()
+
+            if tipo:
+                Produtos = Produto.objects.filter(Tipo=tipo).all()
+            
+            if estilo:
+                Produtos = Produto.objects.filter(Estilo=estilo).all()
+
+            if conf:
+                Produtos = Produto.objects.filter(conferido=conf)
+
+        return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
+                                                    'unitarios': unitarios,
+                                                    'tipos':tipo,
+                                                    'estilos':estilo,
+                                                    'Produtos':Produtos}
+                                                    )
+    else:
+        return 'nada'
+
+@login_required(login_url='/auth/logar/')
 def produto_estoque(request,id):
     produto = Produto.objects.get(pk=id)
     return render(request,'Estoque/entrada_produto.html',{'produto':produto})
 
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
 def realizar_entrada_view(request):
     if request.method == 'POST':
         produto_id = request.POST.get('produto')
         quantidade = int(request.POST.get('quantidade'))
-        realizar_entrada(produto_id, quantidade)
+        realizar_entrada(produto_id=produto_id,quantidade=quantidade)
         messages.add_message(request, constants.SUCCESS, 'Entrada Registrada com sucesso')
         return redirect('/estoque')  
     else:
         messages.add_message(request, constants.ERROR, 'Nao Foi possivei Registrar a Entrada')
         return redirect('/estoque')
-    
-def editar_produto(request):
-    return render(request,'Estoque/editar_produto_estoque.html')
 
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
+def editar_produto(request, id):
+    edita_produto = Produto.objects.get(pk=id)
+    if request.method == "GET":
+        fornecedores = Fornecedor.objects.all()
+        unitarios = TipoUnitario.objects.all()
+        tipos = Tipo.objects.all()
+        estilos = Estilo.objects.all()
+        return render(request, 'Estoque/edita_estoque.html', {
+            'fornecedores': fornecedores,
+            'unitarios': unitarios,
+            'tipos': tipos,
+            'estilos': estilos,
+            'edita_produto': edita_produto
+        })
+    elif request.method == "POST":
+        edita_produto.chavenfe = request.POST.get('chavenfe')
+        edita_produto.importado = True if request.POST.get('importado') == 'true' else False
+        edita_produto.conferido = True if request.POST.get('conferido') == 'true' else False
+        edita_produto.nome = request.POST.get('nome')
+        edita_produto.fornecedor = Fornecedor.objects.get(pk=request.POST.get('fornecedor'))
+        edita_produto.Tipo = Tipo.objects.get(pk=request.POST.get('tipo'))
+        edita_produto.Estilo = Estilo.objects.get(pk=request.POST.get('estilo'))
+        edita_produto.preco_unitario = Decimal(request.POST.get('preco_unitario').replace(".", "").replace(",", "."))
+        edita_produto.preco_venda = Decimal(request.POST.get('preco_venda').replace(".", "").replace(",", "."))
+        edita_produto.quantidade = int(request.POST.get('quantidade'))
+        edita_produto.quantidade_minima = int(request.POST.get('quantidade_minima'))
+        edita_produto.tipo_unitario = TipoUnitario.objects.get(pk=request.POST.get('tipo_unitario'))
+        edita_produto.save()
+        messages.add_message(request, constants.SUCCESS, 'Produto Editado com sucesso')
+        return redirect('/estoque')
+
+@login_required(login_url='/auth/logar/')
 def movimentacao(request):
     movimento = MovimentoEstoque.objects.all().order_by('-id')
 

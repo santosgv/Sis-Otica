@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario,Tipo,Estilo
 from decimal import Decimal
-
+from .views import realizar_entrada
 
 
 def search(request):
@@ -27,7 +27,6 @@ def all_estoque(request):
 
 
 def save_product(request):
-    codigo = request.POST.get('Codigo')
     chavenfe = request.POST.get('chavenfe')
     importado = request.POST.get('importado')
     conferido = request.POST.get('conferido')
@@ -57,7 +56,6 @@ def save_product(request):
     importado = importado,
     conferido =conferido,
     chavenfe= chavenfe,
-    codigo = codigo,
     nome = nome,
     fornecedor =Fornecedor.objects.get(id=fornecedor),
     Tipo =Tipo.objects.get(id=tipo),
@@ -68,6 +66,7 @@ def save_product(request):
     quantidade_minima = int(quantidade_minima),
     tipo_unitario = TipoUnitario.objects.get(id=tipo_unitario)
     )
+    realizar_entrada(produto_id=prod.id,quantidade=int(quantidade))
     prod.save()
     Produtos = Produto.objects.all().order_by('-id')
     return render(request,'parcial/produto_estoque.html',{'Produtos':Produtos})

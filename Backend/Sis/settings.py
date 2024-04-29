@@ -100,6 +100,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'elasticapm.contrib.django.context_processors.rum_tracing',
             ],
+        'libraries':{
+            'filters':'Core.templates.filters'
+        }
         },
     },
 ]
