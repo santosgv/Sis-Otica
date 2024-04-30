@@ -42,6 +42,7 @@ urlpatterns = [
     path('estoque/',views.estoque, name='estoque'),
     path('produto_estoque/<int:id>',views.produto_estoque, name='produto_estoque'),
     path('realizar_entrada/',views.realizar_entrada_view,name='realizar_entrada'),
+    path('realizar_saida_view//<int:id>',views.realizar_saida_view , name='realizar_saida'),
     path('editar_produto/<int:id>',views.editar_produto,name='editar_produto'),
     path('movimentacao/',views.movimentacao,name='movimentacao')
 ]

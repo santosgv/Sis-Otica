@@ -56,9 +56,9 @@ def realizar_entrada(produto_id, quantidade):
     MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
     return entrada_estoque
 
-def realizar_saida(codigo, quantidade):
+def realizar_saida(codigo, quantidade,observacao):
     produto = Produto.objects.get(codigo=codigo)
-    saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade)
+    saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade,observacao=observacao)
     produto.registrar_saida(quantidade)
     MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
     return saida_estoque
@@ -217,7 +217,7 @@ def Cadastrar_os(request,id_cliente):
                     ENTRADA = request.POST.get('ENTRADA')
 
                 if ARMACAO != None:
-                    realizar_saida(ARMACAO,1)
+                    realizar_saida(ARMACAO,1,f'Venda Por OS')
                 else:
                     ARMACAO =''
                 
@@ -803,6 +803,19 @@ def realizar_entrada_view(request):
         return redirect('/estoque')  
     else:
         messages.add_message(request, constants.ERROR, 'Nao Foi possivei Registrar a Entrada')
+        return redirect('/estoque')
+    
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
+def realizar_saida_view(request,id):
+    produto = Produto.objects.get(pk=id)
+    if request.method == 'GET':
+        return render(request,'Estoque/saida_produto.html',{'produto':produto})
+    else:
+        quantidade = int(request.POST.get('quantidade'))
+        observacao = request.POST.get('produto')
+        realizar_saida(codigo=produto.codigo,quantidade=quantidade,observacao=observacao)
+        messages.add_message(request, constants.SUCCESS, 'Saida Registrada com sucesso')
         return redirect('/estoque')
 
 @transaction.atomic
