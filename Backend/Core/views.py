@@ -388,7 +388,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(560,744,'NC'+str(PRINT_OS.id))
+        PDF.drawString(325,778,'NC'+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
@@ -414,7 +414,8 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         PDF.drawString(136,423,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,423,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(555,423,'NC'+str(PRINT_OS.id))
+        PDF.drawString(325,454,'NC'+str(PRINT_OS.id))
+        PDF.drawString(450,454,str('Otica mais popular'))
         PDF.drawString(88,402,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,402,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
