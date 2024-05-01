@@ -56,12 +56,22 @@ def realizar_entrada(produto_id, quantidade):
     MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
     return entrada_estoque
 
-def realizar_saida(codigo, quantidade,observacao):
-    produto = Produto.objects.get(codigo=codigo)
-    saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade,observacao=observacao)
-    produto.registrar_saida(quantidade)
-    MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
-    return saida_estoque
+def realizar_saida(codigo, quantidade, observacao):
+    try:
+        produto = Produto.objects.get(codigo=codigo)
+        
+        registro_saida = produto.registrar_saida(quantidade)
+        
+        if registro_saida:
+            MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
+            saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade, observacao=observacao)
+            return saida_estoque
+        else:  
+            return False  
+
+    except Produto.DoesNotExist:
+        return False  # Retorna False se o produto com o código fornecido não existe
+
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
@@ -813,10 +823,13 @@ def realizar_saida_view(request,id):
         return render(request,'Estoque/saida_produto.html',{'produto':produto})
     else:
         quantidade = int(request.POST.get('quantidade'))
-        observacao = request.POST.get('produto')
-        realizar_saida(codigo=produto.codigo,quantidade=quantidade,observacao=observacao)
-        messages.add_message(request, constants.SUCCESS, 'Saida Registrada com sucesso')
-        return redirect('/estoque')
+        observacao = request.POST.get('observacao')
+        if realizar_saida(codigo=produto.codigo,quantidade=quantidade,observacao=observacao):
+            messages.add_message(request, constants.SUCCESS, 'Saida Registrada com sucesso')
+            return redirect('/estoque')
+        else:
+            messages.add_message(request, constants.ERROR, 'A quantidade de Saida e Maior que em Estoque')
+            return redirect('/estoque')
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -862,3 +875,28 @@ def movimentacao(request):
     movimentacoes = pagina.get_page(page)
 
     return render(request,'Estoque/movimentacao_estoque.html',{'movimentacoes':movimentacoes})
+
+
+@login_required(login_url='/auth/logar/')
+def entradas_estoque(request):
+    entradas = EntradaEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(entradas, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/entradas_estoque.html',{'movimentacoes':movimentacoes})
+
+@login_required(login_url='/auth/logar/')
+def saidas_estoque(request):
+    saidas = SaidaEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(saidas, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/saidas_estoque.html',{'movimentacoes':movimentacoes})

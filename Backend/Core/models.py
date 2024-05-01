@@ -211,8 +211,9 @@ class Produto(models.Model):
         if quantidade <= self.quantidade:
             self.quantidade -= quantidade
             self.save()
+            return True
         else:
-            raise ValueError("Quantidade insuficiente em estoque.")
+            return False
 
     def calcular_total(self):
         return self.quantidade * self.preco_unitario

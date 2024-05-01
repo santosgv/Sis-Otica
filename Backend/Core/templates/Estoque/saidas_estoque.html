@@ -17,23 +17,22 @@ Movimentaçao Estoque
     <ol class="breadcrumb" style="background-color: var(--bs-white);">
       <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
       <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Movimentaçao</li>
+      <li class="breadcrumb-item active" aria-current="page">Saidas Estoque</li>
     </ol>
   </nav>
 
 <div class="text-center">
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link active" href="#">Movimentacao</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'Core:entradas_estoque' %}">Entradas</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'Core:saidas_estoque' %}">Saidas</a>
-    </li>
-  </ul>
-
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'Core:movimentacao'%}">Movimentacao</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'Core:entradas_estoque' %}">Entradas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'Core:saidas_estoque' %}">Saidas</a>
+        </li>
+      </ul>
     <table class="table table-striped">
         <thead>
           <tr>
@@ -41,6 +40,7 @@ Movimentaçao Estoque
             <th scope="col">Produto</th>
             <th scope="col">Tipo</th>
             <th scope="col">Qtd</th>
+            <th scope="col">Obs</th>
             <th scope="col">Data</th>
           </tr>
         </thead>
@@ -49,13 +49,9 @@ Movimentaçao Estoque
           <tr>
             <th scope="row">{{movimento.id}}</th>
             <td>{{movimento.produto.codigo}}</td>
-            {% if movimento.tipo == 'S' %}
             <td><span class="badge badge-danger">Saida</span></td>
-            {% endif %}
-            {% if movimento.tipo == 'E' %}
-            <td><span class="badge badge-success">Entrada</span></td>
-            {% endif %}
             <td>{{movimento.quantidade}}</td>
+            <td>{{movimento.observacao}}</td>
             <td>{{movimento.data|date:"D d M Y H:i"}}</td>
           </tr>
           {% endfor %}
