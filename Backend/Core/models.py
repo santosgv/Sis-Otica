@@ -266,3 +266,11 @@ class MovimentoEstoque(models.Model):
     class Meta:
         verbose_name = 'Movimentaçao'
         verbose_name_plural = 'Movimentaçao'
+
+class AlertaEstoque(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    mensagem = models.CharField(max_length=255)
+    lido = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.mensagem

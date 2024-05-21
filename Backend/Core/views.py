@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -76,7 +76,12 @@ def realizar_saida(codigo, quantidade, observacao):
 @login_required(login_url='/auth/logar/')  
 def home(request):
     if request.user.is_authenticated:
-        return render(request,'home.html',)
+
+        alertas = AlertaEstoque.objects.filter(lido=False)
+        for alerta in alertas:
+            alerta.lido = True
+            alerta.save()
+        return render(request,'home.html',{'alertas': alertas})
     else:
         return render(request,'home.html')
 
