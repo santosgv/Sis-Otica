@@ -43,31 +43,37 @@ def save_product(request):
     tipo_unitario = request.POST.get('tipo_unitario')
 
     if request.POST.get('importado') == 'true':
-        importado =True
+        importado = True
     else:
-        importado =False
+        importado = False
 
     if request.POST.get('conferido') == 'true':
-        conferido =True
+        conferido = True
     else:
-        conferido =False
+        conferido = False
 
-    prod = Produto.objects.create(
-    importado = importado,
-    conferido =conferido,
-    chavenfe= chavenfe,
-    nome = nome,
-    fornecedor =Fornecedor.objects.get(id=fornecedor),
-    Tipo =Tipo.objects.get(id=tipo),
-    Estilo =Estilo.objects.get(id=estilo),
-    preco_unitario =preco,
-    preco_venda =venda,
-    quantidade = int(quantidade),
-    quantidade_minima = int(quantidade_minima),
-    tipo_unitario = TipoUnitario.objects.get(id=tipo_unitario)
-    )
-    realizar_entrada(produto_id=prod.id,quantidade=int(quantidade))
-    prod.save()
+    if len(chavenfe.strip()) == 0:
+        chavenfe =None
+  
+    try:
+        prod = Produto.objects.create(
+        importado = importado,
+        conferido =conferido,
+        chavenfe= chavenfe,
+        nome = nome,
+        fornecedor =Fornecedor.objects.get(id=fornecedor),
+        Tipo =Tipo.objects.get(id=tipo),
+        Estilo =Estilo.objects.get(id=estilo),
+        preco_unitario =preco,
+        preco_venda =venda,
+        quantidade = int(quantidade),
+        quantidade_minima = int(quantidade_minima),
+        tipo_unitario = TipoUnitario.objects.get(id=tipo_unitario)
+        )
+        realizar_entrada(produto_id=prod.id,quantidade=int(quantidade))
+        prod.save()
+    except Exception as Msg:
+        print(Msg)
     Produtos = Produto.objects.all().order_by('-id')
     return render(request,'parcial/produto_estoque.html',{'Produtos':Produtos})
     

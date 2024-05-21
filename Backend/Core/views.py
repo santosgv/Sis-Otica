@@ -849,6 +849,8 @@ def editar_produto(request, id):
         })
     elif request.method == "POST":
         edita_produto.chavenfe = request.POST.get('chavenfe')
+        if len(edita_produto.chavenfe.strip()) == 0:
+            edita_produto.chavenfe =None
         edita_produto.importado = True if request.POST.get('importado') == 'true' else False
         edita_produto.conferido = True if request.POST.get('conferido') == 'true' else False
         edita_produto.nome = request.POST.get('nome')
