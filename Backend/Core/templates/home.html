@@ -12,13 +12,16 @@
 
 {% block 'body'%}
 <div class="text-center">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="alert {{message.tags}}">
-              {{message}}
-          </div>
-      {% endfor %}
-  {% endif %}
+  {% if alertas %}
+  <br>
+  <div class="alert alert-warning">
+      <ul>
+          {% for alerta in alertas %}
+              <li>{{ alerta.mensagem }}</li>
+          {% endfor %}
+      </ul>
+  </div>
+{% endif %}
 </div>
 
 <div class="card" style="height: 100vh;">
@@ -28,11 +31,7 @@
         Comecar o For aqui
          
       -->
-      {% if user.is_authenticated %}
 
-
-      {% endif %}
-     
       
       </div>
     </div>

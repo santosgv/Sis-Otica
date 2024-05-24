@@ -39,10 +39,41 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'elasticapm.contrib.django',
     'Autenticacao',
-    'Core'
+    'Core',
 ]
 
+#SHARED_APPS = [
+#    'django_tenants', 
+#    'Cliente',
+ #       'django.contrib.admin',
+  #      'django.contrib.auth',
+ #       'django.contrib.contenttypes',
+ #       'django.contrib.sessions',
+ #       'django.contrib.messages',
+#        'django.contrib.staticfiles',
+#        'debug_toolbar',
+#        'Autenticacao',
+#        'Core',
+#]
+
+TENANT_APPS = [
+    # The following Django contrib apps must be in TENANT_APPS
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    # tenant-specific apps
+     'Core',
+     'Autenticacao',
+]
+#INSTALLED_APPS = list(SHARED_APPS) + [
+#    app for app in TENANT_APPS if app not in SHARED_APPS
+#]
+
 MIDDLEWARE = [
+ #   'django_tenants.middleware.main.TenantMainMiddleware',
+ #       'Sis.middleware.TenantActiveMiddleware',
     'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,6 +100,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'elasticapm.contrib.django.context_processors.rum_tracing',
             ],
+        'libraries':{
+            'filters':'Core.templates.filters'
+        }
         },
     },
 ]
@@ -84,9 +118,22 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'homolog-db.sqlite3'),
     }
 }
+
+#DATABASE_ROUTERS = (
+#    'django_tenants.routers.TenantSyncRouter',
+# )
+
+#TENANT_LIMIT_SET_CALLS = True
+
+
+#TENANT_MODEL = "Cliente.Cliente"
+
+#TENANT_DOMAIN_MODEL = "Cliente.Domain"
+
+#TENANT_COLOR_ADMIN_APPS = False
 
 ELASTIC_APM = {
     'SERVICE_NAME': 'Sis-Otica',
@@ -217,6 +264,7 @@ EMAIL_USE_TLS=True
 EMAIL_PORT =587
 EMAIL_HOST='smtp.office365.com'
 
+
 CORS_ALLOWED_ORIGINS : True
 
 CORS_ALLOW_HEADERS = [
@@ -239,3 +287,4 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+

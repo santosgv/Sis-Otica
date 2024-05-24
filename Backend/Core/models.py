@@ -125,7 +125,6 @@ class CAIXA(models.Model):
         self.FECHADO = True
         return
     
-
 class EMPRESA(models.Model):
 
     choices_codigo_de_regime_tributario= (
@@ -147,3 +146,131 @@ class EMPRESA(models.Model):
     endereco_uf=models.CharField(max_length=2)
     endereco_cep=models.IntegerField(),
     endereco_pais=models.IntegerField()
+
+
+class Fornecedor(models.Model):
+    nome = models.CharField(max_length=100)
+
+
+    def __str__(self) -> str:
+        return str(self.nome)
+
+    class Meta:
+        verbose_name = 'Fornecedores'
+        verbose_name_plural = 'Fornecedores'
+
+
+class TipoUnitario(models.Model):
+    nome = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return str(self.nome)
+    
+class Estilo(models.Model):
+    nome = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Estilo'
+        verbose_name_plural = 'Estilos'
+
+    def __str__(self) -> str:
+        return str(self.nome)
+    
+class Tipo(models.Model):
+    nome = models.CharField(max_length=50)
+
+
+    class Meta:
+        verbose_name = 'Tipo'
+        verbose_name_plural = 'Tipos'
+
+    def __str__(self) -> str:
+        return str(self.nome)
+
+class Produto(models.Model):
+    importado =models.BooleanField(default=False)
+    conferido =models.BooleanField(default=False)
+    chavenfe= models.CharField(max_length=44, unique=True,null=True, blank=True)
+    codigo = models.CharField(max_length=50, unique=True)
+    nome = models.CharField(max_length=100)
+    fornecedor = models.ForeignKey(Fornecedor, on_delete=models.CASCADE)
+    Tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
+    Estilo = models.ForeignKey(Estilo, on_delete=models.CASCADE)
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    preco_venda = models.DecimalField(max_digits=10, decimal_places=2)
+    quantidade = models.PositiveIntegerField()
+    quantidade_minima = models.PositiveIntegerField()
+    tipo_unitario = models.ForeignKey(TipoUnitario, on_delete=models.CASCADE)
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
+
+    def registrar_entrada(self, quantidade):
+        self.quantidade += quantidade
+        self.save()
+
+    def registrar_saida(self, quantidade):
+        if quantidade <= self.quantidade:
+            self.quantidade -= quantidade
+            self.save()
+            return True
+        else:
+            return False
+
+    def calcular_total(self):
+        return self.quantidade * self.preco_unitario
+    
+    def save(self, *args, **kwargs):
+        codigo = f"NC-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
+        self.codigo = codigo
+        self.valor_total = self.calcular_total()
+        
+        # Verificar se o campo valor_total está vazio
+        if self.pk is None and self.valor_total is None:
+            self.valor_total = 0
+        
+        # Salvar o objeto
+        super().save(*args, **kwargs)
+
+        
+    def __str__(self) -> str:
+        return str(self.nome)
+
+class EntradaEstoque(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantidade = models.PositiveIntegerField()
+    data = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Entrada Estoque'
+        verbose_name_plural = 'Entrada Estoque'
+
+class SaidaEstoque(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantidade = models.PositiveIntegerField()
+    observacao= models.CharField(max_length=100,null=True, blank=True)
+    data = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Saida Estoque'
+        verbose_name_plural = 'Saida Estoque'
+
+class MovimentoEstoque(models.Model):
+    TIPO_CHOICES = [
+        ('E', 'Entrada'),
+        ('S', 'Saída'),
+    ]
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=1, choices=TIPO_CHOICES)
+    quantidade = models.PositiveIntegerField()
+    data = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Movimentaçao'
+        verbose_name_plural = 'Movimentaçao'
+
+class AlertaEstoque(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    mensagem = models.CharField(max_length=255)
+    lido = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.mensagem

@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ import datetime
 from reportlab.pdfgen import canvas
 import io
 from django.utils.timezone import now
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
@@ -49,13 +49,115 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
+
+import io
+import os
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.graphics.barcode.code128 import Code128
+from django.http import FileResponse
+from PIL import Image
+from barcode import Code128
+from barcode.writer import ImageWriter
+
+def generate_barcode_image(code, volume):
+    """
+    Generates a barcode image for the given code and volume number and returns it as a PIL image.
+    """
+    barcode_value = f"{code}-{volume}"
+    barcode = Code128(barcode_value, writer=ImageWriter())
+    
+    # Generate barcode image in memory
+    output = io.BytesIO()
+    barcode.write(output, {'module_height': 10.0, 'module_width': 0.2, 'quiet_zone': 6.5, 'text_distance': 3.5, 'font_size': 10, 'background': 'white', 'foreground': 'black'})
+    output.seek(0)
+    return Image.open(output)
+
+def create_pdf(request, codigo, quantidade):
+    """
+    Creates a PDF with barcode labels for the given code and number of volumes.
+    """
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    labels_per_page = 10  # Number of labels per page
+    label_width = 70 * mm
+    label_height = 25 * mm
+    margin = 10 * mm
+    x_offset = margin
+    y_offset = height - margin - label_height
+
+    for volume in range(1, quantidade + 1):
+        barcode_image = generate_barcode_image(codigo, volume)
+        barcode_image_path = f"NCbarcode_{codigo}-{volume}.png"
+        
+        # Save the barcode image to a temporary file
+        barcode_image.save(barcode_image_path, "PNG")
+        
+        # Draw the barcode image
+        c.drawImage(barcode_image_path, x_offset, y_offset, width=label_width, height=label_height)
+        # Draw the associated text below the barcode image
+        #c.drawString(x_offset, y_offset - 8, f"NC{codigo}-{volume}")
+
+        # Move to the next label position
+        x_offset += label_width + margin
+        if x_offset + label_width > width:
+            x_offset = margin
+            y_offset -= label_height + margin
+
+        # Move to the next page if needed
+        if y_offset < margin:
+            c.showPage()
+            y_offset = height - margin - label_height
+            x_offset = margin
+
+        # Remove the barcode image file after use
+        os.remove(barcode_image_path)
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+
+    return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
+
+
+def realizar_entrada(produto_id, quantidade):
+    produto = Produto.objects.get(pk=produto_id)
+    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
+    produto.registrar_entrada(quantidade)
+    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
+    return entrada_estoque
+
+def realizar_saida(codigo, quantidade, observacao):
+    try:
+        produto = Produto.objects.get(codigo=codigo)
+        
+        registro_saida = produto.registrar_saida(quantidade)
+        
+        if registro_saida:
+            MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
+            saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade, observacao=observacao)
+            return saida_estoque
+        else:  
+            return False  
+
+    except Produto.DoesNotExist:
+        return False  # Retorna False se o produto com o código fornecido não existe
+
+
 @login_required(login_url='/auth/logar/')  
 def home(request):
     if request.user.is_authenticated:
-        return render(request,'home.html')
+
+        alertas = AlertaEstoque.objects.filter(lido=False)
+        for alerta in alertas:
+            alerta.lido = True
+            alerta.save()
+        return render(request,'home.html',{'alertas': alertas})
     else:
         return render(request,'home.html')
-
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
@@ -155,7 +257,10 @@ def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
-        return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos})
+        produtos = Produto.objects.filter(quantidade__gt=0).order_by('-id')
+        return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
+                                                      'produtos':produtos,
+                                                      })
     else:
         try:
             with transaction.atomic():
@@ -199,6 +304,11 @@ def Cadastrar_os(request,id_cliente):
                     ENTRADA =0
                 else:
                     ENTRADA = request.POST.get('ENTRADA')
+
+                if ARMACAO != None:
+                    realizar_saida(ARMACAO,1,f'Venda Por OS')
+                else:
+                    ARMACAO =''
                 
                 cadastrar_os = ORDEN(
                 ANEXO= ANEXO,
@@ -231,8 +341,7 @@ def Cadastrar_os(request,id_cliente):
                 QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
                 ENTRADA= ENTRADA )
 
-
-
+                
                 cadastrar_os.save()
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
@@ -620,9 +729,11 @@ def transacoes_mensais(request):
     # Retorna os dados como JsonResponse
     return JsonResponse({'data': dados_formatados}, safe=False)
 
+@login_required(login_url='/auth/logar/')
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
+@login_required(login_url='/auth/logar/')
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
         data_inicio = request.GET.get('data_inicio')
@@ -675,6 +786,7 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
+@login_required(login_url='/auth/logar/')
 def obter_os_em_aberto(request):    
     
     vendas = (
@@ -730,8 +842,142 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
-    return render(request,'Estoque/estoque.html')
+    if request.method == 'GET':
+        fornecedores = Fornecedor.objects.all()
+        unitarios = TipoUnitario.objects.all()
+        tipo = Tipo.objects.all()
+        estilo = Estilo.objects.all()
+        Produtos = Produto.objects.all().order_by('-id')
+
+        qtd = request.GET.get('qtd')
+        fornecedor = request.GET.get('fornecedor')
+        conf = request.GET.get('conf')
+        ftipo = request.GET.get('ftipo')
+        festilo = request.GET.get('festilo')
+
+        if qtd or fornecedor or conf or ftipo or festilo:
+            if qtd:
+                Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).order_by('-id')
+
+            if fornecedor:
+                Produtos = Produto.objects.filter(fornecedor=fornecedor).order_by('-id')
+
+            if ftipo:
+                Produtos = Produto.objects.filter(Tipo=ftipo).order_by('-id')
+
+            if conf:
+                Produtos = Produto.objects.filter(conferido=False).order_by('-id')
+
+        return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
+                                                    'unitarios': unitarios,
+                                                    'tipos':tipo,
+                                                    'estilos':estilo,
+                                                    'Produtos':Produtos}
+                                                    )
+
 
 @login_required(login_url='/auth/logar/')
-def cadastro_estoque(request):
-    return render(request,'Estoque/cadastro_estoque.html')
+def produto_estoque(request,id):
+    produto = Produto.objects.get(pk=id)
+    return render(request,'Estoque/entrada_produto.html',{'produto':produto})
+
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
+def realizar_entrada_view(request):
+    if request.method == 'POST':
+        produto_id = request.POST.get('produto')
+        quantidade = int(request.POST.get('quantidade'))
+        realizar_entrada(produto_id=produto_id,quantidade=quantidade)
+        messages.add_message(request, constants.SUCCESS, 'Entrada Registrada com sucesso')
+        return redirect('/estoque')  
+    else:
+        messages.add_message(request, constants.ERROR, 'Nao Foi possivei Registrar a Entrada')
+        return redirect('/estoque')
+    
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
+def realizar_saida_view(request,id):
+    produto = Produto.objects.get(pk=id)
+    if request.method == 'GET':
+        return render(request,'Estoque/saida_produto.html',{'produto':produto})
+    else:
+        quantidade = int(request.POST.get('quantidade'))
+        observacao = request.POST.get('observacao')
+        if realizar_saida(codigo=produto.codigo,quantidade=quantidade,observacao=observacao):
+            messages.add_message(request, constants.SUCCESS, 'Saida Registrada com sucesso')
+            return redirect('/estoque')
+        else:
+            messages.add_message(request, constants.ERROR, 'A quantidade de Saida e Maior que em Estoque')
+            return redirect('/estoque')
+
+@transaction.atomic
+@login_required(login_url='/auth/logar/')
+def editar_produto(request, id):
+    edita_produto = Produto.objects.get(pk=id)
+    if request.method == "GET":
+        fornecedores = Fornecedor.objects.all()
+        unitarios = TipoUnitario.objects.all()
+        tipos = Tipo.objects.all()
+        estilos = Estilo.objects.all()
+        return render(request, 'Estoque/edita_estoque.html', {
+            'fornecedores': fornecedores,
+            'unitarios': unitarios,
+            'tipos': tipos,
+            'estilos': estilos,
+            'edita_produto': edita_produto
+        })
+    elif request.method == "POST":
+        edita_produto.chavenfe = request.POST.get('chavenfe')
+        if len(edita_produto.chavenfe.strip()) == 0:
+            edita_produto.chavenfe =None
+        edita_produto.importado = True if request.POST.get('importado') == 'true' else False
+        edita_produto.conferido = True if request.POST.get('conferido') == 'true' else False
+        edita_produto.nome = request.POST.get('nome')
+        edita_produto.fornecedor = Fornecedor.objects.get(pk=request.POST.get('fornecedor'))
+        edita_produto.Tipo = Tipo.objects.get(pk=request.POST.get('tipo'))
+        edita_produto.Estilo = Estilo.objects.get(pk=request.POST.get('estilo'))
+        edita_produto.preco_unitario = Decimal(request.POST.get('preco_unitario').replace(".", "").replace(",", "."))
+        edita_produto.preco_venda = Decimal(request.POST.get('preco_venda').replace(".", "").replace(",", "."))
+        edita_produto.quantidade = int(request.POST.get('quantidade'))
+        edita_produto.quantidade_minima = int(request.POST.get('quantidade_minima'))
+        edita_produto.tipo_unitario = TipoUnitario.objects.get(pk=request.POST.get('tipo_unitario'))
+        edita_produto.save()
+        messages.add_message(request, constants.SUCCESS, 'Produto Editado com sucesso')
+        return redirect('/estoque')
+
+@login_required(login_url='/auth/logar/')
+def movimentacao(request):
+    movimento = MovimentoEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(movimento, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/movimentacao_estoque.html',{'movimentacoes':movimentacoes})
+
+
+@login_required(login_url='/auth/logar/')
+def entradas_estoque(request):
+    entradas = EntradaEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(entradas, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/entradas_estoque.html',{'movimentacoes':movimentacoes})
+
+@login_required(login_url='/auth/logar/')
+def saidas_estoque(request):
+    saidas = SaidaEstoque.objects.all().order_by('-id')
+
+    pagina = Paginator(saidas, 25)
+
+    page = request.GET.get('page')
+
+    movimentacoes = pagina.get_page(page)
+
+    return render(request,'Estoque/saidas_estoque.html',{'movimentacoes':movimentacoes})

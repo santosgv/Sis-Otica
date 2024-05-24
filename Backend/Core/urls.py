@@ -40,12 +40,21 @@ urlpatterns = [
     path('obter_valores_registros_meses_anteriores',views.obter_valores_registros_meses_anteriores, name='obter_valores_registros_meses_anteriores'),
     path('caixa_mes_anterior',views.caixa_mes_anterior, name='caixa_mes_anterior'),
     path('estoque/',views.estoque, name='estoque'),
-    path('cadastro_estoque/', views.cadastro_estoque, name='cadastro_estoque'),
+    path('produto_estoque/<int:id>',views.produto_estoque, name='produto_estoque'),
+    path('realizar_entrada/',views.realizar_entrada_view,name='realizar_entrada'),
+    path('realizar_saida_view/<int:id>',views.realizar_saida_view , name='realizar_saida'),
+    path('editar_produto/<int:id>',views.editar_produto,name='editar_produto'),
+    path('create_pdf/<str:codigo>/<int:quantidade>/', views.create_pdf, name='create_pdf'),
+    path('entradas_estoque/', views.entradas_estoque,name='entradas_estoque'),
+    path('saidas_estoque/', views.saidas_estoque,name='saidas_estoque'),
+    path('movimentacao/',views.movimentacao,name='movimentacao')
 ]
 
 htmx_patterns =[
     path('search/',htmx_views.search, name='search'),
-    path('search_cliente/',htmx_views.search_cliente,name='search_cliente')
+    path('search_cliente/',htmx_views.search_cliente,name='search_cliente'),
+    path('all_estoque',htmx_views.all_estoque,name='all_estoque'),
+    path('save_product',htmx_views.save_product, name='save_product'),
 
 ]
 

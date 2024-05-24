@@ -136,13 +136,30 @@ Cadastrar O.S
           </div>
             <hr>
             <div class="form-group col-md-12" id="_lentes">
-              <label for="FILIAL">Lentes</label>
+              <label>Lentes</label>
               <input  class="form-control" id="LENTES" name="LENTES" maxlength="150" >
             </div>
-            <div class="form-group col-md-12" id="_armacao" >
-              <label for="FILIAL">Armação</label>
-              <input  class="form-control" id="ARMACAO" name="ARMACAO" maxlength="150" >
-            </div>
+            <div class="form-group col-md-12" id="_armacao">
+              <div class="input-group">
+                  <label  class="sr-only">Armação</label>
+                  <div class="input-group-prepend">
+                      <div class="input-group-text">
+                          <i class="fas fa-search"></i>
+                      </div>
+                  </div>
+                  <select id="ARMACAO" name="ARMACAO" class="form-control">
+                    <option value="" disabled selected>Estoque ...</option>
+                    {% for produto in produtos %}
+                    {% if produto.quantidade > 0 %}
+                          <option value="{{ produto.codigo }}">{{ produto.codigo }} - Disponível: {{ produto.quantidade }}</option>
+                      {% endif %}
+                  {% empty %}
+                      <option value="" disabled>Sem produtos em estoque</option>
+                  {% endfor %}
+                  </select>
+              </div>
+          </div>
+          
             <div class="form-group" id="_observacao">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
               <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="2" maxlength="80"></textarea>

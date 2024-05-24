@@ -1,0 +1,98 @@
+{% load static %}
+{% block 'head' %}
+{% load filters %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endblock %}
+<form action="{% url 'Core:estoque' %}" method="get">
+  <div class="row">
+    <div class="col-md">
+      <select id="fornecedor" name="fornecedor" class="form-control">
+        <option value="" disabled selected>
+        Todos os Fornecedores
+        </option>
+        {% for fornecedor in  fornecedores %}
+        <option value="{{fornecedor.id}}">{{fornecedor}}</option>
+        {% endfor %}
+      </select>
+  </div>
+    <div class="col-md-2">
+        <input type="number" class="form-control" id="qtd" name="qtd" placeholder="Qtd">
+    </div>
+    <div class="col-md">
+      <select id="ftipo" name="ftipo" class="form-control">
+        <option value="" disabled selected>
+        Todos os Tipos
+        </option>
+        {% for tipo in  tipos %}
+        <option value="{{tipo.id}}">{{tipo}}</option>
+        {% endfor %}
+      </select>
+  </div>
+  <div class="col-md">
+    <select id="festilo" name="festilo" class="form-control">
+      <option value="" disabled selected>
+      Todos os Estilos
+      </option>
+      {% for estilo in  estilos %}
+      <option value="{{estilo.id}}">{{estilo}}</option>
+      {% endfor %}
+    </select>
+</div>
+<div class="col-md">
+  <input type="checkbox" class="form-check-input" id="conf" name="conf" value="True">
+  <label class="form-check-label" for="exampleCheck1">Conferido</label>
+</div>
+    <div class="col-md"><button type="submit"class="btn btn-primary" >Aplicar</button></div>
+    
+  </div>
+</form>
+{% if Produtos %}
+
+  <br>
+      <table id="myTable" class="table table-hover">
+          <tr class="thead">
+            <th scope="col">Conferido</th>
+              <th scope="col">Codigo</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Fornecedor</th>
+              <th scope="col">Preco unitario</th>
+              <th scope="col">Preco venda</th>
+              <th scope="col">Qtd</th>
+              <th scope="col">Qtd minimo</th>
+              <th scope="col">tipo</th>
+              <th scope="col">R$</th>
+              <th scope="col">Açao</th>
+            </tr>
+          {% for produto in Produtos %}
+
+            <tbody>
+              <tr>
+                <th hidden id="id" name="id">{{produto.id}}</th>
+                {% if produto.conferido == False %}
+                <th scope="row"><img width="20" height="20" src="https://img.icons8.com/color/48/close-window.png" alt="close-window"/></th>
+                {% endif %}
+                {% if produto.conferido == True %}
+                <th scope="row"><img width="20" height="20" src="https://img.icons8.com/emoji/48/check-mark-emoji.png" alt="check-mark-emoji"/></th>
+                {% endif %}
+                <td><a href="{% url 'Core:editar_produto' produto.pk %}">{{produto.codigo}}</a></td>
+                <td>{{produto.nome}}</td>
+                <td>{{produto.fornecedor}}</td>
+                <td>{{produto.preco_unitario}}</td>
+                <td>{{produto.preco_venda}}</td>
+                <td>{{produto.quantidade}}</td>
+                <td>{{produto.quantidade_minima}}</td>
+                <td>{{produto.Tipo}}</td>
+                <td>{{produto.valor_total}}</td>
+                <td><a href="{% url 'Core:produto_estoque' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/ios-filled/50/move-by-trolley.png" alt="move-by-trolley"/></a> <span>|</span>
+                  <a href="{% url 'Core:realizar_saida' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/material-rounded/24/empty-box.png" alt="empty-box"/></a>
+                </td>
+              </tr>
+            </tbody>
+            {% endfor %}
+      </table>
+      
+    </div>
+
+{% else %}
+<span style="color: red; font-weight: bold;">Sem Produtos Cadastrados</span>
+{% endif %}
