@@ -56,17 +56,17 @@ INSTALLED_APPS = [
 #        'Core',
 #]
 
-TENANT_APPS = [
+#TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
-    'django.contrib.contenttypes',
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'django.contrib.sessions',
-    'django.contrib.messages',
+#    'django.contrib.contenttypes',
+#    'django.contrib.auth',
+#    'django.contrib.admin',
+#    'django.contrib.sessions',
+#    'django.contrib.messages',
     # tenant-specific apps
-     'Core',
-     'Autenticacao',
-]
+#     'Core',
+#     'Autenticacao',
+#]
 #INSTALLED_APPS = list(SHARED_APPS) + [
 #    app for app in TENANT_APPS if app not in SHARED_APPS
 #]
@@ -118,7 +118,7 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'homolog-db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
