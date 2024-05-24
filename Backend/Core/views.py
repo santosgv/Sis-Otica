@@ -49,6 +49,80 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
+
+import io
+import os
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.graphics.barcode.code128 import Code128
+from django.http import FileResponse
+from PIL import Image
+from barcode import Code128
+from barcode.writer import ImageWriter
+
+def generate_barcode_image(code, volume):
+    """
+    Generates a barcode image for the given code and volume number and returns it as a PIL image.
+    """
+    barcode_value = f"{code}-{volume}"
+    barcode = Code128(barcode_value, writer=ImageWriter())
+    
+    # Generate barcode image in memory
+    output = io.BytesIO()
+    barcode.write(output, {'module_height': 10.0, 'module_width': 0.2, 'quiet_zone': 6.5, 'text_distance': 3.5, 'font_size': 10, 'background': 'white', 'foreground': 'black'})
+    output.seek(0)
+    return Image.open(output)
+
+def create_pdf(request, codigo, quantidade):
+    """
+    Creates a PDF with barcode labels for the given code and number of volumes.
+    """
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    labels_per_page = 10  # Number of labels per page
+    label_width = 70 * mm
+    label_height = 25 * mm
+    margin = 10 * mm
+    x_offset = margin
+    y_offset = height - margin - label_height
+
+    for volume in range(1, quantidade + 1):
+        barcode_image = generate_barcode_image(codigo, volume)
+        barcode_image_path = f"NCbarcode_{codigo}-{volume}.png"
+        
+        # Save the barcode image to a temporary file
+        barcode_image.save(barcode_image_path, "PNG")
+        
+        # Draw the barcode image
+        c.drawImage(barcode_image_path, x_offset, y_offset, width=label_width, height=label_height)
+        # Draw the associated text below the barcode image
+        #c.drawString(x_offset, y_offset - 8, f"NC{codigo}-{volume}")
+
+        # Move to the next label position
+        x_offset += label_width + margin
+        if x_offset + label_width > width:
+            x_offset = margin
+            y_offset -= label_height + margin
+
+        # Move to the next page if needed
+        if y_offset < margin:
+            c.showPage()
+            y_offset = height - margin - label_height
+            x_offset = margin
+
+        # Remove the barcode image file after use
+        os.remove(barcode_image_path)
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+
+    return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
+
+
 def realizar_entrada(produto_id, quantidade):
     produto = Produto.objects.get(pk=produto_id)
     entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)

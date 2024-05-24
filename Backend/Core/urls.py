@@ -44,6 +44,7 @@ urlpatterns = [
     path('realizar_entrada/',views.realizar_entrada_view,name='realizar_entrada'),
     path('realizar_saida_view/<int:id>',views.realizar_saida_view , name='realizar_saida'),
     path('editar_produto/<int:id>',views.editar_produto,name='editar_produto'),
+    path('create_pdf/<str:codigo>/<int:quantidade>/', views.create_pdf, name='create_pdf'),
     path('entradas_estoque/', views.entradas_estoque,name='entradas_estoque'),
     path('saidas_estoque/', views.saidas_estoque,name='saidas_estoque'),
     path('movimentacao/',views.movimentacao,name='movimentacao')

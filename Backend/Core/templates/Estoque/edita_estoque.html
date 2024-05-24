@@ -110,6 +110,7 @@ Entrada Produto
           {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Editar</button>
+        <a class="btn btn-success" href="{% url 'Core:create_pdf' edita_produto.codigo edita_produto.quantidade %}">Imprimir Etiquetas</a>
       </form>
   </div>
 
