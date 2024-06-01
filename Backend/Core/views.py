@@ -27,6 +27,7 @@ import logging
 from calendar import monthrange
 from calendar import month_name
 from django.db import transaction
+from django.core.cache import cache
 
 logger = logging.getLogger('MyApp')
 
@@ -48,6 +49,28 @@ def ultimo_dia_mes():
 def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
+
+def get_aniversariantes_mes():
+    cached_aniversariantes = cache.get('all_aniversariantes_mes')
+    if cached_aniversariantes is None:
+        aniversariantes = CLIENTE.objects.filter(
+            DATA_NASCIMENTO__gte=primeiro_dia_mes(),
+            DATA_NASCIMENTO__lte=ultimo_dia_mes()
+        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('id')
+
+        cached_aniversariantes = [
+            {
+                'id': cliente.id,
+                'NOME': cliente.NOME,
+                'TELEFONE': cliente.TELEFONE,
+                'DATA_NASCIMENTO': cliente.DATA_NASCIMENTO,
+                'EMAIL': cliente.EMAIL
+            }
+            for cliente in aniversariantes
+        ]
+        
+        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=1800)
+    return cached_aniversariantes
 
 
 import io
@@ -150,12 +173,12 @@ def realizar_saida(codigo, quantidade, observacao):
 @login_required(login_url='/auth/logar/')  
 def home(request):
     if request.user.is_authenticated:
-
+        aniversariantes = get_aniversariantes_mes()
         alertas = AlertaEstoque.objects.filter(lido=False)
         for alerta in alertas:
             alerta.lido = True
             alerta.save()
-        return render(request,'home.html',{'alertas': alertas})
+        return render(request,'home.html',{'alertas': alertas,'aniversariantes':aniversariantes})
     else:
         return render(request,'home.html')
 

@@ -25,16 +25,23 @@
 </div>
 
 <div class="card" style="height: 100vh;">
-  <div class="card-body">
+  <div class="card-body text-center">
     <div class="row centralizar">
-      <!--
-        Comecar o For aqui
-         
-      -->
-
-      
+      {% for cliente in aniversariantes %}
+      <div class="card border-primary mb-3" style="max-width: 18rem;">
+        <div class="card-header">Aniversariante do Mes {{cliente.DATA_NASCIMENTO}}</div>
+        <div class="card-body text-primary">
+          <h5 class="card-title">{{cliente.NOME}}</h5>
+          <p class="card-text">Email: {{cliente.EMAIL}}</p>
+          <p class="card-text">Telefone: {{cliente.TELEFONE}}</p>
+        </div>
       </div>
-    </div>
+      <br>
+      {% endfor %}
+
+</div>
+
+
     <div class="pagination">
       <samp class="step-links">
             {% if clientes.has_previous %}
