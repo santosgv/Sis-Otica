@@ -56,7 +56,7 @@ def get_aniversariantes_mes():
         aniversariantes = CLIENTE.objects.filter(
             DATA_NASCIMENTO__gte=primeiro_dia_mes(),
             DATA_NASCIMENTO__lte=ultimo_dia_mes()
-        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('id')
+        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('DATA_NASCIMENTO')
 
         cached_aniversariantes = [
             {
