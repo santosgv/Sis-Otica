@@ -9,8 +9,8 @@ def main():
     #Faker.seed(1)
     clientes = CLIENTE.objects.all()
     dbservicoes = SERVICO.objects.all()
-    start_date = date(2024, 1, 1)
-    end_date = date(2024, 12, 31)
+    start_date = date(1990,6,1)
+    end_date = date(2024, 6, 29)
     for _ in range(50):
        pessoa=CLIENTE.objects.create(
            NOME=fake.name(),

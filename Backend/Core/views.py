@@ -10,6 +10,7 @@ from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 import datetime
+
 from reportlab.pdfgen import canvas
 import io
 from django.utils.timezone import now
@@ -18,8 +19,9 @@ from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now,timedelta
+from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value
-from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
+from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
 from django.http import JsonResponse
 from django.core.serializers import serialize
 from decimal import Decimal
@@ -53,10 +55,16 @@ def thirty_days_ago():
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
-        aniversariantes = CLIENTE.objects.filter(
-            DATA_NASCIMENTO__gte=primeiro_dia_mes(),
-            DATA_NASCIMENTO__lte=ultimo_dia_mes()
-        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('DATA_NASCIMENTO')
+        today = timezone.now()
+        current_month = today.month
+
+        # Filtrando aniversariantes do mês corrente
+        aniversariantes = CLIENTE.objects.annotate(
+            birth_month=ExtractMonth('DATA_NASCIMENTO'),
+            birth_day=ExtractDay('DATA_NASCIMENTO')
+        ).filter(
+            birth_month=current_month
+        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('birth_day')
 
         cached_aniversariantes = [
             {
