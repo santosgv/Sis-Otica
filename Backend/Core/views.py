@@ -674,7 +674,7 @@ def vendas_ultimos_12_meses(request):
         ORDEN.objects
         .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
         .values('mes_venda')
-        .annotate(total_vendas=Count('id'))
+        .annotate(total_vendas=Sum('VALOR'))
         .filter(DATA_SOLICITACAO__gte=data_limite).exclude(STATUS='C')
         .order_by('mes_venda')
     )
