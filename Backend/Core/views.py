@@ -20,7 +20,7 @@ from Autenticacao.urls import views
 from django.conf import settings
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
-from django.db.models import Sum,Count,IntegerField,Case, When,Value
+from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
 from django.http import JsonResponse
 from django.core.serializers import serialize
@@ -846,11 +846,20 @@ def relatorios(request):
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
-    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
-        .values('VENDEDOR__first_name') \
-        .annotate(total_pedidos=Count('id')) \
-        .annotate(total_valor_vendas=Sum('VALOR')) \
-        .order_by('-total_pedidos')[:1]
+    vendedor = ORDEN.objects.filter(
+        DATA_SOLICITACAO__gte=primeiro_dia_mes(),
+        DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+        VENDEDOR=USUARIO.objects.get(id=id_user.id)
+    ).exclude(STATUS='C') \
+    .values('VENDEDOR__first_name') \
+    .annotate(total_pedidos=Count('id')) \
+    .annotate(total_valor_vendas=Sum('VALOR')) \
+    .annotate(ticket_medio=ExpressionWrapper(
+        F('total_valor_vendas') / F('total_pedidos'),
+        output_field=DecimalField(max_digits=10, decimal_places=2)
+    )) \
+    .order_by('-total_pedidos')[:1]
+
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
 @login_required(login_url='/auth/logar/')

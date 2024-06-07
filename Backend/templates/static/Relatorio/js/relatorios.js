@@ -156,18 +156,21 @@ function renderiza_minhas_vendas(url) {
     .then(data => {
       const vendedores = data.minhas_vendas_mes;
       const vendedorContainer = document.getElementById('eu');
+      const pm = document.getElementById('pm');
 
       vendedores.forEach(vendedor => {
         const vendedorNome = vendedor['VENDEDOR__first_name'];
         const totalPedidos = vendedor['total_pedidos'];
         const totalVendas = vendedor['total_valor_vendas'];
+        const ticketmedio = vendedor['ticket_medio'];
 
         // Crie um elemento HTML para cada vendedor
         const vendedorElement = document.createElement('div');
         vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas} em Vendas`;
-
+        pm.innerHTML=`Preço Medio: R$${ticketmedio}`;
         // Adicione o elemento à div de vendedores
         vendedorContainer.appendChild(vendedorElement);
+        pm.appendChild(ticketmedio);
       });
     })
     .catch(error => {
