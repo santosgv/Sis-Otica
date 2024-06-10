@@ -248,7 +248,7 @@ Vizualiar O.S
           </div>
         </div>
         </div>
-        {% if user.FUNCAO == "G" %}
+        {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
         {% if VISUALIZAR_OS.STATUS == "A" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
         {% endif %}
