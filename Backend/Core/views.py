@@ -70,13 +70,14 @@ def get_aniversariantes_mes():
             {
                 'id': cliente.id,
                 'NOME': cliente.NOME,
-                'TELEFONE': cliente.TELEFONE,
+                'TELEFONE': cliente.TELEFONE.replace("(","").replace(")","").replace("-",""),
                 'DATA_NASCIMENTO': cliente.DATA_NASCIMENTO,
                 'EMAIL': cliente.EMAIL
             }
             for cliente in aniversariantes
         ]
         
+
         cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=1800)
     return cached_aniversariantes
 
