@@ -10,7 +10,7 @@ from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 import datetime
-
+from urllib.parse import quote
 from reportlab.pdfgen import canvas
 import io
 from django.utils.timezone import now
@@ -52,6 +52,20 @@ def thirty_days_ago():
     data = get_today_data() - datetime.timedelta(days=30)
     return data
 
+
+def criar_mensagem_parabens(cliente):
+    nome_cliente = cliente
+    mensagem = (
+        f"*Parabéns pelo seu aniversário,{nome_cliente}!*\n\n"
+        f"A *Otica mais popular* deseja a você um dia repleto de alegria, amor e saúde. E para tornar essa data ainda mais especial, preparamos um presente para você!\n\n"
+        f"Você ganhou um *vale-presente de R$50,00* para ser usado em compras acima de R$300,00 na nossa ótica. E o melhor de tudo: esse vale é seu, mas se preferir, você pode dar de presente para alguém especial também!\n\n"
+        f"Esperamos que aproveite esse mimo e continue contando com a gente para ver o mundo com mais clareza e estilo.\n\n"
+        f"Com carinho,"
+        f"*Otica mais popular*"
+    )
+    return quote(mensagem)
+
+
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
@@ -72,7 +86,8 @@ def get_aniversariantes_mes():
                 'NOME': cliente.NOME,
                 'TELEFONE': cliente.TELEFONE.replace("(","").replace(")","").replace("-",""),
                 'DATA_NASCIMENTO': cliente.DATA_NASCIMENTO,
-                'EMAIL': cliente.EMAIL
+                'EMAIL': cliente.EMAIL,
+                'MENSAGEM_ANIVERSARIO':criar_mensagem_parabens(cliente.NOME),
             }
             for cliente in aniversariantes
         ]
