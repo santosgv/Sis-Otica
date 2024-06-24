@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum
 from Autenticacao.models import USUARIO
 from django.utils.timezone import now
-
+from django.conf import settings
 
 
 
@@ -219,7 +219,7 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        codigo = f"NC-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
+        codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
         self.codigo = codigo
         self.valor_total = self.calcular_total()
         

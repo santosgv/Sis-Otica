@@ -20,6 +20,7 @@ from Autenticacao.urls import views
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -34,6 +35,7 @@ from django.db import transaction
 from django.core.cache import cache
 
 logger = logging.getLogger('MyApp')
+
 
 
 def get_today_data():
@@ -156,7 +158,7 @@ def create_pdf(request, codigo, quantidade):
 
     for volume in range(1, quantidade + 1):
         barcode_image = generate_barcode_image(codigo, volume)
-        barcode_image_path = f"NCbarcode_{codigo}-{volume}.png"
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
         
         # Save the barcode image to a temporary file
         barcode_image.save(barcode_image_path, "PNG")
@@ -314,7 +316,7 @@ def Lista_Os(request):
 
         Ordem_servicos = pagina.get_page(page)
 
-        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -423,6 +425,7 @@ def Visualizar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
        
         return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                       'unidade':settings.UNIDADE
                                                    })
     else:
         return render(request,'Os/Visualizar_os.htmll')
@@ -434,6 +437,7 @@ def Editar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
         
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                  'unidade':settings.UNIDADE
                                                    })
     else:
         with transaction.atomic():
@@ -542,7 +546,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(325,778,'NC'+str(PRINT_OS.id))
+        PDF.drawString(325,778,str(settings.UNIDADE)+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
@@ -568,7 +572,7 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         # parte laboratorio
         PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(325,454,'NC'+str(PRINT_OS.id))
+        PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
         PDF.drawString(450,454,str('Otica mais popular'))
         PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
@@ -600,7 +604,7 @@ def Imprimir_os(request,id_os):
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f'OS-NC{PRINT_OS.id}.pdf')
+        return FileResponse(buffer, as_attachment=True, filename=f'OS-{settings.UNIDADE}{PRINT_OS.id}.pdf')
     except Exception as msg:
         print(msg)
         logger.warning(msg)
@@ -612,7 +616,9 @@ def Dashabord(request):
     pagina = Paginator(Lista_os, 10)
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
-    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
+    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
+                                                      'unidade':settings.UNIDADE
+                                                      })
 
 
 def dados_caixa():
