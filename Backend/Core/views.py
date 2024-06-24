@@ -17,6 +17,8 @@ from django.utils.timezone import now
 from django.http import FileResponse, HttpResponse
 from reportlab.lib.pagesizes import letter
 from Autenticacao.urls import views
+import json
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
@@ -65,14 +67,13 @@ def criar_mensagem_parabens(cliente):
     )
     return quote(mensagem)
 
-
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
         today = timezone.now()
         current_month = today.month
 
-        # Filtrando aniversariantes do mês corrente
+
         aniversariantes = CLIENTE.objects.annotate(
             birth_month=ExtractMonth('DATA_NASCIMENTO'),
             birth_day=ExtractDay('DATA_NASCIMENTO')
@@ -93,8 +94,25 @@ def get_aniversariantes_mes():
         ]
         
 
-        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=1800)
+        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=129600)
     return cached_aniversariantes
+
+@csrf_exempt
+def fechar_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cliente_id = data.get('cliente_id')
+
+        # Atualizar o cache removendo o cliente da lista de aniversariantes
+        cached_aniversariantes = cache.get('all_aniversariantes_mes', [])
+        updated_aniversariantes = [cliente for cliente in cached_aniversariantes if cliente['id'] != cliente_id]
+        
+        # Atualizar o cache com a nova lista de aniversariantes
+        cache.set('all_aniversariantes_mes', updated_aniversariantes, timeout=129600)  # 30 dias = 2592000 segundos
+        
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'fail'}, status=400)
 
 
 import io
@@ -622,6 +640,8 @@ def Caixa(request):
             pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)
+            for i in dados:
+                print(i)
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
                                                       'saida':saida,
@@ -633,17 +653,12 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    hora = datetime.datetime.now()
-    if hora.hour >= 20:
-        caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
-        for dado in caixa:
-            dado.fechar_caixa()
-            dado.save()
+    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    for dado in caixa:
+        dado.fechar_caixa()
+        dado.save()
         messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
-        return redirect('/Caixa')
-    else:
-        messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
-        return redirect('/Caixa')
+    return redirect('/Caixa')
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')

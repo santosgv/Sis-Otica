@@ -11,6 +11,7 @@ app_name = 'Core'
 urlpatterns = [
     path('', views.home, name='home'),
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
+    path('fechar_card/', views.fechar_card, name='fechar_card'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
     path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
