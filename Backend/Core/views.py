@@ -620,7 +620,7 @@ def dados_caixa():
     return dado
 
 @login_required(login_url='/auth/logar/')
-def get_entrada_saida():
+def get_entrada_saida(self):
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saldo = round(entradas - saidas,2)
@@ -636,18 +636,17 @@ def Caixa(request):
     if request.method == "GET":
         try:
             dadoscaixa = dados_caixa()
-            entradas,saida,saldo,saldo_total= get_entrada_saida()
+            entradas,saida,saldo,saldo_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)
-            for i in dados:
-                print(i)
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
                                                       'saida':saida,
                                                       'saldo':saldo,
                                                       'saldo_total':saldo_total})
         except Exception as msg:
+            print(msg)
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
@@ -657,7 +656,8 @@ def fechar_caixa(request):
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()
-        messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+        
+    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
 
 @transaction.atomic

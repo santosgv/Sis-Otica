@@ -128,9 +128,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 SESSION_FILE_PATH = os.path.join(BASE_DIR,'tmp/')
 
 
-#DATABASE_ROUTERS = (
-#    'django_tenants.routers.TenantSyncRouter',
-# )
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+ )
 
 #TENANT_LIMIT_SET_CALLS = True
 
