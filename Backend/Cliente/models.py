@@ -18,7 +18,8 @@ class Cliente(TenantMixin):
     is_active = models.BooleanField(default=False, blank=True)
     created_on = models.DateField(auto_now_add=True)
 
-
+    # default true, schema will be automatically created and
+    # synced when it is saved
     auto_create_schema = True
 
     """

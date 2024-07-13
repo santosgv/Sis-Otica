@@ -31,5 +31,5 @@ def created_user_client(sender, **kwargs):
         '''
         from_email = config('EMAIL_HOST_USER')
         recipient_list = ['santosgomesv@gmail.com',client.email]
-        #send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
         return 'Super Usuario Criado'
