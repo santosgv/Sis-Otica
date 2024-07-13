@@ -17,6 +17,9 @@ cd Sis-Otica
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser --username="admin" --email=""
+python manage.py makemigrations
+python manage.py makemigrations Cliente
+python manage.py migrate_schemas
+python manage.py createsuperuser #cria o superusuario
+python manage.py create_tenant_superuser #cria o superusuario do tennant
 python manage.py runserver
