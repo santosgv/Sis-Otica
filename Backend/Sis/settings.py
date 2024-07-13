@@ -42,38 +42,38 @@ INSTALLED_APPS = [
     'Core',
 ]
 
-#SHARED_APPS = [
-#    'django_tenants', 
-#    'Cliente',
- #       'django.contrib.admin',
-  #      'django.contrib.auth',
- #       'django.contrib.contenttypes',
- #       'django.contrib.sessions',
- #       'django.contrib.messages',
-#        'django.contrib.staticfiles',
-#        'debug_toolbar',
-#        'Autenticacao',
-#        'Core',
-#]
+SHARED_APPS = [
+    'django_tenants', 
+    'Cliente',
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'debug_toolbar',
+        'Autenticacao',
+        'Core',
+]
 
-#TENANT_APPS = [
+TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
-#    'django.contrib.contenttypes',
-#    'django.contrib.auth',
-#    'django.contrib.admin',
-#    'django.contrib.sessions',
-#    'django.contrib.messages',
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     # tenant-specific apps
-#     'Core',
-#     'Autenticacao',
-#]
-#INSTALLED_APPS = list(SHARED_APPS) + [
-#    app for app in TENANT_APPS if app not in SHARED_APPS
-#]
+     'Core',
+     'Autenticacao',
+]
+INSTALLED_APPS = list(SHARED_APPS) + [
+    app for app in TENANT_APPS if app not in SHARED_APPS
+]
 
 MIDDLEWARE = [
- #   'django_tenants.middleware.main.TenantMainMiddleware',
- #       'Sis.middleware.TenantActiveMiddleware',
+    'django_tenants.middleware.main.TenantMainMiddleware',
+        'Sis.middleware.TenantActiveMiddleware',
     'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -115,31 +115,43 @@ WSGI_APPLICATION = 'Sis.wsgi.application'
 
 AUTH_USER_MODEL= "Autenticacao.USUARIO"
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+       'ENGINE': 'django_tenants.postgresql_backend',
+            'NAME': config('BANCO'),
+        'USER': config('BANCO_USER'),
+        'PASSWORD': config('BANCO_PASSWORD'),
+        'HOST': config('BANCO_HOST'),
+        'PORT': '5432',
     }
 }
 
 SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_FILE_PATH = os.path.join(BASE_DIR,'tmp/')
+#SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+#SESSION_FILE_PATH = os.path.join(BASE_DIR,'tmp/')
 
 
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
  )
 
-#TENANT_LIMIT_SET_CALLS = True
+TENANT_LIMIT_SET_CALLS = True
 
 
-#TENANT_MODEL = "Cliente.Cliente"
+TENANT_MODEL = "Cliente.Cliente"
 
-#TENANT_DOMAIN_MODEL = "Cliente.Domain"
+TENANT_DOMAIN_MODEL = "Cliente.Domain"
 
-#TENANT_COLOR_ADMIN_APPS = False
+TENANT_COLOR_ADMIN_APPS = False
 
 ELASTIC_APM = {
     'SERVICE_NAME': 'Sis-Otica',
