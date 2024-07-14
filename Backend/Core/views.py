@@ -149,6 +149,7 @@ def realizar_saida(codigo, quantidade, observacao):
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
+    
     if request.user.is_authenticated:
 
         alertas = AlertaEstoque.objects.filter(lido=False)
@@ -555,7 +556,7 @@ def dados_caixa():
     return dado
 
 @login_required(login_url='/auth/logar/')
-def get_entrada_saida():
+def get_entrada_saida(self):
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saldo = round(entradas - saidas,2)
@@ -571,7 +572,7 @@ def Caixa(request):
     if request.method == "GET":
         try:
             dadoscaixa = dados_caixa()
-            entradas,saida,saldo,saldo_total= get_entrada_saida()
+            entradas,saida,saldo,saldo_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)

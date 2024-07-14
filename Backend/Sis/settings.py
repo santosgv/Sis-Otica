@@ -153,14 +153,16 @@ TENANT_DOMAIN_MODEL = "Cliente.Domain"
 
 TENANT_COLOR_ADMIN_APPS = False
 
+
+
 ELASTIC_APM = {
-    'SERVICE_NAME': 'Sis-Otica',
-    'DEBUG': True,
+    'SERVICE_NAME': 'Sis-Otica',  # Nome do seu serviço
+    'SECRET_TOKEN': 'qweqW',               # Token secreto, se configurado
     'SERVER_URL': 'http://localhost:8200',
-    'ENVIRONMENT': 'production'
-    }
-
-
+    'ENVIRONMENT': 'production',      # Ambiente (ex: production, development)
+    'DEBUG': True,                    # Ativa o modo de depuração
+    'TRANSACTIONS_IGNORE_PATTERNS': ['^/health$', '^/metrics$'],  # Ignore rotas específicas
+}
 
 LOGGING = {
     'version': 1,

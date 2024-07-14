@@ -7,13 +7,16 @@ metricbeat.modules:
   - module: elasticsearch
     metricsets: ["node", "node_stats", "cluster_stats", "index"]
     period: 10s
-    hosts: ["elasticsearch:9200"]
+    hosts: ["http://elasticsearch:9200"]
 
 output.elasticsearch:
-  hosts: ["elasticsearch:9200"]
+  hosts: ["http://elasticsearch:9200"]
+  protocol: "http"
+  username: "elastic"
+  password: "changeme"
 
 setup.kibana:
-  host: "kibana:5601"
+  host: "http://kibana:5601"
   
 setup.dashboards.enabled: true
 
