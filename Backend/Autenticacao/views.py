@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from .models import USUARIO, Ativacao,Colaborador,Desconto,Comissao
+from .models import USUARIO, Ativacao,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
 from datetime import date
@@ -17,7 +17,6 @@ import logging
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Colaborador, Desconto, Comissao
 from .forms import ColaboradorForm, DescontoForm, ComissaoForm
 
 logger = logging.getLogger('MyApp')
@@ -164,63 +163,96 @@ def sair(request):
 
 @login_required(login_url='/auth/logar/')
 def listar_folha_pagamento(request):
-    mes_atual = date.today().month
-    ano_atual = date.today().year
-    colaboradores = Colaborador.objects.all()
-    folha_pagamento = []
+    if request.user.FUNCAO == 'G':
+        mes_atual = date.today().month
+        ano_atual = date.today().year
+        colaboradores = USUARIO.objects.all()
+        folha_pagamento = []
+        total_descontos=0
+        total_comissao=0
 
-    for colaborador in colaboradores:
-        salario_bruto = colaborador.salario_bruto
-
-
-        descontos = Desconto.objects.filter(colaborador=colaborador)
-        total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
-
-        comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
-        total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
-
-        salario_liquido = salario_bruto - total_descontos + total_comissao
-
-        folha_pagamento.append({
-            'colaborador': colaborador,
-            'salario_bruto': salario_bruto,
-            'total_descontos': total_descontos,
-            'total_comissao': total_comissao,
-            'salario_liquido': salario_liquido,
-            'comissoes': comissoes,
-            'descontos': descontos,
-        })
+        for colaborador in colaboradores:
+            salario_bruto = colaborador.salario_bruto
 
 
-    return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
-                                                         'mes_atual':mes_atual,
-                                                           'ano_atual':ano_atual})
+            descontos = Desconto.objects.filter(colaborador=colaborador)
+            total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
+
+            comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
+            total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+
+            salario_liquido = salario_bruto - total_descontos + total_comissao
+
+            folha_pagamento.append({
+                'colaborador': colaborador,
+                'salario_bruto': salario_bruto,
+                'total_descontos': total_descontos,
+                'total_comissao': total_comissao,
+                'salario_liquido': salario_liquido,
+                'comissoes': comissoes,
+                'descontos': descontos,
+            })
+
+
+
+        return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
+                                                                                'total_descontos':total_descontos,
+                                                                                'total_comissao':total_comissao,
+                                                                                'mes_atual':mes_atual,
+                                                                                'ano_atual':ano_atual})
+    else:
+        mes_atual = date.today().month
+        ano_atual = date.today().year
+        colaboradores = USUARIO.objects.filter(pk=request.user.pk)
+        folha_pagamento = []
+        total_descontos=0
+        total_comissao=0
+
+
+        for colaborador in colaboradores:
+            salario_bruto = colaborador.salario_bruto
+
+
+            descontos = Desconto.objects.filter(colaborador=colaborador)
+            total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
+
+            comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
+            total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+
+            salario_liquido = salario_bruto - total_descontos + total_comissao
+
+            folha_pagamento.append({
+                'colaborador': colaborador,
+                'salario_bruto': salario_bruto,
+                'total_descontos': total_descontos,
+                'total_comissao': total_comissao,
+                'salario_liquido': salario_liquido,
+                'comissoes': comissoes,
+                'descontos': descontos,
+            })
+
+        return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
+                                                                                'total_descontos':total_descontos,
+                                                                                'total_comissao':total_comissao,
+                                                                                'mes_atual':mes_atual,
+                                                                                'ano_atual':ano_atual})
 
 
 class ColaboradorListView(ListView):
-    model = Colaborador
+    model = USUARIO
     template_name = 'controle_pagamento/colaborador_list.html'
 
 class ColaboradorDetailView(DetailView):
-    model = Colaborador
+    model = USUARIO
     template_name = 'controle_pagamento/colaborador_detail.html'
 
-class ColaboradorCreateView(CreateView):
-    model = Colaborador
-    form_class = ColaboradorForm
-    template_name = 'controle_pagamento/colaborador_form.html'
-    success_url = reverse_lazy('colaborador_list')
 
 class ColaboradorUpdateView(UpdateView):
-    model = Colaborador
+    model = USUARIO
     form_class = ColaboradorForm
     template_name = 'controle_pagamento/colaborador_form.html'
     success_url = reverse_lazy('colaborador_list')
 
-class ColaboradorDeleteView(DeleteView):
-    model = Colaborador
-    template_name = 'controle_pagamento/colaborador_confirm_delete.html'
-    success_url = reverse_lazy('colaborador_list')
 
 class DescontoListView(ListView):
     model = Desconto

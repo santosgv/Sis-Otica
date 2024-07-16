@@ -1,5 +1,5 @@
 from django import forms
-from .models import Fornecedor, TipoUnitario, Estilo,Tipo
+from .models import Fornecedor, TipoUnitario, Estilo,Tipo,SERVICO
 
 class FornecedorForm(forms.ModelForm):
     class Meta:
@@ -20,3 +20,8 @@ class TipoForm(forms.ModelForm):
     class Meta:
         model = Tipo
         fields = ['nome']
+
+class ServicoForm(forms.ModelForm):
+    class Meta:
+        model = SERVICO
+        fields = ['SERVICO']

@@ -35,7 +35,7 @@ from django.core.cache import cache
 
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
 
 logger = logging.getLogger('MyApp')
 
@@ -1087,3 +1087,14 @@ class FornecedorDeleteView(DeleteView):
     model = Fornecedor
     template_name = 'Estoque/fornecedor_confirm_delete.html'
     success_url = reverse_lazy('Core:fornecedor_list')
+
+
+class ServicoListView(ListView):
+    model = SERVICO
+    template_name = 'Os/os_list.html'
+
+class ServicoCreateView(CreateView):
+    model = SERVICO
+    form_class = ServicoForm
+    template_name = 'Os/os_form.html'
+    success_url = reverse_lazy('Core:os_list')

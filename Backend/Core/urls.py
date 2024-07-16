@@ -7,7 +7,7 @@ from Core import views
 from django.contrib.auth import views as auth_views
 
 from .views import (
-    FornecedorListView,FornecedorDetailView,FornecedorCreateView,FornecedorUpdateView,FornecedorDeleteView
+    FornecedorListView,FornecedorDetailView,FornecedorCreateView,FornecedorUpdateView,FornecedorDeleteView,ServicoListView,ServicoCreateView
 )
 
 
@@ -62,6 +62,8 @@ urlpatterns = [
     path('fornecedor/novo/', FornecedorCreateView.as_view(), name='fornecedor_create'),
     path('fornecedor/<int:pk>/editar/', FornecedorUpdateView.as_view(), name='fornecedor_update'),
     path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
+    path('servicos/',ServicoListView.as_view(),name='os_list'),
+    path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
 ]
 
 htmx_patterns =[

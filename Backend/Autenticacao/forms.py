@@ -1,10 +1,13 @@
 from django import forms
-from .models import Colaborador, Desconto, Comissao
+from .models import USUARIO, Desconto, Comissao
 
 class ColaboradorForm(forms.ModelForm):
     class Meta:
-        model = Colaborador
-        fields = ['usuario', 'salario_bruto', 'comissao_percentual', 'data_contratacao']
+        model = USUARIO
+        fields = ['salario_bruto', 'comissao_percentual', 'data_contratacao']
+        widgets = {
+            'data_contratacao': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 class DescontoForm(forms.ModelForm):
     class Meta:
@@ -15,3 +18,6 @@ class ComissaoForm(forms.ModelForm):
     class Meta:
         model = Comissao
         fields = ['colaborador', 'valor_vendas', 'data_referencia']
+        widgets = {
+            'data_referencia': forms.DateInput(attrs={'type': 'date'}),
+        }

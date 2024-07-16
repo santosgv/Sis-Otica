@@ -3,7 +3,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from .views import (
-    ColaboradorListView, ColaboradorDetailView, ColaboradorCreateView, ColaboradorUpdateView, ColaboradorDeleteView,
+    ColaboradorListView, ColaboradorDetailView, ColaboradorUpdateView,
     DescontoListView, DescontoDetailView, DescontoCreateView, DescontoUpdateView, DescontoDeleteView,
     ComissaoListView, ComissaoDetailView, ComissaoCreateView, ComissaoUpdateView, ComissaoDeleteView
 )
@@ -19,9 +19,7 @@ urlpatterns = [
         # Colaborador URLs
     path('colaboradores/', ColaboradorListView.as_view(), name='colaborador_list'),
     path('colaboradores/<int:pk>/', ColaboradorDetailView.as_view(), name='colaborador_detail'),
-    path('colaboradores/novo/', ColaboradorCreateView.as_view(), name='colaborador_create'),
     path('colaboradores/<int:pk>/editar/', ColaboradorUpdateView.as_view(), name='colaborador_update'),
-    path('colaboradores/<int:pk>/excluir/', ColaboradorDeleteView.as_view(), name='colaborador_delete'),
 
     # Desconto URLs
     path('descontos/', DescontoListView.as_view(), name='desconto_list'),
