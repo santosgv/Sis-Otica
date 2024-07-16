@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+  Detalhes da Comissao
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Detalhes da Comissao</h2>
+  <div class="text-center">
+  
+  <p>Mes: {{ object.data_referencia }}</p>
+  <p>Venda Mensal: {{ object.valor_vendas }}</p>
+  <a href="{% url 'comissao_update' object.pk %}" class="btn btn-secondary">Editar</a>
+  <a href="{% url 'comissao_delete' object.pk %}" class="btn btn-danger">Excluir</a>
+  <a href="{% url 'comissao_list' %}" class="btn btn-primary">Voltar</a>
+</div>
+{% endblock %}

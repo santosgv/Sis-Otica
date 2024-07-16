@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title >{% block 'title' %}
+  Lista de Comissao Mensal
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Comissao de Pagamento </h2>
+  <a href="{% url 'comissao_create' %}" class="btn btn-primary">Nova Comissao</a>
+  <br>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Funcionario</th>
+        <th scope="col">Valor de vendas</th>
+        <th scope="col">Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for comissao in object_list %}
+      <tr>
+        <th scope="row"><a href="{% url 'comissao_detail' comissao.pk %}">{{comissao.colaborador}}</a></th>
+        <td>{{ comissao.valor_vendas }}</td>
+        <td>{{ comissao.data_referencia }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}

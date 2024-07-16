@@ -34,6 +34,10 @@
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:estoque' %}">Estoque</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:Caixa'%}">Caixa</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'Core:minhas_vendas' %}">Minhas Vendas</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{%url 'listar_folha_pagamento' %}">Folha de Pagamento</a>
+                    {% if user.FUNCAO == "G" %}
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'colaborador_list' %}">Realizar Pagamento</a>
+                    {% endif %}
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'sair'%}">Sair</a>
                 </div>
             </div>

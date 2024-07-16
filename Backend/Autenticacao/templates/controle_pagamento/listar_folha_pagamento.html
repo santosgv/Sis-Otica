@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+    Folha de Pagamento 
+       {% endblock %}</title>
+{% block 'body'%}
+<h2 class="text-center">Folha de Pagamento - {{ mes_atual }}/{{ ano_atual }}</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Colaborador</th>
+            <th scope="col">Salário Bruto</th>
+            <th scope="col">Descontos</th>
+            <th scope="col">Comissão</th>
+            <th scope="col">Salário Líquido</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in folha_pagamento %}
+        <tr>
+            <td>{{ item.colaborador.usuario.first_name }}</td>
+            <td>{{ item.salario_bruto }}</td>
+            <td>
+                {% for desconto in item.descontos %}
+                {{ desconto.tipo }}: {{ desconto.percentual }}%<br>
+                {% endfor %}
+            </td>
+            <td>
+                {% for comissao in item.comissoes %}
+                {{ comissao.valor_vendas }} x {{ item.colaborador.comissao_percentual }}%<br>
+                {% endfor %}
+            </td>
+            <td>{{ item.salario_liquido }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

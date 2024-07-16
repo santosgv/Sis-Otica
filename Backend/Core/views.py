@@ -16,7 +16,6 @@ import io
 from django.utils.timezone import now
 from django.http import FileResponse, HttpResponse
 from reportlab.lib.pagesizes import letter
-from Autenticacao.urls import views
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings

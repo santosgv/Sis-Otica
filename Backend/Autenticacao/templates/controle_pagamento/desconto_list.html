@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title >{% block 'title' %}
+  Lista de Descontos Mensais
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Descontos de Pagamento </h2>
+  <a href="{% url 'desconto_create' %}" class="btn btn-primary">Novo Desconto</a>
+  <br>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">N°</th>
+        <th scope="col">Descriçao</th>
+        <th scope="col">%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for descontos in object_list %}
+      <tr>
+        <th scope="row">{{descontos.pk}}</th>
+        <td><a href="{% url 'desconto_detail' descontos.pk %}">{{ descontos }}</a></td>
+        <td>{{ descontos.percentual }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}

@@ -128,9 +128,9 @@ SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 #SESSION_FILE_PATH = os.path.join(BASE_DIR,'tmp/')
 
 
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
- )
+#DATABASE_ROUTERS = (
+#    'django_tenants.routers.TenantSyncRouter',
+# )
 
 #TENANT_LIMIT_SET_CALLS = True
 
@@ -141,12 +141,12 @@ DATABASE_ROUTERS = (
 
 #TENANT_COLOR_ADMIN_APPS = False
 
-ELASTIC_APM = {
-    'SERVICE_NAME': 'Sis-Otica',
-    'DEBUG': True,
-    'SERVER_URL': 'http://localhost:8200',
-    'ENVIRONMENT': 'production'
-    }
+#ELASTIC_APM = {
+#    'SERVICE_NAME': 'Sis-Otica',
+#    'DEBUG': True,
+#    'SERVER_URL': 'http://localhost:8200',
+#    'ENVIRONMENT': 'production'
+#    }
 
 
 

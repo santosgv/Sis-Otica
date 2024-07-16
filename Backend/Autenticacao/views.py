@@ -1,17 +1,24 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import USUARIO
+from django.contrib.auth.decorators import login_required
+from .models import USUARIO, Ativacao,Colaborador,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
-from .models import Ativacao
+from datetime import date
 from .utils import email_html
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+#from django.template.loader import render_to_string
+#from django.utils.html import strip_tags
 import os
 import logging
+
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Colaborador, Desconto, Comissao
+from .forms import ColaboradorForm, DescontoForm, ComissaoForm
 
 logger = logging.getLogger('MyApp')
 
@@ -112,7 +119,7 @@ def alterar_conta(request):
         username = request.user.username
         first_name = request.user.first_name
         cpf = request.user.CPF
-        data_nascimento = request.user.DATA_NASCIMENTO
+       # data_nascimento = request.user.DATA_NASCIMENTO
         email = request.user.email
 
         return render(request,'alterar_conta.html',{
@@ -154,3 +161,113 @@ def alterar_conta(request):
 def sair(request):
     auth.logout(request)
     return redirect('/auth/logar')
+
+@login_required(login_url='/auth/logar/')
+def listar_folha_pagamento(request):
+    mes_atual = date.today().month()
+    ano_atual = date.today().year
+    colaboradores = Colaborador.objects.all()
+    folha_pagamento = []
+
+    for colaborador in colaboradores:
+        salario_bruto = colaborador.salario_bruto
+
+
+        descontos = Desconto.objects.filter(colaborador=colaborador)
+        total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
+
+        comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
+        total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+
+        salario_liquido = salario_bruto - total_descontos + total_comissao
+
+        folha_pagamento.append({
+            'colaborador': colaborador,
+            'salario_bruto': salario_bruto,
+            'total_descontos': total_descontos,
+            'total_comissao': total_comissao,
+            'salario_liquido': salario_liquido,
+            'comissoes': comissoes,
+            'descontos': descontos,
+        })
+
+
+    return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
+                                                         'mes_atual':mes_atual,
+                                                           'ano_atual':ano_atual})
+
+
+class ColaboradorListView(ListView):
+    model = Colaborador
+    template_name = 'controle_pagamento/colaborador_list.html'
+
+class ColaboradorDetailView(DetailView):
+    model = Colaborador
+    template_name = 'controle_pagamento/colaborador_detail.html'
+
+class ColaboradorCreateView(CreateView):
+    model = Colaborador
+    form_class = ColaboradorForm
+    template_name = 'controle_pagamento/colaborador_form.html'
+    success_url = reverse_lazy('colaborador_list')
+
+class ColaboradorUpdateView(UpdateView):
+    model = Colaborador
+    form_class = ColaboradorForm
+    template_name = 'controle_pagamento/colaborador_form.html'
+    success_url = reverse_lazy('colaborador_list')
+
+class ColaboradorDeleteView(DeleteView):
+    model = Colaborador
+    template_name = 'controle_pagamento/colaborador_confirm_delete.html'
+    success_url = reverse_lazy('colaborador_list')
+
+class DescontoListView(ListView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_list.html'
+
+class DescontoDetailView(DetailView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_detail.html'
+
+class DescontoCreateView(CreateView):
+    model = Desconto
+    form_class = DescontoForm
+    template_name = 'controle_pagamento/desconto_form.html'
+    success_url = reverse_lazy('desconto_list')
+
+class DescontoUpdateView(UpdateView):
+    model = Desconto
+    form_class = DescontoForm
+    template_name = 'controle_pagamento/desconto_form.html'
+    success_url = reverse_lazy('desconto_list')
+
+class DescontoDeleteView(DeleteView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_confirm_delete.html'
+    success_url = reverse_lazy('desconto_list')
+
+class ComissaoListView(ListView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_list.html'
+
+class ComissaoDetailView(DetailView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_detail.html'
+
+class ComissaoCreateView(CreateView):
+    model = Comissao
+    form_class = ComissaoForm
+    template_name = 'controle_pagamento/comissao_form.html'
+    success_url = reverse_lazy('comissao_list')
+
+class ComissaoUpdateView(UpdateView):
+    model = Comissao
+    form_class = ComissaoForm
+    template_name = 'controle_pagamento/comissao_form.html'
+    success_url = reverse_lazy('comissao_list')
+
+class ComissaoDeleteView(DeleteView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_confirm_delete.html'
+    success_url = reverse_lazy('comissao_list')

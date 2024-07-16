@@ -36,23 +36,32 @@ class Ativacao(models.Model):
         return str(self.user)
 
 
-class SALARIO(models.Model):
-    COLABORADOR = models.ForeignKey(USUARIO,on_delete=models.DO_NOTHING)
-    VALOR = models.FloatField()
-    DISCRIMINAÇAO = models.CharField(max_length=200,blank=True, null=True)
-    DATA = models.DateTimeField()
+class Colaborador(models.Model):
+    usuario = models.OneToOneField(USUARIO, on_delete=models.CASCADE)
+    salario_bruto = models.FloatField()
+    comissao_percentual = models.FloatField(default=0.0)  # Percentual de comissão
+    data_contratacao = models.DateField()
 
     def __str__(self):
-        return self.user.username
+        return self.usuario.first_name
+    
 
-class COMISSAO(models.Model):
-    VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
-    VALOR =  models.FloatField(blank=True, null=True)
-    VENDAS = models.IntegerField(blank=True, null=True)
-    TICKET = models.FloatField(blank=True, null=True)
-    COMISSAO = models.DecimalField(max_digits=2,decimal_places=2, blank=True, null=True)
+    
+class Desconto(models.Model):
+    colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=100)
+    percentual = models.FloatField()  
 
     def __str__(self):
-        return self.user.username
+        return f"{self.tipo} - {self.colaborador.usuario.first_name}"
 
+class Comissao(models.Model):
+    colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
+    valor_vendas = models.FloatField() 
+    data_referencia = models.DateField()  
 
+    def calcular_comissao(self):
+        return self.valor_vendas * (self.colaborador.comissao_percentual / 100)
+
+    def __str__(self):
+        return f"Comissão - {self.colaborador.usuario.username} - {self.data_referencia}"
