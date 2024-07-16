@@ -164,7 +164,7 @@ def sair(request):
 
 @login_required(login_url='/auth/logar/')
 def listar_folha_pagamento(request):
-    mes_atual = date.today().month()
+    mes_atual = date.today().month
     ano_atual = date.today().year
     colaboradores = Colaborador.objects.all()
     folha_pagamento = []

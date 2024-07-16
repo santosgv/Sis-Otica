@@ -33,6 +33,10 @@ from calendar import month_name
 from django.db import transaction
 from django.core.cache import cache
 
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm
+
 logger = logging.getLogger('MyApp')
 
 
@@ -1057,3 +1061,29 @@ def saidas_estoque(request):
     movimentacoes = pagina.get_page(page)
 
     return render(request,'Estoque/saidas_estoque.html',{'movimentacoes':movimentacoes})
+
+
+class FornecedorListView(ListView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_list.html'
+
+class FornecedorDetailView(DetailView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_detail.html'
+
+class FornecedorCreateView(CreateView):
+    model = Fornecedor
+    form_class = FornecedorForm
+    template_name = 'Estoque/fornecedor_form.html'
+    success_url = reverse_lazy('Core:fornecedor_list')
+
+class FornecedorUpdateView(UpdateView):
+    model = Fornecedor
+    form_class = FornecedorForm
+    template_name = 'Estoque/fornecedor_form.html'
+    success_url = reverse_lazy('Core:fornecedor_list')
+
+class FornecedorDeleteView(DeleteView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_confirm_delete.html'
+    success_url = reverse_lazy('Core:fornecedor_list')

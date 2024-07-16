@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
-    'elasticapm.contrib.django',
+ #   'elasticapm.contrib.django',
     'Autenticacao',
     'Core',
 ]
@@ -74,7 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
  #   'django_tenants.middleware.main.TenantMainMiddleware',
  #       'Sis.middleware.TenantActiveMiddleware',
-    'elasticapm.contrib.django.middleware.TracingMiddleware',
+ #   'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,7 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'elasticapm.contrib.django.context_processors.rum_tracing',
+             #   'elasticapm.contrib.django.context_processors.rum_tracing',
             ],
         'libraries':{
             'filters':'Core.templates.filters'
@@ -150,40 +150,40 @@ SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-    },
-    'handlers': {
-        'elasticapm': {
-            'level': 'WARNING',
-            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
-        },
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'formatters': {
+#         'verbose': {
+#             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+#         },
+#     },
+#     'handlers': {
+#         'elasticapm': {
+#             'level': 'WARNING',
+#             'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+#         },
 
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['elasticapm'],
-            'propagate': True,
-        },
-        'MyApp': {
-            'level': 'WARNING',
-            'handlers': ['elasticapm'],
-            'propagate': True,
-        },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'ERROR',
+#             'handlers': ['elasticapm'],
+#             'propagate': True,
+#         },
+#         'MyApp': {
+#             'level': 'WARNING',
+#             'handlers': ['elasticapm'],
+#             'propagate': True,
+#         },
        
-        'elasticapm.errors': {
-            'level': 'ERROR',
-            'handlers': ['elasticapm'],
-            'propagate': True,
-        },
-    },
-}
+#         'elasticapm.errors': {
+#             'level': 'ERROR',
+#             'handlers': ['elasticapm'],
+#             'propagate': True,
+#         },
+#     },
+# }
 
 
 

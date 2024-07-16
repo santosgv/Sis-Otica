@@ -4,6 +4,11 @@ from django.conf import settings
 from . import htmx_views
 from django.conf.urls.static import static
 from Core import views
+from django.contrib.auth import views as auth_views
+
+from .views import (
+    FornecedorListView,FornecedorDetailView,FornecedorCreateView,FornecedorUpdateView,FornecedorDeleteView
+)
 
 
 app_name = 'Core'
@@ -48,7 +53,15 @@ urlpatterns = [
     path('create_pdf/<str:codigo>/<int:quantidade>/', views.create_pdf, name='create_pdf'),
     path('entradas_estoque/', views.entradas_estoque,name='entradas_estoque'),
     path('saidas_estoque/', views.saidas_estoque,name='saidas_estoque'),
-    path('movimentacao/',views.movimentacao,name='movimentacao')
+    path('movimentacao/',views.movimentacao,name='movimentacao'),
+
+
+
+    path('fornecedores/', FornecedorListView.as_view(), name='fornecedor_list'),
+    path('fornecedor/<int:pk>/', FornecedorDetailView.as_view(), name='fornecedor_detail'),
+    path('fornecedor/novo/', FornecedorCreateView.as_view(), name='fornecedor_create'),
+    path('fornecedor/<int:pk>/editar/', FornecedorUpdateView.as_view(), name='fornecedor_update'),
+    path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
 ]
 
 htmx_patterns =[
