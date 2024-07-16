@@ -51,6 +51,7 @@ SHARED_APPS = [
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'elasticapm.contrib.django',
         'debug_toolbar',
         'Autenticacao',
         'Core',
@@ -59,6 +60,8 @@ SHARED_APPS = [
 TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
     'django.contrib.contenttypes',
+    'debug_toolbar',
+    'elasticapm.contrib.django',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.sessions',
@@ -79,7 +82,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+   'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
