@@ -4,7 +4,7 @@ from django.contrib import messages
 from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -1098,3 +1098,57 @@ class ServicoCreateView(CreateView):
     form_class = ServicoForm
     template_name = 'Os/os_form.html'
     success_url = reverse_lazy('Core:os_list')
+
+
+class TipoUnitarioListView(ListView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_list.html'
+
+class TipoUnitarioCreateView(CreateView):
+    model = TipoUnitario
+    form_class = TipoUnitarioForm
+    template_name = 'Estoque/tipounitario_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class TipoUnitarioDetailView(DetailView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_detail.html'
+
+class TipoUnitarioUpdateView(UpdateView):
+    model = TipoUnitario
+    form_class = TipoUnitarioForm
+    template_name = 'Estoque/tipounitario_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class TipoUnitarioDeleteView(DeleteView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_confirm_delete.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+    #
+
+
+class EstiloListView(ListView):
+    model = Estilo
+    template_name = 'Estoque/estilo_list.html'
+
+class EstiloCreateView(CreateView):
+    model = Estilo
+    form_class = EstiloForm
+    template_name = 'Estoque/estilo_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class EstiloDetailView(DetailView):
+    model = Estilo
+    template_name = 'Estoque/estilo_detail.html'
+
+class EstiloUpdateView(UpdateView):
+    model = Estilo
+    form_class = EstiloForm
+    template_name = 'Estoque/estilo_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class EstiloDeleteView(DeleteView):
+    model = Estilo
+    template_name = 'Estoque/estilo_confirm_delete.html'
+    success_url = reverse_lazy('Core:tipos_list')

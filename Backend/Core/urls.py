@@ -7,7 +7,20 @@ from Core import views
 from django.contrib.auth import views as auth_views
 
 from .views import (
-    FornecedorListView,FornecedorDetailView,FornecedorCreateView,FornecedorUpdateView,FornecedorDeleteView,ServicoListView,ServicoCreateView
+    FornecedorListView,
+    FornecedorDetailView,
+    FornecedorCreateView,
+    FornecedorUpdateView,
+    FornecedorDeleteView,
+    ServicoListView,
+    ServicoCreateView,
+    TipoUnitarioListView,
+    TipoUnitarioCreateView,
+    TipoUnitarioDetailView,
+    TipoUnitarioUpdateView,
+    TipoUnitarioDeleteView,
+    EstiloListView,
+    EstiloCreateView,
 )
 
 
@@ -64,6 +77,18 @@ urlpatterns = [
     path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
     path('servicos/',ServicoListView.as_view(),name='os_list'),
     path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
+
+    path('tipos/', TipoUnitarioListView.as_view(), name='tipos_list'),
+    path('tipo/novo/', TipoUnitarioCreateView.as_view(), name='tipo_create'),
+    path('tipo/<int:pk>/', TipoUnitarioDetailView.as_view(), name='tipo_detail'),
+    path('tipo/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='tipo_update'),
+    path('tipo/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='tipo_delete'),
+
+    path('estilos/', EstiloListView.as_view(), name='estilos_list'),
+    path('estilo/novo/', EstiloCreateView.as_view(), name='estilo_create'),
+    path('estilo/<int:pk>/', TipoUnitarioDetailView.as_view(), name='estilo_detail'),
+    path('estilo/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='estilo_update'),
+    path('estilo/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='estilo_delete'),
 ]
 
 htmx_patterns =[
