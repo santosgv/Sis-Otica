@@ -1,7 +1,5 @@
 import os
-from django.views.decorators.cache import cache_page
 from django.contrib import messages
-from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
@@ -9,68 +7,40 @@ from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-import datetime
-from urllib.parse import quote
 from reportlab.pdfgen import canvas
 import io
-from django.utils.timezone import now
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-
+from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
 from django.http import JsonResponse
-from django.core.serializers import serialize
 from decimal import Decimal
 import logging
-from calendar import monthrange
-from calendar import month_name
 from django.db import transaction
 from django.core.cache import cache
-
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
+import io
+import os
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.graphics.barcode.code128 import Code128
+from django.http import FileResponse
+from PIL import Image
+from barcode import Code128
+from barcode.writer import ImageWriter
 
 logger = logging.getLogger('MyApp')
 
 
-
-def get_today_data():
-    date_now  = datetime.datetime.now().date()
-    return date_now
-
-def primeiro_dia_mes():
-    data_atual = date.today()
-    primeiro_dia = data_atual.replace(day=1)
-    return primeiro_dia
-
-def ultimo_dia_mes():
-    data_atual = date.today()
-    last_date = data_atual.replace(day=1) + timedelta(monthrange(data_atual.year, data_atual.month)[1] - 1)
-    return last_date
-
-def thirty_days_ago():
-    data = get_today_data() - datetime.timedelta(days=30)
-    return data
-
-
-def criar_mensagem_parabens(cliente):
-    nome_cliente = cliente
-    mensagem = (
-        f"*Parabéns pelo seu aniversário,{nome_cliente}!*\n\n"
-        f"A *Otica mais popular* deseja a você um dia repleto de alegria, amor e saúde. E para tornar essa data ainda mais especial, preparamos um presente para você!\n\n"
-        f"Você ganhou um *vale-presente de R$50,00* para ser usado em compras acima de R$300,00 na nossa ótica. E o melhor de tudo: esse vale é seu, mas se preferir, você pode dar de presente para alguém especial também!\n\n"
-        f"Esperamos que aproveite esse mimo e continue contando com a gente para ver o mundo com mais clareza e estilo.\n\n"
-        f"Com carinho,"
-        f"*Otica mais popular*"
-    )
-    return quote(mensagem)
 
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
@@ -119,17 +89,6 @@ def fechar_card(request):
 
     return JsonResponse({'status': 'fail'}, status=400)
 
-
-import io
-import os
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
-from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode.code128 import Code128
-from django.http import FileResponse
-from PIL import Image
-from barcode import Code128
-from barcode.writer import ImageWriter
 
 def generate_barcode_image(code, volume):
     """
@@ -192,29 +151,6 @@ def create_pdf(request, codigo, quantidade):
 
     return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
 
-
-def realizar_entrada(produto_id, quantidade):
-    produto = Produto.objects.get(pk=produto_id)
-    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
-    produto.registrar_entrada(quantidade)
-    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
-    return entrada_estoque
-
-def realizar_saida(codigo, quantidade, observacao):
-    try:
-        produto = Produto.objects.get(codigo=codigo)
-        
-        registro_saida = produto.registrar_saida(quantidade)
-        
-        if registro_saida:
-            MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
-            saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade, observacao=observacao)
-            return saida_estoque
-        else:  
-            return False  
-
-    except Produto.DoesNotExist:
-        return False  # Retorna False se o produto com o código fornecido não existe
 
 
 @login_required(login_url='/auth/logar/')  
@@ -576,7 +512,7 @@ def Imprimir_os(request,id_os):
         # parte laboratorio
         PDF.setFont('Courier-Bold', 12)
         PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
-        PDF.drawString(450,454,str('Otica mais popular'))
+        PDF.drawString(395,454,str(settings.NOME))
         PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
@@ -624,10 +560,6 @@ def Dashabord(request):
                                                       })
 
 
-def dados_caixa():
-    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
-    return dado
-
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -661,7 +593,7 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()

@@ -261,7 +261,8 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
 }
 
-UNIDADE='BNU'
+UNIDADE='SGO'
+NOME='Sistema Gerencial de Óticas'
 
 
 DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
