@@ -12,8 +12,8 @@
   <div class="text-center">
   
   <p>Nome: {{ object.nome }}</p>
-  <a href="{% url 'Core:tipound_update' object.pk %}" class="btn btn-secondary">Editar</a>
-  <a href="{% url 'Core:tipound_delete' object.pk %}" class="btn btn-danger">Excluir</a>
-  <a href="{% url 'Core:tiposund_list' %}" class="btn btn-primary">Voltar</a>
+  <a href="{% url 'Core:tipo_update' object.pk %}" class="btn btn-secondary">Editar</a>
+  <a href="{% url 'Core:tipo_delete' object.pk %}" class="btn btn-danger">Excluir</a>
+  <a href="{% url 'Core:tipos_list' %}" class="btn btn-primary">Voltar</a>
 </div>
 {% endblock %}

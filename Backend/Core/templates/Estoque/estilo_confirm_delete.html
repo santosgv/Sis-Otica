@@ -5,14 +5,14 @@
 {% block 'head' %}
 {% endblock %}
 <title>{% block 'title' %}
-  Excluir Tipo
+  Excluir Estilo
        {% endblock %}</title>
 {% block 'body'%}
-  <h2 class="text-center">Excluir Tipo</h2>
+  <h2 class="text-center">Excluir Estilo</h2>
   <p class="text-center">Tem certeza de que deseja excluir "{{ object }}"?</p>
   <form method="post" class="text-center">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Confirmar</button>
   </form>
-  <a href="{% url 'Core:tiposund_list' %}" class="btn btn-primary">Cancelar</a>
+  <a href="{% url 'Core:estilos_list' %}" class="btn btn-primary">Cancelar</a>
 {% endblock %}

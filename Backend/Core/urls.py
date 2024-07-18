@@ -21,6 +21,14 @@ from .views import (
     TipoUnitarioDeleteView,
     EstiloListView,
     EstiloCreateView,
+    EstiloDetailView,
+    EstiloUpdateView,
+    EstiloDeleteView,
+    TipoListView,
+    TipoCreateView,
+    TipoDetailView,
+    TipoUpdateView,
+    TipoDeleteView
 )
 
 
@@ -78,17 +86,23 @@ urlpatterns = [
     path('servicos/',ServicoListView.as_view(),name='os_list'),
     path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
 
-    path('tipos/', TipoUnitarioListView.as_view(), name='tipos_list'),
-    path('tipo/novo/', TipoUnitarioCreateView.as_view(), name='tipo_create'),
-    path('tipo/<int:pk>/', TipoUnitarioDetailView.as_view(), name='tipo_detail'),
-    path('tipo/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='tipo_update'),
-    path('tipo/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='tipo_delete'),
+    path('tiposund/', TipoUnitarioListView.as_view(), name='tiposund_list'),
+    path('tipound/novo/', TipoUnitarioCreateView.as_view(), name='tipound_create'),
+    path('tipound/<int:pk>/', TipoUnitarioDetailView.as_view(), name='tipound_detail'),
+    path('tipound/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='tipound_update'),
+    path('tipound/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='tipound_delete'),
 
     path('estilos/', EstiloListView.as_view(), name='estilos_list'),
     path('estilo/novo/', EstiloCreateView.as_view(), name='estilo_create'),
-    path('estilo/<int:pk>/', TipoUnitarioDetailView.as_view(), name='estilo_detail'),
-    path('estilo/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='estilo_update'),
-    path('estilo/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='estilo_delete'),
+    path('estilo/<int:pk>/', EstiloDetailView.as_view(), name='estilo_detail'),
+    path('estilo/<int:pk>/editar/', EstiloUpdateView.as_view(), name='estilo_update'),
+    path('estilo/<int:pk>/excluir/', EstiloDeleteView.as_view(), name='estilo_delete'),
+
+    path('tipos/', TipoListView.as_view(), name='tipos_list'),
+    path('tipo/novo/', TipoCreateView.as_view(), name='tipo_create'),
+    path('tipo/<int:pk>/', TipoDetailView.as_view(), name='tipo_detail'),
+    path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
+    path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
 ]
 
 htmx_patterns =[

@@ -5,17 +5,17 @@
 {% block 'head' %}
 {% endblock %}
 <title >{% block 'title' %}
-  Lista de Tipos Unitarios
+  Lista de Tipos
        {% endblock %}</title>
 {% block 'body'%}  
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
     <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
     <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Tipos Unitarios</li>
+    <li class="breadcrumb-item active" aria-current="page">Tipos</li>
   </ol>
 </nav>
-  <h2 class="text-center">Tipos Unitarios</h2>
+  <h2 class="text-center">Tipos</h2>
   <a href="{% url 'Core:tipo_create' %}" class="btn btn-primary">Novo Tipo</a>
   <br>
   <br>
@@ -30,7 +30,7 @@
       {% for tipo in object_list %}
       <tr>
         <th scope="row">{{tipo.pk}}</th>
-        <td><a href="{% url 'Core:tipound_detail' tipo.pk %}">{{ tipo.nome }}</a></td>
+        <td><a href="{% url 'Core:tipo_detail' tipo.pk %}">{{ tipo.nome }}</a></td>
       </tr>
       {% endfor %}
     </tbody>

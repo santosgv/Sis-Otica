@@ -21,7 +21,7 @@
         <div class="card-body">
             <form>
                 <div class="form-group row">
-                    <samp class="text-center">Data Contrataçao {{ item.colaborador.data_contratacao }}</samp>
+                    <samp class="text-center">Data Contrataçao: {% if item.colaborador.data_contratacao %} {{ item.colaborador.data_contratacao }} {% else %} Sem Data {% endif %}</samp>
                     <label for="salarioBruto" class="col-sm-2 col-form-label">Salário Bruto</label>
                     <div class="col-sm-10">
                         <input type="text" readonly class="form-control-plaintext" id="salarioBruto" value="R$ {{ item.salario_bruto }}">
@@ -65,4 +65,5 @@
     </div>
 </div>
 {% endfor %}
+
 {% endblock %}

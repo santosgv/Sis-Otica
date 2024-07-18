@@ -5,7 +5,7 @@
 {% block 'head' %}
 {% endblock %}
 <title>{% block 'title' %}
-  Novo Tipo Unitario
+  Novo Tipo
        {% endblock %}</title>
 {% block 'body'%}
   <h2>{{ view.title }}</h2>
@@ -14,5 +14,5 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Salvar</button>
   </form>
-  <a href="{% url 'Core:tiposund_list' %}">Voltar para a Lista</a>
+  <a href="{% url 'Core:tipos_list' %}">Voltar para a Lista</a>
 {% endblock %}

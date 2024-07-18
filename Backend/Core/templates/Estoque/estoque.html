@@ -29,9 +29,12 @@
     </ol>
   </nav>
   
+  <div style="justify-content: end;     display: table-cell;">
   <a href="{% url 'Core:fornecedor_list' %}" class="btn btn-primary">Fornecedores</a>
-  <a href="{% url 'Core:tipos_list' %}" class="btn btn-primary">Tipos Unitarios</a>
-  <a href="{% url 'Core:estilos_list' %}" class="btn btn-primary">Estilos</a>
+  <a href="{% url 'Core:tipos_list' %}" class="btn btn-success">Tipos</a>
+  <a href="{% url 'Core:estilos_list' %}" class="btn btn-warning">Estilos</a>
+  <a href="{% url 'Core:tiposund_list' %}" class="btn btn-secondary">Tipos Und</a>
+</div>
   <div class="text-center">
       <form>
         {% csrf_token %}

@@ -185,10 +185,10 @@ def listar_folha_pagamento(request):
 
             folha_pagamento.append({
                 'colaborador': colaborador,
-                'salario_bruto': salario_bruto,
-                'total_descontos': total_descontos,
-                'total_comissao': total_comissao,
-                'salario_liquido': salario_liquido,
+                'salario_bruto':  round(salario_bruto,2),
+                'total_descontos': round(total_descontos,2),
+                'total_comissao': round(total_comissao,2),
+                'salario_liquido': round(salario_liquido,2),
                 'comissoes': comissoes,
                 'descontos': descontos,
             })
