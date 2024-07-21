@@ -24,6 +24,7 @@ class USUARIO(AbstractUser):
     FUNCAO = models.CharField(max_length=1, choices=CHOICES_FUNCAO,blank=True, null=True)
     salario_bruto = models.FloatField(default=0.0)
     comissao_percentual = models.FloatField(default=0.0)
+    valor_hora = models.FloatField(default=0.0)
     data_contratacao = models.DateField(blank=True, null=True)
 
     def __str__(self) -> str:
@@ -51,9 +52,13 @@ class Comissao(models.Model):
     colaborador = models.ForeignKey(USUARIO, on_delete=models.CASCADE)
     valor_vendas = models.FloatField() 
     data_referencia = models.DateField()  
+    horas_extras = models.FloatField(default=0.0)
 
     def calcular_comissao(self):
         return self.valor_vendas * (self.colaborador.comissao_percentual / 100)
 
+    def calcula_horas_extras(self):
+        return self.horas_extras * (self.colaborador.valor_hora * 1.50 )
+
     def __str__(self):
-        return f"Comissão - {self.colaborador.usuario.username} - {self.data_referencia}"
+        return f"Comissão - {self.colaborador.username} - {self.data_referencia}"

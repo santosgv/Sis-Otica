@@ -164,78 +164,58 @@ def sair(request):
 @login_required(login_url='/auth/logar/')
 def listar_folha_pagamento(request):
     if request.user.FUNCAO == 'G':
-        mes_atual = date.today().month
-        ano_atual = date.today().year
         colaboradores = USUARIO.objects.all()
-        folha_pagamento = []
-        total_descontos=0
-        total_comissao=0
-
-        for colaborador in colaboradores:
-            salario_bruto = colaborador.salario_bruto
-
-
-            descontos = Desconto.objects.filter(colaborador=colaborador)
-            total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
-
-            comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
-            total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
-
-            salario_liquido = salario_bruto - total_descontos + total_comissao
-
-            folha_pagamento.append({
-                'colaborador': colaborador,
-                'salario_bruto':  round(salario_bruto,2),
-                'total_descontos': round(total_descontos,2),
-                'total_comissao': round(total_comissao,2),
-                'salario_liquido': round(salario_liquido,2),
-                'comissoes': comissoes,
-                'descontos': descontos,
-            })
-
-
-
-        return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
-                                                                                'total_descontos':total_descontos,
-                                                                                'total_comissao':total_comissao,
-                                                                                'mes_atual':mes_atual,
-                                                                                'ano_atual':ano_atual})
     else:
-        mes_atual = date.today().month
-        ano_atual = date.today().year
         colaboradores = USUARIO.objects.filter(pk=request.user.pk)
-        folha_pagamento = []
-        total_descontos=0
-        total_comissao=0
 
+    mes_atual = date.today().month
+    ano_atual = date.today().year
 
-        for colaborador in colaboradores:
-            salario_bruto = colaborador.salario_bruto
+    # Pre-fetch related objects to reduce the number of queries
+    colaboradores = colaboradores.prefetch_related(
+        'desconto_set', 
+        'comissao_set'
+    )
 
+    folha_pagamento = []
 
-            descontos = Desconto.objects.filter(colaborador=colaborador)
-            total_descontos = sum([salario_bruto * (desconto.percentual / 100) for desconto in descontos])
+    for colaborador in colaboradores:
+        salario_bruto = colaborador.salario_bruto
 
-            comissoes = Comissao.objects.filter(colaborador=colaborador, data_referencia__month=mes_atual, data_referencia__year=ano_atual)
-            total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+        # Calculate total discounts
+        total_descontos = sum(
+            [salario_bruto * (desconto.percentual / 100) for desconto in colaborador.desconto_set.all()]
+        )
 
-            salario_liquido = salario_bruto - total_descontos + total_comissao
+        # Calculate total commissions
+        comissoes = colaborador.comissao_set.filter(
+            data_referencia__month=mes_atual, 
+            data_referencia__year=ano_atual
+        )
 
-            folha_pagamento.append({
-                'colaborador': colaborador,
-                'salario_bruto': salario_bruto,
-                'total_descontos': total_descontos,
-                'total_comissao': total_comissao,
-                'salario_liquido': salario_liquido,
-                'comissoes': comissoes,
-                'descontos': descontos,
-            })
+        total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
 
-        return render(request, 'controle_pagamento/listar_folha_pagamento.html',{'folha_pagamento':folha_pagamento,
-                                                                                'total_descontos':total_descontos,
-                                                                                'total_comissao':total_comissao,
-                                                                                'mes_atual':mes_atual,
-                                                                                'ano_atual':ano_atual})
+        # Calculate total extra hours
+        total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
+
+        salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+
+        folha_pagamento.append({
+            'colaborador': colaborador,
+            'salario_bruto': round(salario_bruto, 2),
+            'total_descontos': round(total_descontos, 2),
+            'total_comissao': round(total_comissao, 2),
+            'total_horas': round(total_horas, 2),
+            'salario_liquido': round(salario_liquido, 2),
+            'comissoes': comissoes,
+            'descontos': colaborador.desconto_set.all(),
+        })
+
+    return render(request, 'controle_pagamento/listar_folha_pagamento.html', {
+        'folha_pagamento': folha_pagamento,
+        'mes_atual': mes_atual,
+        'ano_atual': ano_atual,
+    })
 
 
 class ColaboradorListView(ListView):

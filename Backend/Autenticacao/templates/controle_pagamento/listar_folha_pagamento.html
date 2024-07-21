@@ -16,12 +16,21 @@
 <div class="container">
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="card-title text-center">{{ item.colaborador.first_name }}</h5>
+            <h5 class="card-title text-center">{{ item.colaborador.first_name }}  {% if item.colaborador.FUNCAO == "G" %}
+                <span class="badge badge-info">Gerente</span>
+                {% endif %}
+                {% if item.colaborador.FUNCAO == "C" %}
+                <span class="badge badge-info">Caixa</span>
+                {% endif %}
+                {% if item.colaborador.FUNCAO == "V" %}
+                <span class="badge badge-info">Vendedor</span>
+                {% endif %} </h5>
         </div>
         <div class="card-body">
             <form>
                 <div class="form-group row">
                     <samp class="text-center">Data Contrataçao: {% if item.colaborador.data_contratacao %} {{ item.colaborador.data_contratacao }} {% else %} Sem Data {% endif %}</samp>
+                
                     <label for="salarioBruto" class="col-sm-2 col-form-label">Salário Bruto</label>
                     <div class="col-sm-10">
                         <input type="text" readonly class="form-control-plaintext" id="salarioBruto" value="R$ {{ item.salario_bruto }}">
@@ -42,7 +51,7 @@
                 </div>
                 <hr>
                 <div class="form-group row">
-                    <label for="comissoes" class="col-sm-2 col-form-label">Comissões</label>
+                    <label for="comissoes" class="col-sm-2 col-form-label">Proventos</label>
                     <div class="col-sm-10">
                         <div class="form-control-plaintext" id="comissoes">
                             {% for comissao in item.comissoes %}
@@ -50,6 +59,17 @@
                             {% endfor %}
                             <hr>
                             Total: R$ {{ item.total_comissao }}
+                        </div>
+                    </div>
+                    <hr>
+                    <label for="horas" class="col-sm-2 col-form-label">Horas Extras:</label>
+                    <div class="col-sm-10">
+                        <div class="form-control-plaintext" id="horas">
+                            {% for hora in item.comissoes %}
+                            Horas Trabalhadas {{hora.horas_extras}}  x  {{ item.colaborador.valor_hora }} + 50%
+                            {% endfor %}
+                            <hr>
+                            Total: R$ {{item.total_horas }}
                         </div>
                     </div>
                 </div>
