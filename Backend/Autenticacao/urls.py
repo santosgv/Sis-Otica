@@ -15,8 +15,9 @@ urlpatterns = [
     path('ativar_conta/<str:token>/', views.ativar_conta, name="ativar_conta"),
     path('alterar_conta', views.alterar_conta, name='alterar_conta'),
     path('listar_folha_pagamento/',views.listar_folha_pagamento, name='listar_folha_pagamento'),
+    path('generate_pdf/',views.generate_pdf, name='generate_pdf'),
 
-        # Colaborador URLs
+    # Colaborador URLs
     path('colaboradores/', ColaboradorListView.as_view(), name='colaborador_list'),
     path('colaboradores/<int:pk>/', ColaboradorDetailView.as_view(), name='colaborador_detail'),
     path('colaboradores/<int:pk>/editar/', ColaboradorUpdateView.as_view(), name='colaborador_update'),

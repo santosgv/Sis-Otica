@@ -12,7 +12,7 @@
 
 
 {% for item in folha_pagamento %}
-<h2 class="text-center"> Holerite ({{ mes_atual }}) x ({{ ano_atual }})</h2>
+<h2 class="text-center"> Holerite ({{ mes_atual }}) x ({{ ano_atual }}) <a href="{% url 'generate_pdf' %}">Baixar</a></h2>
 <div class="container">
     <div class="card mb-3">
         <div class="card-header">
@@ -58,7 +58,7 @@
                     <div class="col-sm-10">
                         <div class="form-control-plaintext" id="comissoes">
                             {% for comissao in item.comissoes %}
-                            {{ comissao.valor_vendas }} x {{ item.colaborador.comissao_percentual }}%<br>
+                            Comissão R$ {{ comissao.valor_vendas }} x {{ item.colaborador.comissao_percentual }}%<br>
                             {% endfor %}
                             <hr>
                             Total: R$ {{ item.total_comissao }}

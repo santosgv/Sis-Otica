@@ -559,7 +559,6 @@ def Dashabord(request):
                                                       'unidade':settings.UNIDADE
                                                       })
 
-
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -887,7 +886,6 @@ def estoque(request):
                                                     'Produtos':Produtos}
                                                     )
 
-
 @login_required(login_url='/auth/logar/')
 def produto_estoque(request,id):
     produto = Produto.objects.get(pk=id)
@@ -969,7 +967,6 @@ def movimentacao(request):
 
     return render(request,'Estoque/movimentacao_estoque.html',{'movimentacoes':movimentacoes})
 
-
 @login_required(login_url='/auth/logar/')
 def entradas_estoque(request):
     entradas = EntradaEstoque.objects.all().order_by('-id')
@@ -1022,7 +1019,6 @@ class FornecedorDeleteView(DeleteView):
     template_name = 'Estoque/fornecedor_confirm_delete.html'
     success_url = reverse_lazy('Core:fornecedor_list')
 
-
 class ServicoListView(ListView):
     model = SERVICO
     template_name = 'Os/os_list.html'
@@ -1032,7 +1028,6 @@ class ServicoCreateView(CreateView):
     form_class = ServicoForm
     template_name = 'Os/os_form.html'
     success_url = reverse_lazy('Core:os_list')
-
 
 class TipoUnitarioListView(ListView):
     model = TipoUnitario
@@ -1059,7 +1054,6 @@ class TipoUnitarioDeleteView(DeleteView):
     template_name = 'Estoque/tipounitario_confirm_delete.html'
     success_url = reverse_lazy('Core:tiposund_list')
 
-
 class EstiloListView(ListView):
     model = Estilo
     template_name = 'Estoque/estilo_list.html'
@@ -1084,7 +1078,6 @@ class EstiloDeleteView(DeleteView):
     model = Estilo
     template_name = 'Estoque/estilo_confirm_delete.html'
     success_url = reverse_lazy('Core:estilos_list')
-
 
 class TipoListView(ListView):
     model = Tipo

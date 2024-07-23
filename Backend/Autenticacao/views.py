@@ -195,6 +195,7 @@ def listar_folha_pagamento(request):
         )
 
         total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+        
 
         # Calculate total extra hours
         total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
@@ -230,6 +231,25 @@ def listar_folha_pagamento(request):
         'ano_atual': ultimo_dia_mes(),
     })
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+from django.http import FileResponse
+
+def generate_pdf(request):
+    try:
+        buffer = io.BytesIO()
+        PDF = canvas.Canvas(buffer,pagesize=letter)
+        PDF.setFont('Courier', 12)
+        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','holerite.png'),0, 0, width=letter[0], height=letter[1])
+        PDF.drawString(136,744,str('2024'))
+        PDF.showPage()
+        PDF.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f'holerite.pdf')
+    except Exception as msg:
+        print(msg)
+        return redirect('/Lista_Os')
 
 class ColaboradorListView(ListView):
     model = USUARIO
