@@ -13,7 +13,7 @@ from django.core.mail import EmailMultiAlternatives
 #from django.utils.html import strip_tags
 import os
 import logging
-
+from Core.utils import primeiro_dia_mes,ultimo_dia_mes
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -168,9 +168,6 @@ def listar_folha_pagamento(request):
     else:
         colaboradores = USUARIO.objects.filter(pk=request.user.pk)
 
-    mes_atual = date.today().month
-    ano_atual = date.today().year
-
     # Pre-fetch related objects to reduce the number of queries
     colaboradores = colaboradores.prefetch_related(
         'desconto_set', 
@@ -178,6 +175,8 @@ def listar_folha_pagamento(request):
     )
 
     folha_pagamento = []
+
+    print()
 
     for colaborador in colaboradores:
         salario_bruto = colaborador.salario_bruto
@@ -189,8 +188,8 @@ def listar_folha_pagamento(request):
 
         # Calculate total commissions
         comissoes = colaborador.comissao_set.filter(
-            data_referencia__month=mes_atual, 
-            data_referencia__year=ano_atual
+            data_referencia__gte=primeiro_dia_mes(), 
+            data_referencia__lte=ultimo_dia_mes()
         )
 
         total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
@@ -213,8 +212,8 @@ def listar_folha_pagamento(request):
 
     return render(request, 'controle_pagamento/listar_folha_pagamento.html', {
         'folha_pagamento': folha_pagamento,
-        'mes_atual': mes_atual,
-        'ano_atual': ano_atual,
+        'mes_atual': primeiro_dia_mes(),
+        'ano_atual': ultimo_dia_mes(),
     })
 
 
