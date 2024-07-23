@@ -6,7 +6,7 @@ from .models import USUARIO, Ativacao,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
 from datetime import date
-from .utils import email_html
+from .utils import email_html,calcular_inss,calcular_irrf
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
 #from django.template.loader import render_to_string
@@ -176,10 +176,12 @@ def listar_folha_pagamento(request):
 
     folha_pagamento = []
 
-    print()
+
 
     for colaborador in colaboradores:
         salario_bruto = colaborador.salario_bruto
+
+        desconto_inss = calcular_inss(salario_bruto)
 
         # Calculate total discounts
         total_descontos = sum(
@@ -197,8 +199,18 @@ def listar_folha_pagamento(request):
         # Calculate total extra hours
         total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
 
-        salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+        # Calcular salário líquido parcial (antes do IRRF)
+        salario_liquido_parcial = salario_bruto - total_descontos - desconto_inss + total_comissao + total_horas
 
+        # Calcular desconto do IRRF baseado no salário líquido parcial
+        desconto_irrf = calcular_irrf(salario_liquido_parcial)
+
+        # Atualizar total de descontos
+        total_descontos += desconto_inss + desconto_irrf
+
+        # Calcular salário líquido final
+        salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+        
         folha_pagamento.append({
             'colaborador': colaborador,
             'salario_bruto': round(salario_bruto, 2),
@@ -206,6 +218,8 @@ def listar_folha_pagamento(request):
             'total_comissao': round(total_comissao, 2),
             'total_horas': round(total_horas, 2),
             'salario_liquido': round(salario_liquido, 2),
+            'desconto_inss':desconto_inss,
+            'desconto_irrf':desconto_irrf,
             'comissoes': comissoes,
             'descontos': colaborador.desconto_set.all(),
         })
@@ -225,13 +239,11 @@ class ColaboradorDetailView(DetailView):
     model = USUARIO
     template_name = 'controle_pagamento/colaborador_detail.html'
 
-
 class ColaboradorUpdateView(UpdateView):
     model = USUARIO
     form_class = ColaboradorForm
     template_name = 'controle_pagamento/colaborador_form.html'
     success_url = reverse_lazy('colaborador_list')
-
 
 class DescontoListView(ListView):
     model = Desconto

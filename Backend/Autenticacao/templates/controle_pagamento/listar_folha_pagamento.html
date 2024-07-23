@@ -12,7 +12,7 @@
 
 
 {% for item in folha_pagamento %}
-<h2 class="text-center">Folha de Pagamento  ({{ mes_atual }}) x ({{ ano_atual }})</h2>
+<h2 class="text-center"> Holerite ({{ mes_atual }}) x ({{ ano_atual }})</h2>
 <div class="container">
     <div class="card mb-3">
         <div class="card-header">
@@ -44,6 +44,9 @@
                             {% for desconto in item.descontos %}
                             {{ desconto.tipo }}: {{ desconto.percentual }}%<br>
                             {% endfor %}
+                            Desconto INSS: R${{item.desconto_inss}}
+                            <br>
+                            Desconto IRRF: R${{item.desconto_irrf}}
                             <hr>
                             Total: R$ {{ item.total_descontos }}
                         </div>
