@@ -6,7 +6,7 @@ from .models import USUARIO, Ativacao,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
 from datetime import date
-from .utils import email_html,calcular_inss,calcular_irrf
+from .utils import email_html,calcular_inss,calcular_irrf,generate_pdf
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
 #from django.template.loader import render_to_string
@@ -224,6 +224,7 @@ def listar_folha_pagamento(request):
             'comissoes': comissoes,
             'descontos': colaborador.desconto_set.all(),
         })
+        generate_pdf()
 
     return render(request, 'controle_pagamento/listar_folha_pagamento.html', {
         'folha_pagamento': folha_pagamento,

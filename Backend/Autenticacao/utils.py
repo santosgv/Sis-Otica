@@ -45,8 +45,7 @@ def calcular_irrf(salario_liquido):
     else:
         return round((salario_liquido * 0.275) - 869.36,2)
 
-
-def generate_pdf(request):
+def generate_pdf(request,colaborador):
     coordenadas = {
         'Nome_Empresa': (84, 732),
         'Endereco': (105, 714),
@@ -78,7 +77,7 @@ def generate_pdf(request):
 
         PDF.setFont('Courier-Bold', 12)
         PDF.drawString(coordenadas['id'][0], coordenadas['id'][1],str('id'))
-        PDF.drawString(coordenadas['Funcionario'][0], coordenadas['Funcionario'][1],str('Funcionario'))
+        PDF.drawString(coordenadas['Funcionario'][0], coordenadas['Funcionario'][1],str(f'{colaborador}'))
         PDF.drawString(coordenadas['Cargo'][0], coordenadas['Cargo'][1],str('Cargo'))
         PDF.drawString(coordenadas['Admissao'][0], coordenadas['Admissao'][1],str('Admissao'))
 
