@@ -224,7 +224,6 @@ def listar_folha_pagamento(request):
             'comissoes': comissoes,
             'descontos': colaborador.desconto_set.all(),
         })
-        generate_pdf()
 
     return render(request, 'controle_pagamento/listar_folha_pagamento.html', {
         'folha_pagamento': folha_pagamento,

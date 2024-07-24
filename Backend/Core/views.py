@@ -89,7 +89,6 @@ def fechar_card(request):
 
     return JsonResponse({'status': 'fail'}, status=400)
 
-
 def generate_barcode_image(code, volume):
     """
     Generates a barcode image for the given code and volume number and returns it as a PIL image.
@@ -150,8 +149,6 @@ def create_pdf(request, codigo, quantidade):
     buffer.seek(0)
 
     return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
-
-
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
