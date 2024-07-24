@@ -1,6 +1,7 @@
 from . import views
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from .utils import generate_pdf
 
 from .views import (
     ColaboradorListView, ColaboradorDetailView, ColaboradorUpdateView,
@@ -15,7 +16,7 @@ urlpatterns = [
     path('ativar_conta/<str:token>/', views.ativar_conta, name="ativar_conta"),
     path('alterar_conta', views.alterar_conta, name='alterar_conta'),
     path('listar_folha_pagamento/',views.listar_folha_pagamento, name='listar_folha_pagamento'),
-    path('generate_pdf/',views.generate_pdf, name='generate_pdf'),
+    path('generate_pdf/',generate_pdf, name='generate_pdf'),
 
     # Colaborador URLs
     path('colaboradores/', ColaboradorListView.as_view(), name='colaborador_list'),

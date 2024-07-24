@@ -2,7 +2,16 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.shortcuts import redirect
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+import os
+import logging
+from django.http import FileResponse
 
+
+logger = logging.getLogger('MyApp')
 
 def email_html(path_template: str, assunto: str, para: list, **kwargs) -> dict:
     html_content = render_to_string(path_template, kwargs)
@@ -35,3 +44,55 @@ def calcular_irrf(salario_liquido):
         return round((salario_liquido * 0.225) - 636.13,2)
     else:
         return round((salario_liquido * 0.275) - 869.36,2)
+
+
+def generate_pdf(request):
+    coordenadas = {
+        'Nome_Empresa': (84, 732),
+        'Endereco': (105, 714),
+        'CNPJ': (82, 695),
+        'Mes_Corrente': (475, 695),
+
+        'id':(50,645),
+        'Funcionario':(105,645),
+        'Cargo':(258,645),
+        'Admissao':(440,645),
+
+        'total_desconto':(498, 223),
+        'saldo_liquido':(498, 197),
+        'salario_base':(50, 150),
+        'fgts_mes':(255, 150),
+        'irrf':(485, 150),
+
+
+    }
+    try:
+        buffer = io.BytesIO()
+        PDF = canvas.Canvas(buffer,pagesize=letter)
+        PDF.setFont('Courier-Bold', 15)
+        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','holerite.png'),0, 0, width=letter[0], height=letter[1])
+        PDF.drawString(coordenadas['Nome_Empresa'][0], coordenadas['Nome_Empresa'][1],str('Nome Empresa aqui'))
+        PDF.drawString(coordenadas['Endereco'][0], coordenadas['Endereco'][1],str('Endereco aqui'))
+        PDF.drawString(coordenadas['CNPJ'][0], coordenadas['CNPJ'][1],str('CNPJ aqui'))
+        PDF.drawString(coordenadas['Mes_Corrente'][0], coordenadas['Mes_Corrente'][1],str('MES aqui'))
+
+        PDF.setFont('Courier-Bold', 12)
+        PDF.drawString(coordenadas['id'][0], coordenadas['id'][1],str('id'))
+        PDF.drawString(coordenadas['Funcionario'][0], coordenadas['Funcionario'][1],str('Funcionario'))
+        PDF.drawString(coordenadas['Cargo'][0], coordenadas['Cargo'][1],str('Cargo'))
+        PDF.drawString(coordenadas['Admissao'][0], coordenadas['Admissao'][1],str('Admissao'))
+
+        PDF.setFont('Courier-Bold', 12)
+        PDF.drawString(coordenadas['total_desconto'][0], coordenadas['total_desconto'][1],str('desconto'))
+        PDF.drawString(coordenadas['saldo_liquido'][0], coordenadas['saldo_liquido'][1],str('liquido'))
+        PDF.drawString(coordenadas['salario_base'][0], coordenadas['salario_base'][1],str('base'))
+        PDF.drawString(coordenadas['fgts_mes'][0], coordenadas['fgts_mes'][1],str('fgts'))
+        PDF.drawString(coordenadas['irrf'][0], coordenadas['irrf'][1],str('irrf'))
+
+        PDF.showPage()
+        PDF.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f'holerite.pdf')
+    except Exception as msg:
+        logger.critical(msg)
+        return redirect('/auth/listar_folha_pagamento')

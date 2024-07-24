@@ -1,8 +1,7 @@
 
 from django.urls import path
-from django.conf import settings
 from . import htmx_views
-from django.conf.urls.static import static
+from .utils import Imprimir_os
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -50,7 +49,7 @@ urlpatterns = [
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
-    path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
+    path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
