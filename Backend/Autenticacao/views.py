@@ -164,7 +164,7 @@ def sair(request):
 @login_required(login_url='/auth/logar/')
 def listar_folha_pagamento(request):
     if request.user.FUNCAO == 'G':
-        colaboradores = USUARIO.objects.all()
+        colaboradores = USUARIO.objects.filter(is_active=True).all()
     else:
         colaboradores = USUARIO.objects.filter(pk=request.user.pk)
 
