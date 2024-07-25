@@ -45,8 +45,7 @@ def calcular_irrf(salario_liquido):
     else:
         return round((salario_liquido * 0.275) - 869.36,2)
 
-
-def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, colaborador, salario_liquido, total_descontos, salario_bruto, desconto_irrf):
+def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, id_colaborador,colaborador,cargo,dataadminissao,horas_extras,total_comissao,comissoes,descontos,inss, salario_liquido, total_descontos, salario_bruto, desconto_irrf):
     coordenadas = {
         'Nome_Empresa': (84, 732),
         'Endereco': (105, 714),
@@ -58,10 +57,17 @@ def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, colaborador, salari
         'Cargo':(258,645),
         'Admissao':(440,645),
 
+        'horas_extra':(45,555),
+        'comissao':(45,543),
+        'total_comissao':(45,285),
+        #'inss':(380,555),
+        'desconto':(380,520),
+        
+
         'total_desconto':(498, 223),
         'saldo_liquido':(498, 197),
         'salario_base':(50, 150),
-        'fgts_mes':(255, 150),
+        'inss':(355, 150),
         'irrf':(485, 150),
 
 
@@ -77,16 +83,33 @@ def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, colaborador, salari
         PDF.drawString(coordenadas['Mes_Corrente'][0], coordenadas['Mes_Corrente'][1],str(f'{mes_corrente}'))
 
         PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(coordenadas['id'][0], coordenadas['id'][1],str('id'))
+        PDF.drawString(coordenadas['id'][0], coordenadas['id'][1],str(f'{id_colaborador}'))
         PDF.drawString(coordenadas['Funcionario'][0], coordenadas['Funcionario'][1],str(f'{colaborador}'))
-        PDF.drawString(coordenadas['Cargo'][0], coordenadas['Cargo'][1],str('Cargo'))
-        PDF.drawString(coordenadas['Admissao'][0], coordenadas['Admissao'][1],str('Admissao'))
+        PDF.drawString(coordenadas['Cargo'][0], coordenadas['Cargo'][1],str(f'{cargo}'))
+        PDF.drawString(coordenadas['Admissao'][0], coordenadas['Admissao'][1],str(f'{dataadminissao}'))
 
+
+
+        PDF.drawString(coordenadas['horas_extra'][0], coordenadas['horas_extra'][1],str(f'Horas Extras: R${horas_extras}'))
+        PDF.setFont('Courier-Bold', 12)
+        y_comissao = coordenadas['comissao'][1]
+        for comissao in comissoes:
+            PDF.drawString(coordenadas['comissao'][0], y_comissao, f'Comissão R${comissao.valor_vendas} x {comissao.colaborador.comissao_percentual}%')
+            y_comissao -= 15 
+
+        y_desconto = coordenadas['desconto'][1]
+        for desconto in descontos:
+            PDF.drawString(coordenadas['desconto'][0], y_desconto, f'{desconto.tipo} {desconto.percentual}%')
+            y_desconto -= 15 
+        #PDF.drawString(coordenadas['inss'][0], coordenadas['inss'][1],str(f'Desconto INSS: R${inss}'))
+        #PDF.drawString(380,540,str(f'Desconto IRRF: R${desconto_irrf}'))
+
+        PDF.drawString(coordenadas['total_comissao'][0], coordenadas['total_comissao'][1],str(f'Total Comissao: R${total_comissao}'))
         PDF.setFont('Courier-Bold', 12)
         PDF.drawString(coordenadas['total_desconto'][0], coordenadas['total_desconto'][1],str(f'{total_descontos}'))
         PDF.drawString(coordenadas['saldo_liquido'][0], coordenadas['saldo_liquido'][1],str(f'{salario_liquido}'))
         PDF.drawString(coordenadas['salario_base'][0], coordenadas['salario_base'][1],str(f'{salario_bruto}'))
-        PDF.drawString(coordenadas['fgts_mes'][0], coordenadas['fgts_mes'][1],str('fgts'))
+        PDF.drawString(coordenadas['inss'][0], coordenadas['inss'][1],str(f'{inss}'))
         PDF.drawString(coordenadas['irrf'][0], coordenadas['irrf'][1],str(f'{desconto_irrf}'))
 
         PDF.showPage()

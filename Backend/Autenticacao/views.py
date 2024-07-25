@@ -234,6 +234,14 @@ def listar_folha_pagamento(request):
 
 def baixar_pdf(request, colaborador_id):
     colaborador = get_object_or_404(USUARIO, pk=colaborador_id)
+    if colaborador.FUNCAO == 'G':
+        funcao = 'Gerente'
+
+    elif colaborador.FUNCAO == 'V':
+        funcao = 'Vendedor'
+    else:
+        funcao = 'Caixa'
+
     salario_bruto = colaborador.salario_bruto
 
     desconto_inss = calcular_inss(salario_bruto)
@@ -266,17 +274,27 @@ def baixar_pdf(request, colaborador_id):
     # Calcular salário líquido final
     salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
 
+
+
     # Gerar o PDF
     pdf_response = generate_pdf(
         nome_empresa="Nome Empresa aqui",
         endereco="Endereco aqui",
         cnpj="CNPJ aqui",
         mes_corrente=primeiro_dia_mes(),
+        id_colaborador=colaborador.id,
+        cargo= funcao,
+        dataadminissao= colaborador.data_contratacao,
+        horas_extras =round(total_horas, 2),
+        comissoes =comissoes,
+        total_comissao=total_comissao,
+        descontos=colaborador.desconto_set.all(),
+        inss=desconto_inss,
         colaborador=colaborador.first_name,
         salario_liquido=round(salario_liquido, 2),
         total_descontos=round(total_descontos, 2),
         salario_bruto=round(salario_bruto, 2),
-        desconto_irrf=desconto_irrf
+        desconto_irrf=round(desconto_irrf, 2),
     )
     return pdf_response
 
