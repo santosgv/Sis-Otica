@@ -12,7 +12,7 @@
 
 
 {% for item in folha_pagamento %}
-<h2 class="text-center"> Holerite ({{ mes_atual }}) x ({{ ano_atual }}) <a href="#">Baixar</a></h2>
+<h2 class="text-center"> Holerite ({{ mes_atual }}) x ({{ ano_atual }}) <a href="{% url 'baixar_pdf' item.colaborador.id %}">Baixar</a></h2>
 <div class="container">
     <div class="card mb-3">
         <div class="card-header">

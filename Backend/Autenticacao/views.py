@@ -231,6 +231,55 @@ def listar_folha_pagamento(request):
         'ano_atual': ultimo_dia_mes(),
     })
 
+
+def baixar_pdf(request, colaborador_id):
+    colaborador = get_object_or_404(USUARIO, pk=colaborador_id)
+    salario_bruto = colaborador.salario_bruto
+
+    desconto_inss = calcular_inss(salario_bruto)
+
+    # Calculate total discounts
+    total_descontos = sum(
+        [salario_bruto * (desconto.percentual / 100) for desconto in colaborador.desconto_set.all()]
+    )
+
+    # Calculate total commissions
+    comissoes = colaborador.comissao_set.filter(
+        data_referencia__gte=primeiro_dia_mes(), 
+        data_referencia__lte=ultimo_dia_mes()
+    )
+
+    total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+    
+    # Calculate total extra hours
+    total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
+
+    # Calcular salário líquido parcial (antes do IRRF)
+    salario_liquido_parcial = salario_bruto - total_descontos - desconto_inss + total_comissao + total_horas
+
+    # Calcular desconto do IRRF baseado no salário líquido parcial
+    desconto_irrf = calcular_irrf(salario_liquido_parcial)
+
+    # Atualizar total de descontos
+    total_descontos += desconto_inss + desconto_irrf
+
+    # Calcular salário líquido final
+    salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+
+    # Gerar o PDF
+    pdf_response = generate_pdf(
+        nome_empresa="Nome Empresa aqui",
+        endereco="Endereco aqui",
+        cnpj="CNPJ aqui",
+        mes_corrente=primeiro_dia_mes(),
+        colaborador=colaborador.first_name,
+        salario_liquido=round(salario_liquido, 2),
+        total_descontos=round(total_descontos, 2),
+        salario_bruto=round(salario_bruto, 2),
+        desconto_irrf=desconto_irrf
+    )
+    return pdf_response
+
 class ColaboradorListView(ListView):
     model = USUARIO
     template_name = 'controle_pagamento/colaborador_list.html'
