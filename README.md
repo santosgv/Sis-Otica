@@ -10,6 +10,29 @@ Repositório para o Projeto SIS ótica !
 
 # Como rodar o projeto?
 
+# Criaçao das Tabelas caso nao Suba no migrations
+
+CREATE TABLE Autenticacao_comissao (
+    id INTEGER NOT NULL PRIMARY KEY,
+    colaborador_id INTEGER, 
+    valor_vendas FLOAT,
+    data_referencia DATE,
+    horas_extras FLOAT,
+    FOREIGN KEY (colaborador_id) REFERENCES Autenticacao_USUARIO(ID)
+);
+
+CREATE TABLE Autenticacao_desconto (
+    id INTEGER NOT NULL PRIMARY KEY,
+    colaborador_id INTEGER,
+    tipo VARCHAR(100), 
+    percentual FLOAT,
+    FOREIGN KEY (colaborador_id) REFERENCES Autenticacao_USUARIO(ID)
+);
+
+DROP TABLE Autenticacao_desconto ;
+
+
+DROP TABLE Autenticacao_comissao ;
 
 ~~~linux
 git clone https://github.com/santosgv/Sis-Otica.git
