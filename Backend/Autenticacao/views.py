@@ -6,7 +6,7 @@ from .models import USUARIO, Ativacao,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
 from datetime import date
-from .utils import email_html,calcular_inss,calcular_irrf,generate_pdf
+from .utils import email_html,calcular_inss,calcular_irrf,generate_pdf,calcula_fgts
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
 #from django.template.loader import render_to_string
@@ -182,6 +182,8 @@ def listar_folha_pagamento(request):
         salario_bruto = colaborador.salario_bruto
 
         desconto_inss = calcular_inss(salario_bruto)
+        
+        desconto_fgts = calcula_fgts(salario_bruto)
 
         # Calculate total discounts
         total_descontos = sum(
@@ -207,7 +209,7 @@ def listar_folha_pagamento(request):
         desconto_irrf = calcular_irrf(salario_liquido_parcial)
 
         # Atualizar total de descontos
-        total_descontos += desconto_inss + desconto_irrf
+        total_descontos += desconto_inss + desconto_irrf + desconto_fgts
 
         # Calcular salário líquido final
         salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
@@ -221,6 +223,7 @@ def listar_folha_pagamento(request):
             'salario_liquido': round(salario_liquido, 2),
             'desconto_inss':desconto_inss,
             'desconto_irrf':desconto_irrf,
+            'desconto_fgts':desconto_fgts,
             'comissoes': comissoes,
             'descontos': colaborador.desconto_set.all(),
         })
@@ -245,6 +248,7 @@ def baixar_pdf(request, colaborador_id):
     salario_bruto = colaborador.salario_bruto
 
     desconto_inss = calcular_inss(salario_bruto)
+    desconto_fgts = calcula_fgts(salario_bruto)
 
     # Calculate total discounts
     total_descontos = sum(
@@ -269,7 +273,7 @@ def baixar_pdf(request, colaborador_id):
     desconto_irrf = calcular_irrf(salario_liquido_parcial)
 
     # Atualizar total de descontos
-    total_descontos += desconto_inss + desconto_irrf
+    total_descontos += desconto_inss + desconto_irrf + desconto_fgts
 
     # Calcular salário líquido final
     salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
@@ -295,6 +299,7 @@ def baixar_pdf(request, colaborador_id):
         total_descontos=round(total_descontos, 2),
         salario_bruto=round(salario_bruto, 2),
         desconto_irrf=round(desconto_irrf, 2),
+        desconto_fgts = desconto_fgts
     )
     return pdf_response
 

@@ -33,6 +33,10 @@ def calcular_inss(salario_bruto):
     else:
         return 751.99 
 
+def calcula_fgts(salario_bruto):
+    valor = salario_bruto *( 8 /100 ) 
+    return round(valor,2)
+
 def calcular_irrf(salario_liquido):
     if salario_liquido <= 1903.98:
         return 0
@@ -45,7 +49,24 @@ def calcular_irrf(salario_liquido):
     else:
         return round((salario_liquido * 0.275) - 869.36,2)
 
-def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, id_colaborador,colaborador,cargo,dataadminissao,horas_extras,total_comissao,comissoes,descontos,inss, salario_liquido, total_descontos, salario_bruto, desconto_irrf):
+def generate_pdf(nome_empresa, 
+endereco, 
+cnpj, 
+mes_corrente,
+ id_colaborador,
+ colaborador,
+ cargo,
+ dataadminissao,
+ horas_extras,
+ total_comissao,
+ comissoes,
+descontos,
+inss,
+salario_liquido,
+total_descontos,
+salario_bruto,
+desconto_irrf,
+desconto_fgts):
     coordenadas = {
         'Nome_Empresa': (84, 732),
         'Endereco': (105, 714),
@@ -68,6 +89,8 @@ def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, id_colaborador,cola
         'saldo_liquido':(498, 197),
         'salario_base':(50, 150),
         'inss':(355, 150),
+        'fgts1':(150, 150),
+        'fgts':(270, 150),
         'irrf':(485, 150),
 
 
@@ -110,6 +133,8 @@ def generate_pdf(nome_empresa, endereco, cnpj, mes_corrente, id_colaborador,cola
         PDF.drawString(coordenadas['saldo_liquido'][0], coordenadas['saldo_liquido'][1],str(f'{salario_liquido}'))
         PDF.drawString(coordenadas['salario_base'][0], coordenadas['salario_base'][1],str(f'{salario_bruto}'))
         PDF.drawString(coordenadas['inss'][0], coordenadas['inss'][1],str(f'{inss}'))
+        PDF.drawString(coordenadas['fgts'][0], coordenadas['fgts'][1],str(f'{desconto_fgts}'))
+        PDF.drawString(coordenadas['fgts1'][0], coordenadas['fgts1'][1],str(f'{desconto_fgts}'))
         PDF.drawString(coordenadas['irrf'][0], coordenadas['irrf'][1],str(f'{desconto_irrf}'))
 
         PDF.showPage()
