@@ -23,3 +23,12 @@ DROP TABLE Autenticacao_desconto ;
 
 
 DROP TABLE Autenticacao_comissao ;
+
+-- add campo na tabela ja existente
+ALTER TABLE Autenticacao_usuario ADD COLUMN salario_bruto FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN comissao_percentual FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN valor_hora FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN data_contratacao DATE;
