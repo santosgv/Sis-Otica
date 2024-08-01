@@ -9,11 +9,19 @@ from django.utils import timezone
 
 class Cliente(TenantMixin):
     Usuario = models.ForeignKey(USUARIO, on_delete=models.SET_NULL, null=True)
-    nome = models.CharField(max_length=100)
+    razao_social=models.CharField(max_length=255)
     pago_ate = models.DateField(default=now)
     on_trial = models.BooleanField(default=True, blank=True)
     descricao = models.TextField(blank=True)
-    email =models.EmailField()
+    email =models.EmailField(null=True)
+    nome_fantasia=models.CharField(max_length=255)
+    cnpj=models.IntegerField(null=True),       
+    endereco_logradouro=models.CharField(max_length=80,null=True)
+    endereco_numero=models.IntegerField(null=True),
+    endereco_bairro=models.CharField(max_length=255,null=True),
+    endereco_municipio=models.CharField(max_length=255,null=True),
+    endereco_cep=models.IntegerField(null=True),
+
 
     is_active = models.BooleanField(default=False, blank=True)
     created_on = models.DateField(auto_now_add=True)
@@ -33,7 +41,7 @@ class Cliente(TenantMixin):
         ordering = ('-on_trial', '-pago_ate')
 
     def __str__(self):
-        return f"{self.nome}"
+        return f"{self.razao_social}"
 
     def is_active_now(self):
         #pago_ate = self.pago_ate.date()

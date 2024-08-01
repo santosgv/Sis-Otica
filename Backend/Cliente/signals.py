@@ -15,13 +15,13 @@ def created_user_client(sender, **kwargs):
     with tenant_context(client):
         super_user = USUARIO.objects.create_superuser(
             username=client.schema_name,
-            first_name=client.nome,
+            first_name=client.razao_social,
             password=client.schema_name,
             FUNCAO='G'
         )
         super_user.save()
         subject = 'Novo Cliente Criado'
-        message = f'''O Cliente {client.nome} foi criado com sucesso!
+        message = f'''O Cliente {client.razao_social} foi criado com sucesso!
         Nome do Banco : {client.schema_name}
         Usuario Administrador : {client.schema_name}
         Senha Administrador : {client.schema_name}

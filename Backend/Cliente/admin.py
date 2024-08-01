@@ -35,7 +35,7 @@ class DomainInline(PublicTenantOnlyMixin,admin.TabularInline):
 @admin.register(Cliente)
 class TenantAdmin(PublicTenantOnlyMixin,TenantAdminMixin, admin.ModelAdmin):
         list_display = (
-        "nome",
+        "razao_social",
         "is_active",
         "created_on",
         )
