@@ -22,9 +22,13 @@ class USUARIO(AbstractUser):
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     STATUS = models.CharField(max_length=1, choices=CHOICES_SITUACAO, default="A")
     FUNCAO = models.CharField(max_length=1, choices=CHOICES_FUNCAO,blank=True, null=True)
+    salario_bruto = models.FloatField(default=0.0)
+    comissao_percentual = models.FloatField(default=0.0)
+    valor_hora = models.FloatField(default=0.0)
+    data_contratacao = models.DateField(blank=True, null=True)
 
     def __str__(self) -> str:
-        return str(self.username)
+        return str(self.first_name)
 
 
 class Ativacao(models.Model):
@@ -34,25 +38,27 @@ class Ativacao(models.Model):
 
     def __str__(self):
         return str(self.user)
-
-
-class SALARIO(models.Model):
-    COLABORADOR = models.ForeignKey(USUARIO,on_delete=models.DO_NOTHING)
-    VALOR = models.FloatField()
-    DISCRIMINAÇAO = models.CharField(max_length=200,blank=True, null=True)
-    DATA = models.DateTimeField()
-
-    def __str__(self):
-        return self.user.username
-
-class COMISSAO(models.Model):
-    VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
-    VALOR =  models.FloatField(blank=True, null=True)
-    VENDAS = models.IntegerField(blank=True, null=True)
-    TICKET = models.FloatField(blank=True, null=True)
-    COMISSAO = models.DecimalField(max_digits=2,decimal_places=2, blank=True, null=True)
+    
+    
+class Desconto(models.Model):
+    colaborador = models.ForeignKey(USUARIO, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=100)
+    percentual = models.FloatField()  
 
     def __str__(self):
-        return self.user.username
+        return f"{self.tipo} - {self.colaborador.first_name}"
 
+class Comissao(models.Model):
+    colaborador = models.ForeignKey(USUARIO, on_delete=models.CASCADE)
+    valor_vendas = models.FloatField() 
+    data_referencia = models.DateField()  
+    horas_extras = models.FloatField(default=0.0)
 
+    def calcular_comissao(self):
+        return self.valor_vendas * (self.colaborador.comissao_percentual / 100)
+
+    def calcula_horas_extras(self):
+        return self.horas_extras * (self.colaborador.valor_hora * 1.50 )
+
+    def __str__(self):
+        return f"Comissão - {self.colaborador.username} - {self.data_referencia}"

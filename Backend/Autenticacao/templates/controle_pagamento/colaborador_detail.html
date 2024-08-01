@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+  Detalhes do Colaborador
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Detalhes do Colaborador</h2>
+  <div class="text-center">
+  
+  <p>Nome: {{ object.first_name }}</p>
+  <p>Salário Bruto: {{ object.salario_bruto }}</p>
+  <p>Percentual de Comissão: {{ object.comissao_percentual }}</p>
+  <p>Data de Contratação: {{ object.data_contratacao }}</p>
+  <a href="{% url 'colaborador_update' object.pk %}" class="btn btn-secondary">Editar</a>
+  <a href="{% url 'colaborador_list' %}" class="btn btn-primary">Voltar</a>
+</div>
+{% endblock %}

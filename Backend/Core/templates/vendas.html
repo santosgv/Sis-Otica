@@ -1,0 +1,114 @@
+
+
+{% load static %}
+
+{% block 'body'%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGO - Sistema Gerencial de Óticas</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .pricing-card:hover {
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .pricing-card .card-header {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .pricing-card .card-body {
+      padding: 2rem;
+    }
+    .pricing-card .card-footer {
+      padding: 1rem 2rem;
+      background-color: #f7f7f7;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<section class="bg-primary text-white text-center py-5">
+  <div class="container">
+    <h1 class="display-4">SGO - Sistema Gerencial de Óticas</h1>
+    <p class="lead">A solução completa para a gestão eficiente da sua ótica</p>
+    <a href="#pricing" class="btn btn-light btn-lg">Saiba Mais</a>
+  </div>
+</section>
+
+<!-- Video Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/d9TLfhkxly0?si=HBKYnHaHx3id94JX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="py-5 bg-light">
+
+  <div class="container">
+    <div class="card-deck mb-3 text-center">
+      <div class="card mb-4 box-shadow pricing-card">
+        <div class="card-header bg-success text-white">
+          <h4 class="my-0 font-weight-normal">Free</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">R$0 <small class="text-muted">/ Mes</small></h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>10 users included</li>
+            <li>2 GB of storage</li>
+            <li>Email support</li>
+            <li>Help center access</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-outline-success">Teste Agora</button>
+        </div>
+      </div>
+      <div class="card mb-4 box-shadow pricing-card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="my-0 font-weight-normal">Pro</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">R$300 <small class="text-muted">/ Mes</small></h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>20 users included</li>
+            <li>10 GB of storage</li>
+            <li>Priority email support</li>
+            <li>Help center access</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-primary">Assine Agora</button>
+        </div>
+      </div>
+      <div class="card mb-4 box-shadow pricing-card">
+        <div class="card-header bg-danger text-white">
+          <h4 class="my-0 font-weight-normal">Enterprise</h4>
+        </div>
+        <div class="card-body">
+          <h1 class="card-title pricing-card-title">R$3.000 <small class="text-muted">/ Anual</small></h1>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li>30 users included</li>
+            <li>15 GB of storage</li>
+            <li>Phone and email support</li>
+            <li>Help center access</li>
+          </ul>
+          <button type="button" class="btn btn-lg btn-block btn-danger">Assine Agora</button>
+        </div>
+      </div>
+    </div>
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+  {% endblock %}

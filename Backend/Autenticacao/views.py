@@ -1,17 +1,23 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import USUARIO
+from django.contrib.auth.decorators import login_required
+from .models import USUARIO, Ativacao,Desconto,Comissao
 from django.contrib import auth
 from django.conf import settings
-from .models import Ativacao
-from .utils import email_html
+from datetime import date
+from .utils import email_html,calcular_inss,calcular_irrf,generate_pdf,calcula_fgts
 from hashlib import sha256
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+#from django.template.loader import render_to_string
+#from django.utils.html import strip_tags
 import os
 import logging
+from Core.utils import primeiro_dia_mes,ultimo_dia_mes
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .forms import ColaboradorForm, DescontoForm, ComissaoForm
 
 logger = logging.getLogger('MyApp')
 
@@ -112,7 +118,7 @@ def alterar_conta(request):
         username = request.user.username
         first_name = request.user.first_name
         cpf = request.user.CPF
-        data_nascimento = request.user.DATA_NASCIMENTO
+       # data_nascimento = request.user.DATA_NASCIMENTO
         email = request.user.email
 
         return render(request,'alterar_conta.html',{
@@ -154,3 +160,209 @@ def alterar_conta(request):
 def sair(request):
     auth.logout(request)
     return redirect('/auth/logar')
+
+@login_required(login_url='/auth/logar/')
+def listar_folha_pagamento(request):
+    if request.user.FUNCAO == 'G':
+        colaboradores = USUARIO.objects.filter(is_active=True).all()
+    else:
+        colaboradores = USUARIO.objects.filter(pk=request.user.pk)
+
+    # Pre-fetch related objects to reduce the number of queries
+    colaboradores = colaboradores.prefetch_related(
+        'desconto_set', 
+        'comissao_set'
+    )
+
+    folha_pagamento = []
+
+
+
+    for colaborador in colaboradores:
+        salario_bruto = colaborador.salario_bruto
+
+        desconto_inss = calcular_inss(salario_bruto)
+        
+        desconto_fgts = calcula_fgts(salario_bruto)
+
+        # Calculate total discounts
+        total_descontos = sum(
+            [salario_bruto * (desconto.percentual / 100) for desconto in colaborador.desconto_set.all()]
+        )
+
+        # Calculate total commissions
+        comissoes = colaborador.comissao_set.filter(
+            data_referencia__gte=primeiro_dia_mes(), 
+            data_referencia__lte=ultimo_dia_mes()
+        )
+
+        total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+        
+
+        # Calculate total extra hours
+        total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
+
+        # Calcular salário líquido parcial (antes do IRRF)
+        salario_liquido_parcial = salario_bruto - total_descontos - desconto_inss + total_comissao + total_horas
+
+        # Calcular desconto do IRRF baseado no salário líquido parcial
+        desconto_irrf = calcular_irrf(salario_liquido_parcial)
+
+        # Atualizar total de descontos
+        total_descontos += desconto_inss + desconto_irrf + desconto_fgts
+
+        # Calcular salário líquido final
+        salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+        
+        folha_pagamento.append({
+            'colaborador': colaborador,
+            'salario_bruto': round(salario_bruto, 2),
+            'total_descontos': round(total_descontos, 2),
+            'total_comissao': round(total_comissao, 2),
+            'total_horas': round(total_horas, 2),
+            'salario_liquido': round(salario_liquido, 2),
+            'desconto_inss':desconto_inss,
+            'desconto_irrf':desconto_irrf,
+            'desconto_fgts':desconto_fgts,
+            'comissoes': comissoes,
+            'descontos': colaborador.desconto_set.all(),
+        })
+
+    return render(request, 'controle_pagamento/listar_folha_pagamento.html', {
+        'folha_pagamento': folha_pagamento,
+        'mes_atual': primeiro_dia_mes(),
+        'ano_atual': ultimo_dia_mes(),
+    })
+
+
+def baixar_pdf(request, colaborador_id):
+    colaborador = get_object_or_404(USUARIO, pk=colaborador_id)
+    if colaborador.FUNCAO == 'G':
+        funcao = 'Gerente'
+
+    elif colaborador.FUNCAO == 'V':
+        funcao = 'Vendedor'
+    else:
+        funcao = 'Caixa'
+
+    salario_bruto = colaborador.salario_bruto
+
+    desconto_inss = calcular_inss(salario_bruto)
+    desconto_fgts = calcula_fgts(salario_bruto)
+
+    # Calculate total discounts
+    total_descontos = sum(
+        [salario_bruto * (desconto.percentual / 100) for desconto in colaborador.desconto_set.all()]
+    )
+
+    # Calculate total commissions
+    comissoes = colaborador.comissao_set.filter(
+        data_referencia__gte=primeiro_dia_mes(), 
+        data_referencia__lte=ultimo_dia_mes()
+    )
+
+    total_comissao = sum([comissao.calcular_comissao() for comissao in comissoes])
+    
+    # Calculate total extra hours
+    total_horas = sum([comissao.calcula_horas_extras() for comissao in comissoes])
+
+    # Calcular salário líquido parcial (antes do IRRF)
+    salario_liquido_parcial = salario_bruto - total_descontos - desconto_inss + total_comissao + total_horas
+
+    # Calcular desconto do IRRF baseado no salário líquido parcial
+    desconto_irrf = calcular_irrf(salario_liquido_parcial)
+
+    # Atualizar total de descontos
+    total_descontos += desconto_inss + desconto_irrf + desconto_fgts
+
+    # Calcular salário líquido final
+    salario_liquido = salario_bruto - total_descontos + total_comissao + total_horas
+
+
+
+    # Gerar o PDF
+    pdf_response = generate_pdf(
+        nome_empresa="Nome Empresa aqui",
+        endereco="Endereco aqui",
+        cnpj="CNPJ aqui",
+        mes_corrente=primeiro_dia_mes(),
+        id_colaborador=colaborador.id,
+        cargo= funcao,
+        dataadminissao= colaborador.data_contratacao,
+        horas_extras =round(total_horas, 2),
+        comissoes =comissoes,
+        total_comissao=total_comissao,
+        descontos=colaborador.desconto_set.all(),
+        inss=desconto_inss,
+        colaborador=colaborador.first_name,
+        salario_liquido=round(salario_liquido, 2),
+        total_descontos=round(total_descontos, 2),
+        salario_bruto=round(salario_bruto, 2),
+        desconto_irrf=round(desconto_irrf, 2),
+        desconto_fgts = desconto_fgts
+    )
+    return pdf_response
+
+class ColaboradorListView(ListView):
+    model = USUARIO
+    template_name = 'controle_pagamento/colaborador_list.html'
+
+class ColaboradorDetailView(DetailView):
+    model = USUARIO
+    template_name = 'controle_pagamento/colaborador_detail.html'
+
+class ColaboradorUpdateView(UpdateView):
+    model = USUARIO
+    form_class = ColaboradorForm
+    template_name = 'controle_pagamento/colaborador_form.html'
+    success_url = reverse_lazy('colaborador_list')
+
+class DescontoListView(ListView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_list.html'
+
+class DescontoDetailView(DetailView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_detail.html'
+
+class DescontoCreateView(CreateView):
+    model = Desconto
+    form_class = DescontoForm
+    template_name = 'controle_pagamento/desconto_form.html'
+    success_url = reverse_lazy('desconto_list')
+
+class DescontoUpdateView(UpdateView):
+    model = Desconto
+    form_class = DescontoForm
+    template_name = 'controle_pagamento/desconto_form.html'
+    success_url = reverse_lazy('desconto_list')
+
+class DescontoDeleteView(DeleteView):
+    model = Desconto
+    template_name = 'controle_pagamento/desconto_confirm_delete.html'
+    success_url = reverse_lazy('desconto_list')
+
+class ComissaoListView(ListView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_list.html'
+
+class ComissaoDetailView(DetailView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_detail.html'
+
+class ComissaoCreateView(CreateView):
+    model = Comissao
+    form_class = ComissaoForm
+    template_name = 'controle_pagamento/comissao_form.html'
+    success_url = reverse_lazy('comissao_list')
+
+class ComissaoUpdateView(UpdateView):
+    model = Comissao
+    form_class = ComissaoForm
+    template_name = 'controle_pagamento/comissao_form.html'
+    success_url = reverse_lazy('comissao_list')
+
+class ComissaoDeleteView(DeleteView):
+    model = Comissao
+    template_name = 'controle_pagamento/comissao_confirm_delete.html'
+    success_url = reverse_lazy('comissao_list')

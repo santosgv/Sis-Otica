@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+  Nova Comissao
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2>{{ view.title }}</h2>
+  <form method="post" class="text-center">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Salvar</button>
+  </form>
+  <a href="{% url 'comissao_list' %}">Voltar para a Lista</a>
+{% endblock %}

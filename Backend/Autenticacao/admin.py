@@ -1,4 +1,6 @@
 from django.contrib import admin
-from .models import Ativacao
+from .models import Comissao,Desconto
 
-admin.site.register(Ativacao)
+
+admin.site.register(Desconto)
+admin.site.register(Comissao)

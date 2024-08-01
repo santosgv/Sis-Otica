@@ -1,9 +1,34 @@
 
 from django.urls import path
-from django.conf import settings
 from . import htmx_views
-from django.conf.urls.static import static
+from .utils import Imprimir_os
 from Core import views
+from django.contrib.auth import views as auth_views
+
+from .views import (
+    FornecedorListView,
+    FornecedorDetailView,
+    FornecedorCreateView,
+    FornecedorUpdateView,
+    FornecedorDeleteView,
+    ServicoListView,
+    ServicoCreateView,
+    TipoUnitarioListView,
+    TipoUnitarioCreateView,
+    TipoUnitarioDetailView,
+    TipoUnitarioUpdateView,
+    TipoUnitarioDeleteView,
+    EstiloListView,
+    EstiloCreateView,
+    EstiloDetailView,
+    EstiloUpdateView,
+    EstiloDeleteView,
+    TipoListView,
+    TipoCreateView,
+    TipoDetailView,
+    TipoUpdateView,
+    TipoDeleteView
+)
 
 
 app_name = 'Core'
@@ -11,6 +36,7 @@ app_name = 'Core'
 urlpatterns = [
     path('', views.home, name='home'),
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
+    path('fechar_card/', views.fechar_card, name='fechar_card'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
     path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
@@ -23,7 +49,7 @@ urlpatterns = [
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
-    path('Imprimir_os/<int:id_os>',views.Imprimir_os, name='Imprimir_os'),
+    path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
@@ -47,7 +73,36 @@ urlpatterns = [
     path('create_pdf/<str:codigo>/<int:quantidade>/', views.create_pdf, name='create_pdf'),
     path('entradas_estoque/', views.entradas_estoque,name='entradas_estoque'),
     path('saidas_estoque/', views.saidas_estoque,name='saidas_estoque'),
-    path('movimentacao/',views.movimentacao,name='movimentacao')
+    path('movimentacao/',views.movimentacao,name='movimentacao'),
+    path('vendas/',views.vendas, name='vendas'),
+
+
+
+    path('fornecedores/', FornecedorListView.as_view(), name='fornecedor_list'),
+    path('fornecedor/<int:pk>/', FornecedorDetailView.as_view(), name='fornecedor_detail'),
+    path('fornecedor/novo/', FornecedorCreateView.as_view(), name='fornecedor_create'),
+    path('fornecedor/<int:pk>/editar/', FornecedorUpdateView.as_view(), name='fornecedor_update'),
+    path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
+    path('servicos/',ServicoListView.as_view(),name='os_list'),
+    path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
+
+    path('tiposund/', TipoUnitarioListView.as_view(), name='tiposund_list'),
+    path('tipound/novo/', TipoUnitarioCreateView.as_view(), name='tipound_create'),
+    path('tipound/<int:pk>/', TipoUnitarioDetailView.as_view(), name='tipound_detail'),
+    path('tipound/<int:pk>/editar/', TipoUnitarioUpdateView.as_view(), name='tipound_update'),
+    path('tipound/<int:pk>/excluir/', TipoUnitarioDeleteView.as_view(), name='tipound_delete'),
+
+    path('estilos/', EstiloListView.as_view(), name='estilos_list'),
+    path('estilo/novo/', EstiloCreateView.as_view(), name='estilo_create'),
+    path('estilo/<int:pk>/', EstiloDetailView.as_view(), name='estilo_detail'),
+    path('estilo/<int:pk>/editar/', EstiloUpdateView.as_view(), name='estilo_update'),
+    path('estilo/<int:pk>/excluir/', EstiloDeleteView.as_view(), name='estilo_delete'),
+
+    path('tipos/', TipoListView.as_view(), name='tipos_list'),
+    path('tipo/novo/', TipoCreateView.as_view(), name='tipo_create'),
+    path('tipo/<int:pk>/', TipoDetailView.as_view(), name='tipo_detail'),
+    path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
+    path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
 ]
 
 htmx_patterns =[

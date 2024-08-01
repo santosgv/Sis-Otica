@@ -1,0 +1,34 @@
+-- database: ./db.sqlite3
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+CREATE TABLE Autenticacao_comissao (
+    id INTEGER NOT NULL PRIMARY KEY,
+    colaborador_id INTEGER, 
+    valor_vendas FLOAT,
+    data_referencia DATE,
+    horas_extras FLOAT,
+    FOREIGN KEY (colaborador_id) REFERENCES Autenticacao_USUARIO(ID)
+);
+
+CREATE TABLE Autenticacao_desconto (
+    id INTEGER NOT NULL PRIMARY KEY,
+    colaborador_id INTEGER,
+    tipo VARCHAR(100), 
+    percentual FLOAT,
+    FOREIGN KEY (colaborador_id) REFERENCES Autenticacao_USUARIO(ID)
+);
+
+DROP TABLE Autenticacao_desconto ;
+
+
+DROP TABLE Autenticacao_comissao ;
+
+-- add campo na tabela ja existente
+ALTER TABLE Autenticacao_usuario ADD COLUMN salario_bruto FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN comissao_percentual FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN valor_hora FLOAT;
+
+ALTER TABLE Autenticacao_usuario ADD COLUMN data_contratacao DATE;

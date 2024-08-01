@@ -30,7 +30,7 @@ Vizualiar O.S
     </div>
     
     <form method="POST" class="form_cliente">{% csrf_token %}
-      <h1>OS:NC{{VISUALIZAR_OS.id}}</h1>
+      <h1>{{unidade}}{{VISUALIZAR_OS.id}}</h1>
         <div class="row">
         {% if VISUALIZAR_OS.ANEXO %}
         <div class="form-group col-md-6">

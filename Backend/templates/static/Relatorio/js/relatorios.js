@@ -73,7 +73,7 @@ function renderiza_vendedor(url) {
       const totalvendas = vendedor['total_valor_vendas'];
       // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
       const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas} em Vendas`;
+      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas},00 em Vendas`;
 
       // Adicione o elemento à div de vendedores
       vendedorContainer.appendChild(vendedorElement);
@@ -146,7 +146,7 @@ function obter_os_em_aberto(url) {
     const totalValorContainer = document.getElementById('total_valor');
 
     totalVendasContainer.textContent = `Total de Vendas: ${totalVendas}`;
-    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor}`;
+    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor},00`;
   });
 }
 
@@ -156,18 +156,21 @@ function renderiza_minhas_vendas(url) {
     .then(data => {
       const vendedores = data.minhas_vendas_mes;
       const vendedorContainer = document.getElementById('eu');
+      const pm = document.getElementById('pm');
 
       vendedores.forEach(vendedor => {
         const vendedorNome = vendedor['VENDEDOR__first_name'];
         const totalPedidos = vendedor['total_pedidos'];
         const totalVendas = vendedor['total_valor_vendas'];
+        const ticketmedio = vendedor['ticket_medio'];
 
         // Crie um elemento HTML para cada vendedor
         const vendedorElement = document.createElement('div');
-        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas} em Vendas`;
-
+        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas},00 em Vendas`;
+        pm.innerHTML=`Preço Medio: R$${ticketmedio},00`;
         // Adicione o elemento à div de vendedores
         vendedorContainer.appendChild(vendedorElement);
+        pm.appendChild(ticketmedio);
       });
     })
     .catch(error => {
@@ -202,7 +205,7 @@ function recebe_hoje(url) {
 
     const receberdiv = document.getElementById('receber');
 
-    receberdiv.textContent = `R$ ${totalvendahoje}`;
+    receberdiv.textContent = `R$ ${totalvendahoje},00`;
 
   });
 }

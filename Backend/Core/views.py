@@ -1,55 +1,32 @@
 import os
-from django.views.decorators.cache import cache_page
 from django.contrib import messages
-from datetime import datetime, date
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-import datetime
 from reportlab.pdfgen import canvas
 import io
-from django.utils.timezone import now
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
-from Autenticacao.urls import views
+import json
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa
 from django.utils.timezone import now,timedelta
-from django.db.models import Sum,Count,IntegerField,Case, When,Value
-from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear
+from django.utils import timezone
+from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
+from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
 from django.http import JsonResponse
-from django.core.serializers import serialize
 from decimal import Decimal
 import logging
-from calendar import monthrange
-from calendar import month_name
 from django.db import transaction
-
-logger = logging.getLogger('MyApp')
-
-
-def get_today_data():
-    date_now  = datetime.datetime.now().date()
-    return date_now
-
-def primeiro_dia_mes():
-    data_atual = date.today()
-    primeiro_dia = data_atual.replace(day=1)
-    return primeiro_dia
-
-def ultimo_dia_mes():
-    data_atual = date.today()
-    last_date = data_atual.replace(day=1) + timedelta(monthrange(data_atual.year, data_atual.month)[1] - 1)
-    return last_date
-
-def thirty_days_ago():
-    data = get_today_data() - datetime.timedelta(days=30)
-    return data
-
-
+from django.core.cache import cache
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
 import io
 import os
 from reportlab.lib.pagesizes import letter
@@ -60,6 +37,57 @@ from django.http import FileResponse
 from PIL import Image
 from barcode import Code128
 from barcode.writer import ImageWriter
+
+logger = logging.getLogger('MyApp')
+
+
+
+def get_aniversariantes_mes():
+    cached_aniversariantes = cache.get('all_aniversariantes_mes')
+    if cached_aniversariantes is None:
+        today = timezone.now()
+        current_month = today.month
+
+
+        aniversariantes = CLIENTE.objects.annotate(
+            birth_month=ExtractMonth('DATA_NASCIMENTO'),
+            birth_day=ExtractDay('DATA_NASCIMENTO')
+        ).filter(
+            birth_month=current_month
+        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('birth_day')
+
+        cached_aniversariantes = [
+            {
+                'id': cliente.id,
+                'NOME': cliente.NOME,
+                'TELEFONE': cliente.TELEFONE.replace("(","").replace(")","").replace("-",""),
+                'DATA_NASCIMENTO': cliente.DATA_NASCIMENTO,
+                'EMAIL': cliente.EMAIL,
+                'MENSAGEM_ANIVERSARIO':criar_mensagem_parabens(cliente.NOME),
+            }
+            for cliente in aniversariantes
+        ]
+        
+
+        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=129600)
+    return cached_aniversariantes
+
+@csrf_exempt
+def fechar_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cliente_id = data.get('cliente_id')
+
+        # Atualizar o cache removendo o cliente da lista de aniversariantes
+        cached_aniversariantes = cache.get('all_aniversariantes_mes', [])
+        updated_aniversariantes = [cliente for cliente in cached_aniversariantes if cliente['id'] != cliente_id]
+        
+        # Atualizar o cache com a nova lista de aniversariantes
+        cache.set('all_aniversariantes_mes', updated_aniversariantes, timeout=129600)  # 30 dias = 2592000 segundos
+        
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'fail'}, status=400)
 
 def generate_barcode_image(code, volume):
     """
@@ -91,7 +119,7 @@ def create_pdf(request, codigo, quantidade):
 
     for volume in range(1, quantidade + 1):
         barcode_image = generate_barcode_image(codigo, volume)
-        barcode_image_path = f"NCbarcode_{codigo}-{volume}.png"
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
         
         # Save the barcode image to a temporary file
         barcode_image.save(barcode_image_path, "PNG")
@@ -122,41 +150,16 @@ def create_pdf(request, codigo, quantidade):
 
     return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
 
-
-def realizar_entrada(produto_id, quantidade):
-    produto = Produto.objects.get(pk=produto_id)
-    entrada_estoque = EntradaEstoque.objects.create(produto=produto, quantidade=quantidade)
-    produto.registrar_entrada(quantidade)
-    MovimentoEstoque.objects.create(produto=produto, tipo='E', quantidade=quantidade)
-    return entrada_estoque
-
-def realizar_saida(codigo, quantidade, observacao):
-    try:
-        produto = Produto.objects.get(codigo=codigo)
-        
-        registro_saida = produto.registrar_saida(quantidade)
-        
-        if registro_saida:
-            MovimentoEstoque.objects.create(produto=produto, tipo='S', quantidade=quantidade)
-            saida_estoque = SaidaEstoque.objects.create(produto=produto, quantidade=quantidade, observacao=observacao)
-            return saida_estoque
-        else:  
-            return False  
-
-    except Produto.DoesNotExist:
-        return False  # Retorna False se o produto com o código fornecido não existe
-
-
 @login_required(login_url='/auth/logar/')  
 def home(request):
     
     if request.user.is_authenticated:
-
+        aniversariantes = get_aniversariantes_mes()
         alertas = AlertaEstoque.objects.filter(lido=False)
         for alerta in alertas:
             alerta.lido = True
             alerta.save()
-        return render(request,'home.html',{'alertas': alertas})
+        return render(request,'home.html',{'alertas': alertas,'aniversariantes':aniversariantes})
     else:
         return render(request,'home.html')
 
@@ -250,7 +253,7 @@ def Lista_Os(request):
 
         Ordem_servicos = pagina.get_page(page)
 
-        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos})
+        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -359,6 +362,7 @@ def Visualizar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
        
         return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                       'unidade':settings.UNIDADE
                                                    })
     else:
         return render(request,'Os/Visualizar_os.htmll')
@@ -370,6 +374,7 @@ def Editar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
         
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
+                                                  'unidade':settings.UNIDADE
                                                    })
     else:
         with transaction.atomic():
@@ -466,94 +471,15 @@ def Loja_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')      
 
-@login_required(login_url='/auth/logar/')   
-def Imprimir_os(request,id_os):
-    try:
-        PRINT_OS =ORDEN.objects.get(id=id_os)
-        
-        buffer = io.BytesIO()
-        PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Courier', 12)
-        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
-
-        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
-        PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(325,778,'NC'+str(PRINT_OS.id))
-        PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
-        PDF.drawString(88,665,str(PRINT_OS.SERVICO))
-        PDF.drawString(385,665,str('N/D'))
-        PDF.drawString(88,637,str(PRINT_OS.LENTES))
-        PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
-        if PRINT_OS.FORMA_PAG == 'A':
-            PDF.drawString(109,539,'PIX')
-        elif PRINT_OS.FORMA_PAG == 'B':
-            PDF.drawString(109,539,'DINHEIRO')
-        elif PRINT_OS.FORMA_PAG == 'C':
-            PDF.drawString(109,539,'DEBITO')
-        elif PRINT_OS.FORMA_PAG == 'D':
-            PDF.drawString(109,539,'CREDITO')
-        elif PRINT_OS.FORMA_PAG == 'E':
-            PDF.drawString(109,539,'CARNER')
-        elif PRINT_OS.FORMA_PAG == 'F':
-            PDF.drawString(109,539,'PERMUTA')
-        
-        PDF.drawString(240,539,str(PRINT_OS.VALOR))
-        PDF.drawString(385,539,str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
-        # parte laboratorio
-        PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(325,454,'NC'+str(PRINT_OS.id))
-        PDF.drawString(450,454,str('Otica mais popular'))
-        PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
-        PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,385,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
-        PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str('N/D'))
-        PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
-        PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
-        PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
-        PDF.drawString(301,282,str(PRINT_OS.OE_CIL))
-        PDF.drawString(472,312,str(PRINT_OS.OD_EIXO))
-        PDF.drawString(472,282,str(PRINT_OS.OE_EIXO))
-        PDF.drawString(64,248,str(PRINT_OS.AD))
-        PDF.drawString(78,215,str(PRINT_OS.LENTES))
-        PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO[:69]))
-
-        PDF.drawString(60,116,str(PRINT_OS.DNP))
-        PDF.drawString(270,116,str(PRINT_OS.P))
-        PDF.drawString(430,116,str(PRINT_OS.DPA))
-        PDF.drawString(66,96,str(PRINT_OS.DIAG))
-        PDF.drawString(270,96,str(PRINT_OS.V))
-        PDF.drawString(415,96,str(PRINT_OS.H))
-        PDF.drawString(60,80,str(PRINT_OS.ALT))
-        PDF.drawString(432,78,str(PRINT_OS.ARM))
-        PDF.drawString(94,60,str(PRINT_OS.MONTAGEM))
-
-        PDF.showPage()
-        PDF.save()
-        buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f'OS-NC{PRINT_OS.id}.pdf')
-    except Exception as msg:
-        print(msg)
-        logger.warning(msg)
-        return redirect('/Lista_Os')
-
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
     Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
     pagina = Paginator(Lista_os, 10)
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
-    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos})
-
-
-def dados_caixa():
-    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
-    return dado
+    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
+                                                      'unidade':settings.UNIDADE
+                                                      })
 
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
@@ -582,22 +508,19 @@ def Caixa(request):
                                                       'saldo':saldo,
                                                       'saldo_total':saldo_total})
         except Exception as msg:
+            print(msg)
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    hora = datetime.datetime.now()
-    if hora.hour >= 20:
-        caixa = CAIXA.objects.filter(DATA__gte=thirty_days_ago(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
-        for dado in caixa:
-            dado.fechar_caixa()
-            dado.save()
-        messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
-        return redirect('/Caixa')
-    else:
-        messages.add_message(request, constants.WARNING, 'O caixa deve ser fechado apos as 20 Horas de hoje!')
-        return redirect('/Caixa')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    for dado in caixa:
+        dado.fechar_caixa()
+        dado.save()
+        
+    messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
+    return redirect('/Caixa')
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -644,7 +567,7 @@ def vendas_ultimos_12_meses(request):
         ORDEN.objects
         .annotate(mes_venda=TruncMonth('DATA_SOLICITACAO')) 
         .values('mes_venda')
-        .annotate(total_vendas=Count('id'))
+        .annotate(total_vendas=Sum('VALOR'))
         .filter(DATA_SOLICITACAO__gte=data_limite).exclude(STATUS='C')
         .order_by('mes_venda')
     )
@@ -816,11 +739,20 @@ def relatorios(request):
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
-    vendedor = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes(), VENDEDOR=USUARIO.objects.get(id=id_user.id)).exclude(STATUS='C') \
-        .values('VENDEDOR__first_name') \
-        .annotate(total_pedidos=Count('id')) \
-        .annotate(total_valor_vendas=Sum('VALOR')) \
-        .order_by('-total_pedidos')[:1]
+    vendedor = ORDEN.objects.filter(
+        DATA_SOLICITACAO__gte=primeiro_dia_mes(),
+        DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+        VENDEDOR=USUARIO.objects.get(id=id_user.id)
+    ).exclude(STATUS='C') \
+    .values('VENDEDOR__first_name') \
+    .annotate(total_pedidos=Count('id')) \
+    .annotate(total_valor_vendas=Sum('VALOR')) \
+    .annotate(ticket_medio=ExpressionWrapper(
+        F('total_valor_vendas') / F('total_pedidos'),
+        output_field=DecimalField(max_digits=10, decimal_places=2)
+    )) \
+    .order_by('-total_pedidos')[:1]
+
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
 @login_required(login_url='/auth/logar/')
@@ -875,7 +807,6 @@ def estoque(request):
                                                     'estilos':estilo,
                                                     'Produtos':Produtos}
                                                     )
-
 
 @login_required(login_url='/auth/logar/')
 def produto_estoque(request,id):
@@ -958,7 +889,6 @@ def movimentacao(request):
 
     return render(request,'Estoque/movimentacao_estoque.html',{'movimentacoes':movimentacoes})
 
-
 @login_required(login_url='/auth/logar/')
 def entradas_estoque(request):
     entradas = EntradaEstoque.objects.all().order_by('-id')
@@ -982,3 +912,116 @@ def saidas_estoque(request):
     movimentacoes = pagina.get_page(page)
 
     return render(request,'Estoque/saidas_estoque.html',{'movimentacoes':movimentacoes})
+
+def vendas(request):
+    return render(request,'vendas.html')
+
+class FornecedorListView(ListView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_list.html'
+
+class FornecedorDetailView(DetailView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_detail.html'
+
+class FornecedorCreateView(CreateView):
+    model = Fornecedor
+    form_class = FornecedorForm
+    template_name = 'Estoque/fornecedor_form.html'
+    success_url = reverse_lazy('Core:fornecedor_list')
+
+class FornecedorUpdateView(UpdateView):
+    model = Fornecedor
+    form_class = FornecedorForm
+    template_name = 'Estoque/fornecedor_form.html'
+    success_url = reverse_lazy('Core:fornecedor_list')
+
+class FornecedorDeleteView(DeleteView):
+    model = Fornecedor
+    template_name = 'Estoque/fornecedor_confirm_delete.html'
+    success_url = reverse_lazy('Core:fornecedor_list')
+
+class ServicoListView(ListView):
+    model = SERVICO
+    template_name = 'Os/os_list.html'
+
+class ServicoCreateView(CreateView):
+    model = SERVICO
+    form_class = ServicoForm
+    template_name = 'Os/os_form.html'
+    success_url = reverse_lazy('Core:os_list')
+
+class TipoUnitarioListView(ListView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_list.html'
+
+class TipoUnitarioCreateView(CreateView):
+    model = TipoUnitario
+    form_class = TipoUnitarioForm
+    template_name = 'Estoque/tipounitario_form.html'
+    success_url = reverse_lazy('Core:tiposund_list')
+
+class TipoUnitarioDetailView(DetailView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_detail.html'
+
+class TipoUnitarioUpdateView(UpdateView):
+    model = TipoUnitario
+    form_class = TipoUnitarioForm
+    template_name = 'Estoque/tipounitario_form.html'
+    success_url = reverse_lazy('Core:tiposund_list')
+
+class TipoUnitarioDeleteView(DeleteView):
+    model = TipoUnitario
+    template_name = 'Estoque/tipounitario_confirm_delete.html'
+    success_url = reverse_lazy('Core:tiposund_list')
+
+class EstiloListView(ListView):
+    model = Estilo
+    template_name = 'Estoque/estilo_list.html'
+
+class EstiloCreateView(CreateView):
+    model = Estilo
+    form_class = EstiloForm
+    template_name = 'Estoque/estilo_form.html'
+    success_url = reverse_lazy('Core:estilos_list')
+
+class EstiloDetailView(DetailView):
+    model = Estilo
+    template_name = 'Estoque/estilo_detail.html'
+
+class EstiloUpdateView(UpdateView):
+    model = Estilo
+    form_class = EstiloForm
+    template_name = 'Estoque/estilo_form.html'
+    success_url = reverse_lazy('Core:estilos_list')
+
+class EstiloDeleteView(DeleteView):
+    model = Estilo
+    template_name = 'Estoque/estilo_confirm_delete.html'
+    success_url = reverse_lazy('Core:estilos_list')
+
+class TipoListView(ListView):
+    model = Tipo
+    template_name = 'Estoque/tipo_list.html'
+
+class TipoCreateView(CreateView):
+    model = Tipo
+    form_class = TipoForm
+    template_name = 'Estoque/tipo_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class TipoDetailView(DetailView):
+    model = Tipo
+    template_name = 'Estoque/tipo_detail.html'
+
+class TipoUpdateView(UpdateView):
+    model = Tipo
+    form_class = TipoForm
+    template_name = 'Estoque/tipo_form.html'
+    success_url = reverse_lazy('Core:tipos_list')
+
+class TipoDeleteView(DeleteView):
+    model = Tipo
+    template_name = 'Estoque/tipo_confirm_delete.html'
+    success_url = reverse_lazy('Core:tipos_list')

@@ -1,16 +1,16 @@
 from django.contrib import admin
-from Autenticacao.models import USUARIO,SALARIO,COMISSAO
+from Autenticacao.models import USUARIO
 from Core.models import CLIENTE,ORDEN,CAIXA,SERVICO,EMPRESA,Fornecedor,TipoUnitario,Produto,EntradaEstoque,SaidaEstoque,MovimentoEstoque,Tipo,Estilo,AlertaEstoque
 
 
 
 admin.site.register(CAIXA)
-admin.site.register(COMISSAO)
+
 admin.site.register(CLIENTE)
 admin.site.register(SERVICO)
 admin.site.register(ORDEN)
 admin.site.register(USUARIO)
-admin.site.register(SALARIO)
+
 admin.site.register(EMPRESA)
 
 

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+  Detalhes do Desconto
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Detalhes do Desconto</h2>
+  <div class="text-center">
+  
+  <p>Desconto: {{ object }}</p>
+  <p>{{ object.percentual }}%</p>
+  <a href="{% url 'desconto_update' object.pk %}" class="btn btn-secondary">Editar</a>
+  <a href="{% url 'desconto_delete' object.pk %}" class="btn btn-danger">Excluir</a>
+  <a href="{% url 'desconto_list' %}" class="btn btn-primary">Voltar</a>
+</div>
+{% endblock %}

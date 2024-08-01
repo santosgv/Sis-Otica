@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title >{% block 'title' %}
+  Lista de Estilos
+       {% endblock %}</title>
+{% block 'body'%}  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Estilos</li>
+  </ol>
+</nav>
+  <h2 class="text-center">Estilos</h2>
+  <a href="{% url 'Core:estilo_create' %}" class="btn btn-primary">Novo Estilo</a>
+  <br>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">N°</th>
+        <th scope="col">Nome</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for estilo in object_list %}
+      <tr>
+        <th scope="row">{{estilo.pk}}</th>
+        <td><a href="{% url 'Core:estilo_detail' estilo.pk %}">{{ estilo.nome }}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}

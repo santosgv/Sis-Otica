@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_sonar',
     'debug_toolbar',
     'elasticapm.contrib.django',
     'Autenticacao',
@@ -86,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+      'django_sonar.middlewares.requests.RequestsMiddleware',
 ]
 
 ROOT_URLCONF = 'Sis.urls'
@@ -117,13 +119,6 @@ WSGI_APPLICATION = 'Sis.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 AUTH_USER_MODEL= "Autenticacao.USUARIO"
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
 
 
 DATABASES = {
@@ -162,10 +157,8 @@ ELASTIC_APM = {
     'SERVICE_NAME': 'Sis-Otica',  # Nome do seu serviço
     'SECRET_TOKEN': 'qweqW',               # Token secreto, se configurado
     'SERVER_URL': 'http://localhost:8200',
-    'ENVIRONMENT': 'production',      # Ambiente (ex: production, development)
-    'DEBUG': True,                    # Ativa o modo de depuração
-    'TRANSACTIONS_IGNORE_PATTERNS': ['^/health$', '^/metrics$'],  # Ignore rotas específicas
-}
+    'ENVIRONMENT': 'production'
+    }
 
 LOGGING = {
     'version': 1,
@@ -193,7 +186,7 @@ LOGGING = {
             'handlers': ['elasticapm'],
             'propagate': True,
         },
-       
+     
         'elasticapm.errors': {
             'level': 'ERROR',
             'handlers': ['elasticapm'],
@@ -268,6 +261,16 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DJANGO_SONAR = {
+    'excludes': [
+        STATIC_URL,
+        MEDIA_URL,
+        '/sonar/',
+        '/admin/',
+        '/__reload__/',
+    ],
+}
+
 
 
 MESSAGE_TAGS = {
@@ -277,6 +280,9 @@ MESSAGE_TAGS = {
     constants.INFO: 'alert-info',
     constants.WARNING: 'alert-warning',
 }
+
+UNIDADE='SGO'
+NOME='Sistema Gerencial de Óticas'
 
 
 DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title >{% block 'title' %}
+  Lista de Colaboradores
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Folha de Pagamento Funcionarios</h2>
+  <a href="{% url 'comissao_list' %}" class="btn btn-success">Comissoes</a>
+  <a href="{% url 'desconto_list' %}" class="btn btn-danger">Descontos</a>
+  <br>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">N°</th>
+        <th scope="col">Nome</th>
+        <th scope="col">Salario Bruto</th>
+        <th scope="col">Comissao</th>
+        <th scope="col">Contrataçao</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for colaborador in object_list %}
+      <tr>
+        <th scope="row">{{colaborador.pk}}</th>
+        <td><a href="{% url 'colaborador_detail' colaborador.pk %}">{{ colaborador.first_name }}</a></td>
+        <td>{{ colaborador.salario_bruto }}</td>
+        <td>{{ colaborador.comissao_percentual }}%</td>
+        <td>{{ colaborador.data_contratacao }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}
