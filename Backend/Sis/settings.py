@@ -122,11 +122,14 @@ AUTH_USER_MODEL= "Autenticacao.USUARIO"
 DATABASES = {
     'default': {
        'ENGINE': 'django_tenants.postgresql_backend',
-            'NAME': config('BANCO'),
+        'NAME': config('BANCO'),
         'USER': config('BANCO_USER'),
         'PASSWORD': config('BANCO_PASSWORD'),
         'HOST': config('BANCO_HOST'),
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 
