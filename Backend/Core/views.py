@@ -487,17 +487,17 @@ def get_entrada_saida(self):
     saldo = round(entradas - saidas,2)
 
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo_total = round(entradas_total - saidas_total,2)
+    #saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    #saldo_total = round(entradas_total - saidas_total,2)
 
-    return entradas,saidas,saldo,saldo_total
+    return entradas,saidas,saldo,entradas_total
 
 @login_required(login_url='/auth/logar/')
 def Caixa(request):
     if request.method == "GET":
         try:
             dadoscaixa = dados_caixa()
-            entradas,saida,saldo,saldo_total= get_entrada_saida(request)
+            entradas,saida,saldo,entradas_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)
@@ -505,7 +505,7 @@ def Caixa(request):
                                                       'entrada':entradas,
                                                       'saida':saida,
                                                       'saldo':saldo,
-                                                      'saldo_total':saldo_total})
+                                                      'saldo_total':entradas_total})
         except Exception as msg:
             print(msg)
             logger.critical(msg)
@@ -513,7 +513,7 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).exclude(FORMA='B').order_by('-id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()

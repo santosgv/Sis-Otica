@@ -147,7 +147,6 @@ class EMPRESA(models.Model):
     endereco_cep=models.IntegerField(),
     endereco_pais=models.IntegerField()
 
-
 class Fornecedor(models.Model):
     nome = models.CharField(max_length=100)
 
@@ -158,7 +157,6 @@ class Fornecedor(models.Model):
     class Meta:
         verbose_name = 'Fornecedores'
         verbose_name_plural = 'Fornecedores'
-
 
 class TipoUnitario(models.Model):
     nome = models.CharField(max_length=50)
