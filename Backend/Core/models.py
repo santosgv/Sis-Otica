@@ -136,7 +136,6 @@ class Fornecedor(models.Model):
         verbose_name = 'Fornecedores'
         verbose_name_plural = 'Fornecedores'
 
-
 class TipoUnitario(models.Model):
     nome = models.CharField(max_length=50)
 
