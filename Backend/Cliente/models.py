@@ -14,13 +14,6 @@ class Cliente(TenantMixin):
     on_trial = models.BooleanField(default=True, blank=True)
     descricao = models.TextField(blank=True)
     email =models.EmailField(null=True)
-    nome_fantasia=models.CharField(max_length=255)
-    cnpj=models.IntegerField(null=True),       
-    endereco_logradouro=models.CharField(max_length=80,null=True)
-    endereco_numero=models.IntegerField(null=True),
-    endereco_bairro=models.CharField(max_length=255,null=True),
-    endereco_municipio=models.CharField(max_length=255,null=True),
-    endereco_cep=models.IntegerField(null=True),
 
 
     is_active = models.BooleanField(default=False, blank=True)
