@@ -225,8 +225,7 @@ class Produto(models.Model):
         ).count()
 
         next_number = count + 1
-        codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
-        self.codigo = codigo
+        self.codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{next_number}"
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio
