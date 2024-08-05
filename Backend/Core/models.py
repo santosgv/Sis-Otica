@@ -217,15 +217,7 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        # Contar o número de produtos existentes com o mesmo fornecedor, tipo e estilo
-        count = Produto.objects.filter(
-            fornecedor=self.fornecedor,
-            Tipo=self.Tipo,
-            Estilo=self.Estilo
-        ).count()
-
-        next_number = count + 1
-        self.codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{next_number}"
+        self.codigo =codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio
