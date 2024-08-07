@@ -41,15 +41,18 @@
                     <label for="DATA_NASCIMENTO">Data</label>
                     <input class="form-control" type="text" value="{{data}}" name="DATA" id="DATA" readonly>
                   </div>
+
                   <div class="form-group col-md-2">
-                    <label for="inputState">O.S</label>
-                    <select id="REFERENCIA" name="REFERENCIA" class="form-control">
-                      <option selected value="null">..</option>
-                      {% for os in OsS %}
-                      <option value="{{os}}">{{os}}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
+                    <label for="search_os">Pesquisa</label>
+                    <div class="input-group">
+                      <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search_os" name="search_os" class="form-control" hx-get="/search_caixa" hx-target="#os-select" hx-trigger="keyup changed delay:500ms" placeholder="Os">
+                        <select id="os-select" name="REFERENCIA" class="form-control">
+                            <option value="" disabled selected>Os</option>
+                            {% include 'parcial/select_os.html' %}
+                        </select>
+                    </div>
+                </div>
                   <div class="form-group col-md-3">
                     <label for="inputZip">Valor</label>
                     <input required class="form-control" data-mask='000.000,00' maxlength="6" data-mask-reverse="true" id="VALOR" name="VALOR" required>

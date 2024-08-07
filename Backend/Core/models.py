@@ -124,28 +124,6 @@ class CAIXA(models.Model):
     def fechar_caixa(self):
         self.FECHADO = True
         return
-    
-class EMPRESA(models.Model):
-
-    choices_codigo_de_regime_tributario= (
-        (1,'simples nacional'),
-        (3,'Normal')
-    )
-
-    razao_social=models.CharField(max_length=255)
-    nome_fantasia=models.CharField(max_length=255)
-    cnpj=models.IntegerField(),
-    codigo_de_regime_tributario=models.CharField(max_length=1, choices=choices_codigo_de_regime_tributario, default=1)
-    inscricao_estadual=models.IntegerField(),
-    inscricao_municipal=models.IntegerField(),
-    cnae_fiscal=models.IntegerField(),        
-    endereco_logradouro=models.CharField(max_length=80)
-    endereco_numero=models.IntegerField(),
-    endereco_bairro=models.CharField(max_length=255),
-    endereco_municipio=models.CharField(max_length=255),
-    endereco_uf=models.CharField(max_length=2)
-    endereco_cep=models.IntegerField(),
-    endereco_pais=models.IntegerField()
 
 class Fornecedor(models.Model):
     nome = models.CharField(max_length=100)

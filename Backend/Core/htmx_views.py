@@ -15,6 +15,15 @@ def search(request):
 
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
+def search_products(request):
+    search_term = request.GET.get('search_products')
+    produtos = Produto.objects.filter(codigo__icontains=search_term)
+    return render(request, 'parcial/select_options.html', {'produtos': produtos})
+
+def search_caixa(request):
+    search_term = request.GET.get('search_os')
+    orden = ORDEN.objects.filter(id__icontains=search_term).exclude(STATUS='C').exclude(STATUS='E').all()
+    return render(request, 'parcial/select_os.html', {'OsS': orden})
 
 def search_cliente(request):
     search = request.GET.get('search_cliente')
