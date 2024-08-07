@@ -351,6 +351,7 @@ def Cadastrar_os(request,id_cliente):
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
                 return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
         except Exception as msg:
+
             logger.warning(msg)
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
@@ -487,7 +488,7 @@ def get_entrada_saida(self):
     saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     saldo = round(entradas - saidas,2)
 
-    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     #saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     #saldo_total = round(entradas_total - saidas_total,2)
 
@@ -781,6 +782,12 @@ def estoque(request):
         tipo = Tipo.objects.all()
         estilo = Estilo.objects.all()
         Produtos = Produto.objects.all().order_by('-id')
+
+        pagina = Paginator(Produtos, 25)
+
+        page = request.GET.get('page')
+
+        Produtos = pagina.get_page(page)
 
         qtd = request.GET.get('qtd')
         fornecedor = request.GET.get('fornecedor')

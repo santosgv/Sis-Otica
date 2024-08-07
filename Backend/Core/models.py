@@ -125,6 +125,7 @@ class CAIXA(models.Model):
         self.FECHADO = True
         return
     
+
 class Fornecedor(models.Model):
     nome = models.CharField(max_length=100)
 
@@ -195,8 +196,7 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
-        self.codigo = codigo
+        self.codigo =codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio

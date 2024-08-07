@@ -12,7 +12,6 @@ admin.site.register(ORDEN)
 admin.site.register(USUARIO)
 
 
-
 admin.site.register(Fornecedor)
 admin.site.register(TipoUnitario)
 admin.site.register(Produto)

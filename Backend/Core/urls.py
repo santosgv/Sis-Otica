@@ -108,6 +108,8 @@ urlpatterns = [
 htmx_patterns =[
     path('search/',htmx_views.search, name='search'),
     path('search_cliente/',htmx_views.search_cliente,name='search_cliente'),
+    path('search_products/', htmx_views.search_products, name='search_products'),
+    path('search_caixa/',htmx_views.search_caixa, name='search_caixa'),
     path('all_estoque',htmx_views.all_estoque,name='all_estoque'),
     path('save_product',htmx_views.save_product, name='save_product'),
 

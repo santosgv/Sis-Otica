@@ -1,0 +1,5 @@
+{% for os in OsS %}
+ <option value="{{os}}">{{os}}</option>
+{% empty %}
+    <option value="" disabled>Sem dados das OS</option>
+{% endfor %}

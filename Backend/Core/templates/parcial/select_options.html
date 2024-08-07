@@ -1,0 +1,5 @@
+{% for produto in produtos %}
+    <option value="{{ produto.codigo }}">{{ produto.codigo }} - Disponível: {{ produto.quantidade }}</option>
+{% empty %}
+    <option value="" disabled>Sem produtos em estoque</option>
+{% endfor %}

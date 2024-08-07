@@ -147,17 +147,12 @@ Cadastrar O.S
                       <div class="input-group-text">
                           <i class="fas fa-search"></i>
                       </div>
-                  </div>
-                  <select id="ARMACAO" name="ARMACAO" class="form-control">
-                    <option value="" disabled selected>Estoque ...</option>
-                    {% for produto in produtos %}
-                    {% if produto.quantidade > 0 %}
-                          <option value="{{ produto.codigo }}">{{ produto.codigo }} - Disponível: {{ produto.quantidade }}</option>
-                      {% endif %}
-                  {% empty %}
-                      <option value="" disabled>Sem produtos em estoque</option>
-                  {% endfor %}
-                  </select>
+                  </div>    
+                    <input type="text" id="search-input" name="search_products" hx-get="/search_products" hx-target="#produto-select" hx-trigger="keyup changed delay:500ms" placeholder="código do produto...">
+                    <select id="produto-select" name="ARMACAO" class="form-control">
+                      <option value="" disabled selected>Estoque ...</option>
+                      {% include 'parcial/select_options.html' %}
+                    </select>
               </div>
           </div>
           
