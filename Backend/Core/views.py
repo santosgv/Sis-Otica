@@ -514,7 +514,7 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).exclude(FORMA='B').order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()
