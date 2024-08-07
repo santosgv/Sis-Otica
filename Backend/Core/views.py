@@ -782,6 +782,12 @@ def estoque(request):
         estilo = Estilo.objects.all()
         Produtos = Produto.objects.all().order_by('-id')
 
+        pagina = Paginator(Produtos, 25)
+
+        page = request.GET.get('page')
+
+        Produtos = pagina.get_page(page)
+
         qtd = request.GET.get('qtd')
         fornecedor = request.GET.get('fornecedor')
         conf = request.GET.get('conf')

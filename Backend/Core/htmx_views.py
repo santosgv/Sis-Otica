@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario,Tipo,Estilo
 from decimal import Decimal
+from django.core.paginator import Paginator
 from .views import realizar_entrada
 
 

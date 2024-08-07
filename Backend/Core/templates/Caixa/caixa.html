@@ -23,12 +23,6 @@
   <a type="button" class="btn btn-primary" href="{% url 'Core:caixa_mes_anterior' %}">Visualizar Mês anteriores</a>
   <div class="container text-center">
     <nav class="navbar navbar-light bg-white">
-        <form class="form-inline">
-          <input hidden class="form-control mr-sm-2" type="text" id="myInput" onkeyup="myFunction()"  placeholder="Buscar Nome" aria-label="Search">
-        </form>
-        <div class="btn-continuar">
-          <a type="button" class="btn btn-primary" href="{% url 'Core:fechar_caixa' %}">Fechar Caixa</a>
-        </div>
       </nav>
       <div class="text-center">
         {% if messages %}
@@ -40,77 +34,86 @@
         {% endif %}
     </div>
     
-    <div class="row">
-      <div class="col-10">
-                  <table id="myTable" class="table table-hover">
-                      <tr class="thead">
-                          <th scope="col">DATA</th>
-                          <th scope="col">DESCRIÇAO</th>
-                          <th scope="col">OS</th>
-                          <th scope="col">TIPO</th>
-                          <th scope="col">VALOR</th>
-                          <th scope="col">FORMA</th>
-                        </tr>
-                      {% for dado in dados %}
-                        <tbody>
-                          <tr>
-                            <th hidden id="id" name="id">{{dado.id}}</th>
-                            <th scope="row">{{dado.DATA}}</th>
-                            <td >{{dado.DESCRICAO|slice:":25"}}</td>
-                            {% if dado.REFERENCIA == None %}
-                            <td></td>
-                            {% else %}
-                            <td><a href="{% url 'Core:Visualizar_os' dado.REFERENCIA  %}" rel="noopener noreferrer">{{dado.REFERENCIA}}</a></td>
-                            {% endif %}
-                            {% if dado.TIPO == "E" %}
-                            <td>Entrada</td>
-                            {% else%}
-                            <td>Saida</td>
-                            {% endif %}
-                            <td>R$: {{dado.VALOR}}</td>
-                            {% if dado.FORMA == "A" %}
-                            <td>PIX</td>
-                            {%endif%}
-                            {% if dado.FORMA == "B" %}
-                            <td>DINHEIRO</td>
-                            {%endif%}
-                            {% if dado.FORMA == "C" %}
-                            <td>DEBITO</td>
-                            {%endif%}
-                            {% if dado.FORMA == "D" %}
-                            <td>CREDITO</td>
-                            {%endif%}
-                            {% if dado.FORMA == "E" %}
-                            <td>CARNER</td>
-                            {%endif%}
-                            {% if dado.FORMA == "F" %}
-                            <td>PERMUTA</td>
-                            {%endif%}
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                      <a href="{% url 'Core:cadastro_caixa'%}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg=="></a>
-                </div>
-                  <div class="col-2">
-                    <div class="_caixa">
-                      <span>Saldo em dinheiro</span>
-                    </div>
-                    <div class="_caixa">
-                      <span>&nbspR$ {{saldo}}</span>
-                    </div>
-                    <div class="_caixa">
-                      <span>Total de entradas</span>
-                    </div>
-                    <div class="_caixa">
-                      <span>&nbspR$ {{saldo_total}}</span>
-                    </div>
-                    </div>
-    
-                </div>
-                  </div>
-            
-              </div>
+    <section class="container-fluid text-center">
+      <div class="row">
+        <!-- Table Column -->
+        <div class="col-lg-10 col-md-12">
+          <table id="myTable" class="table table-hover">
+            <thead>
+              <tr class="thead">
+                <th scope="col">DATA</th>
+                <th scope="col">DESCRIÇAO</th>
+                <th scope="col">OS</th>
+                <th scope="col">TIPO</th>
+                <th scope="col">VALOR</th>
+                <th scope="col">FORMA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for dado in dados %}
+              <tr>
+                <th hidden id="id" name="id">{{ dado.id }}</th>
+                <th scope="row">{{ dado.DATA }}</th>
+                <td>{{ dado.DESCRICAO|slice:":25" }}</td>
+                {% if dado.REFERENCIA == None %}
+                <td></td>
+                {% else %}
+                <td><a href="{% url 'Core:Visualizar_os' dado.REFERENCIA %}" rel="noopener noreferrer">{{ dado.REFERENCIA }}</a></td>
+                {% endif %}
+                {% if dado.TIPO == "E" %}
+                <td>Entrada</td>
+                {% else %}
+                <td>Saida</td>
+                {% endif %}
+                <td>R$: {{ dado.VALOR }}</td>
+                {% if dado.FORMA == "A" %}
+                <td>PIX</td>
+                {% endif %}
+                {% if dado.FORMA == "B" %}
+                <td>DINHEIRO</td>
+                {% endif %}
+                {% if dado.FORMA == "C" %}
+                <td>DEBITO</td>
+                {% endif %}
+                {% if dado.FORMA == "D" %}
+                <td>CREDITO</td>
+                {% endif %}
+                {% if dado.FORMA == "E" %}
+                <td>CARNER</td>
+                {% endif %}
+                {% if dado.FORMA == "F" %}
+                <td>PERMUTA</td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <a href="{% url 'Core:cadastro_caixa' %}">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg==" />
+          </a>
+        </div>
+        <!-- Cards Column -->
+        <div class="col-lg-2 col-md-12">
+          <div class="_caixa mb-3">
+            <span>Saldo em dinheiro</span>
+          </div>
+          <div class="_caixa mb-3">
+            <span>&nbspR$ {{ saldo }}</span>
+          </div>
+          <div class="_caixa mb-3">
+            <span>Total de entradas</span>
+          </div>
+          <div class="_caixa mb-3">
+            <span>&nbspR$ {{ saldo_total }}</span>
+          </div>
+          <div>
+            <a type="button" class="btn btn-warning" href="{% url 'Core:fechar_caixa' %}">Fechar Caixa</a>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+              
               <div class="pagination">
               
                 <samp class="step-links">
