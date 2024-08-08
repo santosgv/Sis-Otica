@@ -18,7 +18,7 @@ def search(request):
 
 def search_products(request):
     search_term = request.GET.get('search_products')
-    produtos = Produto.objects.filter(codigo__icontains=search_term)
+    produtos = Produto.objects.filter(codigo__icontains=search_term,quantidade__gt=0)
     return render(request, 'parcial/select_options.html', {'produtos': produtos})
 
 def search_caixa(request):
