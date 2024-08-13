@@ -515,7 +515,7 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).exclude(FORMA='B').order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
     for dado in caixa:
         dado.fechar_caixa()
         dado.save()
@@ -932,16 +932,18 @@ class FornecedorDetailView(DetailView):
     template_name = 'Estoque/fornecedor_detail.html'
 
 class FornecedorCreateView(CreateView):
-    model = Fornecedor
-    form_class = FornecedorForm
-    template_name = 'Estoque/fornecedor_form.html'
-    success_url = reverse_lazy('Core:fornecedor_list')
+    with transaction.atomic():
+        model = Fornecedor
+        form_class = FornecedorForm
+        template_name = 'Estoque/fornecedor_form.html'
+        success_url = reverse_lazy('Core:fornecedor_list')
 
 class FornecedorUpdateView(UpdateView):
-    model = Fornecedor
-    form_class = FornecedorForm
-    template_name = 'Estoque/fornecedor_form.html'
-    success_url = reverse_lazy('Core:fornecedor_list')
+    with transaction.atomic():
+        model = Fornecedor
+        form_class = FornecedorForm
+        template_name = 'Estoque/fornecedor_form.html'
+        success_url = reverse_lazy('Core:fornecedor_list')
 
 class FornecedorDeleteView(DeleteView):
     model = Fornecedor
@@ -953,30 +955,33 @@ class ServicoListView(ListView):
     template_name = 'Os/os_list.html'
 
 class ServicoCreateView(CreateView):
-    model = SERVICO
-    form_class = ServicoForm
-    template_name = 'Os/os_form.html'
-    success_url = reverse_lazy('Core:os_list')
+    with transaction.atomic():
+        model = SERVICO
+        form_class = ServicoForm
+        template_name = 'Os/os_form.html'
+        success_url = reverse_lazy('Core:os_list')
 
 class TipoUnitarioListView(ListView):
     model = TipoUnitario
     template_name = 'Estoque/tipounitario_list.html'
 
 class TipoUnitarioCreateView(CreateView):
-    model = TipoUnitario
-    form_class = TipoUnitarioForm
-    template_name = 'Estoque/tipounitario_form.html'
-    success_url = reverse_lazy('Core:tiposund_list')
+    with transaction.atomic():
+        model = TipoUnitario
+        form_class = TipoUnitarioForm
+        template_name = 'Estoque/tipounitario_form.html'
+        success_url = reverse_lazy('Core:tiposund_list')
 
 class TipoUnitarioDetailView(DetailView):
     model = TipoUnitario
     template_name = 'Estoque/tipounitario_detail.html'
 
 class TipoUnitarioUpdateView(UpdateView):
-    model = TipoUnitario
-    form_class = TipoUnitarioForm
-    template_name = 'Estoque/tipounitario_form.html'
-    success_url = reverse_lazy('Core:tiposund_list')
+    with transaction.atomic():
+        model = TipoUnitario
+        form_class = TipoUnitarioForm
+        template_name = 'Estoque/tipounitario_form.html'
+        success_url = reverse_lazy('Core:tiposund_list')
 
 class TipoUnitarioDeleteView(DeleteView):
     model = TipoUnitario
@@ -988,20 +993,22 @@ class EstiloListView(ListView):
     template_name = 'Estoque/estilo_list.html'
 
 class EstiloCreateView(CreateView):
-    model = Estilo
-    form_class = EstiloForm
-    template_name = 'Estoque/estilo_form.html'
-    success_url = reverse_lazy('Core:estilos_list')
+    with transaction.atomic():
+        model = Estilo
+        form_class = EstiloForm
+        template_name = 'Estoque/estilo_form.html'
+        success_url = reverse_lazy('Core:estilos_list')
 
 class EstiloDetailView(DetailView):
     model = Estilo
     template_name = 'Estoque/estilo_detail.html'
 
 class EstiloUpdateView(UpdateView):
-    model = Estilo
-    form_class = EstiloForm
-    template_name = 'Estoque/estilo_form.html'
-    success_url = reverse_lazy('Core:estilos_list')
+    with transaction.atomic():
+        model = Estilo
+        form_class = EstiloForm
+        template_name = 'Estoque/estilo_form.html'
+        success_url = reverse_lazy('Core:estilos_list')
 
 class EstiloDeleteView(DeleteView):
     model = Estilo
@@ -1013,20 +1020,22 @@ class TipoListView(ListView):
     template_name = 'Estoque/tipo_list.html'
 
 class TipoCreateView(CreateView):
-    model = Tipo
-    form_class = TipoForm
-    template_name = 'Estoque/tipo_form.html'
-    success_url = reverse_lazy('Core:tipos_list')
+    with transaction.atomic():
+        model = Tipo
+        form_class = TipoForm
+        template_name = 'Estoque/tipo_form.html'
+        success_url = reverse_lazy('Core:tipos_list')
 
 class TipoDetailView(DetailView):
     model = Tipo
     template_name = 'Estoque/tipo_detail.html'
 
 class TipoUpdateView(UpdateView):
-    model = Tipo
-    form_class = TipoForm
-    template_name = 'Estoque/tipo_form.html'
-    success_url = reverse_lazy('Core:tipos_list')
+    with transaction.atomic():
+        model = Tipo
+        form_class = TipoForm
+        template_name = 'Estoque/tipo_form.html'
+        success_url = reverse_lazy('Core:tipos_list')
 
 class TipoDeleteView(DeleteView):
     model = Tipo
