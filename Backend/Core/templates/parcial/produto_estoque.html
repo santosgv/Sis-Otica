@@ -1,7 +1,9 @@
-{% load static %}
+{% load static %}{% load compress %}
 {% block 'head' %}
 {% load filters %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endcompress %}
 {% endblock %}
 <form action="{% url 'Core:estoque' %}" method="get">
   <div class="row">

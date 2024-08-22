@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_sonar',
+    'compressor',
     'debug_toolbar',
  #   'elasticapm.contrib.django',
     'Autenticacao',
@@ -76,6 +77,7 @@ MIDDLEWARE = [
  #   'django_tenants.middleware.main.TenantMainMiddleware',
  #       'Sis.middleware.TenantActiveMiddleware',
  #   'elasticapm.contrib.django.middleware.TracingMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -188,7 +190,14 @@ SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 # }
 
 
-
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": os.path.join(BASE_DIR, 'tmp/django_cache'),
+        "TIMEOUT": 60,
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    }
+}
 #CACHES = {
 #    "default": {
 #        "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -240,6 +249,14 @@ INTERNAL_IPS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)
