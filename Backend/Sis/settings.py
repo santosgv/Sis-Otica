@@ -133,6 +133,13 @@ DATABASES = {
     }
 }
 
+DATABASE_POOL_ARGS = {
+    'MIN_CONN': 5,
+    'MAX_CONN': 10,
+    'POOL_TYPE': 'threading', 
+    'ASYNC': True
+}
+
 SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 
 #SESSION_ENGINE = 'django.contrib.sessions.backends.file'
