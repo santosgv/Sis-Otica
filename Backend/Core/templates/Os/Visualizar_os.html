@@ -249,6 +249,7 @@ Vizualiar O.S
           </div>
         </div>
         </div>
+        <div style="margin: 15px;">
         {% if user.FUNCAO == "G" and VISUALIZAR_OS.STATUS == "E" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
         {% endif %}
@@ -288,6 +289,7 @@ Vizualiar O.S
         <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
         <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
         {% endif %}
+      </div>
       </form>
   </section>
 
