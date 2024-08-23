@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_sonar',
+    'compressor',
     'debug_toolbar',
     'elasticapm.contrib.django',
     'Autenticacao',
@@ -55,6 +57,7 @@ SHARED_APPS = [
         'debug_toolbar',
         'Autenticacao',
         'Core',
+        'compressor',
 ]
 
 TENANT_APPS = [
@@ -69,6 +72,7 @@ TENANT_APPS = [
     # tenant-specific apps
      'Core',
      'Autenticacao',
+     'compressor',
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
@@ -76,13 +80,14 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',
-        'Sis.middleware.TenantActiveMiddleware',
+    'Sis.middleware.TenantActiveMiddleware',
     'elasticapm.contrib.django.middleware.TracingMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-   'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -204,7 +209,14 @@ LOGGING = {
 }
 
 
-
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": os.path.join(BASE_DIR, 'tmp/django_cache'),
+        "TIMEOUT": 60,
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    }
+}
 #CACHES = {
 #    "default": {
 #        "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -256,6 +268,14 @@ INTERNAL_IPS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)

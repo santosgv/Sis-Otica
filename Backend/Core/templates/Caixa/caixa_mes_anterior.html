@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
-
+{% load compress %}
 {% load static %}
 
 {% block 'head' %}
+{% compress css %}
 <html lang="pt-br">
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
-
+{% endcompress %}
 <title>{% block 'title' %}
     Mês Anterior
     {% endblock %}</title>

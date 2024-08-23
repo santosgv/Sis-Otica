@@ -22,3 +22,4 @@ typing_extensions==4.12.2
 tzdata==2022.6
 urllib3==2.2.2
 wrapt==1.14.1
+django-compressor==4.5.1

@@ -1,6 +1,8 @@
-{% load static %}
+{% load static %}{% load compress %}
 {% block 'head' %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endcompress %}
 {% endblock %}
 
 {% if clientes %}

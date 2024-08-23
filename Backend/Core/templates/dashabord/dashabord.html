@@ -1,8 +1,10 @@
-{% extends 'base.html' %} {% load static %}
+{% extends 'base.html' %} {% load static %}{% load compress %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'Relatorio/js/js.css' %}" />
 <link rel="stylesheet" href="{% static 'Relatorio/css/css.css' %}" />
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endcompress %}
 <title>{% block 'title' %} Kanban Board {% endblock %}</title>
 {% endblock %} 
 {% block 'body'%}

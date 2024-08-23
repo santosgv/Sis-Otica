@@ -127,7 +127,7 @@ class CAIXA(models.Model):
     
 
 class Fornecedor(models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=100, db_index=True)
 
 
     def __str__(self) -> str:
@@ -138,13 +138,13 @@ class Fornecedor(models.Model):
         verbose_name_plural = 'Fornecedores'
 
 class TipoUnitario(models.Model):
-    nome = models.CharField(max_length=50)
+    nome = models.CharField(max_length=50 ,db_index=True)
 
     def __str__(self) -> str:
         return str(self.nome)
     
 class Estilo(models.Model):
-    nome = models.CharField(max_length=50)
+    nome = models.CharField(max_length=50 ,db_index=True)
 
     class Meta:
         verbose_name = 'Estilo'
@@ -154,7 +154,7 @@ class Estilo(models.Model):
         return str(self.nome)
     
 class Tipo(models.Model):
-    nome = models.CharField(max_length=50)
+    nome = models.CharField(max_length=50, db_index=True)
 
 
     class Meta:
