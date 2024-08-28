@@ -9,8 +9,10 @@ from pynfe.utils.flags import CODIGO_BRASIL
 from decimal import Decimal
 import datetime
 
-certificado = "C:\GitHub\Sis-Otica\Backend"
-senha = 'senha'
+
+
+certificado = "/home/vitor/Documentos/github/Sis-Otica/JBC MUNDO OPTICO LTDA_53470256000129.pfx"
+senha = ''
 uf = 'mg'
 homologacao = True
 
