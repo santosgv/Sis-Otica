@@ -11,42 +11,40 @@ import datetime
 
 
 
-certificado = "/home/vitor/Documentos/github/Sis-Otica/JBC MUNDO OPTICO LTDA_53470256000129.pfx"
-senha = ''
+certificado = "C:\GitHub\Sis-Otica\JBC MUNDO OPTICO LTDA_53470256000129.pfx"
+senha = 'senha'
 uf = 'mg'
 homologacao = True
 
-# emitente
 emitente = Emitente(
-    razao_social='NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
-    nome_fantasia='Nome Fantasia da Empresa',
-    cnpj='99999999000199',           # cnpj apenas números
+    razao_social='JBC MUNDO OPTICO LTDA - SEM VALOR FISCAL',
+    nome_fantasia='Otica Mais Popular',
+    cnpj='53470256000129',           # cnpj apenas números
     codigo_de_regime_tributario='1', # 1 para simples nacional ou 3 para normal
-    inscricao_estadual='9999999999', # numero de IE da empresa
+    inscricao_estadual='47959030006', # numero de IE da empresa
     inscricao_municipal='12345',
-    cnae_fiscal='9999999',           # cnae apenas números
-    endereco_logradouro='Rua da Paz',
-    endereco_numero='154',
-    endereco_bairro='Belvedere',
-    endereco_municipio='Ribeirao das Neves',
+    cnae_fiscal='4774100',           # cnae apenas números
+    endereco_logradouro='Rua Lajedo',
+    endereco_numero='410',
+    endereco_bairro='Sao Gabriel',
+    endereco_municipio='Belo Horizonte',
     endereco_uf='MG',
-    endereco_cep='33821452',
+    endereco_cep='31985070',
     endereco_pais=CODIGO_BRASIL
 )
 
-# cliente
 cliente = Cliente(
     razao_social='NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
     tipo_documento='CPF',           #CPF ou CNPJ
     email='email@email.com',
-    numero_documento='12345678900', # numero do cpf ou cnpj
+    numero_documento='01858082633', # numero do cpf ou cnpj
     indicador_ie=9,                 # 9=Não contribuinte 
     endereco_logradouro='Rua dos Bobos',
     endereco_numero='Zero',
     endereco_complemento='Ao lado de lugar nenhum',
     endereco_bairro='Aquele Mesmo',
-    endereco_municipio='Brasilia',
-    endereco_uf='DF',
+    endereco_municipio='Belo Horizonte',
+    endereco_uf='MG',
     endereco_cep='12345123',
     endereco_pais=CODIGO_BRASIL,
     endereco_telefone='11912341234',
@@ -66,7 +64,7 @@ nota_fiscal = NotaFiscal(
    data_emissao=datetime.datetime.now(),
    data_saida_entrada=datetime.datetime.now(),
    tipo_documento=1,          # 0=entrada; 1=saida
-   municipio='4118402',       # Código IBGE do Município 
+   municipio='3106200',       # Código IBGE do Município 
    tipo_impressao_danfe=4,    # 0=Sem geração de DANFE;1=DANFE normal, Retrato;2=DANFE normal Paisagem;3=DANFE Simplificado;4=DANFE NFC-e;
    forma_emissao='1',         # 1=Emissão normal (não em contingência);
    cliente_final=1,           # 0=Normal;1=Consumidor final;
@@ -74,16 +72,17 @@ nota_fiscal = NotaFiscal(
    indicador_presencial=1,
    finalidade_emissao='1',    # 1=NF-e normal;2=NF-e complementar;3=NF-e de ajuste;4=Devolução de mercadoria.
    processo_emissao='0',      #0=Emissão de NF-e com aplicativo do contribuinte;
-   transporte_modalidade_frete=9, # 9=Sem Ocorrência de Transporte.
+   transporte_modalidade_frete=1,
    informacoes_adicionais_interesse_fisco='Mensagem complementar',
-   totais_tributos_aproximado=Decimal('21.06'),
+   totais_tributos_aproximado=Decimal('00.01'),
 )
 
 # Produto
 nota_fiscal.adicionar_produto_servico(
     codigo='000328',                           # id do produto
     descricao='NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
-    ncm='99999999',
+    ncm='90031910',
+    #cest='0100100',                            # NT2015/003
     cfop='5102',
     unidade_comercial='UN',
     ean='SEM GTIN',
@@ -95,12 +94,14 @@ nota_fiscal.adicionar_produto_servico(
     quantidade_tributavel=Decimal('12'),
     valor_unitario_tributavel=Decimal('9.75'),
     ind_total=1,
+    # numero_pedido='12345',                   # xPed
+    # numero_item='123456',                    # nItemPed
     icms_modalidade='102',
     icms_origem=0,
     icms_csosn='400',
     pis_modalidade='07',
     cofins_modalidade='07',
-    valor_tributos_aprox=Decimal('21.06')
+    valor_tributos_aprox='21.06'
     )
 
 # responsável técnico
@@ -145,7 +146,6 @@ else:
   print(envio[1].text) # resposta
   print('Nota:')
   print(etree.tostring(envio[2], encoding="unicode")) # nfe
-
 
 
 xml_com_qrcode = SerializacaoQrcode().gerar_qrcode(token, csc, xml,return_qr=True)
