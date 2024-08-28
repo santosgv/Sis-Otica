@@ -754,6 +754,9 @@ def dados_minhas_vendas(request):
     )) \
     .order_by('-total_pedidos')[:1]
 
+    for item in vendedor:
+        item['ticket_medio'] = format(item['ticket_medio'], '.2f')
+
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
 @login_required(login_url='/auth/logar/')
