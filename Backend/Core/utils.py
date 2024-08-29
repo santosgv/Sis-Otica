@@ -14,19 +14,24 @@ from reportlab.pdfgen import canvas
 from Core.models import ORDEN
 from django.utils.timezone import timedelta
 import logging
+from django_tenants.utils import get_tenant_model
 
 logger = logging.getLogger('MyApp')
 
+def get_tenant(request):
+    TenantModel = get_tenant_model()
+    tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
+    return tenant
 
-def criar_mensagem_parabens(cliente):
+def criar_mensagem_parabens(request,cliente):
     nome_cliente = cliente
     mensagem = (
         f"*Parabéns pelo seu aniversário,{nome_cliente}!*\n\n"
-        f"A *{settings.NOME}* deseja a você um dia repleto de alegria, amor e saúde. E para tornar essa data ainda mais especial, preparamos um presente para você!\n\n"
+        f"A *{get_tenant(request).razao_social}* deseja a você um dia repleto de alegria, amor e saúde. E para tornar essa data ainda mais especial, preparamos um presente para você!\n\n"
         f"Você ganhou um *vale-presente de R$50,00* para ser usado em compras acima de R$300,00 na nossa ótica. E o melhor de tudo: esse vale é seu, mas se preferir, você pode dar de presente para alguém especial também!\n\n"
         f"Esperamos que aproveite esse mimo e continue contando com a gente para ver o mundo com mais clareza e estilo.\n\n"
         f"Com carinho,"
-        f"*{settings.NOME}*"
+        f"*{get_tenant(request).razao_social}*"
     )
     return quote(mensagem)
 
@@ -83,7 +88,7 @@ def Imprimir_os(request,id_os):
 
         PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(325,778,str(settings.UNIDADE)+str(PRINT_OS.id))
+        PDF.drawString(325,778,str(get_tenant(request).unidade)+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
@@ -109,8 +114,8 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         # parte laboratorio
         PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
-        PDF.drawString(395,454,str(settings.NOME))
+        PDF.drawString(325,454,str(get_tenant(request).unidade)+str(PRINT_OS.id))
+        PDF.drawString(395,454,str(get_tenant(request)))
         PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
@@ -141,7 +146,7 @@ def Imprimir_os(request,id_os):
         PDF.showPage()
         PDF.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f'OS-{settings.UNIDADE}{PRINT_OS.id}.pdf')
+        return FileResponse(buffer, as_attachment=True, filename=f'OS-{get_tenant(request).unidade}{PRINT_OS.id}.pdf')
     except Exception as msg:
         print(msg)
         logger.warning(msg)

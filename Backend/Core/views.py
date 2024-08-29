@@ -14,7 +14,7 @@ from reportlab.lib.pagesizes import letter
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa
+from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_tenant
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -38,11 +38,11 @@ from PIL import Image
 from barcode import Code128
 from barcode.writer import ImageWriter
 
+
 logger = logging.getLogger('MyApp')
 
 
-
-def get_aniversariantes_mes():
+def get_aniversariantes_mes(request):
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
         today = timezone.now()
@@ -63,7 +63,7 @@ def get_aniversariantes_mes():
                 'TELEFONE': cliente.TELEFONE.replace("(","").replace(")","").replace("-",""),
                 'DATA_NASCIMENTO': cliente.DATA_NASCIMENTO,
                 'EMAIL': cliente.EMAIL,
-                'MENSAGEM_ANIVERSARIO':criar_mensagem_parabens(cliente.NOME),
+                'MENSAGEM_ANIVERSARIO':criar_mensagem_parabens(request,cliente.NOME),
             }
             for cliente in aniversariantes
         ]
@@ -152,9 +152,9 @@ def create_pdf(request, codigo, quantidade):
 
 @login_required(login_url='/auth/logar/')  
 def home(request):
-    
     if request.user.is_authenticated:
-        aniversariantes = get_aniversariantes_mes()
+
+        aniversariantes = get_aniversariantes_mes(request)
         alertas = AlertaEstoque.objects.filter(lido=False)
         for alerta in alertas:
             alerta.lido = True
@@ -253,7 +253,7 @@ def Lista_Os(request):
 
         Ordem_servicos = pagina.get_page(page)
 
-        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
+        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':get_tenant(request).unidade})
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -363,7 +363,7 @@ def Visualizar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
        
         return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
-                                                       'unidade':settings.UNIDADE
+                                                       'unidade':get_tenant(request).unidade
                                                    })
     else:
         return render(request,'Os/Visualizar_os.htmll')
@@ -375,7 +375,7 @@ def Editar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
         
         return render(request,'Os/Edita_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
-                                                  'unidade':settings.UNIDADE
+                                                  'unidade':get_tenant(request).unidade
                                                    })
     else:
         with transaction.atomic():
@@ -479,7 +479,7 @@ def Dashabord(request):
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
-                                                      'unidade':settings.UNIDADE
+                                                      'unidade':get_tenant(request).unidade
                                                       })
 
 @login_required(login_url='/auth/logar/')
