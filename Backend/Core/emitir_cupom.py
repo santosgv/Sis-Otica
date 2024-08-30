@@ -8,13 +8,21 @@ from pynfe.processamento.assinatura import AssinaturaA1
 from pynfe.utils.flags import CODIGO_BRASIL
 from decimal import Decimal
 import datetime
+import os
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-certificado = "C:\GitHub\Sis-Otica\JBC MUNDO OPTICO LTDA_53470256000129.pfx"
+certificado = (os.path.join(BASE_DIR, 'JBC MUNDO OPTICO LTDA_53470256000129.pfx'),)
 senha = 'senha'
 uf = 'mg'
 homologacao = True
+
+
+
+con = ComunicacaoSefaz(uf, certificado, senha, homologacao)
+xml = con.status_servico('nfe')
+print(xml.text)
 
 emitente = Emitente(
     razao_social='JBC MUNDO OPTICO LTDA - SEM VALOR FISCAL',
