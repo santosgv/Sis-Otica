@@ -23,9 +23,6 @@
       <li class="nav-item">
         <a class="nav-link" href="#pricing">Preços</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#contato">Contatos</a>
-      </li>
     </ul>
   </div>
 </nav>
@@ -55,8 +52,33 @@
 
 
 <!-- Pricing Section -->
-<section id="pricing" class="py-5 bg-light">
 
+<section id="pricing" class="py-5 bg-light">
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+      <h1 class="display-4">EXPERIMENTE SEM COMPROMISSO POR 7 DIAS</h1>
+      <div class="container mt-5">
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-6 mb-4">
+              <img width="48" height="48" src="https://img.icons8.com/material-rounded/48/ffda1c/private-folder.png" alt="private-folder"/>
+                <p>Dados pessoais sigilosos não são compartilhados</p>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+              <img width="48" height="48" src="https://img.icons8.com/ios-filled/50/ffda1c/card-security.png" alt="card-security"/>
+                <p>Dados financeiros guardados não são compartilhados</p>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+              <img width="48" height="48" src="https://img.icons8.com/ios-filled/50/ffda1c/shield.png" alt="shield"/>
+                <p>100% confiável compre com segurança</p>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+              <img width="48" height="48" src="https://img.icons8.com/glyph-neue/50/ffda1c/time-machine.png" alt="time-machine"/>
+                <p>Entrega garantida no prazo e política de devolução</p>
+            </div>
+        </div>
+    </div>
+
+      <p class="lead"><img src="{% static 'home/img/Selo10_7Dias_0.75x.png' %}" alt="selo" srcset="" height="20%" width="20%"></p>
+    </div>
   <div class="container">
     <div class="card-deck mb-3 text-center">
       <div class="card mb-4 box-shadow pricing-card">
@@ -121,36 +143,9 @@
     </div>
 
 </section>
-
-<div class="container contact-form" id="contato">
-  <div class="contact-image">
-    <img width="50" height="50" src="https://img.icons8.com/ios-filled/50/bb3452/rocket.png" alt="rocket"/>
-  </div>
-  <form method="post">
-      <h3>Deixe uma Menssagem</h3>
-     <div class="row">
-          <div class="col-md-6">
-              <div class="form-group">
-                  <input type="text" name="txtName" class="form-control" placeholder="Seu Nome *" value="" />
-              </div>
-              <div class="form-group">
-                  <input type="text" name="txtEmail" class="form-control" placeholder="Seu Email *" value="" />
-              </div>
-              <div class="form-group">
-                  <input type="text" name="txtPhone" class="form-control" placeholder="Seu  Numero *" value="" />
-              </div>
-              <div class="form-group">
-                  <input type="submit" name="btnSubmit" class="btnContact" value="Enviar Menssagem" />
-              </div>
-          </div>
-          <div class="col-md-6">
-              <div class="form-group">
-                  <textarea name="txtMsg" class="form-control" placeholder="Sua Menssagem *" style="width: 100%; height: 150px;"></textarea>
-              </div>
-          </div>
-      </div>
-  </form>
-</div>
+<a href="https://wa.me/5555319841783?text=Ola%20gostaria%20de%20saber%20mais%20sobre%20o%20Sistema" target="_blank" style="position:fixed;bottom:20px;right:30px;">
+  <svg enable-background="new 0 0 512 512" width="50" height="50" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M256.064,0h-0.128l0,0C114.784,0,0,114.816,0,256c0,56,18.048,107.904,48.736,150.048l-31.904,95.104  l98.4-31.456C155.712,496.512,204,512,256.064,512C397.216,512,512,397.152,512,256S397.216,0,256.064,0z" fill="#4CAF50"></path><path d="m405.02 361.5c-6.176 17.44-30.688 31.904-50.24 36.128-13.376 2.848-30.848 5.12-89.664-19.264-75.232-31.168-123.68-107.62-127.46-112.58-3.616-4.96-30.4-40.48-30.4-77.216s18.656-54.624 26.176-62.304c6.176-6.304 16.384-9.184 26.176-9.184 3.168 0 6.016 0.16 8.576 0.288 7.52 0.32 11.296 0.768 16.256 12.64 6.176 14.88 21.216 51.616 23.008 55.392 1.824 3.776 3.648 8.896 1.088 13.856-2.4 5.12-4.512 7.392-8.288 11.744s-7.36 7.68-11.136 12.352c-3.456 4.064-7.36 8.416-3.008 15.936 4.352 7.36 19.392 31.904 41.536 51.616 28.576 25.44 51.744 33.568 60.032 37.024 6.176 2.56 13.536 1.952 18.048-2.848 5.728-6.176 12.8-16.416 20-26.496 5.12-7.232 11.584-8.128 18.368-5.568 6.912 2.4 43.488 20.48 51.008 24.224 7.52 3.776 12.48 5.568 14.304 8.736 1.792 3.168 1.792 18.048-4.384 35.52z" fill="#FAFAFA"></path></svg>
+</a>
 <footer class="bg-body-tertiary text-center text-lg-start">
   <!-- Copyright -->
   <div class="text-center p-3" style="background-color:#BB3452; color: #fff;">
@@ -159,6 +154,7 @@
   </div>
   <!-- Copyright -->
 </footer>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
