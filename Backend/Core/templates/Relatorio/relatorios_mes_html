@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load compress %}
+{% load static %}
+
+{% block 'head' %}
+<html lang="pt-br">
+{% compress css %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endcompress %}
+<title>{% block 'title' %}
+    Mês Anterior
+{% endblock %}</title>
+{% endblock %}
+
+{% block 'body'%}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: var(--bs-white);">
+        <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'Core:relatorios'%}">Relatorios</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Meses</li>
+    </ol>
+</nav>
+<div class="text-center">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{message.tags}}">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<section class="container-fluid text-center">
+    <div class="form_">
+        <div class="text-center">
+            <label for="" class="titulo">Consultar Mêses</label>
+        </div>
+        <form action="#" method="GET">{% csrf_token %}
+            <label for="data_inicio">Data de Início:</label>
+            <input type="date" id="data_inicio" required name="data_inicio">
+            <label for="data_fim">Data de Término:</label>
+            <input type="date" id="data_fim" required name="data_fim">
+            <input type="submit" value="Obter Valores" class="btn btn-primary">
+        </form>
+        <br>
+    </div>
+    <div class="container-fluid">
+        <div id="vendedor" class="bg-light p-3"></div>
+    </div>
+</section>
+
+<script src="{% static 'Relatorio/js/relatorios.js' %}"></script>
+
+<script>
+    let myChart; // Variável para armazenar o gráfico
+
+    function meses() {
+        const data_inicio = document.getElementById('data_inicio').value;
+        const data_fim = document.getElementById('data_fim').value;
+
+        const url = `{% url "Core:maiores_vendedores_meses" %}?data_inicio=${data_inicio}&data_fim=${data_fim}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const vendedores = data.maiores_vendedores_30_dias;
+                const vendedorContainer = document.getElementById('vendedor');
+                vendedorContainer.innerHTML = ''; // Limpa qualquer conteúdo existente
+
+                vendedores.forEach(function(vendedor) {
+                    const vendedorNome = vendedor['VENDEDOR__first_name'];
+                    const totalPedidos = vendedor['total_pedidos'];
+                    const totalvendas = vendedor['total_valor_vendas'];
+                    const tkmedio = vendedor['ticket_medio'];
+
+                    const vendedorElement = document.createElement('div');
+                    vendedorElement.innerHTML = `<strong>${vendedorNome}</strong>: ${totalPedidos} Pedidos, R$ ${totalvendas},00 em Vendas, Ticket médio: R$ ${tkmedio},00`;
+
+                    vendedorContainer.appendChild(vendedorElement);
+                });
+            })
+            .catch(error => console.error(error));
+    }
+
+    window.onload = function (e) {
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            meses();
+        });
+    }
+</script>
+</html>
+{% endblock %}

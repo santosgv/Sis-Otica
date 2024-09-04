@@ -600,6 +600,21 @@ def maiores_vendedores_30_dias(request):
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
 @login_required(login_url='/auth/logar/')
+def maiores_vendedores_meses(request):
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=data_inicio,DATA_SOLICITACAO__lte=data_fim).exclude(STATUS='C') \
+        .values('VENDEDOR__first_name') \
+        .annotate(total_pedidos=Count('id')) \
+        .annotate(total_valor_vendas=Sum('VALOR')) \
+        .annotate(ticket_medio=ExpressionWrapper(
+        F('total_valor_vendas') / F('total_pedidos'),
+        output_field=DecimalField(max_digits=10, decimal_places=2)
+    )) \
+        .order_by('-total_pedidos')[:5]
+    return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
+
+@login_required(login_url='/auth/logar/')
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
     transacoes_mensais = CAIXA.objects.annotate(
@@ -661,6 +676,7 @@ def transacoes_mensais(request):
 @login_required(login_url='/auth/logar/')
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
+
 
 @login_required(login_url='/auth/logar/')
 def obter_valores_registros_meses_anteriores(request):
@@ -740,6 +756,10 @@ def obter_os_em_aberto(request):
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
     return render(request,'Relatorio/relatorios.html')
+
+@login_required(login_url='/auth/logar/')
+def relatorio_mes_anterior(request):
+    return render(request, 'Relatorio/relatorios_mes_html')
 
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
