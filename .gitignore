@@ -7,7 +7,7 @@ __pycache__/
 media/
 migrations/
 tmp/
-
+CACHE/
 # C extensions
 *.so
 

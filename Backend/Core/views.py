@@ -591,6 +591,10 @@ def maiores_vendedores_30_dias(request):
         .values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
+        .annotate(ticket_medio=ExpressionWrapper(
+        F('total_valor_vendas') / F('total_pedidos'),
+        output_field=DecimalField(max_digits=10, decimal_places=2)
+    )) \
         .order_by('-total_pedidos')[:5]
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
