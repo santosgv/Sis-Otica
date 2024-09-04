@@ -73,7 +73,7 @@
                     const tkmedio = vendedor['ticket_medio'];
 
                     const vendedorElement = document.createElement('div');
-                    vendedorElement.innerHTML = `<strong>${vendedorNome}</strong>: ${totalPedidos} Pedidos, R$ ${totalvendas},00 em Vendas, Ticket médio: R$ ${tkmedio},00`;
+                    vendedorElement.innerHTML = `<strong>${vendedorNome}</strong>: ${totalPedidos} Pedidos, R$ ${totalvendas} em Vendas, Ticket médio: R$ ${tkmedio}`;
 
                     vendedorContainer.appendChild(vendedorElement);
                 });
