@@ -132,18 +132,14 @@ DATABASES = {
         'PASSWORD': config('BANCO_PASSWORD'),
         'HOST': config('BANCO_HOST'),
         'PORT': '5432',
+        'CONN_MAX_AGE': 500,
+        'MAX_CONNS': 20,
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
 
-DATABASE_POOL_ARGS = {
-    'MIN_CONN': 5,
-    'MAX_CONN': 10,
-    'POOL_TYPE': 'threading', 
-    'ASYNC': True
-}
 
 SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 
