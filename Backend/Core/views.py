@@ -13,6 +13,7 @@ from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
 from django.conf import settings
 from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa
 from django.utils.timezone import now,timedelta
@@ -558,6 +559,7 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
@@ -585,6 +587,7 @@ def vendas_ultimos_12_meses(request):
 
     return JsonResponse({'data': data_vendas})
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def maiores_vendedores_30_dias(request):
     vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
@@ -598,6 +601,7 @@ def maiores_vendedores_30_dias(request):
         .order_by('-total_pedidos')[:5]
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
@@ -676,7 +680,6 @@ def transacoes_mensais(request):
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
-
 @login_required(login_url='/auth/logar/')
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
@@ -730,6 +733,7 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
+
 @login_required(login_url='/auth/logar/')
 def obter_os_em_aberto(request):    
     
@@ -760,6 +764,7 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
@@ -779,11 +784,13 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
 
+@cache_page(60 * 15)
 @login_required(login_url='/auth/logar/')
 def receber(request):
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
