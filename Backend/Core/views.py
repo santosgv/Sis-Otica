@@ -621,8 +621,8 @@ def maiores_vendedores_meses(request):
         vendedor_formatado = {
             'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
             'total_pedidos': vendedor['total_pedidos'],
-            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas']), '.2f'),
-            'ticket_medio': format(Decimal(vendedor['ticket_medio']), '.2f')
+            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas'])),
+            'ticket_medio': format(Decimal(vendedor['ticket_medio']))
         }
         vendedores_formatados.append(vendedor_formatado)
 
