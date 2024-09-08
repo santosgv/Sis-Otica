@@ -614,8 +614,19 @@ def maiores_vendedores_meses(request):
         F('total_valor_vendas') / F('total_pedidos'),
         output_field=DecimalField(max_digits=10, decimal_places=2)
     )) \
-        .order_by('-total_pedidos')[:5]
-    return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
+        .order_by('-total_pedidos')
+
+    vendedores_formatados = []
+    for vendedor in vendedores:
+        vendedor_formatado = {
+            'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
+            'total_pedidos': vendedor['total_pedidos'],
+            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas']), '.2f'),
+            'ticket_medio': format(Decimal(vendedor['ticket_medio']), '.2f')
+        }
+        vendedores_formatados.append(vendedor_formatado)
+
+    return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
 
 @login_required(login_url='/auth/logar/')
 def transacoes_mensais(request):
