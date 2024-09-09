@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_sonar',
+#    'django_sonar',
     'compressor',
     'debug_toolbar',
     'elasticapm.contrib.django',
@@ -285,15 +285,15 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DJANGO_SONAR = {
-    'excludes': [
-        STATIC_URL,
-        MEDIA_URL,
-        '/sonar/',
-        '/admin/',
-        '/__reload__/',
-    ],
-}
+#DJANGO_SONAR = {
+#    'excludes': [
+#        STATIC_URL,
+#        MEDIA_URL,
+#        '/sonar/',
+#        '/admin/',
+#        '/__reload__/',
+#    ],
+#}
 
 
 
