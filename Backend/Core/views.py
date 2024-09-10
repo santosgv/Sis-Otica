@@ -817,6 +817,7 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
+    quantidade = Produto.objects.count()
     if request.method == 'GET':
         fornecedores = Fornecedor.objects.all()
         unitarios = TipoUnitario.objects.all()
@@ -853,7 +854,8 @@ def estoque(request):
                                                     'unitarios': unitarios,
                                                     'tipos':tipo,
                                                     'estilos':estilo,
-                                                    'Produtos':Produtos}
+                                                    'Produtos':Produtos,
+                                                    'quantidade':quantidade}
                                                     )
 
 @login_required(login_url='/auth/logar/')
