@@ -622,8 +622,8 @@ def maiores_vendedores_meses(request):
         vendedor_formatado = {
             'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
             'total_pedidos': vendedor['total_pedidos'],
-            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas']), '.2f'),
-            'ticket_medio': format(Decimal(vendedor['ticket_medio']), '.2f')
+            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas'])),
+            'ticket_medio': format(Decimal(vendedor['ticket_medio']))
         }
         vendedores_formatados.append(vendedor_formatado)
 
@@ -821,6 +821,7 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
+    quantidade = Produto.objects.count()
     if request.method == 'GET':
         fornecedores = Fornecedor.objects.all()
         unitarios = TipoUnitario.objects.all()
@@ -857,7 +858,8 @@ def estoque(request):
                                                     'unitarios': unitarios,
                                                     'tipos':tipo,
                                                     'estilos':estilo,
-                                                    'Produtos':Produtos}
+                                                    'Produtos':Produtos,
+                                                    'quantidade':quantidade}
                                                     )
 
 @login_required(login_url='/auth/logar/')
