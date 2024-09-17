@@ -1,17 +1,18 @@
 from urllib.parse import quote
+import pandas as pd
 from django.conf import settings
 from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
-from django.http import FileResponse
+from django.http import FileResponse,HttpResponse
 import io
 import os
 from reportlab.lib.pagesizes import letter
 from django.shortcuts import redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
-from Core.models import ORDEN
+from Core.models import ORDEN,CLIENTE
 from django.utils.timezone import timedelta
 import logging
 
@@ -146,3 +147,47 @@ def Imprimir_os(request,id_os):
         print(msg)
         logger.warning(msg)
         return redirect('/Lista_Os')
+    
+def export_clientes(request):
+    try:
+        clientes = CLIENTE.objects.all().filter(STATUS=1).values('NOME','EMAIL','TELEFONE','CPF','DATA_NASCIMENTO','LOGRADOURO','NUMERO','BAIRRO','CIDADE')
+
+        df = pd.DataFrame(list(clientes))
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=clientes.xlsx'
+        df.to_excel(response, index=False)
+
+        return response
+    except Exception as msg:
+        logger.warning(msg)
+
+def export_os(request):
+    try:
+        CHOICES_PAGAMENTO_DICT = {
+        'A': 'PIX',
+        'B': 'DINHEIRO',
+        'C': 'DEBITO',
+        'D': 'CREDITO',
+        'E': 'CARNER',
+        'F': 'PERMUTA',
+        }
+        CHOICES_SITUACAO_DIC ={
+        'A':'SOLICITADO',
+        'E':'ENTREGUE',
+        'C':'CANCELADO',
+        'L':'LABORATÓRIO',
+        'J':'LOJA',
+        }
+        
+        os = ORDEN.objects.select_related('VENDEDOR','CLIENTE','SERVICO').values(
+        'id','DATA_SOLICITACAO','VENDEDOR__first_name','CLIENTE__NOME','SERVICO__SERVICO','LENTES',
+        'ARMACAO','OBSERVACAO','FORMA_PAG','VALOR','QUANTIDADE_PARCELA','ENTRADA','STATUS')
+        df = pd.DataFrame(list(os))
+        df['FORMA_PAG'] = df['FORMA_PAG'].map(CHOICES_PAGAMENTO_DICT)
+        df['STATUS'] = df['STATUS'].map(CHOICES_SITUACAO_DIC)
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=OS.xlsx'
+        df.to_excel(response, index=False)
+        return response
+    except Exception as msg:
+        logger.warn(msg)
