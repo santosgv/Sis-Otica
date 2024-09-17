@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os
+from .utils import Imprimir_os,export_clientes,export_os
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -50,6 +50,8 @@ urlpatterns = [
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
     path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
+    path('export_clientes',export_clientes,name='export_clientes'),
+    path('export_os',export_os,name='export_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
