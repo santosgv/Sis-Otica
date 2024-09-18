@@ -135,7 +135,7 @@ DATABASES = {
         'CONN_MAX_AGE': 500,
         'MAX_CONNS': 20,
         'OPTIONS': {
-            'sslmode': 'require',
+      #      'sslmode': 'require',
         },
     }
 }
