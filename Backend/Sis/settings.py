@@ -143,6 +143,8 @@ DATABASES = {
 
 SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 #SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 #SESSION_FILE_PATH = os.path.join(BASE_DIR,'tmp/')
 
