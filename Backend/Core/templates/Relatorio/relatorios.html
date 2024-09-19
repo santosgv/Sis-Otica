@@ -24,10 +24,10 @@ Relatorios
 {% if user.FUNCAO == "G" %}
 <div class="container-fluid">
   <br>
-  <div class="btn-group" role="group" aria-label="Basic example">
-    <a type="button" class="btn btn-secondary" href="{% url 'Core:relatorio_mes_anterior' %}">Vendedores Mês anteriores</a>
-    <a href="{% url 'Core:export_clientes' %}" type="button" class="btn btn-secondary">Exportar Clientes</a>
-    <a href="{% url 'Core:export_os' %}" type="button" class="btn btn-secondary">Exportar Os</a>
+  <div class="btn-toolbar mb-3" role="group" aria-label="Basic example">
+    <a type="button" class="btn btn-dark" href="{% url 'Core:relatorio_mes_anterior' %}">Vendedores Mês anteriores</a>
+    <a href="{% url 'Core:export_clientes' %}" type="button" class="btn btn-success">Exportar Clientes</a>
+    <a href="{% url 'Core:export_os' %}" type="button" class="btn btn-info">Exportar Os</a>
   </div>
   <div class="row text-center">
     <div class="card">
