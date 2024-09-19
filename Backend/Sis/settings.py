@@ -140,8 +140,7 @@ DATABASES = {
     }
 }
 
-
-SESSION_COOKIE_AGE = 86400 # 24 horas * 60 minutos * 60 segundos
+SESSION_COOKIE_AGE=604800 # 1 semana
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
