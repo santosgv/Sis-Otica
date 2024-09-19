@@ -59,10 +59,16 @@
             <input type="date" class="form-control"  id="DATA_NASCIMENTO" value="{{cliente.DATA_NASCIMENTO|date:"d/m/Y"}}" name="DATA_NASCIMENTO" required>
           </div>
         </div>
-        <div class="form-group">
-          <label for="LOGRADOURO">Logradouro</label>
-          <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" value="{{cliente.LOGRADOURO}}" placeholder="1234 Main St" required>
-        </div>
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label for="cep">CEP</label>
+            <input type="text" class="form-control" id="CEP" name="CEP" placeholder="Cep" value="{{cliente.CEP}}">
+          </div>
+          <div class="form-group col-md-8">
+            <label for="LOGRADOURO">Logradouro</label>
+            <input type="text" class="form-control" id="LOGRADOURO" name="LOGRADOURO" placeholder="Main St" value="{{cliente.LOGRADOURO}}" required>
+          </div>
+         </div>
         <div class="row">
             <div class="form-group col-md-2">
                 <label for="NUMERO">Numero</label>

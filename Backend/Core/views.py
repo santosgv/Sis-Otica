@@ -183,6 +183,7 @@ def cadastro_cliente(request):
         return render(request, 'Cliente/cadastro_cliente.html')
     else:
         NOME = request.POST.get('NOME')
+        CEP = request.POST.get('CEP')
         LOGRADOURO = request.POST.get('LOGRADOURO')
         NUMERO = request.POST.get('NUMERO')
         BAIRRO = request.POST.get('BAIRRO')
@@ -194,6 +195,7 @@ def cadastro_cliente(request):
              
     with transaction.atomic():
         cliente =CLIENTE(NOME=NOME,
+        CEP=CEP,
         LOGRADOURO=LOGRADOURO,
         NUMERO=NUMERO,
         BAIRRO=BAIRRO,
@@ -222,6 +224,7 @@ def Edita_cliente(request,id):
         with transaction.atomic():
             cliente = CLIENTE.objects.get(id=id)
             cliente.NOME = request.POST.get('NOME')
+            cliente.CEP = request.POST.get('CEP')
             cliente.LOGRADOURO = request.POST.get('LOGRADOURO')
             cliente.NUMERO = request.POST.get('NUMERO')
             cliente.BAIRRO = request.POST.get('BAIRRO')

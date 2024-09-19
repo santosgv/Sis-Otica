@@ -3,6 +3,8 @@ from Core.models import ORDEN,CLIENTE,Produto,Fornecedor,TipoUnitario,Tipo,Estil
 from decimal import Decimal
 from django.core.paginator import Paginator
 from .views import realizar_entrada
+from django.db.models.functions import Replace
+from django.db.models import Value
 
 
 def search(request):
@@ -17,8 +19,13 @@ def search(request):
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
 def search_products(request):
-    search_term = request.GET.get('search_products')
-    produtos = Produto.objects.filter(codigo__icontains=search_term,quantidade__gt=0)
+    search_term = request.GET.get('search_products', '').replace('-', '')
+    produtos = Produto.objects.annotate(
+        codigo_sem_hifen=Replace('codigo', Value('-'), Value(''))
+    ).filter(
+        codigo_sem_hifen__icontains=search_term,
+        quantidade__gt=0
+    )
     return render(request, 'parcial/select_options.html', {'produtos': produtos})
 
 def search_caixa(request):
@@ -31,10 +38,8 @@ def search_cliente(request):
     clientes = CLIENTE.objects.filter(NOME__icontains=search)
     return render(request,'parcial/cliente_parcial.html',{'clientes':clientes})
 
-
 def all_estoque(request):
     return render(request,'parcial/produto_estoque.html')
-
 
 def save_product(request):
     chavenfe = request.POST.get('chavenfe')
