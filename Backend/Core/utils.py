@@ -191,3 +191,62 @@ def export_os(request):
         return response
     except Exception as msg:
         logger.warn(msg)
+
+def gerar_etiquetas_cliente(request):
+    try:
+        if request.method == 'POST':
+            ids_clientes_selecionados = request.POST.getlist('clientes_ids')
+            clientes = CLIENTE.objects.filter(id__in=ids_clientes_selecionados)
+
+
+            # Configuração do PDF
+            buffer = io.BytesIO()
+            p = canvas.Canvas(buffer, pagesize=letter)
+            altura_pagina = letter[1]  # Apenas a altura
+
+            # Configuração da posição inicial
+            x_inicial = 20 * mm
+            y_inicial = altura_pagina - 20 * mm
+            espacamento_vertical = 20 * mm
+            espacamento_horizontal = 55 * mm
+
+            linha = 0
+            coluna = 0
+
+            for cliente in clientes:
+                # Gerar conteúdo da etiqueta
+                endereco = f"{cliente.NOME}\n{cliente.LOGRADOURO}, {cliente.NUMERO}\n{cliente.BAIRRO} - {cliente.CIDADE} {cliente.ENDERECO_UF}\nCEP: {cliente.CEP}"
+
+                # Inserir a etiqueta no PDF
+                x = x_inicial + (coluna * espacamento_horizontal)
+                y = y_inicial - (linha * espacamento_vertical)
+
+                # Usar drawText para permitir quebras de linha
+                text_object = p.beginText(x, y)
+                text_object.setFont("Helvetica", 12)
+                for linha_endereco in endereco.split('\n'):
+                    text_object.textLine(linha_endereco)
+                p.drawText(text_object)
+
+                # Verificar se já preencheu uma linha de etiquetas (3 por linha, por exemplo)
+                coluna += 1
+                if coluna == 3:
+                    coluna = 0
+                    linha += 1
+
+                # Verificar se precisa adicionar uma nova página
+                if y - espacamento_vertical < 20 * mm:
+                    p.showPage()  # Cria uma nova página no PDF
+                    y_inicial = altura_pagina - 20 * mm  # Resetar a posição inicial
+                    linha = 0
+                    coluna = 0
+
+            # Fechar o PDF e retornar a resposta
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            return FileResponse(buffer, as_attachment=True, filename='etiquetas_clientes.pdf')
+        return redirect('/clientes')
+    except Exception as msg:
+        print(msg)
+        return redirect('/clientes')

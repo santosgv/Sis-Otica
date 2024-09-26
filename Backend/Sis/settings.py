@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_sonar',
+  #  'django_sonar',
     'compressor',
     'debug_toolbar',
  #   'elasticapm.contrib.django',

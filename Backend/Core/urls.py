@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os,export_clientes,export_os
+from .utils import Imprimir_os,export_clientes,export_os,gerar_etiquetas_cliente
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -107,7 +107,7 @@ urlpatterns = [
     path('tipo/<int:pk>/', TipoDetailView.as_view(), name='tipo_detail'),
     path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
     path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
-    path('gerar_etiquetas_selecionados',views.gerar_etiquetas_selecionados, name='gerar_etiquetas_selecionados'),
+    path('gerar_etiquetas_cliente/',gerar_etiquetas_cliente, name='gerar_etiquetas_cliente'),
 ]
 
 htmx_patterns =[
