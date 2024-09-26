@@ -37,6 +37,7 @@
     </form>
     <div class="btn-continuar">
       <a type="button" class="btn btn-primary" href="{% url 'Core:cadastro_cliente'%}">Cadastrar cliente</a>
+      <a href="{% url 'Core:gerar_etiquetas_selecionados' %}">gerar etiquetas</a>
     </div>
   </nav>
             <div class="text-center">
@@ -65,7 +66,7 @@
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
-                          <th scope="row"><a href="{% url 'Core:cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
+                          <th scope="row"><input type="checkbox" name="clientes_selecionados" value="{{ cliente.id }}"><a href="{% url 'Core:cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
                           <td>{{cliente.LOGRADOURO|slice:":10"}}</td>
                           <td>{{cliente.NUMERO|slice:":5"}}</td>
                           <td>{{cliente.BAIRRO|slice:":10"}}</td>

@@ -107,6 +107,7 @@ urlpatterns = [
     path('tipo/<int:pk>/', TipoDetailView.as_view(), name='tipo_detail'),
     path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
     path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
+    path('gerar_etiquetas_selecionados',views.gerar_etiquetas_selecionados, name='gerar_etiquetas_selecionados'),
 ]
 
 htmx_patterns =[
