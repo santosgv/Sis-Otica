@@ -72,7 +72,7 @@ class ORDEN(models.Model):
     OE_CIL = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     OE_EIXO = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     AD = models.CharField(max_length=5,blank=True, null=True,default='N/D')
-    DNP = models.CharField(max_length=5,blank=True, null=True,default='N/D')
+    DNP = models.CharField(max_length=15,blank=True, null=True,default='N/D')
     P = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     DPA = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     DIAG = models.CharField(max_length=5,blank=True, null=True,default='N/D')
