@@ -292,8 +292,8 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
 }
 
-UNIDADE='SGO'
-NOME='Sistema Gerencial de Óticas'
+UNIDADE=config('UNIDADE')
+NOME=config('NOME')
 
 
 DEFAULT_FROM_EMAIL=config('EMAIL_HOST_USER')
