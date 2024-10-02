@@ -8,6 +8,15 @@
   Lista de Fornecedores
        {% endblock %}</title>
 {% block 'body'%}  
+
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {{message.tags}}">
+        {{message}}
+    </div>
+{% endfor %}
+{% endif %}
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb" style="background-color: var(--bs-white);">
     <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
@@ -15,9 +24,18 @@
     <li class="breadcrumb-item active" aria-current="page">Fornecedores</li>
   </ol>
 </nav>
+<br>
+<form class="text-center" method="post" enctype="multipart/form-data" action="{% url 'Core:gerar_etiquetas_cliente'%}">
+  {% csrf_token %}
+  <label for="arquivo_excel">Selecione a planilha:</label>
+  <input type="file" id="arquivo_excel" name="arquivo_excel" accept=".xls, .xlsx">
+  <button type="submit" class="btn btn-primary">Gerar Etiquetas</button>
+</form>
+<br>
   <h2 class="text-center">Fornecedores</h2>
   <a href="{% url 'Core:fornecedor_create' %}" class="btn btn-primary">Novo Fornecedor</a>
   <br>
+  
   <br>
   <table class="table table-striped">
     <thead>

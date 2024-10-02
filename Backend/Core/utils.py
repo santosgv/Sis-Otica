@@ -1,5 +1,7 @@
 from urllib.parse import quote
 import pandas as pd
+from django.contrib import messages
+from django.contrib.messages import constants
 from django.conf import settings
 from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA
 from datetime import datetime, date
@@ -195,9 +197,21 @@ def export_os(request):
 def gerar_etiquetas_cliente(request):
     try:
         if request.method == 'POST':
-            ids_clientes_selecionados = request.POST.getlist('clientes_ids')
-            clientes = CLIENTE.objects.filter(id__in=ids_clientes_selecionados)
+            # Verificar se o arquivo de planilha foi enviado
+            arquivo_excel = request.FILES.get('arquivo_excel')
+            
+            if not arquivo_excel:
+                messages.add_message(request, constants.ERROR, 'nenhum arquivo for enviado')
+                return redirect('/fornecedores')  # Redireciona se nenhum arquivo for enviado
 
+            # Ler a planilha Excel usando pandas
+            df = pd.read_excel(arquivo_excel)
+
+            # Verificar se as colunas necessárias estão presentes
+            colunas_necessarias = ['Fantasia','Tipo', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'CEP']
+            if not all(col in df.columns for col in colunas_necessarias):
+                messages.add_message(request, constants.ERROR, 'Falta uma das Colunas na planilha Fantasia Tipo, Endereço, Número, Complemento, Bairro, Cidade,UF,CEP')
+                return redirect('/fornecedores')  
 
             # Configuração do PDF
             buffer = io.BytesIO()
@@ -208,14 +222,23 @@ def gerar_etiquetas_cliente(request):
             x_inicial = 20 * mm
             y_inicial = altura_pagina - 20 * mm
             espacamento_vertical = 20 * mm
-            espacamento_horizontal = 55 * mm
+            espacamento_horizontal = 90 * mm
 
             linha = 0
             coluna = 0
 
-            for cliente in clientes:
+            # Gerar etiquetas para cada cliente na planilha
+            for index, row in df.iterrows():
+                # Obter os dados do cliente da planilha
+                Fantasia = row['Fantasia']
+                endereco_completo = f"{row['Tipo']},{row['Endereço']}, {row['Número']}, {row['Complemento']}"
+                bairro = row['Bairro']
+                cidade = row['Cidade']
+                uf = row['UF']
+                cep = row['CEP']
+                
                 # Gerar conteúdo da etiqueta
-                endereco = f"{cliente.NOME}\n{cliente.LOGRADOURO}, {cliente.NUMERO}\n{cliente.BAIRRO} - {cliente.CIDADE} {cliente.ENDERECO_UF}\nCEP: {cliente.CEP}"
+                etiqueta = f"{Fantasia}\n{endereco_completo}\nBAIRRO:{bairro} - {cidade} {uf}\nCEP: {cep}"
 
                 # Inserir a etiqueta no PDF
                 x = x_inicial + (coluna * espacamento_horizontal)
@@ -223,14 +246,14 @@ def gerar_etiquetas_cliente(request):
 
                 # Usar drawText para permitir quebras de linha
                 text_object = p.beginText(x, y)
-                text_object.setFont("Helvetica", 12)
-                for linha_endereco in endereco.split('\n'):
+                text_object.setFont("Helvetica", 10)
+                for linha_endereco in etiqueta.split('\n'):
                     text_object.textLine(linha_endereco)
                 p.drawText(text_object)
 
                 # Verificar se já preencheu uma linha de etiquetas (3 por linha, por exemplo)
                 coluna += 1
-                if coluna == 3:
+                if coluna == 2:
                     coluna = 0
                     linha += 1
 
@@ -246,7 +269,9 @@ def gerar_etiquetas_cliente(request):
             p.save()
             buffer.seek(0)
             return FileResponse(buffer, as_attachment=True, filename='etiquetas_clientes.pdf')
-        return redirect('/clientes')
+        else:
+            print('erro')
+        return redirect('/fornecedores')
     except Exception as msg:
         print(msg)
-        return redirect('/clientes')
+        return redirect('/fornecedores')

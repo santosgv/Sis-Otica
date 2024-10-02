@@ -26,16 +26,14 @@
     <div class="btn-continuar">
       <a type="button" class="btn btn-primary" href="{% url 'Core:cadastro_cliente'%}">Cadastrar cliente</a>
     </div>
-    <form class="form-inline"  method="POST" action="{% url 'Core:gerar_etiquetas_cliente' %}">
-      {% csrf_token %}
+    <form class="form-inline">
       <input class="form-control mr-sm-2" type="search" 
        name="search_cliente" placeholder="Nome" 
        hx-get="search_cliente/" 
        hx-trigger="input changed delay:500ms, search" 
        hx-target="#search-results" 
        hx-indicator=".htmx-indicator">
-      <button type="submit" class="btn btn-primary">Imprimir Etiquetas Selecionadas</button>
-  
+    </form>
   </nav>
             <div class="text-center">
               {% if messages %}
@@ -49,7 +47,6 @@
                 <table id="myTable" class="table table-hover">
                   <span id="search-results"></span>
                     <tr class="thead">
-                      <th scope="col">Selecionar</th>
                         <th scope="col">NOME</th>
                         <th scope="col">LOGRADOURO</th>
                         <th scope="col">NUMERO</th>
@@ -64,7 +61,6 @@
                       <tbody>
                         <tr>
                           <th hidden id="id" name="id">{{cliente.id}}</th>
-                          <td><input type="checkbox" name="clientes_ids" value="{{ cliente.id }}"></td>
                           <th scope="row"><a href="{% url 'Core:cliente' cliente.id  %}">{{cliente.NOME}}</a></th>
                           <td>{{cliente.LOGRADOURO|slice:":10"}}</td>
                           <td>{{cliente.NUMERO|slice:":5"}}</td>
@@ -81,7 +77,7 @@
                       </tbody>
                       {% endfor%}
                 </table>
-                </form>
+
             </div>
             
             <div class="pagination">
