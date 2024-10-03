@@ -15,9 +15,85 @@ from reportlab.pdfgen import canvas
 from Core.models import ORDEN,CLIENTE
 from django.utils.timezone import timedelta
 import logging
+from PIL import Image
+from barcode import Code128
+from barcode.writer import ImageWriter
 
 logger = logging.getLogger('MyApp')
 
+
+def generate_barcode_image(code, volume):
+
+    barcode_value = f"{code}-{volume}"
+    barcode = Code128(barcode_value, writer=ImageWriter())
+    
+    # Generate barcode image in memory
+    output = io.BytesIO()
+    barcode.write(output, {
+        'module_height': 6.0,  # Ajustado para ficar proporcional na área de 30mm
+        'module_width': 0.2,
+        'quiet_zone': 6.5,
+        'text_distance': 3.5,
+        'font_size': 8,  # Tamanho de fonte ajustado
+        'background': 'white',
+        'foreground': 'black'
+    })
+    output.seek(0)
+    return Image.open(output)
+
+# Função para criar o PDF das etiquetas
+def create_pdf(request, codigo, quantidade):
+    produto_preco = Produto.objects.get(codigo=codigo)
+    # Define o tamanho da etiqueta: 90mm de largura por 12mm de altura
+    etiqueta_width = 90 * mm
+    etiqueta_height = 12 * mm
+
+    # Buffer de saída para o PDF
+    buffer = io.BytesIO()
+    
+    # Cria o canvas no tamanho da etiqueta
+    c = canvas.Canvas(buffer, pagesize=(etiqueta_width, etiqueta_height))
+
+    # Configurações de layout
+    labels_per_page = 10  # Ajustável dependendo da lógica de impressão
+    x_inicial = 0
+    y_inicial = etiqueta_height
+    
+    # Lógica para cada etiqueta
+    for volume in range(1, quantidade + 1):
+        # Gera a imagem do código de barras
+        barcode_image = generate_barcode_image(codigo, volume)
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
+        
+        # Salva a imagem temporariamente
+        barcode_image.save(barcode_image_path, "PNG")
+        
+        # Desenhar espaço em branco (primeiros 30mm)
+        c.setFillColor("white")
+        c.rect(x_inicial, y_inicial - 12 * mm, 30 * mm, etiqueta_height, stroke=0, fill=1)
+        
+        # Desenhar a informação do preço (segundo bloco de 30mm)
+        c.setFillColor("black")
+        c.setFont("Helvetica", 8)
+        c.drawString(x_inicial + 35 * mm, y_inicial - 5 * mm, f"SGO SISTEMAS")
+        c.drawString(x_inicial + 35 * mm, y_inicial - 10 * mm, f"Preço: R$ {produto_preco.preco_venda}")
+        
+        # Desenhar o código de barras no último bloco de 30mm
+        c.drawImage(barcode_image_path, x_inicial + 60 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
+        
+        # Movimentação para a próxima etiqueta
+        x_inicial = 0
+        c.showPage()  # Nova etiqueta, já que cada página é uma etiqueta
+
+        # Remover o arquivo de imagem temporário
+        os.remove(barcode_image_path)
+    
+    # Finaliza o PDF
+    c.save()
+    buffer.seek(0)
+
+    # Retorna o PDF gerado
+    return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
 
 def criar_mensagem_parabens(cliente):
     nome_cliente = cliente
