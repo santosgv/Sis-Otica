@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os,export_clientes,export_os,create_pdf
+from .utils import gerar_etiquetas_cliente,Imprimir_os,export_clientes,export_os,create_pdf
 from Core import views
 from django.contrib.auth import views as auth_views
 
