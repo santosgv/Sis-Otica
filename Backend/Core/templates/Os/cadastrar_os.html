@@ -148,14 +148,23 @@ Cadastrar O.S
                           <i class="fas fa-search"></i>
                       </div>
                   </div>    
-                    <input type="text" id="search-input" name="search_products" hx-get="/search_products" hx-target="#produto-select" hx-trigger="keyup changed delay:500ms" placeholder="código do produto...">
+                    <input type="text" id="search-input" name="search_products" hx-get="/search_products" hx-target="#produto-select" hx-trigger="keyup changed delay:500ms" placeholder="   do produto...">
                     <select id="produto-select" name="ARMACAO" class="form-control">
                       <option value="" disabled selected>Estoque ...</option>
                       {% include 'parcial/select_options.html' %}
                     </select>
               </div>
+              <br>
+              <div class="col-auto">
+                <label class="sr-only" for="inlineFormInputGroup">Username</label>
+                <div class="input-group mb-2">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text"><img src="{% static 'home/img/code.png' %}" height="25px" width="25px" alt=""></div>
+                  </div>
+                  <input class="form-control" type="text" id="search-input" name="search_products" hx-get="/search_products" hx-target="#produto-select" hx-trigger="keyup changed delay:500ms" placeholder="Etiqueta">
+                </div>
+              </div>
           </div>
-          
             <div class="form-group" id="_observacao">
               <label for="exampleFormControlTextarea1">Obeservaçâo</label>
               <textarea class="form-control" id="OBSERVACAO" name="OBSERVACAO" rows="2" maxlength="80"></textarea>
