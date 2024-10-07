@@ -284,9 +284,9 @@ def gerar_etiquetas_cliente(request):
             df = pd.read_excel(arquivo_excel)
 
             # Verificar se as colunas necessárias estão presentes
-            colunas_necessarias = ['Fantasia','Tipo', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'CEP']
+            colunas_necessarias = ['Razão','Tipo', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'CEP']
             if not all(col in df.columns for col in colunas_necessarias):
-                messages.add_message(request, constants.ERROR, 'Falta uma das Colunas na planilha Fantasia Tipo, Endereço, Número, Complemento, Bairro, Cidade,UF,CEP')
+                messages.add_message(request, constants.ERROR, 'Falta uma das Colunas na planilha Razão Tipo, Endereço, Número, Complemento, Bairro, Cidade,UF,CEP')
                 return redirect('/fornecedores')  
 
             # Configuração do PDF
@@ -306,7 +306,7 @@ def gerar_etiquetas_cliente(request):
             # Gerar etiquetas para cada cliente na planilha
             for index, row in df.iterrows():
                 # Obter os dados do cliente da planilha
-                Fantasia = row['Fantasia']
+                Fantasia = row['Razão']
                 endereco_completo = f"{row['Tipo']},{row['Endereço']}, {row['Número']}, {row['Complemento']}"
                 bairro = row['Bairro']
                 cidade = row['Cidade']
@@ -314,7 +314,7 @@ def gerar_etiquetas_cliente(request):
                 cep = row['CEP']
                 
                 # Gerar conteúdo da etiqueta
-                etiqueta = f"{Fantasia}\n{endereco_completo}\nBAIRRO:{bairro} - {cidade} {uf}\nCEP: {cep}"
+                etiqueta = f"{Fantasia[:43]}\n{endereco_completo[:43]}\nBAIRRO:{bairro[:10]} - {cidade[:20]} {uf}\nCEP: {cep}"
 
                 # Inserir a etiqueta no PDF
                 x = x_inicial + (coluna * espacamento_horizontal)
