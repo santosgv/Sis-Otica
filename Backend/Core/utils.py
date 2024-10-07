@@ -277,7 +277,7 @@ def gerar_etiquetas_cliente(request):
             arquivo_excel = request.FILES.get('arquivo_excel')
             
             if not arquivo_excel:
-                messages.add_message(request, constants.ERROR, 'nenhum arquivo for enviado')
+                messages.add_message(request, constants.ERROR, 'Nenhum arquivo foi enviado')
                 return redirect('/fornecedores')  # Redireciona se nenhum arquivo for enviado
 
             # Ler a planilha Excel usando pandas
@@ -286,67 +286,39 @@ def gerar_etiquetas_cliente(request):
             # Verificar se as colunas necessárias estão presentes
             colunas_necessarias = ['Razão','Tipo', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'CEP']
             if not all(col in df.columns for col in colunas_necessarias):
-                messages.add_message(request, constants.ERROR, 'Falta uma das Colunas na planilha Razão Tipo, Endereço, Número, Complemento, Bairro, Cidade,UF,CEP')
-                return redirect('/fornecedores')  
+                messages.add_message(request, constants.ERROR, 'Falta uma das colunas na planilha Razão, Tipo, Endereço, Número, Complemento, Bairro, Cidade, UF, CEP')
+                return redirect('/fornecedores')
 
-            # Configuração do PDF
-            buffer = io.BytesIO()
-            p = canvas.Canvas(buffer, pagesize=letter)
-            altura_pagina = letter[1]  # Apenas a altura
-
-            # Configuração da posição inicial
-            x_inicial = 20 * mm
-            y_inicial = altura_pagina - 20 * mm
-            espacamento_vertical = 20 * mm
-            espacamento_horizontal = 90 * mm
-
-            linha = 0
-            coluna = 0
+            # Iniciar uma string para os comandos ZPL
+            zpl_commands = ""
 
             # Gerar etiquetas para cada cliente na planilha
             for index, row in df.iterrows():
                 # Obter os dados do cliente da planilha
                 Fantasia = row['Razão']
-                endereco_completo = f"{row['Tipo']},{row['Endereço']}, {row['Número']}, {row['Complemento']}"
+                endereco_completo = f"{row['Tipo']}, {row['Endereço']}, {row['Número']}, {row['Complemento']}"
                 bairro = row['Bairro']
                 cidade = row['Cidade']
                 uf = row['UF']
                 cep = row['CEP']
-                
+
                 # Gerar conteúdo da etiqueta
                 etiqueta = f"{Fantasia[:43]}\n{endereco_completo[:43]}\nBAIRRO:{bairro[:10]} - {cidade[:20]} {uf}\nCEP: {cep}"
 
-                # Inserir a etiqueta no PDF
-                x = x_inicial + (coluna * espacamento_horizontal)
-                y = y_inicial - (linha * espacamento_vertical)
+                # Gerar comandos ZPL para a etiqueta
+                zpl_commands += "^XA"  # Início de uma nova etiqueta
+                zpl_commands += "^FO30,30^A0N,30,30^FD" + str(Fantasia[:43]) + "^FS"  # Nome do cliente
+                zpl_commands += "^FO30,60^A0N,30,30^FD" + str(endereco_completo[:43]) + "^FS"  # Endereço
+                zpl_commands += "^FO30,90^A0N,30,30^FD" + f"BAIRRO: {bairro[:10]} - {cidade[:20]} {uf}" + "^FS"  # Bairro, Cidade, UF
+                zpl_commands += "^FO30,120^A0N,30,30^FDCEP: " + str(cep) + "^FS"  # CEP
+                zpl_commands += "^XZ"  # Fim da etiqueta
 
-                # Usar drawText para permitir quebras de linha
-                text_object = p.beginText(x, y)
-                text_object.setFont("Helvetica", 10)
-                for linha_endereco in etiqueta.split('\n'):
-                    text_object.textLine(linha_endereco)
-                p.drawText(text_object)
-
-                # Verificar se já preencheu uma linha de etiquetas (3 por linha, por exemplo)
-                coluna += 1
-                if coluna == 2:
-                    coluna = 0
-                    linha += 1
-
-                # Verificar se precisa adicionar uma nova página
-                if y - espacamento_vertical < 20 * mm:
-                    p.showPage()  # Cria uma nova página no PDF
-                    y_inicial = altura_pagina - 20 * mm  # Resetar a posição inicial
-                    linha = 0
-                    coluna = 0
-
-            # Fechar o PDF e retornar a resposta
-            p.showPage()
-            p.save()
-            buffer.seek(0)
-            return FileResponse(buffer, as_attachment=True, filename='etiquetas_clientes.pdf')
+            # Retornar os comandos ZPL como uma resposta de arquivo .txt
+            response = HttpResponse(zpl_commands, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=etiquetas_zpl.txt'
+            return response
         else:
-            print('erro')
+            print('Erro')
         return redirect('/fornecedores')
     except Exception as msg:
         print(msg)
