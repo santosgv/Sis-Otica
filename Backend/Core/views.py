@@ -327,7 +327,27 @@ def Editar_os(request,id_os):
             if 'ASSINATURA' in request.FILES:
                 ASSINATURA = request.FILES['ASSINATURA']
             else:
-                ASSINATURA = None
+                ASSINATURA = None 
+            OD_ESF = request.POST.get('OD_ESF')
+            OD_CIL = request.POST.get('OD_CIL')
+            OD_EIXO = request.POST.get('OD_EIXO')
+            OE_ESF = request.POST.get('OE_ESF')
+            OE_CIL = request.POST.get('OE_CIL')
+            OE_EIXO = request.POST.get('OE_EIXO')
+            AD = request.POST.get('AD')
+            DNP = request.POST.get('DNP')
+            P = request.POST.get('P')
+            DPA = request.POST.get('DPA')
+            DIAG = request.POST.get('DIAG')
+            V = request.POST.get('V')
+            H = request.POST.get('H')
+            ALT = request.POST.get('ALT')
+            ARM = request.POST.get('ARM')
+            MONTAGEM = request.POST.get('MONTAGEM')
+            LENTES = request.POST.get('LENTES')
+            ARMACAO = request.POST.get('ARMACAO')
+            OBSERVACAO = request.POST.get('OBSERVACAO')
+
             FORMA_PAG = request.POST.get('PAGAMENTO')
             VALOR_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
             VALOR = Decimal(VALOR_str)
@@ -342,6 +362,26 @@ def Editar_os(request,id_os):
                 VISUALIZAR_OS.ANEXO = ANEXO
             if ASSINATURA is not None:
                 VISUALIZAR_OS.ASSINATURA = ASSINATURA
+
+            VISUALIZAR_OS.OD_ESF=OD_ESF
+            VISUALIZAR_OS.OD_CIL=OD_CIL
+            VISUALIZAR_OS.OD_EIXO=OD_EIXO
+            VISUALIZAR_OS.OE_ESF=OE_ESF 
+            VISUALIZAR_OS.OE_CIL=OE_CIL 
+            VISUALIZAR_OS.OE_EIXO=OE_EIXO 
+            VISUALIZAR_OS.AD=AD 
+            VISUALIZAR_OS.DNP=DNP 
+            VISUALIZAR_OS.P=P 
+            VISUALIZAR_OS.DPA=DPA 
+            VISUALIZAR_OS.DIAG=DIAG 
+            VISUALIZAR_OS.V=V 
+            VISUALIZAR_OS.H=H 
+            VISUALIZAR_OS.ALT=ALT 
+            VISUALIZAR_OS.ARM=ARM 
+            VISUALIZAR_OS.MONTAGEM=MONTAGEM 
+            VISUALIZAR_OS.LENTES=LENTES 
+            VISUALIZAR_OS.ARMACAO=ARMACAO 
+            VISUALIZAR_OS.OBSERVACAO=OBSERVACAO
             VISUALIZAR_OS.ASSINATURA=ASSINATURA
             VISUALIZAR_OS.FORMA_PAG=FORMA_PAG
             VISUALIZAR_OS.VALOR=VALOR
