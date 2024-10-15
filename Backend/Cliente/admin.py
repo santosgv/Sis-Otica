@@ -37,6 +37,6 @@ class TenantAdmin(PublicTenantOnlyMixin,TenantAdminMixin, admin.ModelAdmin):
         list_display = (
         "razao_social",
         "is_active",
-        "created_on",
+        "pago_ate",
         )
         inlines = [DomainInline]
