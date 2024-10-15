@@ -289,28 +289,33 @@ def gerar_etiquetas_cliente(request):
                 messages.add_message(request, constants.ERROR, 'Falta uma das colunas na planilha Razão, Tipo, Endereço, Número, Complemento, Bairro, Cidade, UF, CEP')
                 return redirect('/fornecedores')
 
-            # Iniciar uma string para os comandos ZPL
-            zpl_commands = ""
+        zpl_commands = ""
 
-            # Gerar etiquetas para cada cliente na planilha
-            for index, row in df.iterrows():
-                # Obter os dados do cliente da planilha
-                Fantasia = row['Razão']
-                endereco_completo = f"{row['Tipo']}, {row['Endereço']}, {row['Número']}, {row['Complemento']}"
-                bairro = row['Bairro']
-                cidade = row['Cidade']
-                uf = row['UF']
-                cep = row['CEP']
+        # Gerar etiquetas para cada cliente na planilha
+        for index, row in df.iterrows():
+            # Obter os dados do cliente da planilha
+            Fantasia = row['Razão']
+            endereco_completo = f"{row['Tipo']}, {row['Endereço']}, {row['Número']}, {row['Complemento']}"
+            bairro = row['Bairro']
+            cidade = row['Cidade']
+            uf = row['UF']
+            cep = row['CEP']
 
-                # Gerar conteúdo da etiqueta
-                etiqueta = f"{Fantasia[:43]}\n{endereco_completo[:43]}\nBAIRRO:{bairro[:10]} - {cidade[:20]} {uf}\nCEP: {cep}"
+            # Gerar comandos ZPL para a etiqueta
+            zpl_commands += "^XA"  # Início de uma nova etiqueta
+            zpl_commands += "^FO30,30^A0N,30,30^FD" + str(Fantasia[:43]) + "^FS"  # Nome do cliente
+            zpl_commands += "^FO30,60^A0N,30,30^FD" + str(endereco_completo[:43]) + "^FS"  # Endereço
+            zpl_commands += "^FO30,90^A0N,30,30^FD" + f"BAIRRO: {bairro[:10]} - {cidade[:20]} {uf}" + "^FS"  # Bairro, Cidade, UF
+            zpl_commands += "^FO30,120^A0N,30,30^FDCEP: " + str(cep) + "^FS"  # CEP
+            zpl_commands += "^XZ"  # Fim da etiqueta
 
-                # Gerar comandos ZPL para a etiqueta
+            # Adicionar uma segunda etiqueta na mesma linha
+            if index % 2 == 1:
                 zpl_commands += "^XA"  # Início de uma nova etiqueta
-                zpl_commands += "^FO30,30^A0N,30,30^FD" + str(Fantasia[:43]) + "^FS"  # Nome do cliente
-                zpl_commands += "^FO30,60^A0N,30,30^FD" + str(endereco_completo[:43]) + "^FS"  # Endereço
-                zpl_commands += "^FO30,90^A0N,30,30^FD" + f"BAIRRO: {bairro[:10]} - {cidade[:20]} {uf}" + "^FS"  # Bairro, Cidade, UF
-                zpl_commands += "^FO30,120^A0N,30,30^FDCEP: " + str(cep) + "^FS"  # CEP
+                zpl_commands += "^FO430,30^A0N,30,30^FD" + str(Fantasia[:43]) + "^FS"  # Nome do cliente
+                zpl_commands += "^FO430,60^A0N,30,30^FD" + str(endereco_completo[:43]) + "^FS"  # Endereço
+                zpl_commands += "^FO430,90^A0N,30,30^FD" + f"BAIRRO: {bairro[:10]} - {cidade[:20]} {uf}" + "^FS"  # Bairro, Cidade, UF
+                zpl_commands += "^FO430,120^A0N,30,30^FDCEP: " + str(cep) + "^FS"  # CEP
                 zpl_commands += "^XZ"  # Fim da etiqueta
 
             # Retornar os comandos ZPL como uma resposta de arquivo .txt
