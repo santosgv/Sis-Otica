@@ -80,8 +80,10 @@ def create_pdf(request, codigo, quantidade):
         # Desenhar a informação do preço (segundo bloco de 30mm)
         c.setFillColor("black")
         c.setFont("Helvetica", 8)
-        c.drawString(x_inicial + 35 * mm, y_inicial - 5 * mm, f"SGO SISTEMAS")
-        c.drawString(x_inicial + 35 * mm, y_inicial - 10 * mm, f"Preço: R$ {produto_preco.preco_venda}")
+        c.drawImage(barcode_image_path, x_inicial + 35 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
+        # emissao de etiqueta com valor e nome do sistema
+        #c.drawString(x_inicial + 35 * mm, y_inicial - 5 * mm, f"SGO SISTEMAS")
+        #c.drawString(x_inicial + 35 * mm, y_inicial - 10 * mm, f"Preço: R$ {produto_preco.preco_venda}")
         
         # Desenhar o código de barras no último bloco de 30mm
         c.drawImage(barcode_image_path, x_inicial + 60 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
