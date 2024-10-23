@@ -1,5 +1,5 @@
 {% for produto in produtos %}
-    <option value="{{ produto.codigo }}">{{ produto.codigo }} ({{ produto.nome }} {{ produto.Estilo }} R${{ produto.preco_venda }} ) - Disponível: {{ produto.quantidade }}</option>
+    <option value="{{ produto.codigo }} ({{ produto.nome }} {{ produto.Estilo }})">{{ produto.codigo }} ({{ produto.nome }} {{ produto.Estilo }} R${{ produto.preco_venda }} ) - Disponível: {{ produto.quantidade }}</option>
 {% empty %}
     <option value="" disabled>Sem produtos em estoque</option>
 {% endfor %}
