@@ -465,29 +465,45 @@ def Dashabord(request):
 
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
-    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FORMA='B',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saldo = round(entradas - saidas,2)
+    # Buscar o último caixa fechado sem filtro de data
+    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+    
+    # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
+    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
 
-    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='E',FECHADO=False).only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    #saidas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(), TIPO='S',FECHADO=False).exclude(FORMA='B').only('VALOR').all().aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    #saldo_total = round(entradas_total - saidas_total,2)
+    print(saldo_anterior,'ultimo saldo no get')
 
-    return entradas,saidas,saldo,entradas_total
+    # Calcula entradas e saídas do dia corrente
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    
+    # Calcula o saldo atual
+    saldo = round(entradas - saidas, 2)
+
+    # Adiciona o saldo anterior ao saldo atual
+    saldo_total_dinheiro = saldo + saldo_anterior
+
+    #print(saldo,'saldo do dia')
+    #print(saldo_total_dinheiro,'saldo total')
+
+    # Calcula entradas totais (sem considerar apenas dinheiro)
+    entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+
+    return entradas, saidas, saldo_total_dinheiro, entradas_total
 
 @login_required(login_url='/auth/logar/')
 def Caixa(request):
     if request.method == "GET":
         try:
             dadoscaixa = dados_caixa()
-            entradas,saida,saldo,entradas_total= get_entrada_saida(request)
+            entradas,saida,saldo_total_dinheiro,entradas_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
             page = request.GET.get('page')
             dados = pagina.get_page(page)
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
                                                       'saida':saida,
-                                                      'saldo':saldo,
+                                                      'saldo':saldo_total_dinheiro,
                                                       'saldo_total':entradas_total})
         except Exception as msg:
             print(msg)
@@ -496,11 +512,33 @@ def Caixa(request):
 
 @login_required(login_url='/auth/logar/')
 def fechar_caixa(request):
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=get_today_data(),FECHADO=False).order_by('-id')
+    # Filtrar o caixa do dia atual que ainda não foi fechado
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
+
+    # Buscar o último caixa fechado, independentemente de datas
+    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+
+    # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
+    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
+
+    # Calcula entradas e saídas do dia corrente
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    
+    # Calcula o saldo do dia
+    saldo = round(entradas - saidas, 2)
+
+    # Adiciona o saldo anterior ao saldo do dia para obter o saldo total
+    saldo_total = saldo + saldo_anterior
+
+    #print(saldo_total, 'saldo final ao fechar')
+
+    # Atualiza o saldo final e fecha o caixa do dia
     for dado in caixa:
+        dado.SALDO_FINAL = saldo_total
         dado.fechar_caixa()
         dado.save()
-        
+
     messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
 
