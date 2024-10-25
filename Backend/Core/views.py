@@ -837,7 +837,8 @@ def minhas_vendas(request):
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):
-    quantidade = Produto.objects.count()
+    quantidade = Produto.objects.aggregate(quantidade=Sum('quantidade'))
+
     if request.method == 'GET':
         fornecedores = Fornecedor.objects.all()
         unitarios = TipoUnitario.objects.all()
