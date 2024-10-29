@@ -20,7 +20,7 @@
       {% endfor %}
   {% endif %}
 
-  {% if user.FUNCAO == "G" %}
+  {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb" style="background-color: var(--bs-white);">
       <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
@@ -28,12 +28,13 @@
       <li class="breadcrumb-item"><a href="{% url 'Core:movimentacao'%}">Movimentaçao</a></li>
     </ol>
   </nav>
-  
+  {% if user.FUNCAO == "G" %}
   <div style="justify-content: end;     display: table-cell;">
   <a href="{% url 'Core:fornecedor_list' %}" class="btn btn-primary">Fornecedores</a>
   <a href="{% url 'Core:tipos_list' %}" class="btn btn-success">Tipos</a>
   <a href="{% url 'Core:estilos_list' %}" class="btn btn-warning">Estilos</a>
   <a href="{% url 'Core:tiposund_list' %}" class="btn btn-secondary">Tipos Und</a>
+  {% endif %}
 </div>
   <div class="text-center">
       <form>
@@ -122,17 +123,18 @@
             </label>
           </div>
         </div>
-        
+        {% if user.FUNCAO == "G" %}
         <button type="submit" class="btn btn-primary"
         hx-post="{% url 'Core:save_product' %}"
         hx-trigget="click"
         hx-target="#list-products"
         >Cadastrar</button>
+        {% endif %}
       </form>
       <hr>
       <div id="list-products">
         {% include 'parcial/produto_estoque.html' %}
-        itens <span class="badge badge-success">{{quantidade.quantidade}}</span>
+        Quantidade <span class="badge badge-success">{{quantidade.quantidade}}</span>
       </div>
       <div class="pagination">
               

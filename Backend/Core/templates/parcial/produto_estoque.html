@@ -63,7 +63,9 @@
               <th scope="col">Qtd minimo</th>
               <th scope="col">tipo</th>
               <th scope="col">R$</th>
+              {% if user.FUNCAO == "G" %}
               <th scope="col">Açao</th>
+              {% endif %}
             </tr>
           {% for produto in Produtos %}
 
@@ -76,7 +78,7 @@
                 {% if produto.conferido == True %}
                 <th scope="row"><img width="20" height="20" src="https://img.icons8.com/emoji/48/check-mark-emoji.png" alt="check-mark-emoji"/></th>
                 {% endif %}
-                <td><a href="{% url 'Core:editar_produto' produto.pk %}">{{produto.codigo}}</a></td>
+                <td>{% if user.FUNCAO == "G" %}<a href="{% url 'Core:editar_produto' produto.pk %}">{% endif %} {{produto.codigo}}</a></td>
                 <td>{{produto.nome}}</td>
                 <td>{{produto.fornecedor}}</td>
                 <td>{{produto.preco_unitario}}</td>
@@ -85,9 +87,11 @@
                 <td>{{produto.quantidade_minima}}</td>
                 <td>{{produto.Tipo}}</td>
                 <td>{{produto.valor_total}}</td>
+                {% if user.FUNCAO == "G" %}
                 <td><a href="{% url 'Core:produto_estoque' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/ios-filled/50/move-by-trolley.png" alt="move-by-trolley"/></a> <span>|</span>
                   <a href="{% url 'Core:realizar_saida' produto.id  %}"><img width="20" height="20" src="https://img.icons8.com/material-rounded/24/empty-box.png" alt="empty-box"/></a>
                 </td>
+                {% endif %}
               </tr>
             </tbody>
             {% endfor %}
