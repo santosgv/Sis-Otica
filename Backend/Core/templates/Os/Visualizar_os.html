@@ -3,6 +3,18 @@
 {% load static %}
 
 {% block 'head' %}
+<style>
+    .fixed-header {
+            position: fixed;
+            top: 0;
+            width: 70%;
+            background-color: white; /* Cor de fundo para o título */
+            z-index: 1000; /* Para garantir que o título fique acima de outros elementos */
+            padding: 10px 0; /* Espaçamento interno */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
+        }
+</style>
+
 {% compress css %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 {% endcompress %}
@@ -16,7 +28,7 @@ Vizualiar O.S
     <ol class="breadcrumb" style="background-color: var(--bs-white);">
       <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
       <li class="breadcrumb-item"><a href="{% url 'Core:Lista_Os'%}">Listar O.S</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Visualziar O.S</li>
+      <li class="breadcrumb-item active" aria-current="page">Visualizar O.S</li>
     </ol>
   </nav>
   <section class="container-fluid text-center">
@@ -31,7 +43,7 @@ Vizualiar O.S
     </div>
     
     <form method="POST" class="form_cliente">{% csrf_token %}
-      <h1>{{unidade}}{{VISUALIZAR_OS.id}}</h1>
+      <h1 id="form-header">{{unidade}}{{VISUALIZAR_OS.id}}</h1>
         <div class="row">
         {% if VISUALIZAR_OS.ANEXO %}
         <div class="form-group col-md-6">
@@ -43,6 +55,16 @@ Vizualiar O.S
           <a href="{{VISUALIZAR_OS.ASSINATURA.url}}" target="_blank">Visualizar Assinatura</a>
         </div>
         {% endif %}
+      </div>
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label for="data_pedido">Data Pedido:</label>
+          {{VISUALIZAR_OS.DATA_SOLICITACAO|date:"D d M Y"}}
+        </div>
+        <div class="form-group col-md-6">
+          <label for="previsao_entrega">Previsâo Entrega:</label>
+          {{VISUALIZAR_OS.PREVISAO_ENTREGA|date:"D d M Y"}}
+        </div>
       </div>
         <div class="row">
           <div class="form-group col-md-6">
@@ -292,7 +314,22 @@ Vizualiar O.S
       </div>
       </form>
   </section>
+  <script>
+  window.addEventListener('scroll', function() {
+            var header = document.getElementById('form-header');
+            if (header) {
+                var headerOffset = header.offsetTop;
+                var pageOffset = window.pageYOffset;
+                var fixedPosition = 500;
 
+                if (pageOffset >= fixedPosition) {
+                    header.classList.add('fixed-header');
+                } else {
+                    header.classList.remove('fixed-header');
+                }
+            }
+        });
+</script>
 
   <script src="{% static 'Unidades/js/os.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
