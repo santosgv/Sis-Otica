@@ -32,11 +32,11 @@ def generate_barcode_image(code, volume):
     # Generate barcode image in memory
     output = io.BytesIO()
     barcode.write(output, {
-        'module_height': 6.0,  # Ajustado para ficar proporcional na área de 30mm
+        'module_height': 7.0,  # Ajustado para ficar proporcional na área de 30mm
         'module_width': 0.2,
         'quiet_zone': 6.5,
-        'text_distance': 3.5,
-        'font_size': 12,  # Tamanho de fonte ajustado
+        'text_distance': 4.5,
+        'font_size': 11,  # Tamanho de fonte ajustado
         'background': 'white',
         'foreground': 'black'
     })
