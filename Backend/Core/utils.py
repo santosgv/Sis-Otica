@@ -36,7 +36,7 @@ def generate_barcode_image(code, volume):
         'module_width': 0.2,
         'quiet_zone': 6.5,
         'text_distance': 3.5,
-        'font_size': 11,  # Tamanho de fonte ajustado
+        'font_size': 12,  # Tamanho de fonte ajustado
         'background': 'white',
         'foreground': 'black'
     })
@@ -72,11 +72,11 @@ def create_pdf(request, codigo, quantidade):
         
         # Desenhar espaço em branco (primeiros 30mm)
         c.setFillColor("white")
-        c.rect(x_inicial, y_inicial - 12 * mm, 30 * mm, etiqueta_height, stroke=0, fill=1)
+        c.rect(x_inicial, y_inicial - 10 * mm, 30 * mm, etiqueta_height, stroke=0, fill=1)
         
         # Desenhar a informação do preço (segundo bloco de 30mm)
         c.setFillColor("black")
-        c.setFont("Helvetica", 11)
+        c.setFont("Helvetica", 12)
         # emissao de codigo de barras
         c.drawImage(barcode_image_path, x_inicial + 35 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
         # emissao de etiqueta com valor e nome do sistema
