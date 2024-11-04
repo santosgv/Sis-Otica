@@ -78,7 +78,7 @@ def create_pdf(request, codigo, quantidade):
         c.setFillColor("black")
         c.setFont("Helvetica", 12)
         # emissao de codigo de barras
-        c.drawImage(barcode_image_path, x_inicial + 35 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
+        c.drawImage(barcode_image_path, x_inicial + 32 * mm, y_inicial - 13 * mm, width=30 * mm, height=11 * mm)
         # emissao de etiqueta com valor e nome do sistema
         #c.drawString(x_inicial + 35 * mm, y_inicial - 5 * mm, f"SGO SISTEMAS")
         #c.drawString(x_inicial + 35 * mm, y_inicial - 10 * mm, f"Preço: R$ {produto_preco.preco_venda}")
