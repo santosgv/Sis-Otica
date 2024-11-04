@@ -19,7 +19,7 @@ def search(request):
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
 def search_products(request):
-    search_term = request.GET.get('search_products', '').replace('-', '')
+    search_term = request.GET.get('search_products', '').replace('-', '').replace('-', '')
     produtos = Produto.objects.annotate(
         codigo_sem_hifen=Replace('codigo', Value('-'), Value(''))
     ).filter(
