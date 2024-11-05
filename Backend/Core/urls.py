@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os,export_clientes,export_os,create_pdf
+from .utils import Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -70,6 +70,7 @@ urlpatterns = [
     path('maiores_vendedores_meses',views.maiores_vendedores_meses, name='maiores_vendedores_meses'),
     path('relatorio_mes_anterior', views.relatorio_mes_anterior, name='relatorio_mes_anterior'),
     path('estoque/',views.estoque, name='estoque'),
+    path('relatorio_estoque_conferido/',gerar_relatorio_estoque_conferido, name='relatorio_estoque_conferido'),
     path('produto_estoque/<int:id>',views.produto_estoque, name='produto_estoque'),
     path('realizar_entrada/',views.realizar_entrada_view,name='realizar_entrada'),
     path('realizar_saida_view/<int:id>',views.realizar_saida_view , name='realizar_saida'),

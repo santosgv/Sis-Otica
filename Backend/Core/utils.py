@@ -12,6 +12,7 @@ from reportlab.lib.pagesizes import letter
 from django.shortcuts import redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 from Core.models import ORDEN,CLIENTE
 from django.utils.timezone import timedelta
 import logging
@@ -274,3 +275,68 @@ def export_os(request):
         return response
     except Exception as msg:
         logger.warn(msg)
+
+def gerar_relatorio_estoque_conferido(request):
+    # Crie um buffer para armazenar o PDF em memória
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    
+    # Configurações iniciais
+    largura_pagina, altura_pagina = letter
+    y_inicial = altura_pagina - inch  # Posição inicial no topo da página
+    espacamento_linha = 15  # Espaço entre linhas
+    margem_esquerda = inch
+    
+    # Cabeçalho do PDF
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(margem_esquerda, y_inicial, "Relatório de Estoque - Produtos Conferidos")
+    p.setFont("Helvetica", 10)
+    p.drawString(margem_esquerda, y_inicial - 20, f"Data: {date.today().strftime('%d/%m/%Y')}")
+
+    y_posicao = y_inicial - 40
+
+    # Cabeçalho da Tabela
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(margem_esquerda, y_posicao, "Código")
+    p.drawString(margem_esquerda + 100, y_posicao, "Nome")
+    p.drawString(margem_esquerda + 220, y_posicao, "Quantidade")
+    p.drawString(margem_esquerda + 300, y_posicao, "Preço Unitário")
+    p.drawString(margem_esquerda + 400, y_posicao, "Valor Total")
+    
+    # Traçar uma linha abaixo do cabeçalho
+    y_posicao -= espacamento_linha
+    p.line(margem_esquerda, y_posicao, largura_pagina - inch, y_posicao)
+    y_posicao -= espacamento_linha
+
+    # Obtenha todos os produtos conferidos
+    produtos_conferidos = Produto.objects.filter(conferido=True)
+    
+    # Preenchendo as linhas com dados dos produtos conferidos
+    for produto in produtos_conferidos:
+        if y_posicao < inch:
+            p.showPage()  # Adiciona uma nova página se a posição y for menor que 1 polegada
+            y_posicao = altura_pagina - inch
+
+        # Escreve cada campo do produto na linha
+        p.setFont("Helvetica", 10)
+        p.drawString(margem_esquerda, y_posicao, str(produto.codigo))
+        p.drawString(margem_esquerda + 100, y_posicao, produto.nome)
+        p.drawString(margem_esquerda + 220, y_posicao, f"x{produto.quantidade}")
+        p.drawString(margem_esquerda + 300, y_posicao, f"R$ {produto.preco_unitario:.2f}")
+        p.drawString(margem_esquerda + 400, y_posicao, f"R$ {produto.valor_total:.2f}")
+
+        y_posicao -= espacamento_linha  # Move para a próxima linha
+
+    # Espaço para a assinatura ao final da lista
+    y_posicao -= espacamento_linha * 2  # Adiciona um pouco de espaço antes da assinatura
+    p.setFont("Helvetica", 10)
+    p.drawString(margem_esquerda, y_posicao, "_______________________________")
+    p.drawString(margem_esquerda, y_posicao - 10, "Assinatura")
+
+    # Finaliza o PDF
+    p.showPage()
+    p.save()
+
+    # Envia o PDF para o navegador
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename="relatorio_estoque_conferido.pdf")
