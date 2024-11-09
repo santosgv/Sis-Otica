@@ -3,7 +3,7 @@ import pandas as pd
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.conf import settings
-from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA
+from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
@@ -15,7 +15,7 @@ from django.shortcuts import redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
-from Core.models import ORDEN,CLIENTE
+from django.db.models import Sum
 from django.utils.timezone import timedelta
 import logging
 from PIL import Image
@@ -25,9 +25,9 @@ from barcode.writer import ImageWriter
 logger = logging.getLogger('MyApp')
 
 
-def generate_barcode_image(code, volume):
+def generate_barcode_image(code):
 
-    barcode_value = f"{code}-{volume}"
+    barcode_value = f"{code}"
     barcode = Code128(barcode_value, writer=ImageWriter())
     
     # Generate barcode image in memory
@@ -65,8 +65,8 @@ def create_pdf(request, codigo, quantidade):
     # Lógica para cada etiqueta
     for volume in range(1, quantidade + 1):
         # Gera a imagem do código de barras
-        barcode_image = generate_barcode_image(codigo, volume)
-        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
+        barcode_image = generate_barcode_image(codigo)
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}.png"
         
         # Salva a imagem temporariamente
         barcode_image.save(barcode_image_path, "PNG")
@@ -390,6 +390,7 @@ def gerar_relatorio_estoque_conferido(request):
 
     # Obtenha todos os produtos conferidos
     produtos_conferidos = Produto.objects.filter(conferido=True)
+    valor_total = Produto.objects.filter(conferido=True).aggregate(Sum('valor_total'))
     
     # Preenchendo as linhas com dados dos produtos conferidos
     for produto in produtos_conferidos:
@@ -412,6 +413,7 @@ def gerar_relatorio_estoque_conferido(request):
     p.setFont("Helvetica", 10)
     p.drawString(margem_esquerda, y_posicao, "_______________________________")
     p.drawString(margem_esquerda, y_posicao - 10, "Assinatura")
+    p.drawString(margem_esquerda + 300, y_posicao, f"Valor total R$ {valor_total['valor_total__sum']:.2f}")
 
     # Finaliza o PDF
     p.showPage()
