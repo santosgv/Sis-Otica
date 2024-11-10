@@ -378,7 +378,7 @@ def gerar_relatorio_estoque_conferido(request):
     # Cabeçalho da Tabela
     p.setFont("Helvetica-Bold", 10)
     p.drawString(margem_esquerda, y_posicao, "Código")
-    p.drawString(margem_esquerda + 100, y_posicao, "Nome")
+    p.drawString(margem_esquerda + 130, y_posicao, "Nome")
     p.drawString(margem_esquerda + 220, y_posicao, "Quantidade")
     p.drawString(margem_esquerda + 300, y_posicao, "Preço Unitário")
     p.drawString(margem_esquerda + 400, y_posicao, "Valor Total")
@@ -401,7 +401,7 @@ def gerar_relatorio_estoque_conferido(request):
         # Escreve cada campo do produto na linha
         p.setFont("Helvetica", 10)
         p.drawString(margem_esquerda, y_posicao, str(produto.codigo))
-        p.drawString(margem_esquerda + 100, y_posicao, produto.nome)
+        p.drawString(margem_esquerda + 130, y_posicao, produto.nome)
         p.drawString(margem_esquerda + 220, y_posicao, f"x{produto.quantidade}")
         p.drawString(margem_esquerda + 300, y_posicao, f"R$ {produto.preco_unitario:.2f}")
         p.drawString(margem_esquerda + 400, y_posicao, f"R$ {produto.valor_total:.2f}")
