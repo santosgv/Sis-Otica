@@ -402,7 +402,7 @@ def gerar_relatorio_estoque_conferido(request):
         p.setFont("Helvetica", 10)
         p.drawString(margem_esquerda, y_posicao, str(produto.codigo))
         p.drawString(margem_esquerda + 130, y_posicao, produto.nome)
-        p.drawString(margem_esquerda + 220, y_posicao, f"x{produto.quantidade}")
+        p.drawString(margem_esquerda + 220, y_posicao, f"{produto.quantidade}")
         p.drawString(margem_esquerda + 300, y_posicao, f"R$ {produto.preco_unitario:.2f}")
         p.drawString(margem_esquerda + 400, y_posicao, f"R$ {produto.valor_total:.2f}")
 
