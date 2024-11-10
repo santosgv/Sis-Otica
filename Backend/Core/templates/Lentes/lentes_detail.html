@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title>{% block 'title' %}
+  Detalhes da Lente
+       {% endblock %}</title>
+{% block 'body'%}
+  <h2 class="text-center">Detalhes da Lente</h2>
+  <div class="text-center">
+  
+  <p>Nome: {{ object.nome }}</p>
+  <p>Codigo: {{ object.codigo }}</p>
+  <p>Valor Custo: {{ object.valor_custo }}</p>
+  <a href="{% url 'Core:lentes_update' object.pk %}" class="btn btn-secondary">Editar</a>
+  <a href="{% url 'Core:lentes_delete' object.pk %}" class="btn btn-danger">Excluir</a>
+  <a href="{% url 'Core:lentes_list' %}" class="btn btn-primary">Voltar</a>
+</div>
+{% endblock %}

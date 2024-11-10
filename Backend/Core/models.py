@@ -164,6 +164,19 @@ class Tipo(models.Model):
     def __str__(self) -> str:
         return str(self.nome)
 
+
+class Lentes(models.Model):
+    nome = models.CharField(max_length=50 ,db_index=True)
+    codigo = models.CharField(max_length=5)
+    valor_custo = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Lente'
+        verbose_name_plural = 'Lentes'
+
+    def __str__(self) -> str:
+        return str(self.nome)
+
 class Produto(models.Model):
     importado =models.BooleanField(default=False)
     conferido =models.BooleanField(default=False)

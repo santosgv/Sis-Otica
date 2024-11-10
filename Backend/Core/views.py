@@ -2,7 +2,7 @@ import os
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo,Lentes
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -27,7 +27,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm,LentesForm
 import io
 import os
 from reportlab.lib.pagesizes import letter
@@ -203,8 +203,10 @@ def Cadastrar_os(request,id_cliente):
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
         produtos = Produto.objects.filter(quantidade__gt=0).order_by('-id')
+        lentes = Lentes.objects.all()
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
                                                       'produtos':produtos,
+                                                      'lentes':lentes
                                                       })
     else:
         try:
@@ -1107,3 +1109,29 @@ class TipoDeleteView(DeleteView):
     success_url = reverse_lazy('Core:tipos_list')
 
 
+class LentesListView(ListView):
+    model = Lentes
+    template_name = 'Lentes/lentes_list.html'
+
+class LentesDetailView(DetailView):
+    model = Lentes
+    template_name = 'Lentes/lentes_detail.html'
+
+class LentesCreateView(CreateView):
+    with transaction.atomic():
+        model = Lentes
+        form_class = LentesForm
+        template_name = 'Lentes/lentes_form.html'
+        success_url = reverse_lazy('Core:lentes_list')
+
+class LentesUpdateView(UpdateView):
+    with transaction.atomic():
+        model = Lentes
+        form_class = LentesForm
+        template_name = 'Lentes/lentes_form.html'
+        success_url = reverse_lazy('Core:lentes_list')
+
+class LentesDeleteView(DeleteView):
+    model = Lentes
+    template_name = 'Lentes/lentes_confirm_delete.html'
+    success_url = reverse_lazy('Core:lentes_list')

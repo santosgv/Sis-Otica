@@ -20,6 +20,7 @@ Cadastrar O.S
   </ol>
 </nav>
 <a href="{% url 'Core:os_list' %}" class="btn btn-primary">Serviços</a>
+<a href="{% url 'Core:lentes_list' %}" class="btn btn-primary">Lentes</a>
     <section class="container-fluid text-center">
       <div class="form_">
         <div class="text-center">
@@ -138,7 +139,12 @@ Cadastrar O.S
             <hr>
             <div class="form-group col-md-12" id="_lentes">
               <label>Lentes</label>
-              <input  class="form-control" id="LENTES" name="LENTES" maxlength="150" >
+              <select class="form-control" id="LENTES" name="LENTES">
+                <option value="" disabled selected>Lentes ...</option>
+                {% for lente in lentes %}
+                <option value="{{lente.codigo}}">{{lente.nome}}{{lente.codigo}} R${{lente.valor_custo}}</option>
+                {% endfor %}
+              </select>
             </div>
             <div class="form-group col-md-12" id="_armacao">
               <div class="input-group">

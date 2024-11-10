@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'head' %}
+{% endblock %}
+<title >{% block 'title' %}
+  Lista de Lentes
+       {% endblock %}</title>
+{% block 'body'%}  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb" style="background-color: var(--bs-white);">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Lentes</li>
+  </ol>
+</nav>
+  <h2 class="text-center">Lentes</h2>
+  <a href="{% url 'Core:lentes_create' %}" class="btn btn-primary">Nova Lente</a>
+  <br>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Codigo</th>
+        <th scope="col">Nome</th>
+        <th scope="col">Valor Custo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lente in object_list %}
+      <tr>
+        <th scope="row">{{lente.codigo}}</th>
+        <td><a href="{% url 'Core:lentes_detail' lente.pk %}">{{ lente.nome }}</a></td>
+        <th scope="row">{{lente.valor_custo}}</th>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock %}

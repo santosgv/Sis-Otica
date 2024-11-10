@@ -27,7 +27,12 @@ from .views import (
     TipoCreateView,
     TipoDetailView,
     TipoUpdateView,
-    TipoDeleteView
+    TipoDeleteView,
+    LentesListView,
+    LentesDetailView,
+    LentesCreateView,
+    LentesUpdateView,
+    LentesDeleteView,
 )
 
 
@@ -109,6 +114,13 @@ urlpatterns = [
     path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
     path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
     path('gerar_etiquetas_cliente/',gerar_etiquetas_cliente, name='gerar_etiquetas_cliente'),
+
+
+    path('lentes/', LentesListView.as_view(), name='lentes_list'),
+    path('lentes/novo/', LentesCreateView.as_view(), name='lentes_create'),
+    path('lentes/<int:pk>/', LentesDetailView.as_view(), name='lentes_detail'),
+    path('lentes/<int:pk>/editar/', LentesUpdateView.as_view(), name='lentes_update'),
+    path('lentes/<int:pk>/excluir/', LentesDeleteView.as_view(), name='lentes_delete'),
 ]
 
 htmx_patterns =[
