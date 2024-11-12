@@ -391,6 +391,7 @@ def gerar_relatorio_estoque_conferido(request):
     # Obtenha todos os produtos conferidos
     produtos_conferidos = Produto.objects.filter(conferido=True)
     valor_total = Produto.objects.filter(conferido=True).aggregate(Sum('valor_total'))
+    quantidade = Produto.objects.filter(conferido=True).aggregate(quantidade=Sum('quantidade'))
     
     # Preenchendo as linhas com dados dos produtos conferidos
     for produto in produtos_conferidos:
@@ -413,6 +414,7 @@ def gerar_relatorio_estoque_conferido(request):
     p.setFont("Helvetica", 10)
     p.drawString(margem_esquerda, y_posicao, "_______________________________")
     p.drawString(margem_esquerda, y_posicao - 10, "Assinatura")
+    p.drawString(margem_esquerda + 220, y_posicao ,f"Total {quantidade['quantidade']}")
     p.drawString(margem_esquerda + 300, y_posicao, f"Valor total R$ {valor_total['valor_total__sum']:.2f}")
 
     # Finaliza o PDF
