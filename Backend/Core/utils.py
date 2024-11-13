@@ -23,9 +23,9 @@ from barcode.writer import ImageWriter
 logger = logging.getLogger('MyApp')
 
 
-def generate_barcode_image(code, volume):
+def generate_barcode_image(code):
 
-    barcode_value = f"{code}-{volume}"
+    barcode_value = f"{code}"
     barcode = Code128(barcode_value, writer=ImageWriter())
     
     # Generate barcode image in memory
@@ -63,8 +63,8 @@ def create_pdf(request, codigo, quantidade):
     # Lógica para cada etiqueta
     for volume in range(1, quantidade + 1):
         # Gera a imagem do código de barras
-        barcode_image = generate_barcode_image(codigo, volume)
-        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
+        barcode_image = generate_barcode_image(codigo)
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}.png"
         
         # Salva a imagem temporariamente
         barcode_image.save(barcode_image_path, "PNG")
