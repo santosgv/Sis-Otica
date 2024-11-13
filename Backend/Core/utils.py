@@ -389,7 +389,7 @@ def gerar_relatorio_estoque_conferido(request):
     y_posicao -= espacamento_linha
 
     # Obtenha todos os produtos conferidos
-    produtos_conferidos = Produto.objects.filter(conferido=True)
+    produtos_conferidos = Produto.objects.filter(conferido=True).filter(quantidade__gt=0)
     valor_total = Produto.objects.filter(conferido=True).aggregate(Sum('valor_total'))
     quantidade = Produto.objects.filter(conferido=True).aggregate(quantidade=Sum('quantidade'))
     

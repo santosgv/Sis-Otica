@@ -18,6 +18,12 @@ def search(request):
 
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
+
+def search_by_id(request):
+    search = request.GET.get('search_by_id')
+    oss = ORDEN.objects.filter(id__icontains=search)
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
+
 def search_products(request):
     search_term = request.GET.get('search_products', '').replace('-', '').replace('-', '')
     produtos = Produto.objects.annotate(

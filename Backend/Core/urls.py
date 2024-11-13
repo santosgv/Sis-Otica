@@ -125,6 +125,7 @@ urlpatterns = [
 
 htmx_patterns =[
     path('search/',htmx_views.search, name='search'),
+    path('search_by_id/',htmx_views.search_by_id, name='search_by_id'),
     path('search_cliente/',htmx_views.search_cliente,name='search_cliente'),
     path('search_products/', htmx_views.search_products, name='search_products'),
     path('search_caixa/',htmx_views.search_caixa, name='search_caixa'),
