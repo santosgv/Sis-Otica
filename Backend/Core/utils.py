@@ -1,7 +1,8 @@
 from urllib.parse import quote
 import pandas as pd
 from django.conf import settings
-from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA
+from django.db.models import Sum
+from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
@@ -13,7 +14,6 @@ from django.shortcuts import redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
-from Core.models import ORDEN,CLIENTE
 from django.utils.timezone import timedelta
 import logging
 from PIL import Image
@@ -309,7 +309,9 @@ def gerar_relatorio_estoque_conferido(request):
     y_posicao -= espacamento_linha
 
     # Obtenha todos os produtos conferidos
-    produtos_conferidos = Produto.objects.filter(conferido=True)
+    produtos_conferidos = Produto.objects.filter(conferido=True).filter(quantidade__gt=0)
+    valor_total = Produto.objects.filter(conferido=True).aggregate(Sum('valor_total'))
+    quantidade = Produto.objects.filter(conferido=True).aggregate(quantidade=Sum('quantidade'))
     
     # Preenchendo as linhas com dados dos produtos conferidos
     for produto in produtos_conferidos:
@@ -332,6 +334,8 @@ def gerar_relatorio_estoque_conferido(request):
     p.setFont("Helvetica", 10)
     p.drawString(margem_esquerda, y_posicao, "_______________________________")
     p.drawString(margem_esquerda, y_posicao - 10, "Assinatura")
+    p.drawString(margem_esquerda + 220, y_posicao ,f"Total {quantidade['quantidade']}")
+    p.drawString(margem_esquerda + 300, y_posicao, f"Valor total R$ {valor_total['valor_total__sum']:.2f}")
 
     # Finaliza o PDF
     p.showPage()
