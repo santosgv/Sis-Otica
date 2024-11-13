@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import gerar_etiquetas_cliente,Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido
+from .utils import Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -113,7 +113,6 @@ urlpatterns = [
     path('tipo/<int:pk>/', TipoDetailView.as_view(), name='tipo_detail'),
     path('tipo/<int:pk>/editar/', TipoUpdateView.as_view(), name='tipo_update'),
     path('tipo/<int:pk>/excluir/', TipoDeleteView.as_view(), name='tipo_delete'),
-    path('gerar_etiquetas_cliente/',gerar_etiquetas_cliente, name='gerar_etiquetas_cliente'),
 
 
     path('lentes/', LentesListView.as_view(), name='lentes_list'),
