@@ -197,7 +197,10 @@ class Produto(models.Model):
         return self.quantidade * self.preco_unitario
     
     def save(self, *args, **kwargs):
-        self.codigo =codigo = f"{settings.UNIDADE}-{self.fornecedor.pk}-{self.Tipo.pk}-{self.Estilo.pk}-{self.pk}"
+        fornecedor_nome = self.fornecedor.nome
+        primeira_letra = fornecedor_nome[0]
+        ultima_letra = fornecedor_nome[-1]
+        self.codigo =f"{self.nome}-{primeira_letra}{ultima_letra}-{settings.UNIDADE}{self.fornecedor.pk}{self.Tipo.pk}{self.Estilo.pk}{self.pk}"
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio

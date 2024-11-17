@@ -1,7 +1,8 @@
 from urllib.parse import quote
 import pandas as pd
 from django.conf import settings
-from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA
+from django.db.models import Sum
+from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
@@ -13,7 +14,6 @@ from django.shortcuts import redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
-from Core.models import ORDEN,CLIENTE
 from django.utils.timezone import timedelta
 import logging
 from PIL import Image
@@ -28,9 +28,9 @@ def get_tenant(request):
     tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
     return tenant
 
-def generate_barcode_image(code, volume):
+def generate_barcode_image(code):
 
-    barcode_value = f"{code}-{volume}"
+    barcode_value = f"{code}"
     barcode = Code128(barcode_value, writer=ImageWriter())
     
     # Generate barcode image in memory
@@ -68,8 +68,8 @@ def create_pdf(request, codigo, quantidade):
     # Lógica para cada etiqueta
     for volume in range(1, quantidade + 1):
         # Gera a imagem do código de barras
-        barcode_image = generate_barcode_image(codigo, volume)
-        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}-{volume}.png"
+        barcode_image = generate_barcode_image(codigo)
+        barcode_image_path = f"{settings.UNIDADE}barcode_{codigo}.png"
         
         # Salva a imagem temporariamente
         barcode_image.save(barcode_image_path, "PNG")
@@ -166,11 +166,11 @@ def Imprimir_os(request,id_os):
         PDF.setFont('Courier', 12)
         PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
 
-        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
+        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
         PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(325,778,str(get_tenant(request).unidade)+str(PRINT_OS.id))
         PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
+        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
         PDF.drawString(88,665,str(PRINT_OS.SERVICO))
         PDF.drawString(385,665,str('N/D'))
         PDF.drawString(88,637,str(PRINT_OS.LENTES))
@@ -194,12 +194,15 @@ def Imprimir_os(request,id_os):
         PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
         # parte laboratorio
         PDF.setFont('Courier-Bold', 12)
+        PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
+        PDF.drawString(395,454,str(settings.NOME))
+        PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
         PDF.drawString(325,454,str(get_tenant(request).unidade)+str(PRINT_OS.id))
         PDF.drawString(395,454,str(get_tenant(request)))
         PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
         PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
         PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,385,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d-%m-%Y')))
+        PDF.drawString(385,385,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
         PDF.drawString(88,361,str(PRINT_OS.SERVICO))
         PDF.drawString(338,361,str('N/D'))
         PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
@@ -309,7 +312,9 @@ def gerar_relatorio_estoque_conferido(request):
     y_posicao -= espacamento_linha
 
     # Obtenha todos os produtos conferidos
-    produtos_conferidos = Produto.objects.filter(conferido=True)
+    produtos_conferidos = Produto.objects.filter(conferido=True).filter(quantidade__gt=0)
+    valor_total = Produto.objects.filter(conferido=True).aggregate(Sum('valor_total'))
+    quantidade = Produto.objects.filter(conferido=True).aggregate(quantidade=Sum('quantidade'))
     
     # Preenchendo as linhas com dados dos produtos conferidos
     for produto in produtos_conferidos:
@@ -332,6 +337,8 @@ def gerar_relatorio_estoque_conferido(request):
     p.setFont("Helvetica", 10)
     p.drawString(margem_esquerda, y_posicao, "_______________________________")
     p.drawString(margem_esquerda, y_posicao - 10, "Assinatura")
+    p.drawString(margem_esquerda + 220, y_posicao ,f"Total {quantidade['quantidade']}")
+    p.drawString(margem_esquerda + 300, y_posicao, f"Valor total R$ {valor_total['valor_total__sum']:.2f}")
 
     # Finaliza o PDF
     p.showPage()
