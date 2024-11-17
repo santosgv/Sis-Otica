@@ -27,16 +27,18 @@
                     <br>
                       <div class="card draggable shadow-sm" id="cd1" >
                         <div class="card-body p-2">
-                            <div class="card-title">
-                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">OS :{{unidade}}{{kanban}}</a>
+                            <div class="card-title text-center">
+                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
                             </div>
-                            <p>
-                              {{kanban.SERVICO}}
-                              <hr>
-                              <span>Data Pedido : {{kanban.DATA_SOLICITACAO|date:"D d M Y"}} </span>
+                            Lentes:{{kanban.LENTES|slice:":25"}}
+                            <br>
+                            Obs: {{kanban.OBSERVACAO|slice:":25"}}
+                            <br>
+                            <div class="card-footer bg-transparent border-secondary d-flex justify-content-between">
+                              <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
                               <br>
-                              <span>Previsao Entrega : {{kanban.PREVISAO_ENTREGA|date:"D d M Y"}} </span>
-                            </p>
+                              <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
+                          </div>
                         </div>
                       </div> 
                       {% endif %}
@@ -53,20 +55,22 @@
                     {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "L" %}
                     <br>
-                      <div class="card draggable shadow-sm" id="cd2">
-                        <div class="card-body p-2">
-                            <div class="card-title">
-                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">OS : {{kanban}}</a>
-                            </div>
-                            <p>
-                              {{kanban.SERVICO}} : {{kanban.SUB_SERVICO}}
-                              <hr>
-                              <span>Data Pedido : {{kanban.DATA_SOLICITACAO|date:"D d M Y"}} </span>
-                              <br>
-                              <span>Previsao Entrega : {{kanban.PREVISAO_ENTREGA|date:"D d M Y"}} </span>
-                            </p>
+                    <div class="card draggable shadow-sm" id="cd1" >
+                      <div class="card-body p-2">
+                          <div class="card-title text-center">
+                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
+                          </div>
+                          Lentes:{{kanban.LENTES|slice:":25"}}
+                          <br>
+                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
+                          <br>
+                          <div class="card-footer bg-transparent border-primary d-flex justify-content-between">
+                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
+                            <br>
+                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
                         </div>
                       </div>
+                    </div> 
                       {% endif %}
                       {% endfor%}
                   </div>
@@ -81,20 +85,22 @@
                     {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "J" %}
                     <br>
-                      <div class="card draggable shadow-sm" id="cd9">
-                        <div class="card-body p-2">
-                            <div class="card-title">
-                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">OS : {{kanban}}</a>
-                            </div>
-                            <p>
-                              {{kanban.SERVICO}} : {{kanban.SUB_SERVICO}}
-                              <hr>
-                              <span>Data Pedido : {{kanban.DATA_SOLICITACAO|date:"D d M Y"}} </span>
-                              <br>
-                              <span>Previsao Entrega : {{kanban.PREVISAO_ENTREGA|date:"D d M Y"}} </span>
-                            </p>
+                    <div class="card draggable shadow-sm" id="cd1" >
+                      <div class="card-body p-2">
+                          <div class="card-title text-center">
+                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
+                          </div>
+                          Lentes:{{kanban.LENTES|slice:":25"}}
+                          <br>
+                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
+                          <br>
+                          <div class="card-footer bg-transparent border-warning d-flex justify-content-between">
+                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
+                            <br>
+                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
                         </div>
                       </div>
+                    </div> 
                       {% endif %}
                       {% endfor%}
                   </div>
@@ -109,21 +115,22 @@
                     {%for kanban in kankan_servicos %}
                     {% if kanban.STATUS == "E" %}
                     <br>
-                      <div class="card draggable shadow-sm" id="cd12">
-                        <div class="card-body p-2">
-                            <div class="card-title">
-                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">OS : {{kanban}}</a>
-                            </div>
-                            <p>
-                              {{kanban.SERVICO}} : {{kanban.SUB_SERVICO}}
-                              <hr>
-                              <span>Data Pedido : {{kanban.DATA_SOLICITACAO|date:"D d M Y"}} </span>
-                              <br>
-                              <span>Previsao Entrega : {{kanban.PREVISAO_ENTREGA|date:"D d M Y"}} </span>
-                            </p>
+                    <div class="card draggable shadow-sm" id="cd1" >
+                      <div class="card-body p-2">
+                          <div class="card-title text-center">
+                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
+                          </div>
+                          Lentes:{{kanban.LENTES|slice:":25"}}
+                          <br>
+                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
+                          <br>
+                          <div class="card-footer bg-transparent border-success d-flex justify-content-between">
+                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
+                            <br>
+                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
                         </div>
                       </div>
-                      
+                    </div> 
                       {% endif %}
                       {% endfor%}
                   </div>
