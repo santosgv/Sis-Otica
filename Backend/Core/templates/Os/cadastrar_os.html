@@ -142,7 +142,7 @@ Cadastrar O.S
               <select class="form-control" id="LENTES" name="LENTES">
                 <option value="" disabled selected>Lentes ...</option>
                 {% for lente in lentes %}
-                <option value="{{lente.codigo}}">{{lente.nome}}{{lente.codigo}} R${{lente.valor_custo}}</option>
+                <option value="{{lente.codigo}}">{{lente.codigo}}-{{lente.nome}} R${{lente.valor_custo}}</option>
                 {% endfor %}
               </select>
             </div>
