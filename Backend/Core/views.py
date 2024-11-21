@@ -1,4 +1,4 @@
-import os
+
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
@@ -7,15 +7,10 @@ from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from reportlab.pdfgen import canvas
-import io
-from django.http import FileResponse
-from reportlab.lib.pagesizes import letter
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import cache_page
 from django.conf import settings
-from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_tenant
+from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_tenant,get_10_days
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -28,16 +23,7 @@ from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
-import io
-import os
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
-from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode.code128 import Code128
-from django.http import FileResponse
-from PIL import Image
-from barcode import Code128
-from barcode.writer import ImageWriter
+
 
 
 logger = logging.getLogger('MyApp')
@@ -455,9 +441,13 @@ def Loja_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')      
 
+
+
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
+    print(get_10_days())
+    print(get_today_data())
+    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data()).order_by('id').all()
     pagina = Paginator(Lista_os, 10)
     page = request.GET.get('page')
     kankan_servicos = pagina.get_page(page)
@@ -857,13 +847,14 @@ def estoque(request):
 
         Produtos = pagina.get_page(page)
 
+        codigo = request.GET.get('codigo')
         qtd = request.GET.get('qtd')
         fornecedor = request.GET.get('fornecedor')
         conf = request.GET.get('conf')
         ftipo = request.GET.get('ftipo')
         festilo = request.GET.get('festilo')
 
-        if qtd or fornecedor or conf or ftipo or festilo:
+        if qtd or fornecedor or conf or ftipo or festilo or codigo:
             if qtd:
                 Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).order_by('-id')
 
@@ -874,7 +865,10 @@ def estoque(request):
                 Produtos = Produto.objects.filter(Tipo=ftipo).order_by('-id')
 
             if conf:
-                Produtos = Produto.objects.filter(conferido=False).order_by('-id')
+                Produtos = Produto.objects.filter(conferido=True).order_by('-id')
+
+            if codigo:
+                Produtos = Produto.objects.filter(codigo=codigo).order_by('-id')
 
         return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
                                                     'unitarios': unitarios,

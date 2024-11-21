@@ -7,10 +7,13 @@
 {% endblock %}
 <form action="{% url 'Core:estoque' %}" method="get">
   <div class="row">
+    <div class="col-md-2">
+      <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Codigo">
+  </div>
     <div class="col-md">
       <select id="fornecedor" name="fornecedor" class="form-control">
         <option value="" disabled selected>
-        Todos os Fornecedores
+       Fornecedores
         </option>
         {% for fornecedor in  fornecedores %}
         <option value="{{fornecedor.id}}">{{fornecedor}}</option>
