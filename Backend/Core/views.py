@@ -445,15 +445,51 @@ def Loja_os(request,id_os):
 
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    print(get_10_days())
-    print(get_today_data())
-    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data()).order_by('id').all()
-    pagina = Paginator(Lista_os, 10)
-    page = request.GET.get('page')
-    kankan_servicos = pagina.get_page(page)
-    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
-                                                      'unidade':get_tenant(request).unidade
-                                                      })
+    solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='A').order_by('id').all()
+    laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='L').order_by('id').all()
+    loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='J').order_by('id').all()
+    entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='E').order_by('id').all()
+
+    return render(request,'dashabord/dashabord.html',{
+        'solititado':solititado,
+        'laboratorio':laboratorio,
+        'loja':loja,
+        'entregue':entregue,
+    })
+
+def update_card_status(request, card_id):
+    if request.method == 'POST':
+        try:
+            # Capturar o objeto baseado no ID
+            card = get_object_or_404(ORDEN, id=card_id)
+            
+            # Obter os dados enviados pelo HTMX
+            data = json.loads(request.body)
+            
+            # Tentar obter o novo status
+            new_status = data.get('status')
+
+            # Atualizar o status no objeto e salvar
+            card.STATUS = new_status
+            card.save()
+
+            # Atualiza o Kanban completo (parcial)
+            solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='A').order_by('id').all()
+            laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='L').order_by('id').all()
+            loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='J').order_by('id').all()
+            entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='E').order_by('id').all()
+
+            # Renderiza o template parcial com o Kanban atualizado
+            return render(request, 'parcial/kanban_partial.html', {
+                'solititado': solititado,
+                'laboratorio': laboratorio,
+                'loja': loja,
+                'entregue': entregue,
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+
 
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
@@ -474,9 +510,6 @@ def get_entrada_saida(self):
 
     # Adiciona o saldo anterior ao saldo atual
     saldo_total_dinheiro = saldo + saldo_anterior
-
-    #print(saldo,'saldo do dia')
-    #print(saldo_total_dinheiro,'saldo total')
 
     # Calcula entradas totais (sem considerar apenas dinheiro)
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -521,7 +554,7 @@ def fechar_caixa(request):
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo do dia para obter o saldo total
-    saldo_total = saldo + saldo_anterior
+    saldo_total = round(saldo + saldo_anterior, 2)
 
     #print(saldo_total, 'saldo final ao fechar')
 

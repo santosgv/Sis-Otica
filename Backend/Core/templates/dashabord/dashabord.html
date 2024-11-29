@@ -9,152 +9,121 @@
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 {% endcompress %}
 <title>{% block 'title' %} Kanban Board {% endblock %}</title>
+<style>
+.clickable-area {
+    cursor: pointer; /* Mostra o cursor de clique na área */
+}
 
+
+.kanban-board {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+}
+
+.kanban-column {
+    width: 320px; /* Ajusta a largura da coluna para acomodar os cards mais largos */
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.kanban-column h6 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.kanban-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab; /* Adiciona uma linha vertical do lado esquerdo */
+    width: 280px; /* Aumenta a largura do card para parecer mais retangular */
+}
+
+.kanban-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.kanban-card-footer {
+    display: flex;
+    justify-content: space-between; /* Adiciona espaço entre os elementos */
+    align-items: center; /* Alinha os elementos verticalmente no centro */
+}
+</style>
+</head>
 {% endblock %} 
 
 {% block 'body'%}
-<div class="container-fluid pt-3">
-  <h3 class="font-weight-light text-center">Kanban Board ultimos 10 Dias</h3>
-  <div class="row flex-row flex-sm-nowrap py-3">
-
-      <div class="col-sm-6 col-md-4">
-          <div class="card bg-light">
-              <div class="card-body">
-                  <h6 class="card-title text-uppercase text-truncate py-2">Solicitado</h6>
-                  <div class="items border border-light">
-                    {%for kanban in kankan_servicos %}
-                    {% if kanban.STATUS == "A" %}
-                    <br>
-                      <div class="card draggable shadow-sm" id="cd1" >
-                        <div class="card-body p-2">
-                            <div class="card-title text-center">
-                                <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
-                            </div>
-                            Lentes:{{kanban.LENTES|slice:":25"}}
-                            <br>
-                            Obs: {{kanban.OBSERVACAO|slice:":25"}}
-                            <br>
-                            <div class="card-footer bg-transparent border-secondary d-flex justify-content-between">
-                              <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
-                              <br>
-                              <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
-                          </div>
-                        </div>
-                      </div> 
-                      {% endif %}
-                      {% endfor%}
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-          <div class="card bg-light">
-              <div class="card-body">
-                  <h6 class="card-title text-uppercase text-truncate py-2">Laboratorio</h6>
-                  <div class="items border border-light">
-                    {%for kanban in kankan_servicos %}
-                    {% if kanban.STATUS == "L" %}
-                    <br>
-                    <div class="card draggable shadow-sm" id="cd1" >
-                      <div class="card-body p-2">
-                          <div class="card-title text-center">
-                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
-                          </div>
-                          Lentes:{{kanban.LENTES|slice:":25"}}
-                          <br>
-                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
-                          <br>
-                          <div class="card-footer bg-transparent border-primary d-flex justify-content-between">
-                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
-                            <br>
-                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
-                        </div>
-                      </div>
-                    </div> 
-                      {% endif %}
-                      {% endfor%}
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-          <div class="card bg-light">
-              <div class="card-body">
-                  <h6 class="card-title text-uppercase text-truncate py-2">Loja</h6>
-                  <div class="items border border-light">
-                    {%for kanban in kankan_servicos %}
-                    {% if kanban.STATUS == "J" %}
-                    <br>
-                    <div class="card draggable shadow-sm" id="cd1" >
-                      <div class="card-body p-2">
-                          <div class="card-title text-center">
-                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
-                          </div>
-                          Lentes:{{kanban.LENTES|slice:":25"}}
-                          <br>
-                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
-                          <br>
-                          <div class="card-footer bg-transparent border-warning d-flex justify-content-between">
-                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
-                            <br>
-                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
-                        </div>
-                      </div>
-                    </div> 
-                      {% endif %}
-                      {% endfor%}
-                  </div>
-              </div>
-          </div>
-      </div>   
-      <div class="col-sm-6 col-md-4">
-          <div class="card">
-              <div class="card-body">
-                  <h6 class="card-title text-uppercase text-truncate py-2">Entregue</h6>
-                  <div class="items border border-light">
-                    {%for kanban in kankan_servicos %}
-                    {% if kanban.STATUS == "E" %}
-                    <br>
-                    <div class="card draggable shadow-sm" id="cd1" >
-                      <div class="card-body p-2">
-                          <div class="card-title text-center">
-                              <a href="{% url 'Core:Visualizar_os' kanban.id  %}" class="lead font-weight-light">{{unidade}}{{kanban}}</a>
-                          </div>
-                          Lentes:{{kanban.LENTES|slice:":25"}}
-                          <br>
-                          Obs: {{kanban.OBSERVACAO|slice:":25"}}
-                          <br>
-                          <div class="card-footer bg-transparent border-success d-flex justify-content-between">
-                            <small class="text-body-secondary">Data Pedido : {{kanban.DATA_SOLICITACAO|date:"d/m"}}</small>
-                            <br>
-                            <small class="text-body-secondary">Data Entrega : {{kanban.PREVISAO_ENTREGA|date:"d/m"}}</small>
-                        </div>
-                      </div>
-                    </div> 
-                      {% endif %}
-                      {% endfor%}
-                  </div>
-              </div>
-          </div>
-      </div>
-      
-  </div>
+<div class="container-fluid">
+    <h3 class="text-center">Kanban - Últimos 10 Dias</h3>
+    <div id="kanban-board" class="kanban-board"  hx-trigger="load">
+        {% include 'parcial/kanban_partial.html' %}
+    </div>
 </div>
 
-<div class="pagination">
-              
-  <samp class="step-links">
-        {% if kankan_servicos.has_previous %}
-        <a href="?page={{kankan_servicos.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
-        {% endif %}
-
-          <samp class="current">
-            {{kankan_servicos.number}} de {{kankan_servicos.paginator.num_pages}}
-          </samp>
-
-        {% if kankan_servicos.has_next %}
-        <a href="?page={{kankan_servicos.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
-        {% endif %}
-  </samp>
-</div>
+<script>
+    function setupKanbanEvents() {
+      // Adiciona eventos de arrastar nos cards
+      const kanbanCards = document.querySelectorAll('.kanban-card');
+      kanbanCards.forEach(card => {
+        card.addEventListener('dragstart', function (event) {
+          // Salva apenas o ID do card no evento (não o conteúdo inteiro)
+          event.dataTransfer.setData('cardId', card.id);
+        });
+      });
+  
+      // Adiciona eventos de dragover e drop nas colunas do Kanban
+      const kanbanColumns = document.querySelectorAll('.kanban-column');
+      kanbanColumns.forEach(column => {
+        column.addEventListener('dragover', function (event) {
+          event.preventDefault(); // Permite o drop
+        });
+  
+        column.addEventListener('drop', function (event) {
+          event.preventDefault();
+  
+          // Obtém o ID do card movido
+          const cardId = event.dataTransfer.getData('cardId'); // Obtém apenas o ID salvo
+          const newStatus = column.id; // ID da coluna onde o card foi solto
+  
+          // Faz a requisição POST para atualizar o status do card
+          fetch(`/update_card_status/${cardId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}', // Certifique-se de usar o CSRF token correto
+            },
+            body: JSON.stringify({ status: newStatus }),
+          }).then(response => {
+            if (response.ok) {
+              // Atualiza o conteúdo do Kanban board sem recarregar a página inteira
+              return response.text(); // Converte a resposta para texto HTML
+            } else {
+              console.error('Erro ao atualizar o status do card.');
+              throw new Error('Erro na resposta do servidor.');
+            }
+          }).then(html => {
+            // Substitui o conteúdo do Kanban board pelo HTML atualizado
+            const kanbanBoard = document.querySelector('.kanban-board');
+            kanbanBoard.innerHTML = html;
+  
+            // Reatribui os eventos de drag-and-drop após a atualização
+            setupKanbanEvents();
+          }).catch(error => {
+            console.error('Erro na requisição:', error);
+          });
+        });
+      });
+    }
+  
+    // Configura os eventos no carregamento inicial
+    document.addEventListener('DOMContentLoaded', setupKanbanEvents);
+  </script>
+</body>
 {% endblock %}
