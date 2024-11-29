@@ -58,6 +58,7 @@ urlpatterns = [
     path('export_clientes',export_clientes,name='export_clientes'),
     path('export_os',export_os,name='export_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),
+    path('update_card_status/<int:card_id>', views.update_card_status, name='update_card_status'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
     path('cadastro_caixa',views.cadastro_caixa, name='cadastro_caixa'),
