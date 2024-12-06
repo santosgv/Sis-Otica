@@ -3,6 +3,7 @@ from django.db.models import Sum
 from Autenticacao.models import USUARIO
 from django.utils.timezone import now
 from django.conf import settings
+from simple_history.models import HistoricalRecords
 
 
 
@@ -89,10 +90,13 @@ class ORDEN(models.Model):
     QUANTIDADE_PARCELA = models.IntegerField(blank=True, null=True,default='N/D')
     ENTRADA = models.CharField(max_length=100)
     DATA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
+    history = HistoricalRecords()
     
 
     def __str__(self):
         return str(self.id)
+    
+    
 
 class CAIXA(models.Model):
 
