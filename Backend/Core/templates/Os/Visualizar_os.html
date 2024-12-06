@@ -29,6 +29,7 @@ Vizualiar O.S
       <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
       <li class="breadcrumb-item"><a href="{% url 'Core:Lista_Os'%}">Listar O.S</a></li>
       <li class="breadcrumb-item active" aria-current="page">Visualizar O.S</li>
+      <li class="breadcrumb-item"><a href="{% url 'Core:view_history' VISUALIZAR_OS.id %}">Historico</a></li>
     </ol>
   </nav>
   <section class="container-fluid text-center">
@@ -276,9 +277,7 @@ Vizualiar O.S
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
         {% endif %}
         {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
-        {% if VISUALIZAR_OS.STATUS == "A" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
-        {% endif %}
         {% endif %}
         <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
         {% if VISUALIZAR_OS.STATUS == "A" %}

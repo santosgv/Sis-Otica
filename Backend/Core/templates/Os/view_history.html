@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load static %}
+    <title>{% block 'title' %}
+        Histórico de Alterações para OS {{ orden.id }}
+         {% endblock %}</title>
+         {% block 'body'%}
+         <ul>
+            {% for change in changes %}
+            <li>
+                <hr>
+                <strong>Data:</strong> {{ change.history_date }}<br>
+                <strong>Usuário:</strong> {{ change.history_user }}<br>
+                <strong>Alterações:</strong>
+                <ul>
+                    {% for field, value in change.changes.items %}
+                    <li>{{ field }}: {{ value.old }} -> {{ value.new }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <hr>
+            {% endfor %}
+        </ul>
+    
+    {% endblock %}

@@ -450,6 +450,52 @@ def Loja_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')      
 
+def view_history(request, id):
+    orden = get_object_or_404(ORDEN, id=id)
+    history = orden.history.all()
+    changes = []
+
+    CHOICES_SITUACAO = (
+        ('A', 'SOLICITADO'),
+        ('E', 'ENTREGUE'),
+        ('C', 'CANCELADO'),
+        ('L', 'LABORATÓRIO'),
+        ('J', 'LOJA')
+    )
+
+    CHOICES_PAGAMENTO = (
+        ('A', 'PIX'),
+        ('B', 'DINHEIRO'),
+        ('C', 'DEBITO'),
+        ('D', 'CREDITO'),
+        ('E', 'CARNER'),
+        ('F', 'PERMUTA'),
+    )
+
+    SITUACAO_DICT = dict(CHOICES_SITUACAO)
+    PAGAMENTO_DICT = dict(CHOICES_PAGAMENTO)
+
+    for record in history:
+        if record.prev_record:
+            diff = record.diff_against(record.prev_record)
+            translated_changes = {}
+            for change in diff.changes:
+                old_value = change.old
+                new_value = change.new
+                if change.field == 'STATUS':
+                    old_value = SITUACAO_DICT.get(change.old, change.old)
+                    new_value = SITUACAO_DICT.get(change.new, change.new)
+                elif change.field == 'FORMA_PAG':
+                    old_value = PAGAMENTO_DICT.get(change.old, change.old)
+                    new_value = PAGAMENTO_DICT.get(change.new, change.new)
+                translated_changes[change.field] = {'old': old_value, 'new': new_value}
+            changes.append({
+                'history_date': record.history_date,
+                'history_user': record.history_user,
+                'changes': translated_changes,
+            })
+
+    return render(request, 'Os/view_history.html', {'orden': orden, 'changes': changes})
 
 
 @login_required(login_url='/auth/logar/')
@@ -507,8 +553,6 @@ def get_entrada_saida(self):
     
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
     saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
-
-    print(saldo_anterior,'ultimo saldo no get')
 
     # Calcula entradas e saídas do dia corrente
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -829,7 +873,6 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
-
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
@@ -849,12 +892,10 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
-
 @login_required(login_url='/auth/logar/')
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
-
 
 @login_required(login_url='/auth/logar/')
 def receber(request):
