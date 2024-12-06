@@ -49,6 +49,7 @@ urlpatterns = [
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
+    path('view_history/<int:id>',views.view_history, name='view_history'),
     path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
     path('export_clientes',export_clientes,name='export_clientes'),
     path('export_os',export_os,name='export_os'),
