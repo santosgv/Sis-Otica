@@ -273,9 +273,6 @@ Vizualiar O.S
         </div>
         </div>
         <div style="margin: 15px;">
-        {% if user.FUNCAO == "G" and VISUALIZAR_OS.STATUS == "E" %}
-        <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
-        {% endif %}
         {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
         {% endif %}
