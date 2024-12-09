@@ -36,7 +36,7 @@ def search_products(request):
 
 def search_caixa(request):
     search_term = request.GET.get('search_os')
-    orden = ORDEN.objects.filter(id__icontains=search_term).exclude(STATUS='C').exclude(STATUS='E').all()
+    orden = ORDEN.objects.filter(id__icontains=search_term).exclude(STATUS='C').all()
     return render(request, 'parcial/select_os.html', {'OsS': orden})
 
 def search_cliente(request):
