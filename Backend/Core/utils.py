@@ -146,6 +146,10 @@ def get_10_days():
     dez_dias_atras = datetime.datetime.now().date() - timedelta(days=10)
     return dez_dias_atras
 
+def get_30_days():
+    dez_dias_atras = datetime.datetime.now().date() - timedelta(days=30)
+    return dez_dias_atras
+
 def primeiro_dia_mes():
     data_atual = date.today()
     primeiro_dia = data_atual.replace(day=1)
