@@ -529,10 +529,10 @@ def update_card_status(request, card_id):
             card.save()
 
             # Atualiza o Kanban completo (parcial)
-            solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='A').order_by('id').all()
-            laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='L').order_by('id').all()
-            loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='J').order_by('id').all()
-            entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(), DATA_SOLICITACAO__lte=get_today_data(), STATUS='E').order_by('id').all()
+            solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='A').order_by('id').all()
+            laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='L').order_by('id').all()
+            loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='J').order_by('id').all()
+            entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='E').order_by('id').all()
 
             # Renderiza o template parcial com o Kanban atualizado
             return render(request, 'parcial/kanban_partial.html', {
