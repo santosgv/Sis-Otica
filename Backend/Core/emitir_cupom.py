@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 print(BASE_DIR)
 
 
-certificado = os.path.join(BASE_DIR ,'Core\SMN PRODUTOS OPTICOS LTDA58016119000132.pfx')
+certificado = os.path.join(BASE_DIR ,'Core/SMN PRODUTOS OPTICOS LTDA58016119000132.pfx')
 senha =config('SENHA_CERTIFICADO')
 uf = 'mg'
 homologacao = True
