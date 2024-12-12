@@ -12,9 +12,12 @@ import os
 from pathlib import Path
 from lxml import etree
 from decouple import config
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+print(BASE_DIR)
 
 
-certificado = "C:\GitHub\Sis-Otica\Backend\Core\SMN PRODUTOS OPTICOS LTDA58016119000132.pfx"
+certificado = os.path.join(BASE_DIR ,'Core\SMN PRODUTOS OPTICOS LTDA58016119000132.pfx')
 senha =config('SENHA_CERTIFICADO')
 uf = 'mg'
 homologacao = True
@@ -152,8 +155,8 @@ if envio[0] == 0:
 # em caso de erro o retorno será o xml de resposta da SEFAZ + NF-e enviada
 else:
   print('Erro:')
-  #print(envio[1].text) # resposta
-  #print('Nota:')
-  #print(etree.tostring(envio[2], encoding="unicode")) # nfe
+  print(envio[1].text) # resposta
+  print('Nota:')
+  print(etree.tostring(envio[2], encoding="unicode")) # nfe
 
 
