@@ -8,27 +8,30 @@ from pynfe.processamento.assinatura import AssinaturaA1
 from pynfe.utils.flags import CODIGO_BRASIL
 from decimal import Decimal
 import datetime
+from lxml import etree
+from decouple import config
 
-certificado = "C:\GitHub\Sis-Otica\Backend"
-senha = 'senha'
+
+certificado = "C:\GitHub\Sis-Otica\Backend\Core\SMN PRODUTOS OPTICOS LTDA58016119000132.pfx"
+senha =config('SENHA_CERTIFICADO')
 uf = 'mg'
 homologacao = True
 
 # emitente
 emitente = Emitente(
     razao_social='NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
-    nome_fantasia='Nome Fantasia da Empresa',
-    cnpj='99999999000199',           # cnpj apenas números
+    nome_fantasia='Smn Produtos Opticos LTDA',
+    cnpj='58016119000132',           # cnpj apenas números
     codigo_de_regime_tributario='1', # 1 para simples nacional ou 3 para normal
-    inscricao_estadual='9999999999', # numero de IE da empresa
-    inscricao_municipal='12345',
-    cnae_fiscal='9999999',           # cnae apenas números
-    endereco_logradouro='Rua da Paz',
-    endereco_numero='154',
-    endereco_bairro='Belvedere',
-    endereco_municipio='Ribeirao das Neves',
+    inscricao_estadual='50366670093', # numero de IE da empresa
+    inscricao_municipal='62369016',
+    cnae_fiscal='4774100',           # cnae apenas números
+    endereco_logradouro='AV RETIRO DOS IMIGRANTES',
+    endereco_numero='520',
+    endereco_bairro='RETIRO',
+    endereco_municipio='Contagem',
     endereco_uf='MG',
-    endereco_cep='33821452',
+    endereco_cep='3118601',
     endereco_pais=CODIGO_BRASIL
 )
 
@@ -37,17 +40,17 @@ cliente = Cliente(
     razao_social='NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
     tipo_documento='CPF',           #CPF ou CNPJ
     email='email@email.com',
-    numero_documento='12345678900', # numero do cpf ou cnpj
+    numero_documento='01858082633', # numero do cpf ou cnpj
     indicador_ie=9,                 # 9=Não contribuinte 
     endereco_logradouro='Rua dos Bobos',
     endereco_numero='Zero',
     endereco_complemento='Ao lado de lugar nenhum',
-    endereco_bairro='Aquele Mesmo',
-    endereco_municipio='Brasilia',
-    endereco_uf='DF',
-    endereco_cep='12345123',
+    endereco_bairro='RETIRO',
+    endereco_municipio='Contagem',
+    endereco_uf='MG',
+    endereco_cep='3118601',
     endereco_pais=CODIGO_BRASIL,
-    endereco_telefone='11912341234',
+    endereco_telefone='33821452',
 )
 
 # Nota Fiscal
@@ -64,7 +67,7 @@ nota_fiscal = NotaFiscal(
    data_emissao=datetime.datetime.now(),
    data_saida_entrada=datetime.datetime.now(),
    tipo_documento=1,          # 0=entrada; 1=saida
-   municipio='4118402',       # Código IBGE do Município 
+   municipio='62369016',       # Código IBGE do Município 
    tipo_impressao_danfe=4,    # 0=Sem geração de DANFE;1=DANFE normal, Retrato;2=DANFE normal Paisagem;3=DANFE Simplificado;4=DANFE NFC-e;
    forma_emissao='1',         # 1=Emissão normal (não em contingência);
    cliente_final=1,           # 0=Normal;1=Consumidor final;
@@ -81,12 +84,12 @@ nota_fiscal = NotaFiscal(
 nota_fiscal.adicionar_produto_servico(
     codigo='000328',                           # id do produto
     descricao='NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
-    ncm='99999999',
-    cfop='5102',
+    ncm='901850',
+    cfop='1556',
     unidade_comercial='UN',
     ean='SEM GTIN',
     ean_tributavel='SEM GTIN',
-    quantidade_comercial=Decimal('12'),        # 12 unidades
+    quantidade_comercial=Decimal('10'),        # 12 unidades
     valor_unitario_comercial=Decimal('9.75'),  # preço unitário
     valor_total_bruto=Decimal('117.00'),       # preço total
     unidade_tributavel='UN',
@@ -104,27 +107,33 @@ nota_fiscal.adicionar_produto_servico(
 # responsável técnico
 nota_fiscal.adicionar_responsavel_tecnico(
     cnpj='99999999000199',
-    contato='TadaSoftware',
-    email='tadasoftware@gmail.com',
-    fone='11912341234'
+    contato='vitorgomes',
+    email='santosgomesv@gmail.com',
+    fone='31993839825'
   )
 
 # serialização
 serializador = SerializacaoXML(_fonte_dados, homologacao=homologacao)
 nfce = serializador.exportar()
 
+
 # assinatura
 a1 = AssinaturaA1(certificado, senha)
 xml = a1.assinar(nfce)
+
+
 
 # token de homologacao
 token = '000001'
 
 # csc de homologação
-csc = 'N4EOUTEDXCOVCGNTWLFD4OJLHBWCWJHCXC0C'
+csc = '35512a49a3c3ad0bddf8cd646a379622'
 
 # gera e adiciona o qrcode no xml NT2015/003
 xml_com_qrcode = SerializacaoQrcode().gerar_qrcode(token, csc, xml)
+
+print('XML com QR Code:')
+print(xml_com_qrcode[0])
 
 # envio
 con = ComunicacaoSefaz(uf, certificado, senha, homologacao)
@@ -140,14 +149,8 @@ if envio[0] == 0:
 # em caso de erro o retorno será o xml de resposta da SEFAZ + NF-e enviada
 else:
   print('Erro:')
-  print(envio[1].text) # resposta
-  print('Nota:')
-  print(etree.tostring(envio[2], encoding="unicode")) # nfe
+  #print(envio[1].text) # resposta
+  #print('Nota:')
+  #print(etree.tostring(envio[2], encoding="unicode")) # nfe
 
 
-
-xml_com_qrcode = SerializacaoQrcode().gerar_qrcode(token, csc, xml,return_qr=True)
-# xml
-xml_com_qrcode[0]
-# qrcode
-xml_com_qrcode[1]
