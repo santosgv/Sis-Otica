@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load compress %}
 {% load static %}
+{% load filters %}
 
 {% block 'head' %}
 {% compress css %}
@@ -95,7 +96,7 @@
                              <span class="badge badge-warning">LOJA</span>
                              {% endif %}
                           </td>
-                          <td>{{Os.CLIENTE.TELEFONE}}</td>
+                          <td>{{Os.CLIENTE.TELEFONE}}<a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><img width="25" height="25" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></td>
                           <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
                           <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
                         </tr>
