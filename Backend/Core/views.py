@@ -181,15 +181,20 @@ def excluir_cliente(request,id):
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
-        Lista_os = ORDEN.objects.order_by('-id').all()
-
-        pagina = Paginator(Lista_os, 25)
-
-        page = request.GET.get('page')
-
-        Ordem_servicos = pagina.get_page(page)
-
-        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
+        if request.method == "GET":
+            status = request.GET.get('status')
+            if status != None:
+                Lista_os = ORDEN.objects.order_by('-id').filter(STATUS=status)
+                pagina = Paginator(Lista_os, 25)
+                page = request.GET.get('page')
+                Ordem_servicos = pagina.get_page(page)
+                return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
+            else:
+                Lista_os = ORDEN.objects.order_by('-id').all()
+                pagina = Paginator(Lista_os, 25)
+                page = request.GET.get('page')
+                Ordem_servicos = pagina.get_page(page)
+                return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':settings.UNIDADE})
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
