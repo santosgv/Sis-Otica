@@ -42,6 +42,25 @@
        hx-target="#search-results" 
        hx-indicator=".htmx-indicator">
     </form>
+    <form action="{% url 'Core:Lista_Os' %}" method="get" class="form-inline">
+      <div class="row">
+        <div class="col-md">
+        <select id="status" name="status" class="custom-select my-1 mr-sm-2">
+          <option value="" disabled selected>
+         Status
+          </option>
+          <option value="A">SOLICITADO</option>
+          <option value="E">ENTREGUE</option>
+          <option value="C">CANCELADO</option>
+          <option value="L">LABORATÓRIO</option>
+          <option value="J">LOJA</option>
+        </select>
+      </div>
+        <div class="col-md"><button type="submit"class="btn btn-primary" >Aplicar</button></div>
+  </div>
+  </form>
+
+  
   </div>
     <div class="text-center">
       {% if messages %}

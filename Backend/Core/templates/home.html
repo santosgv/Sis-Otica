@@ -26,7 +26,11 @@
 
 
   <div class="card-body text-center">
+    <h1>bem vindo!</h1>
+    {% if aniversariantes %}
     <div class="row centralizar">
+      <h1>Ações de marketing pendentes</h1>
+      <hr>
       {% for cliente in aniversariantes %}
       <div class="text-center card border-primary mb-3" id="cliente-{{ cliente.id }}" style="max-width: 18rem; margin-right: 5px;">
         <div class="card-header">Aniversariante do Mes {{cliente.DATA_NASCIMENTO}}</div>
@@ -38,9 +42,7 @@
       </div>
       <br>
       {% endfor %}
-
-      
-
+      {% endif %}
 </div>
 
 
