@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load compress %}
 {% load static %}
+{% load filters %}
 
 {% block 'head' %}
 {% compress css %}
@@ -41,6 +42,25 @@
        hx-target="#search-results" 
        hx-indicator=".htmx-indicator">
     </form>
+    <form action="{% url 'Core:Lista_Os' %}" method="get" class="form-inline">
+      <div class="row">
+        <div class="col-md">
+        <select id="status" name="status" class="custom-select my-1 mr-sm-2">
+          <option value="" disabled selected>
+         Status
+          </option>
+          <option value="A">SOLICITADO</option>
+          <option value="E">ENTREGUE</option>
+          <option value="C">CANCELADO</option>
+          <option value="L">LABORATÓRIO</option>
+          <option value="J">LOJA</option>
+        </select>
+      </div>
+        <div class="col-md"><button type="submit"class="btn btn-primary" >Aplicar</button></div>
+  </div>
+  </form>
+
+  
   </div>
     <div class="text-center">
       {% if messages %}
@@ -95,7 +115,7 @@
                              <span class="badge badge-warning">LOJA</span>
                              {% endif %}
                           </td>
-                          <td>{{Os.CLIENTE.TELEFONE}}</td>
+                          <td>{{Os.CLIENTE.TELEFONE}}<a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><img width="25" height="25" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></td>
                           <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
                           <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
                         </tr>
