@@ -1,4 +1,5 @@
 {% load static %}{% load compress %}
+{% load filters %}
 {% block 'head' %}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
@@ -17,7 +18,7 @@
               <th scope="col">LENTES</th>
               <th scope="col">DATA PEDIDO</th>
               <th scope="col">STATUS</th>
-              <th scope="col">OBSERVAÇAO</th>
+              <th scope="col">N° Contato</th>
               <th scope="col">PREVISÂO ENTREGA</th>
               <th scope="col">AÇAO</th>
             </tr>
@@ -50,7 +51,7 @@
                    <span class="badge badge-warning">LOJA</span>
                    {% endif %}
                 </td>
-                <td>{{Os.OBSERVACAO|slice:":10"}}</td>
+                <td>{{Os.CLIENTE.TELEFONE}}<a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><img width="25" height="25" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></td>
                 <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
                 <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
               </tr>
