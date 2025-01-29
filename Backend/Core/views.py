@@ -159,7 +159,7 @@ def Edita_cliente(request,id):
             cliente.EMAIL = request.POST.get('EMAIL')
             cliente.save()
             messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-        return render(request,'Cliente/cliente.html',{'cliente':cliente})
+        return redirect('Core:clientes')
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -174,17 +174,26 @@ def excluir_cliente(request,id):
 def Lista_Os(request):
         if request.method == "GET":
             status = request.GET.get('status')
+            data_inicio = request.GET.get('data_inicio')
+            data_fim = request.GET.get('data_fim')
+
             if status:
                 Lista_os = ORDEN.objects.order_by('-id').filter(STATUS=status)
             else:
                 Lista_os = ORDEN.objects.order_by('-id').all()
+
+            if data_inicio and data_fim:
+                Lista_os = Lista_os.filter(DATA_SOLICITACAO__range=[data_inicio, data_fim])
             
             pagina = Paginator(Lista_os, 25)
             page = request.GET.get('page')
             Ordem_servicos = pagina.get_page(page)
             return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,
                                                       'unidade':settings.UNIDADE,
-                                                      'status': status})
+                                                      'status': status,
+                                                      'data_inicio': data_inicio,
+                                                      'data_fim': data_fim,
+                                                      })
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -1177,3 +1186,9 @@ class TipoDeleteView(DeleteView):
     model = Tipo
     template_name = 'Estoque/tipo_confirm_delete.html'
     success_url = reverse_lazy('Core:tipos_list')
+
+
+def historico_compras(request, cliente_id):
+    cliente = get_object_or_404(CLIENTE, id=cliente_id)
+    compras = ORDEN.objects.filter(CLIENTE=cliente).order_by('-DATA_SOLICITACAO')
+    return render(request, 'Cliente/historico_compras.html', {'cliente': cliente, 'compras': compras})

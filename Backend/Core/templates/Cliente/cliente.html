@@ -18,6 +18,7 @@
     <li class="breadcrumb-item"><a href="{% url 'Core:clientes'%}">Clientes</a></li>
     <li class="breadcrumb-item active" aria-current="page">Visualizar Cliente</li>
   </ol>
+  <a href="{% url 'Core:historico_compras' cliente.id %}">Ver Histórico de Compras</a>
 </nav>
 <section class="container-fluid text-center">
   <div class="form_">
