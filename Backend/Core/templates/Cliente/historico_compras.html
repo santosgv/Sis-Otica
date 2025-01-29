@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load compress %}
+{% load static %}
+{% load filters %}
+
+{% block 'head' %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endcompress %}
+<title>{% block 'title' %}
+    {{ cliente.NOME }}
+  {% endblock %}</title>
+{% endblock %}
+
+{% block 'body' %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Histórico de Compras de {{ cliente.NOME }}</h1>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID da Ordem</th>
+                    <th>Data da Solicitação</th>
+                    <th>Status</th>
+                    <th>Valor</th>
+                    <th>Forma de Pagamento</th>
+                    <th>Previsão de Entrega</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for compra in compras %}
+                <tr>
+                    <td>
+                        <a href="{% url 'Core:Visualizar_os' compra.id %}" class="btn btn-link">
+                            {{ compra.id }}
+                        </a>
+                    </td>
+                    <td>{{ compra.DATA_SOLICITACAO|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge badge-secondary">
+                            {{ compra.get_STATUS_display }}
+                        </span>
+                    </td>
+                    <td>R$ {{ compra.VALOR|floatformat:2 }}</td>
+                    <td>{{ compra.get_FORMA_PAG_display }}</td>
+                    <td>{{ compra.PREVISAO_ENTREGA|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

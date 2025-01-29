@@ -41,6 +41,7 @@ app_name = 'Core'
 urlpatterns = [
     path('', views.home, name='home'),
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
+    path('historico-compras/<int:cliente_id>/', views.historico_compras, name='historico_compras'),
     path('fechar_card/', views.fechar_card, name='fechar_card'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
