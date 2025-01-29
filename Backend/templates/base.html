@@ -104,12 +104,40 @@
         <script src="{% static 'Unidades/js/scripts.js' %}"></script>
         {% endcompress %}
     </body>
+    <a href="mailto:emanuelrodrigues017@gmail.com,santosgomesv@gmail.com?subject=Preciso de Ajuda&body=Olá, preciso de ajuda com o seguinte Sistema:" target="_blank" class="btn-ajuda">
+        <i class="fas fa-question-circle"></i> Ajuda
+    </a>
     <footer class="bg-body-tertiary text-center text-lg-start">
        
         <div class="text-center p-3" style="background-color:#BB3452; color: #fff;">
           © 2024 Copyright:
           <a class="text-white" href="https://sgosistemas.com.br/">sgosistemas.com.br</a>
         </div>
-       
       </footer>
+
+      <style>
+        .btn-ajuda {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    
+        .btn-ajuda:hover {
+            background-color: #0056b3;
+        }
+    
+        .btn-ajuda i {
+            font-size: 20px;
+        }
+    </style>
 </html>
