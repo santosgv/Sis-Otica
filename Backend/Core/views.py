@@ -2,7 +2,7 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -22,7 +22,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm,laboratorioForm
 
 
 logger = logging.getLogger('MyApp')
@@ -201,9 +201,11 @@ def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
+        laboratorios = LABORATORIO.objects.filter(ATIVO=True).all()
         produtos = Produto.objects.filter(quantidade__gt=0).order_by('-id')
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
                                                       'produtos':produtos,
+                                                      'laboratorios':laboratorios,
                                                       })
     else:
         try:
@@ -220,6 +222,7 @@ def Cadastrar_os(request,id_cliente):
                 else:
                     ASSINATURA = None 
                 SERVICO_POST =request.POST.get('SERVICO')
+                LAB = request.POST.get('lab')
                 OD_ESF = request.POST.get('OD_ESF')
                 OD_CIL = request.POST.get('OD_CIL')
                 OD_EIXO = request.POST.get('OD_EIXO')
@@ -261,6 +264,7 @@ def Cadastrar_os(request,id_cliente):
                 PREVISAO_ENTREGA= PREVISAO_ENTREGA,
                 ASSINATURA =ASSINATURA,
                 SERVICO= SERVICO.objects.get(id=SERVICO_POST),
+                LABORATORIO= LABORATORIO.objects.get(id=LAB),
                 OD_ESF= OD_ESF,
                 OD_CIL = OD_CIL,
                 OD_EIXO = OD_EIXO,
@@ -1186,6 +1190,18 @@ class TipoDeleteView(DeleteView):
     model = Tipo
     template_name = 'Estoque/tipo_confirm_delete.html'
     success_url = reverse_lazy('Core:tipos_list')
+
+
+class LabListView(ListView):
+    model = LABORATORIO
+    template_name = 'Os/lab_list.html'
+
+class LabCreateView(CreateView):
+    with transaction.atomic():
+        model = LABORATORIO
+        form_class = laboratorioForm
+        template_name = 'Os/os_form.html'
+        success_url = reverse_lazy('Core:LabListView')
 
 
 def historico_compras(request, cliente_id):

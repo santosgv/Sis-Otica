@@ -20,6 +20,7 @@ Cadastrar O.S
   </ol>
 </nav>
 <a href="{% url 'Core:os_list' %}" class="btn btn-primary">Serviços</a>
+<a href="{% url 'Core:LabListView' %}" class="btn btn-primary">Laboratorios</a>
     <section class="container-fluid text-center">
       <div class="form_">
         <div class="text-center">
@@ -60,6 +61,18 @@ Cadastrar O.S
                 </div>
                 </div>
               </div>
+              <div class="row text-center">
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="inputState">Laboratorio</label>
+                    <select id="lab" name="lab" class="form-control"  required="required">
+                      {% for lab in laboratorios %}
+                      <option selected value="{{lab.id}}">{{lab}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  </div>
+                </div>
             </div>
             <div id="_receita">
                 <label for="NUMERO">Receita</label>

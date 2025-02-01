@@ -27,7 +27,9 @@ from .views import (
     TipoCreateView,
     TipoDetailView,
     TipoUpdateView,
-    TipoDeleteView
+    TipoDeleteView,
+    LabListView,
+    LabCreateView,
 )
 
 
@@ -93,6 +95,8 @@ urlpatterns = [
     path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
     path('servicos/',ServicoListView.as_view(),name='os_list'),
     path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
+    path('labs/',LabListView.as_view(), name='LabListView'),
+    path('lab/novo',LabCreateView.as_view(),name='LabCreateView'),
 
     path('tiposund/', TipoUnitarioListView.as_view(), name='tiposund_list'),
     path('tipound/novo/', TipoUnitarioCreateView.as_view(), name='tipound_create'),
