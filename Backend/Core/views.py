@@ -1,21 +1,16 @@
-import os
+
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from reportlab.pdfgen import canvas
-import io
-from django.http import FileResponse
-from reportlab.lib.pagesizes import letter
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import cache_page
 from django.conf import settings
-from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_tenant
+from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days,get_tenant
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -27,17 +22,8 @@ from django.db import transaction
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm
-import io
-import os
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
-from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode.code128 import Code128
-from django.http import FileResponse
-from PIL import Image
-from barcode import Code128
-from barcode.writer import ImageWriter
+from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm,laboratorioForm
+
 
 
 logger = logging.getLogger('MyApp')
@@ -175,7 +161,7 @@ def Edita_cliente(request,id):
             cliente.EMAIL = request.POST.get('EMAIL')
             cliente.save()
             messages.add_message(request, constants.SUCCESS, 'Dados alterado com sucesso')
-        return render(request,'Cliente/cliente.html',{'cliente':cliente})
+        return redirect('Core:clientes')
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -188,15 +174,33 @@ def excluir_cliente(request,id):
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
-        Lista_os = ORDEN.objects.order_by('-id').all()
+        if request.method == "GET":
+            status = request.GET.get('status')
+            data_inicio = request.GET.get('data_inicio')
+            data_fim = request.GET.get('data_fim')
 
-        pagina = Paginator(Lista_os, 25)
+            if status:
+                Lista_os = ORDEN.objects.order_by('-id').filter(STATUS=status)
+            else:
+                Lista_os = ORDEN.objects.order_by('-id').all()
 
         page = request.GET.get('page')
 
         Ordem_servicos = pagina.get_page(page)
 
         return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':get_tenant(request).unidade})
+            if data_inicio and data_fim:
+                Lista_os = Lista_os.filter(DATA_SOLICITACAO__range=[data_inicio, data_fim])
+            
+            pagina = Paginator(Lista_os, 25)
+            page = request.GET.get('page')
+            Ordem_servicos = pagina.get_page(page)
+            return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,
+                                                      'unidade':settings.UNIDADE,
+                                                      'status': status,
+                                                      'data_inicio': data_inicio,
+                                                      'data_fim': data_fim,
+                                                      })
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -204,9 +208,11 @@ def Cadastrar_os(request,id_cliente):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id_cliente)
         servicos = SERVICO.objects.filter(ATIVO=True).all()
+        laboratorios = LABORATORIO.objects.filter(ATIVO=True).all()
         produtos = Produto.objects.filter(quantidade__gt=0).order_by('-id')
         return render(request,'Os/cadastrar_os.html',{'cliente':cliente,'servicos':servicos,
                                                       'produtos':produtos,
+                                                      'laboratorios':laboratorios,
                                                       })
     else:
         try:
@@ -223,6 +229,7 @@ def Cadastrar_os(request,id_cliente):
                 else:
                     ASSINATURA = None 
                 SERVICO_POST =request.POST.get('SERVICO')
+                LAB = request.POST.get('lab')
                 OD_ESF = request.POST.get('OD_ESF')
                 OD_CIL = request.POST.get('OD_CIL')
                 OD_EIXO = request.POST.get('OD_EIXO')
@@ -264,6 +271,7 @@ def Cadastrar_os(request,id_cliente):
                 PREVISAO_ENTREGA= PREVISAO_ENTREGA,
                 ASSINATURA =ASSINATURA,
                 SERVICO= SERVICO.objects.get(id=SERVICO_POST),
+                LABORATORIO= LABORATORIO.objects.get(id=LAB),
                 OD_ESF= OD_ESF,
                 OD_CIL = OD_CIL,
                 OD_EIXO = OD_EIXO,
@@ -455,6 +463,54 @@ def Loja_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')      
 
+def view_history(request, id):
+    orden = get_object_or_404(ORDEN, id=id)
+    history = orden.history.all()
+    changes = []
+
+    CHOICES_SITUACAO = (
+        ('A', 'SOLICITADO'),
+        ('E', 'ENTREGUE'),
+        ('C', 'CANCELADO'),
+        ('L', 'LABORATÓRIO'),
+        ('J', 'LOJA')
+    )
+
+    CHOICES_PAGAMENTO = (
+        ('A', 'PIX'),
+        ('B', 'DINHEIRO'),
+        ('C', 'DEBITO'),
+        ('D', 'CREDITO'),
+        ('E', 'CARNER'),
+        ('F', 'PERMUTA'),
+    )
+
+    SITUACAO_DICT = dict(CHOICES_SITUACAO)
+    PAGAMENTO_DICT = dict(CHOICES_PAGAMENTO)
+
+    for record in history:
+        if record.prev_record:
+            diff = record.diff_against(record.prev_record)
+            translated_changes = {}
+            for change in diff.changes:
+                old_value = change.old
+                new_value = change.new
+                if change.field == 'STATUS':
+                    old_value = SITUACAO_DICT.get(change.old, change.old)
+                    new_value = SITUACAO_DICT.get(change.new, change.new)
+                elif change.field == 'FORMA_PAG':
+                    old_value = PAGAMENTO_DICT.get(change.old, change.old)
+                    new_value = PAGAMENTO_DICT.get(change.new, change.new)
+                translated_changes[change.field] = {'old': old_value, 'new': new_value}
+            changes.append({
+                'history_date': record.history_date,
+                'history_user': record.history_user,
+                'changes': translated_changes,
+            })
+
+    return render(request, 'Os/view_history.html', {'orden': orden, 'changes': changes})
+
+
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
     Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
@@ -464,6 +520,51 @@ def Dashabord(request):
     return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
                                                       'unidade':get_tenant(request).unidade
                                                       })
+    solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='A').order_by('id').all()
+    laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='L').order_by('id').all()
+    loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='J').order_by('id').all()
+    entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='E').order_by('id').all()
+
+    return render(request,'dashabord/dashabord.html',{
+        'solititado':solititado,
+        'laboratorio':laboratorio,
+        'loja':loja,
+        'entregue':entregue,
+    })
+
+def update_card_status(request, card_id):
+    if request.method == 'POST':
+        try:
+            # Capturar o objeto baseado no ID
+            card = get_object_or_404(ORDEN, id=card_id)
+            
+            # Obter os dados enviados pelo HTMX
+            data = json.loads(request.body)
+            
+            # Tentar obter o novo status
+            new_status = data.get('status')
+
+            # Atualizar o status no objeto e salvar
+            card.STATUS = new_status
+            card.save()
+
+            # Atualiza o Kanban completo (parcial)
+            solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='A').order_by('id').all()
+            laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='L').order_by('id').all()
+            loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='J').order_by('id').all()
+            entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='E').order_by('id').all()
+
+            # Renderiza o template parcial com o Kanban atualizado
+            return render(request, 'parcial/kanban_partial.html', {
+                'solititado': solititado,
+                'laboratorio': laboratorio,
+                'loja': loja,
+                'entregue': entregue,
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+
 
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
@@ -472,8 +573,6 @@ def get_entrada_saida(self):
     
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
     saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
-
-    print(saldo_anterior,'ultimo saldo no get')
 
     # Calcula entradas e saídas do dia corrente
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -484,9 +583,6 @@ def get_entrada_saida(self):
 
     # Adiciona o saldo anterior ao saldo atual
     saldo_total_dinheiro = saldo + saldo_anterior
-
-    #print(saldo,'saldo do dia')
-    #print(saldo_total_dinheiro,'saldo total')
 
     # Calcula entradas totais (sem considerar apenas dinheiro)
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -531,7 +627,7 @@ def fechar_caixa(request):
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo do dia para obter o saldo total
-    saldo_total = saldo + saldo_anterior
+    saldo_total = round(saldo + saldo_anterior, 2)
 
     #print(saldo_total, 'saldo final ao fechar')
 
@@ -797,7 +893,6 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
-
 @login_required(login_url='/auth/logar/')
 def dados_minhas_vendas(request):
     id_user = request.user
@@ -820,12 +915,10 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
-
 @login_required(login_url='/auth/logar/')
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
-
 
 @login_required(login_url='/auth/logar/')
 def receber(request):
@@ -857,13 +950,14 @@ def estoque(request):
 
         Produtos = pagina.get_page(page)
 
+        codigo = request.GET.get('codigo')
         qtd = request.GET.get('qtd')
         fornecedor = request.GET.get('fornecedor')
         conf = request.GET.get('conf')
         ftipo = request.GET.get('ftipo')
         festilo = request.GET.get('festilo')
 
-        if qtd or fornecedor or conf or ftipo or festilo:
+        if qtd or fornecedor or conf or ftipo or festilo or codigo:
             if qtd:
                 Produtos = Produto.objects.filter(quantidade__gte=qtd,quantidade__lte=qtd).order_by('-id')
 
@@ -874,7 +968,10 @@ def estoque(request):
                 Produtos = Produto.objects.filter(Tipo=ftipo).order_by('-id')
 
             if conf:
-                Produtos = Produto.objects.filter(conferido=False).order_by('-id')
+                Produtos = Produto.objects.filter(conferido=True).order_by('-id')
+
+            if codigo:
+                Produtos = Produto.objects.filter(codigo=codigo).order_by('-id')
 
         return render(request,'Estoque/estoque.html',{'fornecedores':fornecedores,
                                                     'unitarios': unitarios,
@@ -1110,3 +1207,21 @@ class TipoDeleteView(DeleteView):
     model = Tipo
     template_name = 'Estoque/tipo_confirm_delete.html'
     success_url = reverse_lazy('Core:tipos_list')
+
+
+class LabListView(ListView):
+    model = LABORATORIO
+    template_name = 'Os/lab_list.html'
+
+class LabCreateView(CreateView):
+    with transaction.atomic():
+        model = LABORATORIO
+        form_class = laboratorioForm
+        template_name = 'Os/os_form.html'
+        success_url = reverse_lazy('Core:LabListView')
+
+
+def historico_compras(request, cliente_id):
+    cliente = get_object_or_404(CLIENTE, id=cliente_id)
+    compras = ORDEN.objects.filter(CLIENTE=cliente).order_by('-DATA_SOLICITACAO')
+    return render(request, 'Cliente/historico_compras.html', {'cliente': cliente, 'compras': compras})

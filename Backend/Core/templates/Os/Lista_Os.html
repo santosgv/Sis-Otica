@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load compress %}
 {% load static %}
+{% load filters %}
 
 {% block 'head' %}
 {% compress css %}
@@ -41,6 +42,30 @@
        hx-target="#search-results" 
        hx-indicator=".htmx-indicator">
     </form>
+    <form action="{% url 'Core:Lista_Os' %}" method="get" class="form-inline">
+      <div class="row">
+        <div class="col-md">
+          <select id="status" name="status" class="custom-select mr-4">
+            <option value="" disabled selected>Status</option>
+            <option value="A">SOLICITADO</option>
+            <option value="E">ENTREGUE</option>
+            <option value="C">CANCELADO</option>
+            <option value="L">LABORATÓRIO</option>
+            <option value="J">LOJA</option>
+          </select>
+        </div>
+        <div class="col-md">
+          <input class="form-control mr-2" type="date" name="data_inicio" placeholder="Data Início">
+        </div>
+        <div class="col-md">
+          <input class="form-control mr-2" type="date" name="data_fim" placeholder="Data Fim">
+        </div>
+        <div class="col-md">
+          <button type="submit" class="btn btn-primary">Aplicar</button>
+        </div>
+  </div>
+  </form>
+  
   </div>
     <div class="text-center">
       {% if messages %}
@@ -62,7 +87,7 @@
                         <th scope="col">LENTES</th>
                         <th scope="col">DATA PEDIDO</th>
                         <th scope="col">STATUS</th>
-                        <th scope="col">OBSERVAÇAO</th>
+                        <th scope="col">N° Contato</th>
                         <th scope="col">PREVISÂO ENTREGA</th>
                         <th scope="col">AÇAO</th>
                       </tr>
@@ -95,7 +120,7 @@
                              <span class="badge badge-warning">LOJA</span>
                              {% endif %}
                           </td>
-                          <td>{{Os.OBSERVACAO|slice:":10"}}</td>
+                          <td>{{Os.CLIENTE.TELEFONE}}<a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><img width="25" height="25" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></td>
                           <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
                           <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
                         </tr>
@@ -107,7 +132,7 @@
               
               <samp class="step-links">
                     {% if Ordem_servicos.has_previous %}
-                    <a href="?page={{Ordem_servicos.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
+                    <a href="?page={{Ordem_servicos.previous_page_number}}&status={{ request.GET.status }}&data_inicio={{request.GET.data_inicio}}&data_fim={{request.GET.data_fim}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
                     {% endif %}
 
                       <samp class="current">
@@ -115,7 +140,7 @@
                       </samp>
 
                     {% if Ordem_servicos.has_next %}
-                    <a href="?page={{Ordem_servicos.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
+                    <a href="?page={{Ordem_servicos.next_page_number}}&status={{ request.GET.status }}&data_inicio={{request.GET.data_inicio}}&data_fim={{request.GET.data_fim}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
                     {% endif %}
               </samp>
             </div>

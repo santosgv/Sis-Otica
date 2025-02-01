@@ -27,7 +27,9 @@ from .views import (
     TipoCreateView,
     TipoDetailView,
     TipoUpdateView,
-    TipoDeleteView
+    TipoDeleteView,
+    LabListView,
+    LabCreateView,
 )
 
 
@@ -36,6 +38,7 @@ app_name = 'Core'
 urlpatterns = [
     path('', views.home, name='home'),
     path('cadastro_cliente',views.cadastro_cliente,name='cadastro_cliente'),
+    path('historico-compras/<int:cliente_id>/', views.historico_compras, name='historico_compras'),
     path('fechar_card/', views.fechar_card, name='fechar_card'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
@@ -49,10 +52,12 @@ urlpatterns = [
     path('Cancelar_os/<int:id_os>',views.Cancelar_os,name='Cancelar_os'),
     path('Laboratorio_os/<int:id_os>',views.Laboratorio_os,name='Laboratorio_os'),
     path('Loja_os/<int:id_os>',views.Loja_os,name='Loja_os'),
+    path('view_history/<int:id>',views.view_history, name='view_history'),
     path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
     path('export_clientes',export_clientes,name='export_clientes'),
     path('export_os',export_os,name='export_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),
+    path('update_card_status/<int:card_id>', views.update_card_status, name='update_card_status'),
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
     path('cadastro_caixa',views.cadastro_caixa, name='cadastro_caixa'),
@@ -90,6 +95,8 @@ urlpatterns = [
     path('fornecedor/<int:pk>/excluir/', FornecedorDeleteView.as_view(), name='fornecedor_delete'),
     path('servicos/',ServicoListView.as_view(),name='os_list'),
     path('servico/novo/', ServicoCreateView.as_view(), name='servico_create'),
+    path('labs/',LabListView.as_view(), name='LabListView'),
+    path('lab/novo',LabCreateView.as_view(),name='LabCreateView'),
 
     path('tiposund/', TipoUnitarioListView.as_view(), name='tiposund_list'),
     path('tipound/novo/', TipoUnitarioCreateView.as_view(), name='tipound_create'),

@@ -69,6 +69,14 @@ Vizualiar O.S
                 <option selected>{{VISUALIZAR_OS.SERVICO}}</option>
               </select>
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="inputState">LABORATORIO</label>
+              <select required id="lab" name="lab" class="form-control" readonly>
+                <option selected>{{VISUALIZAR_OS.LABORATORIO}}</option>
+              </select>
+            </div>
 
           </div>
         </div>
@@ -141,7 +149,7 @@ Vizualiar O.S
             <hr>
         <div class="form-group col-md-12">
           <label for="FILIAL">Lentes</label>
-          <input required class="form-control"  value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES"  maxlength="6"  >
+          <input required class="form-control"  value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES"  maxlength="150"  >
         </div>
         <div class="form-group col-md-12">
           <label for="FILIAL">Armação</label>
@@ -360,7 +368,7 @@ Vizualiar O.S
           </div>
           
           <div class="form-group col-md-2">
-            <label for="inputZip">Entrada</label>
+            <label for="inputZip">Valor Pago</label>
             <input required type="text"  value="{{VISUALIZAR_OS.ENTRADA}}" class="form-control" data-mask='000.000.000.000.000,00' data-mask-reverse="true" id="ENTRADA" name="ENTRADA">
           </div>
           <div class="form-group col-md-2">

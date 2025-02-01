@@ -1,0 +1,137 @@
+        <!-- Coluna: SOLICITADO -->
+        <div class="kanban-column" id="A">
+            <h6>Solicitado</h6>
+            {% for kanban in solititado %}
+            <div style="border-left: 5px solid #6c757d;" class="kanban-card" id="{{ kanban.id }}" draggable="true"
+                 hx-post="/update_card_status/{{ kanban.id }}"
+                 hx-vals='{"status": "A"}'
+                 hx-swap-oob="afterbegin">
+                 <div class="text-center clickable-area">
+                    <a href="{% url 'Core:Visualizar_os' kanban.id %}" class="text-decoration-none">
+                        <strong>{{ unidade }}{{ kanban }}</strong>
+                    </a>
+                </div>
+                <img class="text-center" width="15" height="15" src="https://img.icons8.com/ios-glyphs/30/user.png" alt="user"/> {{ kanban.CLIENTE.NOME|slice:":25" }}
+                <p>Lentes: {{ kanban.LENTES|slice:":25" }}</p>
+                <p>Obs: {{ kanban.OBSERVACAO|slice:":25" }}</p>
+                <div class="kanban-card-footer">
+                <small>Pedido: {{ kanban.DATA_SOLICITACAO|date:"d/m" }}</small>
+                <br>
+                <small>Entrega: {{ kanban.PREVISAO_ENTREGA|date:"d/m" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Coluna: LABORATÓRIO -->
+        <div class="kanban-column" id="L" >
+            <h6>Laboratório</h6>
+            {% for kanban in laboratorio %}
+            <div style="border-left: 5px solid #007bff;" class="kanban-card" id="{{ kanban.id }}" draggable="true"
+                 hx-post="/update_card_status/{{ kanban.id }}"
+                 hx-vals='{"status": "L"}'
+                 hx-swap-oob="afterbegin">
+                 <div class="text-center clickable-area">
+                    <a href="{% url 'Core:Visualizar_os' kanban.id %}" class="text-decoration-none">
+                        <strong>{{ unidade }}{{ kanban }}</strong>
+                    </a>
+                </div>
+                <img class="text-center" width="15" height="15" src="https://img.icons8.com/ios-glyphs/30/user.png" alt="user"/> {{ kanban.CLIENTE.NOME|slice:":25" }}
+                <p>Lentes: {{ kanban.LENTES|slice:":25" }}</p>
+                <p>Obs: {{ kanban.OBSERVACAO|slice:":25" }}</p>
+                <div class="kanban-card-footer">
+                <small>Pedido: {{ kanban.DATA_SOLICITACAO|date:"d/m" }}</small>
+                <br>
+                <small>Entrega: {{ kanban.PREVISAO_ENTREGA|date:"d/m" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Coluna: LOJA -->
+        <div class="kanban-column" id="J" >
+            <h6>Loja</h6>
+            {% for kanban in loja %}
+            <div style="border-left: 5px solid #ffc107;" class="kanban-card" id="{{ kanban.id }}" draggable="true"
+                 hx-post="/update_card_status/{{ kanban.id }}"
+                 hx-vals='{"status": "J"}'
+                 hx-swap-oob="afterbegin">
+                 <div class="text-center clickable-area">
+                    <a href="{% url 'Core:Visualizar_os' kanban.id %}" class="text-decoration-none">
+                        <strong>{{ unidade }}{{ kanban }}</strong>
+                    </a>
+                </div>
+                <img class="text-center" width="15" height="15" src="https://img.icons8.com/ios-glyphs/30/user.png" alt="user"/> {{ kanban.CLIENTE.NOME|slice:":25" }}
+                <p>Lentes: {{ kanban.LENTES|slice:":25" }}</p>
+                <p>Obs: {{ kanban.OBSERVACAO|slice:":25" }}</p>
+                <div class="kanban-card-footer">
+                <small>Pedido: {{ kanban.DATA_SOLICITACAO|date:"d/m" }}</small>
+                <br>
+                <small>Entrega: {{ kanban.PREVISAO_ENTREGA|date:"d/m" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Coluna: ENTREGUE -->
+        <div class="kanban-column" id="E" >
+            <h6>Entregue</h6>
+            {% for kanban in entregue %}
+            <div style="border-left: 5px solid #28a745;" class="kanban-card" id="{{ kanban.id }}" draggable="true"
+                 hx-post="/update_card_status/{{ kanban.id }}"
+                 hx-vals='{"status": "E"}'>
+                 <div class="text-center clickable-area">
+                    <a href="{% url 'Core:Visualizar_os' kanban.id %}" class="text-decoration-none">
+                        <strong>{{ unidade }}{{ kanban }}</strong>
+                    </a>
+                </div>
+                <img class="text-center" width="15" height="15" src="https://img.icons8.com/ios-glyphs/30/user.png" alt="user"/> {{ kanban.CLIENTE.NOME|slice:":25" }}
+                <p>Lentes: {{ kanban.LENTES|slice:":25" }}</p>
+                <p>Obs: {{ kanban.OBSERVACAO|slice:":25" }}</p>
+                <div class="kanban-card-footer">
+                <small>Pedido: {{ kanban.DATA_SOLICITACAO|date:"d/m" }}</small>
+                <br>
+                <small>Entrega: {{ kanban.PREVISAO_ENTREGA|date:"d/m" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <script>
+            // Configuração de Drag & Drop
+            document.addEventListener('dragstart', function (event) {
+                event.dataTransfer.setData('text/plain', event.target.outerHTML);
+                event.dataTransfer.setData('text/id', event.target.getAttribute('hx-post'));
+            });
+        
+            document.addEventListener('dragover', function (event) {
+                event.preventDefault();
+            });
+        
+            document.addEventListener('drop', function (event) {
+                event.preventDefault();
+        
+                const data = event.dataTransfer.getData('text/plain');
+                const target = event.target.closest('.kanban-column');
+        
+                if (target) {
+                    const cardId = event.dataTransfer.getData('text/id');
+                    const newStatus = target.id;  // ID da coluna representa o novo status
+        
+                    fetch(cardId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ status: newStatus }),
+                    }).then(response => {
+                        if (response.ok) {
+                            target.insertAdjacentHTML('beforeend', data);
+                        } else {
+                            console.error('Erro ao atualizar o status.');
+                        }
+                    });
+                }
+            });
+        </script>
