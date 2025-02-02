@@ -72,7 +72,7 @@ class ORDEN(models.Model):
     PREVISAO_ENTREGA = models.DateField()
     ASSINATURA = models.ImageField(upload_to='assinatura_img' ,blank=True, null=True)
     SERVICO = models.ForeignKey(SERVICO, on_delete=models.DO_NOTHING)
-    LABORATORIO = models.ForeignKey(LABORATORIO, on_delete=models.DO_NOTHING)
+    LABORATORIO = models.ForeignKey(LABORATORIO,on_delete=models.SET_NULL,null=True)
     OD_ESF = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     OD_CIL = models.CharField(max_length=5,blank=True, null=True,default='N/D')
     OD_EIXO = models.CharField(max_length=5,blank=True, null=True,default='N/D')
