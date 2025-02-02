@@ -41,7 +41,7 @@ class SERVICO(models.Model):
         return str(self.SERVICO)
 
 class LABORATORIO(models.Model):
-    LABORATORIO = models.CharField(max_length=500,default='1')
+    LABORATORIO = models.CharField(max_length=500)
     ATIVO = models.BooleanField(default=True)
     def __str__(self) -> str:
         return str(self.LABORATORIO)       
