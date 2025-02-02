@@ -188,10 +188,6 @@ def Lista_Os(request):
             else:
                 Lista_os = ORDEN.objects.order_by('-id').all()
 
-            page = request.GET.get('page')
-
-            Ordem_servicos = pagina.get_page(page)
-            
             pagina = Paginator(Lista_os, 25)
             page = request.GET.get('page')
             Ordem_servicos = pagina.get_page(page)
