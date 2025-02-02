@@ -180,18 +180,17 @@ def Lista_Os(request):
             data_inicio = request.GET.get('data_inicio')
             data_fim = request.GET.get('data_fim')
 
+            if data_inicio and data_fim:
+                Lista_os = Lista_os.filter(DATA_SOLICITACAO__range=[data_inicio, data_fim])
+
             if status:
                 Lista_os = ORDEN.objects.order_by('-id').filter(STATUS=status)
             else:
                 Lista_os = ORDEN.objects.order_by('-id').all()
 
-        page = request.GET.get('page')
+            page = request.GET.get('page')
 
-        Ordem_servicos = pagina.get_page(page)
-
-        return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,'unidade':get_tenant(request).unidade})
-            if data_inicio and data_fim:
-                Lista_os = Lista_os.filter(DATA_SOLICITACAO__range=[data_inicio, data_fim])
+            Ordem_servicos = pagina.get_page(page)
             
             pagina = Paginator(Lista_os, 25)
             page = request.GET.get('page')
