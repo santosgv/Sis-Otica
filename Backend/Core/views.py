@@ -196,7 +196,7 @@ def Lista_Os(request):
             page = request.GET.get('page')
             Ordem_servicos = pagina.get_page(page)
             return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,
-                                                      'unidade'::get_tenant(request).unidade,
+                                                      'unidade':get_tenant(request).unidade,
                                                       'status': status,
                                                       'data_inicio': data_inicio,
                                                       'data_fim': data_fim,
