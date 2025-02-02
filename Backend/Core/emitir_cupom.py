@@ -9,6 +9,7 @@ from pynfe.utils.flags import CODIGO_BRASIL
 from decimal import Decimal
 import datetime
 <<<<<<< HEAD
+<<<<<<< HEAD
 import os
 from pathlib import Path
 
@@ -17,18 +18,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 certificado = os.path.join(BASE_DIR,'certificado/JBC MUNDO OPTICO LTDA_53470256000129.pfx')
 senha = 'senha'
 =======
+=======
+import os
+from pathlib import Path
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
 from lxml import etree
 from decouple import config
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+print(BASE_DIR)
 
 
-certificado = "C:\GitHub\Sis-Otica\Backend\Core\SMN PRODUTOS OPTICOS LTDA58016119000132.pfx"
+certificado = os.path.join(BASE_DIR ,'Core/SMN PRODUTOS OPTICOS LTDA58016119000132.pfx')
 senha =config('SENHA_CERTIFICADO')
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
 uf = 'mg'
 homologacao = False
 
 
 emitente = Emitente(
+<<<<<<< HEAD
 <<<<<<< HEAD
     razao_social='JBC MUNDO OPTICO LTDA - SEM VALOR FISCAL',
     nome_fantasia='Otica Mais Popular',
@@ -44,6 +56,8 @@ emitente = Emitente(
     endereco_uf='MG',
     endereco_cep='31985070',
 =======
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
     razao_social='Smn Produtos Opticos LTDA',
     nome_fantasia='Otica Mais Popular',
     cnpj='58016119000132',           # cnpj apenas números
@@ -57,13 +71,17 @@ emitente = Emitente(
     endereco_municipio='Contagem',
     endereco_uf='MG',
     endereco_cep='32050710',
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
     endereco_pais=CODIGO_BRASIL
 )
 
 cliente = Cliente(
     razao_social='NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
     tipo_documento='CPF',           #CPF ou CNPJ
+<<<<<<< HEAD
 <<<<<<< HEAD
     email='email@email.com',
     numero_documento='01858082633', # numero do cpf ou cnpj
@@ -76,6 +94,8 @@ cliente = Cliente(
     endereco_uf='MG',
     endereco_cep='12345123',
 =======
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
     email='santosgomesv@gmail.com',
     numero_documento='01858082633', # numero do cpf ou cnpj
     indicador_ie=9,                 # 9=Não contribuinte 
@@ -86,7 +106,10 @@ cliente = Cliente(
     endereco_municipio='Ribeirao das Neves',
     endereco_uf='MG',
     endereco_cep='33821452',
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
     endereco_pais=CODIGO_BRASIL,
     endereco_telefone='31993839825',
 )
@@ -106,10 +129,14 @@ nota_fiscal = NotaFiscal(
    data_saida_entrada=datetime.datetime.now(),
    tipo_documento=1,          # 0=entrada; 1=saida
 <<<<<<< HEAD
+<<<<<<< HEAD
    municipio='3106200',       # Código IBGE do Município 
 =======
    municipio='2926202',       # Código IBGE do Município 
 >>>>>>> origin/main
+=======
+   municipio='2926202',       # Código IBGE do Município 
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
    tipo_impressao_danfe=4,    # 0=Sem geração de DANFE;1=DANFE normal, Retrato;2=DANFE normal Paisagem;3=DANFE Simplificado;4=DANFE NFC-e;
    forma_emissao='1',         # 1=Emissão normal (não em contingência);
    cliente_final=1,           # 0=Normal;1=Consumidor final;
@@ -131,11 +158,15 @@ nota_fiscal.adicionar_produto_servico(
     codigo='000328',                           # id do produto
     descricao='NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL',
 <<<<<<< HEAD
+<<<<<<< HEAD
     ncm='90031910',
     #cest='0100100',                            # NT2015/003
 =======
     ncm='901850',
 >>>>>>> origin/main
+=======
+    ncm='901850',
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
     cfop='5102',
     unidade_comercial='UN',
     ean='SEM GTIN',
@@ -210,10 +241,13 @@ else:
 <<<<<<< HEAD
 
 
+<<<<<<< HEAD
 xml_com_qrcode = SerializacaoQrcode().gerar_qrcode(token, csc, xml,return_qr=True)
 # xml
 xml_com_qrcode[0]
 # qrcode
 xml_com_qrcode[1]
+=======
+>>>>>>> 67c1acd1c17b2b9aef91fdb6690ea5577dc35c55
 =======
 >>>>>>> origin/main

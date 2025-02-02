@@ -50,6 +50,7 @@ SHARED_APPS = [
     'Cliente',
         'django.contrib.admin',
         'django.contrib.auth',
+        'simple_history',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
@@ -65,6 +66,7 @@ TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
     'django.contrib.contenttypes',
     'debug_toolbar',
+    'simple_history',
     'elasticapm.contrib.django',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -93,6 +95,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
    #   'django_sonar.middlewares.requests.RequestsMiddleware',
 ]
 

@@ -11,6 +11,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days,get_tenant
+from .utils import get_tenant,criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -196,7 +197,7 @@ def Lista_Os(request):
             page = request.GET.get('page')
             Ordem_servicos = pagina.get_page(page)
             return render(request,'Os/Lista_Os.html',{'Ordem_servicos':Ordem_servicos,
-                                                      'unidade':settings.UNIDADE,
+                                                      'unidade'::get_tenant(request).unidade,
                                                       'status': status,
                                                       'data_inicio': data_inicio,
                                                       'data_fim': data_fim,
@@ -513,13 +514,6 @@ def view_history(request, id):
 
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
-    Lista_os = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).order_by('id').all()
-    pagina = Paginator(Lista_os, 10)
-    page = request.GET.get('page')
-    kankan_servicos = pagina.get_page(page)
-    return render(request,'dashabord/dashabord.html',{'kankan_servicos':kankan_servicos,
-                                                      'unidade':get_tenant(request).unidade
-                                                      })
     solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='A').order_by('id').all()
     laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='L').order_by('id').all()
     loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='J').order_by('id').all()
