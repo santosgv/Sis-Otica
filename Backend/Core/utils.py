@@ -272,10 +272,11 @@ def export_os(request):
         'C':'CANCELADO',
         'L':'LABORATÓRIO',
         'J':'LOJA',
+        'F':'FINALIZADO',
         }
         
         os = ORDEN.objects.select_related('VENDEDOR','CLIENTE','SERVICO').values(
-        'id','DATA_SOLICITACAO','VENDEDOR__first_name','CLIENTE__NOME','SERVICO__SERVICO','LENTES',
+        'id','DATA_SOLICITACAO','VENDEDOR__first_name','CLIENTE__NOME','CLIENTE__TELEFONE','SERVICO__SERVICO','LENTES',
         'ARMACAO','OBSERVACAO','FORMA_PAG','VALOR','QUANTIDADE_PARCELA','ENTRADA','STATUS')
         df = pd.DataFrame(list(os))
         df['FORMA_PAG'] = df['FORMA_PAG'].map(CHOICES_PAGAMENTO_DICT)

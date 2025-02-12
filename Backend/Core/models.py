@@ -53,7 +53,8 @@ class ORDEN(models.Model):
         ('E','ENTREGUE'),
         ('C','CANCELADO'),
         ('L','LABORATÓRIO'),
-        ('J','LOJA')
+        ('J','LOJA'),
+        ('F','FINALIZADO')
     )
 
     CHOICES_PAGAMENTO =(

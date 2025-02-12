@@ -457,7 +457,24 @@ def Loja_os(request,id_os):
                 return redirect('/Lista_Os')  
         except Exception as msg:
             logger.info(msg)
-            return redirect('/Lista_Os')      
+            return redirect('/Lista_Os')
+        
+@transaction.atomic 
+@login_required(login_url='/auth/logar/')
+def Finalizar_os(request,id_os):
+    if request.method == "GET":
+        try:
+            with transaction.atomic():
+                Encerrar_OS = ORDEN.objects.get(id=id_os)
+                Encerrar_OS.STATUS = "F"
+                Encerrar_OS.DARA_ENCERRAMENTO =now()
+                Encerrar_OS.save()
+                messages.add_message(request, constants.SUCCESS, 'O.s Finalizada com sucesso')
+                return redirect('/Lista_Os')  
+        except Exception as msg:
+            logger.info(msg)
+            return redirect('/Lista_Os')   
+      
 
 def view_history(request, id):
     orden = get_object_or_404(ORDEN, id=id)
@@ -469,7 +486,8 @@ def view_history(request, id):
         ('E', 'ENTREGUE'),
         ('C', 'CANCELADO'),
         ('L', 'LABORATÓRIO'),
-        ('J', 'LOJA')
+        ('J', 'LOJA'),
+        ('F','FINALIZADO'),
     )
 
     CHOICES_PAGAMENTO = (
@@ -669,7 +687,7 @@ def cadastro_caixa(request):
 @login_required(login_url='/auth/logar/')
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
-    data_limite = hoje - timedelta(days=365)
+    data_limite = hoje - timedelta(days=390)
 
     vendas = (
         ORDEN.objects
@@ -682,7 +700,8 @@ def vendas_ultimos_12_meses(request):
     meses_portugues = {
         1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
         5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
-        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro',
+        1: 'Janeiro'
     }
 
     # Formata a data para "Nome_do_Mês/Ano"
