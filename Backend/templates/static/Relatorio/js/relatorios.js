@@ -23,7 +23,7 @@ function renderiza_total_vendas_12_meses(url){
       const labels = data.data.map(item => item.mes_venda);
       const values = data.data.map(item => item.total_vendas);
       const canvas = document.getElementById('vendas_12m').getContext('2d');
-      var cores_vendas_12m = gera_cor(qtd=12)
+      var cores_vendas_12m = gera_cor(qtd=13)
 
       // Configura o gráfico
       const chart = new Chart(canvas, {
