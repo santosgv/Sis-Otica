@@ -317,6 +317,10 @@ Vizualiar O.S
         <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
         <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
         {% endif %}
+
+        {% if VISUALIZAR_OS.FORMA_PAG == "E" %}
+        <a href="{% url 'Core:gerar_carner_pdf' VISUALIZAR_OS.id  %}"  class="btn btn-dark" >Gerar Carner</a>
+        {% endif %}
         <a href="{% url 'Core:Finalizar_os' VISUALIZAR_OS.id  %}"  class="btn btn-dark" >Finalizar</a>
       </div>
       </form>

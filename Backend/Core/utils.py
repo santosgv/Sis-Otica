@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from decouple import config
 import pandas as pd
 from django.conf import settings
 from django.db.models import Sum
@@ -9,8 +10,9 @@ import datetime
 from django.http import FileResponse,HttpResponse
 import io
 import os
+from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -19,9 +21,12 @@ import logging
 from PIL import Image
 from barcode import Code128
 from barcode.writer import ImageWriter
+import qrcode
+from reportlab.lib.utils import ImageReader
 
 logger = logging.getLogger('MyApp')
 
+CHAVE_PIX =config('CHAVE_PIX')
 
 def generate_barcode_image(code):
 
@@ -158,7 +163,6 @@ def ultimo_dia_mes():
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
-
 
 def Imprimir_os(request,id_os):
     try:
@@ -348,3 +352,64 @@ def gerar_relatorio_estoque_conferido(request):
     # Envia o PDF para o navegador
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename="relatorio_estoque_conferido.pdf")
+
+def gerar_carner_pdf(request, ordem_id):
+    ordem = get_object_or_404(ORDEN, id=ordem_id)
+
+    # Calcula o valor das parcelas
+    valor_total = float(ordem.VALOR)
+    entrada = float(ordem.ENTRADA.replace(",", "."))
+    quantidade_parcelas = int(ordem.QUANTIDADE_PARCELA)
+    valor_parcela = (valor_total - entrada) / quantidade_parcelas
+    # Cria um buffer para armazenar o PDF
+
+    buffer = io.BytesIO()
+    # Cria o objeto PDF usando o ReportLab
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.setTitle(f"Carnê de pagamentos - OS {ordem.id}")
+
+    # Define a margem e o espaçamento entre os boletos
+    margem = 50  # Margem de 50 pontos (aproximadamente 1.75 cm)
+    espacamento = 20  # Espaçamento entre os boletos
+    x = margem  # Posição horizontal (fixa)
+    y = pdf._pagesize[1] - margem  # Começa no topo da página
+
+
+        # Loop para gerar cada parcela
+    for parcela_numero in range(1, quantidade_parcelas + 1):
+        # Adiciona as informações ao PDF (lado esquerdo)
+        pdf.drawString(x, y, "Carnê de pagamentos")
+        y -= espacamento
+        pdf.drawString(x, y, f"Nome do Cliente: {ordem.CLIENTE.NOME}") 
+        y -= espacamento
+        pdf.drawString(x, y, f"OS: {ordem.id}")
+        y -= espacamento
+        pdf.drawString(x, y, f"Valor da Parcela: R$ {valor_parcela:.2f}")
+        y -= espacamento
+        pdf.drawString(x, y, f"Parcela: {parcela_numero} de {quantidade_parcelas}")
+        y -= espacamento
+        pdf.drawString(x, y, "Assinatura: __________________________")
+        y -= espacamento
+        # Adiciona o QR Code (lado direito)
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(f"{CHAVE_PIX}")  # Link único para cada parcela
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        img.save("qrcode.png")
+        pdf.drawString(x + 395, y + 85, f"Pague com QR code")
+        pdf.drawImage(ImageReader("qrcode.png"), x + 400, y - 20, width=100, height=100)  # Posiciona o QR Code à direita
+        # Adiciona uma linha divisória entre os boletos (exceto após o último)
+        pdf.line(x, y - 30, pdf._pagesize[0] - margem, y - 30)
+        
+        if parcela_numero < quantidade_parcelas:
+            pdf.line(x, y - 30, pdf._pagesize[0] - margem, y - 30)  # Linha horizontal
+            y -= 50  # Espaço para a linha divisória e próximo boleto
+
+        # Finaliza o PDF
+    pdf.save()
+
+        # Retorna o PDF como resposta
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="boletos_ordem_{ordem.id}.pdf"'
+    return response

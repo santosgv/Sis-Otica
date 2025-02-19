@@ -521,7 +521,6 @@ def view_history(request, id):
 
     return render(request, 'Os/view_history.html', {'orden': orden, 'changes': changes})
 
-
 @login_required(login_url='/auth/logar/')
 def Dashabord(request):
     solititado = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='A').order_by('id').all()
@@ -568,7 +567,6 @@ def update_card_status(request, card_id):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método não permitido'}, status=405)
-
 
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
@@ -680,7 +678,6 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
-
 @login_required(login_url='/auth/logar/')
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
@@ -709,7 +706,6 @@ def vendas_ultimos_12_meses(request):
 
     return JsonResponse({'data': data_vendas})
 
-
 @login_required(login_url='/auth/logar/')
 def maiores_vendedores_30_dias(request):
     vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
@@ -723,7 +719,6 @@ def maiores_vendedores_30_dias(request):
         .order_by('-total_pedidos')[:5]
   
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
-
 
 @login_required(login_url='/auth/logar/')
 def maiores_vendedores_meses(request):
@@ -1210,7 +1205,6 @@ class TipoDeleteView(DeleteView):
     template_name = 'Estoque/tipo_confirm_delete.html'
     success_url = reverse_lazy('Core:tipos_list')
 
-
 class LabListView(ListView):
     model = LABORATORIO
     template_name = 'Os/lab_list.html'
@@ -1221,7 +1215,6 @@ class LabCreateView(CreateView):
         form_class = laboratorioForm
         template_name = 'Os/os_form.html'
         success_url = reverse_lazy('Core:LabListView')
-
 
 def historico_compras(request, cliente_id):
     cliente = get_object_or_404(CLIENTE, id=cliente_id)
