@@ -372,8 +372,9 @@ def gerar_carner_pdf(request, ordem_id):
     # Configurações iniciais
     largura, altura = letter
     margem = 50
-    espacamento = 150  # Espaçamento entre os boletos
-    posicao_y = altura - 100  # Posição inicial do primeiro boleto
+    altura_boleto = 240
+    espacamento = altura_boleto + 20  # Espaçamento entre os boletos
+    posicao_y = altura - 10  # Posição inicial do primeiro boleto
 
 
     # Loop para gerar cada parcela
@@ -382,52 +383,52 @@ def gerar_carner_pdf(request, ordem_id):
 
         if posicao_y < 100:  # Se o boleto estiver muito baixo, cria uma nova página
             pdf.showPage()
-            posicao_y = altura - 100  # Reseta a posição inicial na nova página
+            posicao_y = altura - 100 # Reseta a posição inicial na nova página
 
         # Desenhando o retângulo do boleto
         pdf.setStrokeColor(black)
-        pdf.rect(margem, posicao_y - 100, 500, 100, stroke=1, fill=0)
+        pdf.rect(margem, posicao_y - altura_boleto, 500, altura_boleto, stroke=1, fill=0)
 
         # Linha pontilhada para destacar a parte do cliente
         pdf.setDash(3, 2)
-        pdf.line(margem + 180, posicao_y - 100, margem + 180, posicao_y)
+        pdf.line(margem + 180, posicao_y - altura_boleto, margem + 180, posicao_y)
         pdf.setDash()
 
         # Dados do boleto
-        pdf.setFont("Helvetica-Bold", 10)
-        pdf.drawString(margem + 10, posicao_y - 10, "Parcela:")
-        pdf.drawString(margem + 60, posicao_y - 10, str(f'{parcela_numero}/{quantidade_parcelas}'))
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margem + 15, posicao_y - 15, "Parcela:")
+        pdf.drawString(margem + 65, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
 
-        pdf.drawString(margem + 10, posicao_y - 30, "Cliente:")
-        pdf.drawString(margem + 60, posicao_y - 30, str(ordem.CLIENTE.NOME))
+        pdf.drawString(margem + 15, posicao_y - 45, "Cliente:")
+        pdf.drawString(margem + 65, posicao_y - 45, str(ordem.CLIENTE.NOME))
 
-        pdf.drawString(margem + 10, posicao_y - 50, "OS:")
-        pdf.drawString(margem + 60, posicao_y - 50, str(ordem.id))
+        pdf.drawString(margem + 15, posicao_y - 65, "OS:")
+        pdf.drawString(margem + 45, posicao_y - 65, str(ordem.id))
 
-        pdf.drawString(margem + 10, posicao_y - 70, "Vencimento:")
-        pdf.drawString(margem + 80, posicao_y - 70, f"{data_vencimento.strftime('%d/%m/%Y')}")
+        pdf.drawString(margem + 15, posicao_y - 95, "Vencimento:")
+        pdf.drawString(margem + 90, posicao_y - 95, f"{data_vencimento.strftime('%d/%m/%Y')}")
 
-        pdf.drawString(margem + 10, posicao_y - 90, "Valor:")
-        pdf.drawString(margem + 60, posicao_y - 90, f"R$ {valor_parcela:.2f}")
+        pdf.drawString(margem + 15, posicao_y - 125, "Valor:")
+        pdf.drawString(margem + 65, posicao_y - 125, f"R$ {valor_parcela:.2f}")
 
         # Texto da parte do carnê
-        pdf.drawString(margem + 200, posicao_y - 10, "Parcela:")
-        pdf.drawString(margem + 280, posicao_y - 10, str(f'{parcela_numero}/{quantidade_parcelas}'))
+        pdf.drawString(margem + 200, posicao_y - 15, "Parcela:")
+        pdf.drawString(margem + 250, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
 
-        pdf.drawString(margem + 400, posicao_y - 10, "Valor:")
-        pdf.drawString(margem + 430, posicao_y - 10, f"R$ {valor_parcela:.2f}")
+        pdf.drawString(margem + 400, posicao_y - 15, "Valor:")
+        pdf.drawString(margem + 430, posicao_y - 15, f"R$ {valor_parcela:.2f}")
 
-        pdf.drawString(margem + 200, posicao_y - 30, "Carnê de pagamentos")
-        pdf.drawString(margem + 200, posicao_y - 50, "Nome:")
-        pdf.drawString(margem + 240, posicao_y - 50, str(ordem.CLIENTE.NOME))
+        pdf.drawString(margem + 200, posicao_y - 45, "Carnê de pagamentos")
+        pdf.drawString(margem + 200, posicao_y - 65, "Nome:")
+        pdf.drawString(margem + 240, posicao_y - 65, str(ordem.CLIENTE.NOME))
 
-        pdf.drawString(margem + 200, posicao_y - 70, "Vencimento:")
-        pdf.drawString(margem + 280, posicao_y - 70, f"{data_vencimento.strftime('%d/%m/%Y')}")
+        pdf.drawString(margem + 200, posicao_y - 85, "Vencimento:")
+        pdf.drawString(margem + 280, posicao_y - 85, f"{data_vencimento.strftime('%d/%m/%Y')}")
 
-        pdf.drawString(margem + 350, posicao_y - 70, "OS:")
-        pdf.drawString(margem + 380, posicao_y - 70, str(ordem.id))
+        pdf.drawString(margem + 350, posicao_y - 85, "OS:")
+        pdf.drawString(margem + 375, posicao_y - 85, str(ordem.id))
 
-        pdf.drawString(margem + 200, posicao_y - 90, "Assinatura: _____________________________")
+        pdf.drawString(margem + 200, posicao_y - 125, "Assinatura: _____________________________")
 
         # Gerando o QR Code
         qr = qrcode.make(f"{CHAVE_PIX}")
@@ -436,9 +437,9 @@ def gerar_carner_pdf(request, ordem_id):
         qr_img.seek(0)
 
         # Adicionando QR Code no boleto
-        pdf.drawImage(ImageReader(qr_img), margem + 430, posicao_y - 80, width=60, height=60, mask='auto')
+        pdf.drawImage(ImageReader(qr_img), margem + 415, posicao_y - 95, width=75, height=75, mask='auto')
         pdf.setFont("Helvetica-Bold", 7)
-        pdf.drawString(margem + 425, posicao_y - 90, "Pague com QR Code")
+        pdf.drawString(margem + 415, posicao_y - 100,"Pague com QR Code")
 
         # Atualiza a posição do próximo boleto
         posicao_y -= espacamento
@@ -449,5 +450,5 @@ def gerar_carner_pdf(request, ordem_id):
 
     # Retorna o PDF como resposta
     response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="boletos_ordem_{ordem.id}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
     return response
