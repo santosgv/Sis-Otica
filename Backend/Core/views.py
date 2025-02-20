@@ -862,7 +862,6 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
-
 @login_required(login_url='/auth/logar/')
 def obter_os_em_aberto(request):    
     

@@ -23,6 +23,7 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 import qrcode
 from reportlab.lib.utils import ImageReader
+from reportlab.lib.colors import black
 
 logger = logging.getLogger('MyApp')
 
@@ -368,48 +369,85 @@ def gerar_carner_pdf(request, ordem_id):
     pdf = canvas.Canvas(buffer, pagesize=letter)
     pdf.setTitle(f"Carnê de pagamentos - OS {ordem.id}")
 
-    # Define a margem e o espaçamento entre os boletos
-    margem = 50  # Margem de 50 pontos (aproximadamente 1.75 cm)
-    espacamento = 20  # Espaçamento entre os boletos
-    x = margem  # Posição horizontal (fixa)
-    y = pdf._pagesize[1] - margem  # Começa no topo da página
+    # Configurações iniciais
+    largura, altura = letter
+    margem = 50
+    espacamento = 150  # Espaçamento entre os boletos
+    posicao_y = altura - 100  # Posição inicial do primeiro boleto
 
 
-        # Loop para gerar cada parcela
+    # Loop para gerar cada parcela
     for parcela_numero in range(1, quantidade_parcelas + 1):
-        # Adiciona as informações ao PDF (lado esquerdo)
-        pdf.drawString(x, y, "Carnê de pagamentos")
-        y -= espacamento
-        pdf.drawString(x, y, f"Nome do Cliente: {ordem.CLIENTE.NOME}") 
-        y -= espacamento
-        pdf.drawString(x, y, f"OS: {ordem.id}")
-        y -= espacamento
-        pdf.drawString(x, y, f"Valor da Parcela: R$ {valor_parcela:.2f}")
-        y -= espacamento
-        pdf.drawString(x, y, f"Parcela: {parcela_numero} de {quantidade_parcelas}")
-        y -= espacamento
-        pdf.drawString(x, y, "Assinatura: __________________________")
-        y -= espacamento
-        # Adiciona o QR Code (lado direito)
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(f"{CHAVE_PIX}")  # Link único para cada parcela
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-        img.save("qrcode.png")
-        pdf.drawString(x + 395, y + 85, f"Pague com QR code")
-        pdf.drawImage(ImageReader("qrcode.png"), x + 400, y - 20, width=100, height=100)  # Posiciona o QR Code à direita
-        # Adiciona uma linha divisória entre os boletos (exceto após o último)
-        pdf.line(x, y - 30, pdf._pagesize[0] - margem, y - 30)
-        
-        if parcela_numero < quantidade_parcelas:
-            pdf.line(x, y - 30, pdf._pagesize[0] - margem, y - 30)  # Linha horizontal
-            y -= 50  # Espaço para a linha divisória e próximo boleto
+        data_vencimento = get_today_data() +timedelta(days=30 * parcela_numero)
 
-        # Finaliza o PDF
+        if posicao_y < 100:  # Se o boleto estiver muito baixo, cria uma nova página
+            pdf.showPage()
+            posicao_y = altura - 100  # Reseta a posição inicial na nova página
+
+        # Desenhando o retângulo do boleto
+        pdf.setStrokeColor(black)
+        pdf.rect(margem, posicao_y - 100, 500, 100, stroke=1, fill=0)
+
+        # Linha pontilhada para destacar a parte do cliente
+        pdf.setDash(3, 2)
+        pdf.line(margem + 180, posicao_y - 100, margem + 180, posicao_y)
+        pdf.setDash()
+
+        # Dados do boleto
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.drawString(margem + 10, posicao_y - 10, "Parcela:")
+        pdf.drawString(margem + 60, posicao_y - 10, str(f'{parcela_numero}/{quantidade_parcelas}'))
+
+        pdf.drawString(margem + 10, posicao_y - 30, "Cliente:")
+        pdf.drawString(margem + 60, posicao_y - 30, str(ordem.CLIENTE.NOME))
+
+        pdf.drawString(margem + 10, posicao_y - 50, "OS:")
+        pdf.drawString(margem + 60, posicao_y - 50, str(ordem.id))
+
+        pdf.drawString(margem + 10, posicao_y - 70, "Vencimento:")
+        pdf.drawString(margem + 80, posicao_y - 70, f"{data_vencimento.strftime('%d/%m/%Y')}")
+
+        pdf.drawString(margem + 10, posicao_y - 90, "Valor:")
+        pdf.drawString(margem + 60, posicao_y - 90, f"R$ {valor_parcela:.2f}")
+
+        # Texto da parte do carnê
+        pdf.drawString(margem + 200, posicao_y - 10, "Parcela:")
+        pdf.drawString(margem + 280, posicao_y - 10, str(f'{parcela_numero}/{quantidade_parcelas}'))
+
+        pdf.drawString(margem + 400, posicao_y - 10, "Valor:")
+        pdf.drawString(margem + 430, posicao_y - 10, f"R$ {valor_parcela:.2f}")
+
+        pdf.drawString(margem + 200, posicao_y - 30, "Carnê de pagamentos")
+        pdf.drawString(margem + 200, posicao_y - 50, "Nome:")
+        pdf.drawString(margem + 240, posicao_y - 50, str(ordem.CLIENTE.NOME))
+
+        pdf.drawString(margem + 200, posicao_y - 70, "Vencimento:")
+        pdf.drawString(margem + 280, posicao_y - 70, f"{data_vencimento.strftime('%d/%m/%Y')}")
+
+        pdf.drawString(margem + 350, posicao_y - 70, "OS:")
+        pdf.drawString(margem + 380, posicao_y - 70, str(ordem.id))
+
+        pdf.drawString(margem + 200, posicao_y - 90, "Assinatura: _____________________________")
+
+        # Gerando o QR Code
+        qr = qrcode.make(f"{CHAVE_PIX}")
+        qr_img = io.BytesIO()
+        qr.save(qr_img, format="PNG")
+        qr_img.seek(0)
+
+        # Adicionando QR Code no boleto
+        pdf.drawImage(ImageReader(qr_img), margem + 430, posicao_y - 80, width=60, height=60, mask='auto')
+        pdf.setFont("Helvetica-Bold", 7)
+        pdf.drawString(margem + 425, posicao_y - 90, "Pague com QR Code")
+
+        # Atualiza a posição do próximo boleto
+        posicao_y -= espacamento
+
+    # Finaliza o PDF
     pdf.save()
-
-        # Retorna o PDF como resposta
     buffer.seek(0)
+
+    # Retorna o PDF como resposta
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="boletos_ordem_{ordem.id}.pdf"'
     return response
