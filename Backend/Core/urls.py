@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido
+from .utils import Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido,gerar_carner_pdf
 from Core import views
 from django.contrib.auth import views as auth_views
 
@@ -55,6 +55,7 @@ urlpatterns = [
     path('Finalizar_os/<int:id_os>',views.Finalizar_os,name='Finalizar_os'),
     path('view_history/<int:id>',views.view_history, name='view_history'),
     path('Imprimir_os/<int:id_os>',Imprimir_os, name='Imprimir_os'),
+    path('gerar_carner_pdf/<int:ordem_id>',gerar_carner_pdf, name='gerar_carner_pdf'),
     path('export_clientes',export_clientes,name='export_clientes'),
     path('export_os',export_os,name='export_os'),
     path('Dashabord',views.Dashabord,name='Dashabord'),

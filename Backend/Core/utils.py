@@ -1,4 +1,5 @@
 from urllib.parse import quote
+from decouple import config
 import pandas as pd
 from django.conf import settings
 from django.db.models import Sum
@@ -9,8 +10,9 @@ import datetime
 from django.http import FileResponse,HttpResponse
 import io
 import os
+from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -20,6 +22,10 @@ from PIL import Image
 from barcode import Code128
 from barcode.writer import ImageWriter
 from django_tenants.utils import get_tenant_model
+import qrcode
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.colors import black
+from pathlib import Path
 
 logger = logging.getLogger('MyApp')
 
@@ -27,6 +33,13 @@ def get_tenant(request):
     TenantModel = get_tenant_model()
     tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
     return tenant
+
+
+logger = logging.getLogger('MyApp')
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+CHAVE_PIX =config('CHAVE_PIX')
 
 def generate_barcode_image(code):
 
@@ -163,7 +176,6 @@ def ultimo_dia_mes():
 def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
     return dado
-
 
 def Imprimir_os(request,id_os):
     try:
@@ -356,3 +368,110 @@ def gerar_relatorio_estoque_conferido(request):
     # Envia o PDF para o navegador
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename="relatorio_estoque_conferido.pdf")
+
+def gerar_carner_pdf(request, ordem_id):
+    caminho_imagem =os.path.join(BASE_DIR ,'templates/static/home/img/Arte Ótica Popular transparência.png')
+    
+
+    ordem = get_object_or_404(ORDEN, id=ordem_id)
+
+    imagem = ImageReader(caminho_imagem)
+
+    # Calcula o valor das parcelas
+    valor_total = float(ordem.VALOR)
+    entrada = float(ordem.ENTRADA.replace(",", "."))
+    quantidade_parcelas = int(ordem.QUANTIDADE_PARCELA)
+    valor_parcela = (valor_total - entrada) / quantidade_parcelas
+    # Cria um buffer para armazenar o PDF
+
+    buffer = io.BytesIO()
+    # Cria o objeto PDF usando o ReportLab
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.setTitle(f"Carnê de pagamentos - OS {ordem.id}")
+
+    # Configurações iniciais
+    largura, altura = letter
+    margem = 25
+    altura_boleto = 240
+    espacamento = altura_boleto + 20  # Espaçamento entre os boletos
+    posicao_y = altura - 10  # Posição inicial do primeiro boleto
+
+
+    # Loop para gerar cada parcela
+    for parcela_numero in range(1, quantidade_parcelas + 1):
+        data_vencimento = get_today_data() +timedelta(days=30 * parcela_numero)
+
+        if posicao_y < 100:  # Se o boleto estiver muito baixo, cria uma nova página
+            pdf.showPage()
+            posicao_y = altura - 100 # Reseta a posição inicial na nova página
+
+        # Desenhando o retângulo do boleto
+        pdf.setStrokeColor(black)
+        pdf.rect(margem, posicao_y - altura_boleto, 570, altura_boleto, stroke=1, fill=0)
+
+        # Linha pontilhada para destacar a parte do cliente
+        pdf.setDash(3, 2)
+        pdf.line(margem + 180, posicao_y - altura_boleto, margem + 180, posicao_y)
+        pdf.setDash()
+
+        # Dados do boleto
+        pdf.setFont("Helvetica-Bold", 14)
+
+        pdf.drawImage(imagem, margem + 15, posicao_y - 85, width=100, height=80, mask='auto')
+
+        pdf.drawString(margem + 15, posicao_y - 110, "Parcela:")
+        pdf.drawString(margem + 75, posicao_y - 110, str(f'{parcela_numero}/{quantidade_parcelas}'))
+
+        pdf.drawString(margem + 15, posicao_y - 140, "Cliente:")
+        pdf.drawString(margem + 75, posicao_y - 140, str(ordem.CLIENTE.NOME[:17]))
+
+        pdf.drawString(margem + 15, posicao_y - 165, "OS:")
+        pdf.drawString(margem + 45, posicao_y - 165, str(ordem.id))
+
+        pdf.drawString(margem + 15, posicao_y - 200, "Vencimento:")
+        pdf.drawString(margem + 100, posicao_y - 200, f"{data_vencimento.strftime('%d/%m/%Y')}")
+
+        pdf.drawString(margem + 15, posicao_y - 230, "Valor:")
+        pdf.drawString(margem + 65, posicao_y - 230, f"R$ {valor_parcela:.2f}")
+
+        # Texto da parte do carnê
+        pdf.drawString(margem + 200, posicao_y - 15, "Parcela:")
+        pdf.drawString(margem + 265, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
+
+        pdf.drawString(margem + 430, posicao_y - 15, "Valor:")
+        pdf.drawString(margem + 475, posicao_y - 15, f"R$ {valor_parcela:.2f}")
+
+        pdf.drawString(margem + 200, posicao_y - 45, "Carnê de pagamentos")
+        pdf.drawString(margem + 200, posicao_y - 140, "Nome:")
+        pdf.drawString(margem + 245, posicao_y - 140, str(ordem.CLIENTE.NOME[:24]))
+
+        pdf.drawString(margem + 200, posicao_y - 200, "Vencimento:")
+        pdf.drawString(margem + 290, posicao_y - 200, f"{data_vencimento.strftime('%d/%m/%Y')}")
+
+        pdf.drawString(margem + 200, posicao_y - 165, "OS:")
+        pdf.drawString(margem + 235, posicao_y - 165, str(ordem.id))
+
+        pdf.drawString(margem + 200, posicao_y - 230, "Assinatura: ____________________________________")
+
+        # Gerando o QR Code
+        qr = qrcode.make(f"{CHAVE_PIX}")
+        qr_img = io.BytesIO()
+        qr.save(qr_img, format="PNG")
+        qr_img.seek(0)
+
+        # Adicionando QR Code no boleto
+        pdf.drawImage(ImageReader(qr_img), margem + 440, posicao_y - 150, width=100, height=100, mask='auto')
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margem + 435, posicao_y - 165,"Pague com QR Code")
+
+        # Atualiza a posição do próximo boleto
+        posicao_y -= espacamento
+
+    # Finaliza o PDF
+    pdf.save()
+    buffer.seek(0)
+
+    # Retorna o PDF como resposta
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
+    return response
