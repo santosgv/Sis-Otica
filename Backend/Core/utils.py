@@ -358,7 +358,7 @@ def gerar_relatorio_estoque_conferido(request):
     return FileResponse(buffer, as_attachment=True, filename="relatorio_estoque_conferido.pdf")
 
 def gerar_carner_pdf(request, ordem_id):
-    caminho_imagem =os.path.join(BASE_DIR ,'templates/static/home/img/logo-preto-amarelo.jpeg')
+    caminho_imagem =os.path.join(BASE_DIR ,'templates/static/home/img/Arte Ótica Popular transparência.png')
     
 
     ordem = get_object_or_404(ORDEN, id=ordem_id)
