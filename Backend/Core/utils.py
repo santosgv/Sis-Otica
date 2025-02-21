@@ -24,8 +24,11 @@ from barcode.writer import ImageWriter
 import qrcode
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import black
+from pathlib import Path
 
 logger = logging.getLogger('MyApp')
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 CHAVE_PIX =config('CHAVE_PIX')
 
@@ -355,7 +358,12 @@ def gerar_relatorio_estoque_conferido(request):
     return FileResponse(buffer, as_attachment=True, filename="relatorio_estoque_conferido.pdf")
 
 def gerar_carner_pdf(request, ordem_id):
+    caminho_imagem =os.path.join(BASE_DIR ,'templates/static/home/img/logo-preto-amarelo.jpeg')
+    
+
     ordem = get_object_or_404(ORDEN, id=ordem_id)
+
+    imagem = ImageReader(caminho_imagem)
 
     # Calcula o valor das parcelas
     valor_total = float(ordem.VALOR)
@@ -371,7 +379,7 @@ def gerar_carner_pdf(request, ordem_id):
 
     # Configurações iniciais
     largura, altura = letter
-    margem = 50
+    margem = 25
     altura_boleto = 240
     espacamento = altura_boleto + 20  # Espaçamento entre os boletos
     posicao_y = altura - 10  # Posição inicial do primeiro boleto
@@ -387,7 +395,7 @@ def gerar_carner_pdf(request, ordem_id):
 
         # Desenhando o retângulo do boleto
         pdf.setStrokeColor(black)
-        pdf.rect(margem, posicao_y - altura_boleto, 500, altura_boleto, stroke=1, fill=0)
+        pdf.rect(margem, posicao_y - altura_boleto, 570, altura_boleto, stroke=1, fill=0)
 
         # Linha pontilhada para destacar a parte do cliente
         pdf.setDash(3, 2)
@@ -395,40 +403,43 @@ def gerar_carner_pdf(request, ordem_id):
         pdf.setDash()
 
         # Dados do boleto
-        pdf.setFont("Helvetica-Bold", 12)
-        pdf.drawString(margem + 15, posicao_y - 15, "Parcela:")
-        pdf.drawString(margem + 65, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
+        pdf.setFont("Helvetica-Bold", 14)
 
-        pdf.drawString(margem + 15, posicao_y - 45, "Cliente:")
-        pdf.drawString(margem + 65, posicao_y - 45, str(ordem.CLIENTE.NOME))
+        pdf.drawImage(imagem, margem + 15, posicao_y - 85, width=100, height=80, mask='auto')
 
-        pdf.drawString(margem + 15, posicao_y - 65, "OS:")
-        pdf.drawString(margem + 45, posicao_y - 65, str(ordem.id))
+        pdf.drawString(margem + 15, posicao_y - 110, "Parcela:")
+        pdf.drawString(margem + 75, posicao_y - 110, str(f'{parcela_numero}/{quantidade_parcelas}'))
 
-        pdf.drawString(margem + 15, posicao_y - 95, "Vencimento:")
-        pdf.drawString(margem + 90, posicao_y - 95, f"{data_vencimento.strftime('%d/%m/%Y')}")
+        pdf.drawString(margem + 15, posicao_y - 140, "Cliente:")
+        pdf.drawString(margem + 75, posicao_y - 140, str(ordem.CLIENTE.NOME[:17]))
 
-        pdf.drawString(margem + 15, posicao_y - 125, "Valor:")
-        pdf.drawString(margem + 65, posicao_y - 125, f"R$ {valor_parcela:.2f}")
+        pdf.drawString(margem + 15, posicao_y - 165, "OS:")
+        pdf.drawString(margem + 45, posicao_y - 165, str(ordem.id))
+
+        pdf.drawString(margem + 15, posicao_y - 200, "Vencimento:")
+        pdf.drawString(margem + 100, posicao_y - 200, f"{data_vencimento.strftime('%d/%m/%Y')}")
+
+        pdf.drawString(margem + 15, posicao_y - 230, "Valor:")
+        pdf.drawString(margem + 65, posicao_y - 230, f"R$ {valor_parcela:.2f}")
 
         # Texto da parte do carnê
         pdf.drawString(margem + 200, posicao_y - 15, "Parcela:")
-        pdf.drawString(margem + 250, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
+        pdf.drawString(margem + 265, posicao_y - 15, str(f'{parcela_numero}/{quantidade_parcelas}'))
 
-        pdf.drawString(margem + 400, posicao_y - 15, "Valor:")
-        pdf.drawString(margem + 430, posicao_y - 15, f"R$ {valor_parcela:.2f}")
+        pdf.drawString(margem + 430, posicao_y - 15, "Valor:")
+        pdf.drawString(margem + 475, posicao_y - 15, f"R$ {valor_parcela:.2f}")
 
         pdf.drawString(margem + 200, posicao_y - 45, "Carnê de pagamentos")
-        pdf.drawString(margem + 200, posicao_y - 65, "Nome:")
-        pdf.drawString(margem + 240, posicao_y - 65, str(ordem.CLIENTE.NOME))
+        pdf.drawString(margem + 200, posicao_y - 140, "Nome:")
+        pdf.drawString(margem + 245, posicao_y - 140, str(ordem.CLIENTE.NOME[:24]))
 
-        pdf.drawString(margem + 200, posicao_y - 85, "Vencimento:")
-        pdf.drawString(margem + 280, posicao_y - 85, f"{data_vencimento.strftime('%d/%m/%Y')}")
+        pdf.drawString(margem + 200, posicao_y - 200, "Vencimento:")
+        pdf.drawString(margem + 290, posicao_y - 200, f"{data_vencimento.strftime('%d/%m/%Y')}")
 
-        pdf.drawString(margem + 350, posicao_y - 85, "OS:")
-        pdf.drawString(margem + 375, posicao_y - 85, str(ordem.id))
+        pdf.drawString(margem + 200, posicao_y - 165, "OS:")
+        pdf.drawString(margem + 235, posicao_y - 165, str(ordem.id))
 
-        pdf.drawString(margem + 200, posicao_y - 125, "Assinatura: _____________________________")
+        pdf.drawString(margem + 200, posicao_y - 230, "Assinatura: ____________________________________")
 
         # Gerando o QR Code
         qr = qrcode.make(f"{CHAVE_PIX}")
@@ -437,9 +448,9 @@ def gerar_carner_pdf(request, ordem_id):
         qr_img.seek(0)
 
         # Adicionando QR Code no boleto
-        pdf.drawImage(ImageReader(qr_img), margem + 415, posicao_y - 95, width=75, height=75, mask='auto')
-        pdf.setFont("Helvetica-Bold", 7)
-        pdf.drawString(margem + 415, posicao_y - 100,"Pague com QR Code")
+        pdf.drawImage(ImageReader(qr_img), margem + 440, posicao_y - 150, width=100, height=100, mask='auto')
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(margem + 435, posicao_y - 165,"Pague com QR Code")
 
         # Atualiza a posição do próximo boleto
         posicao_y -= espacamento
