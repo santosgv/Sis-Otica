@@ -382,6 +382,7 @@ def gerar_carner_pdf(request, ordem_id):
     margem = 25
     altura_boleto = 240
     espacamento = altura_boleto + 20  # Espaçamento entre os boletos
+    boletos_por_pagina = 3
     posicao_y = altura - 10  # Posição inicial do primeiro boleto
 
 
@@ -389,9 +390,9 @@ def gerar_carner_pdf(request, ordem_id):
     for parcela_numero in range(1, quantidade_parcelas + 1):
         data_vencimento = get_today_data() +timedelta(days=30 * parcela_numero)
 
-        if posicao_y < 100:  # Se o boleto estiver muito baixo, cria uma nova página
+        if (parcela_numero - 1) % boletos_por_pagina == 0 and parcela_numero != 1:  # Se o boleto estiver muito baixo, cria uma nova página
             pdf.showPage()
-            posicao_y = altura - 100 # Reseta a posição inicial na nova página
+            posicao_y = altura - 10 # Reseta a posição inicial na nova página
 
         # Desenhando o retângulo do boleto
         pdf.setStrokeColor(black)
