@@ -340,6 +340,8 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+X_FRAME_OPTIONS = 'DENY'
+
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
