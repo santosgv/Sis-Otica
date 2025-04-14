@@ -104,6 +104,12 @@ class ORDEN(models.Model):
     def __str__(self):
         return str(self.id)
     
+    def solicitar_avaliacao(self):
+        """Retorna True se o cliente ainda não foi avaliado após o pedido finalizado."""
+        if self.STATUS == 'E':
+            return not Review.objects.filter(cliente=self.CLIENTE).exists()
+        return False
+    
     
 
 class CAIXA(models.Model):
@@ -265,3 +271,12 @@ class AlertaEstoque(models.Model):
 
     def __str__(self):
         return self.mensagem
+    
+class Review(models.Model):
+    cliente = models.ForeignKey(CLIENTE, on_delete=models.CASCADE, related_name="reviews")
+    nota = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  
+    comentario = models.TextField(blank=True, null=True)
+    data = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"Avaliação {self.nota} - {self.cliente.NOME}"
