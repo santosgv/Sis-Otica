@@ -87,7 +87,7 @@
 <h3>Avaliações</h3>
 {% if reviews %}
     {% for review in reviews %}
-        <p>Nota: {{ review.nota }} ⭐</p>
+        <p>Nota:  {% if review.nota == 1 %}⭐{% endif %}{% if review.nota == 2 %}⭐⭐ {% endif %}{% if review.nota == 3 %}⭐⭐⭐{% endif %}{% if review.nota == 4 %}⭐⭐⭐⭐{% endif %}{% if review.nota == 5 %}⭐⭐⭐⭐⭐{% endif %}</p>
         <p>Comentário: {{ review.comentario }}</p>
         <a href="{% url 'Core:review_update' review.id %}">Editar Avaliaçao</a>
     {% endfor %}
