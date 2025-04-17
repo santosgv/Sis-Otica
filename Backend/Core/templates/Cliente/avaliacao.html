@@ -18,8 +18,16 @@
                 {% csrf_token %}
                 
                 <div class="form-group">
-                    <label for="{{ form.nota.id_for_label }}">Nota (1 a 5)</label>
-                    {{ form.nota }}
+                    
+                    <label for="nota">Nota (1 a 5)</label>
+                    <select name="nota" id="nota" class="form-control" required>
+                        <option value="">Selecione a nota</option>
+                        <option value="1">1 ⭐</option>
+                        <option value="2">2 ⭐⭐</option>
+                        <option value="3">3 ⭐⭐⭐</option>
+                        <option value="4">4 ⭐⭐⭐⭐</option>
+                        <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
