@@ -35,7 +35,7 @@ Cadastrar O.S
               {% endfor %}
           {% endif %}
       </div>
-          <form method="POST"  enctype="multipart/form-data" class="form_cliente container-fluid">{% csrf_token %}
+          <form method="POST"  enctype="multipart/form-data" id="cadastrar_os" class="form_cliente container-fluid">{% csrf_token %}
             <div class="row">
               <div class="form-group col-md-6">
                 <label for="VENDEDOR" >Vendedor</label>
@@ -243,6 +243,72 @@ Cadastrar O.S
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 	<script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const odCil = document.getElementById('OD_CIL');
+      const odEixo = document.getElementById('OD_EIXO');
+
+      
+
+      odCil.addEventListener('input', function () {
+        const od_cilValue = odCil.value.trim();
+
+        if( od_cilValue > 0){
+          const valorNegativo1 = '-' + parseFloat(od_cilValue);
+          odCil.value = valorNegativo1
+        }
+  
+        if (od_cilValue !== '') {
+          // Torna o campo EIXO obrigatório e destaca
+          odEixo.required = true;
+          odEixo.classList.add('is-invalid');
+        } else {
+          // Remove a obrigatoriedade se o CIL estiver vazio
+          odEixo.required = false;
+          odEixo.classList.remove('is-invalid');
+        }
+      });
+
+      
+
+          // Opcional: remove o destaque visual se o usuário preencher EIXO depois
+            odEixo.addEventListener('input', function () {
+        if (odEixo.value.trim() !== '') {
+          odEixo.classList.remove('is-invalid');
+        }
+      });
+
+      const oeCil = document.getElementById('OE_CIL');
+      const oeEixo = document.getElementById('OE_EIXO');
+  
+      oeCil.addEventListener('input', function () {
+        const cilValue = oeCil.value.trim();
+
+
+        if(cilValue > 0){
+          const valorNegativo = '-' + parseFloat(cilValue);
+          oeCil.value = valorNegativo
+        }
+  
+        if (cilValue !== '') {
+          // Torna o campo EIXO obrigatório e destaca
+          oeEixo.required = true;
+          oeEixo.classList.add('is-invalid');
+        } else {
+          // Remove a obrigatoriedade se o CIL estiver vazio
+          oeEixo.required = false;
+          oeEixo.classList.remove('is-invalid');
+        }
+      });
+  
+      // Opcional: remove o destaque visual se o usuário preencher EIXO depois
+      oeEixo.addEventListener('input', function () {
+        if (oeEixo.value.trim() !== '') {
+          oeEixo.classList.remove('is-invalid');
+        }
+      });
+    });
+  </script>
 
   <script>
     // Adiciona o evento de 'blur' (perda de foco) no campo de busca
