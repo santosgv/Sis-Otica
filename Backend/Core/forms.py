@@ -1,5 +1,20 @@
 from django import forms
-from .models import Fornecedor, TipoUnitario, Estilo,Tipo,SERVICO,LABORATORIO
+from .models import Review,Fornecedor, TipoUnitario, Estilo,Tipo,SERVICO,LABORATORIO
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ["nota", "comentario"]
+
+    def __init__(self, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+        
+        self.fields['nota'].widget.attrs.update({'class': 'form-control'})
+        self.fields['comentario'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Digite seu comentário...',
+            'rows': 4
+        })
 
 class FornecedorForm(forms.ModelForm):
     class Meta:

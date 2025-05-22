@@ -83,5 +83,17 @@
     </div>
   </div>
 </section>
-
+<div class="text-center">
+<h3>Avaliações</h3>
+{% if reviews %}
+    {% for review in reviews %}
+        <p>Nota:  {% if review.nota == 1 %}⭐{% endif %}{% if review.nota == 2 %}⭐⭐ {% endif %}{% if review.nota == 3 %}⭐⭐⭐{% endif %}{% if review.nota == 4 %}⭐⭐⭐⭐{% endif %}{% if review.nota == 5 %}⭐⭐⭐⭐⭐{% endif %}</p>
+        <p>Comentário: {{ review.comentario }}</p>
+        <a href="{% url 'Core:review_update' review.id %}">Editar Avaliaçao</a>
+    {% endfor %}
+{% else %}
+    <p>Este cliente ainda não foi avaliado.</p>
+    <a href="{% url 'Core:avaliar_cliente' cliente.id %}">Avaliar Cliente</a>
+{% endif %}
+</div>
 {% endblock %}

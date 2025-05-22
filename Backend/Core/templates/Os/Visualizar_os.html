@@ -41,7 +41,14 @@ Vizualiar O.S
                 </div>
             {% endfor %}
         {% endif %}
+
+        {% if VISUALIZAR_OS.solicitar_avaliacao %}
+          <div style="background-color: yellow; padding: 10px; border: 1px solid #ccc;">
+              <p>⚠️ Como foi a experiencia com esse cliente. <a href="{% url 'Core:avaliar_cliente' VISUALIZAR_OS.CLIENTE.id %}">Clique aqui para avaliar</a>.</p>
+          </div>
+      {% endif %}
     </div>
+
     
     <form method="POST" class="form_cliente">{% csrf_token %}
       <h1 id="form-header">{{unidade}}{{VISUALIZAR_OS.id}}</h1>

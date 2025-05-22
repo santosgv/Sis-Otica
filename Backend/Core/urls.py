@@ -6,6 +6,7 @@ from Core import views
 from django.contrib.auth import views as auth_views
 
 from .views import (
+    ReviewUpdateView,
     FornecedorListView,
     FornecedorDetailView,
     FornecedorCreateView,
@@ -42,6 +43,7 @@ urlpatterns = [
     path('fechar_card/', views.fechar_card, name='fechar_card'),
     path('clientes',views.clientes,name='clientes'),
     path('cliente/<int:id>',views.Cliente,name='cliente'),
+    path('avaliar_cliente/<int:id>',views.avaliar_cliente, name='avaliar_cliente'),
     path('Edita_cliente/<int:id>',views.Edita_cliente,name='Edita_cliente'),
     path('excluir_cliente/<int:id>',views.excluir_cliente,name='excluir_cliente'),
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
@@ -89,7 +91,7 @@ urlpatterns = [
     path('vendas/',views.vendas, name='vendas'),
 
 
-
+    path('review/<int:pk>/editar/',ReviewUpdateView.as_view(), name='review_update'),
     path('fornecedores/', FornecedorListView.as_view(), name='fornecedor_list'),
     path('fornecedor/<int:pk>/', FornecedorDetailView.as_view(), name='fornecedor_detail'),
     path('fornecedor/novo/', FornecedorCreateView.as_view(), name='fornecedor_create'),

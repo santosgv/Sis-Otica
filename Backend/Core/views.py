@@ -2,7 +2,7 @@
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -23,7 +23,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm,laboratorioForm
+from .forms import ReviewForm,FornecedorForm, TipoUnitarioForm, EstiloForm,TipoForm,ServicoForm,laboratorioForm
 
 
 
@@ -139,7 +139,25 @@ def cadastro_cliente(request):
 def Cliente(request,id):
     if request.method == "GET":
         cliente = CLIENTE.objects.get(id=id)
-        return render(request,'Cliente/cliente.html',{'cliente':cliente})
+        reviews = Review.objects.filter(cliente=cliente)
+        return render(request,'Cliente/cliente.html',{'cliente':cliente,'reviews':reviews})
+
+@login_required(login_url='/auth/logar/')
+def avaliar_cliente(request, id):
+    cliente = get_object_or_404(CLIENTE, id=id)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.cliente = cliente
+            review.save()
+            messages.success(request, "Avaliação salva com sucesso!")
+            return redirect(f"/cliente/{cliente.id}")
+    else:
+        form = ReviewForm()
+
+    return render(request, "Cliente/avaliacao.html", {"form": form, "cliente": cliente})
 
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
@@ -406,10 +424,10 @@ def Encerrar_os(request,id_os):
             with transaction.atomic():
                 Encerrar_OS = ORDEN.objects.get(id=id_os)
                 Encerrar_OS.STATUS = "E"
-                Encerrar_OS.DARA_ENCERRAMENTO =now()
+                Encerrar_OS.DATA_ENCERRAMENTO =now()
+                Encerrar_OS.solicitar_avaliacao()
                 Encerrar_OS.save()
-                messages.add_message(request, constants.SUCCESS, 'O.s Encerrada com sucesso')
-                return redirect('/Lista_Os')  
+                return redirect(f'/Visualizar_os/{Encerrar_OS.id}')  
         except Exception as msg:
             logger.info(msg)
             return redirect('/Lista_Os')   
@@ -559,7 +577,7 @@ def update_card_status(request, card_id):
             laboratorio = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='L').order_by('id').all()
             loja = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_30_days(),DATA_SOLICITACAO__lte=ultimo_dia_mes(),STATUS='J').order_by('id').all()
             entregue = ORDEN.objects.filter(DATA_SOLICITACAO__gte=get_10_days(),DATA_SOLICITACAO__lte=get_today_data(),STATUS='E').order_by('id').all()
-
+ 
             # Renderiza o template parcial com o Kanban atualizado
             return render(request, 'parcial/kanban_partial.html', {
                 'solititado': solititado,
@@ -1220,6 +1238,21 @@ class LabCreateView(CreateView):
         form_class = laboratorioForm
         template_name = 'Os/os_form.html'
         success_url = reverse_lazy('Core:LabListView')
+
+class ReviewUpdateView(UpdateView):
+    with transaction.atomic():
+        model = Review
+        form_class = ReviewForm
+        template_name = 'Cliente/avaliacao.html'
+
+        def form_valid(self, form):
+            messages.success(self.request, 'Avaliação atualizada com sucesso!')
+            return super().form_valid(form)
+        
+        def get_success_url(self):
+            referer = self.request.META.get('HTTP_REFERER')
+            return referer or reverse_lazy('Core:clientes')  
+
 
 def historico_compras(request, cliente_id):
     cliente = get_object_or_404(CLIENTE, id=cliente_id)
