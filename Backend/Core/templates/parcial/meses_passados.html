@@ -1,0 +1,54 @@
+<table class="table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Os</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+        <th>Forma</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entrada in entradas %}
+      <tr>
+        <td>{{ entrada.DATA }}</td>
+        <td>{{ entrada.DESCRICAO|slice:":25" }}</td>
+        {% if entrada.REFERENCIA == None %}
+        <td></td>
+        {% else %}
+         <td> <a href="{% url 'Core:Visualizar_os' entrada.REFERENCIA %}" rel="noopener noreferrer">{{ entrada.REFERENCIA }}</a>
+         </td>
+        {% endif %}
+        {% if entrada.TIPO == "E" %}
+        <td>Entrada</td>
+        {% else %}
+        <td>Saida</td>
+		{% endif %}
+        <td>{{ entrada.VALOR }}</td>
+        {% if entrada.FORMA == "A" %}
+        <td>PIX</td>
+        {% endif %}
+        {% if entrada.FORMA == "B" %}
+        <td>DINHEIRO</td>
+        {% endif %}
+        {% if entrada.FORMA == "C" %}
+        <td>DEBITO</td>
+        {% endif %}
+        {% if entrada.FORMA == "D" %}
+        <td>CREDITO</td>
+        {% endif %}
+        {% if entrada.FORMA == "E" %}
+        <td>CARNER</td>
+        {% endif %}
+        {% if entrada.FORMA == "F" %}
+        <td>PERMUTA</td>
+        {% endif %}
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">Nenhuma entrada nesse período.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>

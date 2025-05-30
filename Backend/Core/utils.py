@@ -464,3 +464,18 @@ def gerar_carner_pdf(request, ordem_id):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
     return response
+
+
+from django.shortcuts import render
+from .models import CAIXA
+
+def entradas_meses_passados(request):
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    
+    entradas = CAIXA.objects.filter(
+        DATA__range=(data_inicio, data_fim),
+        FECHADO=True
+    )
+    
+    return render(request, 'parcial/meses_passados.html', {'entradas': entradas})
