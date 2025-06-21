@@ -18,7 +18,7 @@ class USUARIO(AbstractUser):
         ('G','Gerente'),
     )
 
-    CPF = models.CharField(blank=True, max_length=18)
+    CPF = models.CharField(blank=True,null=True, max_length=18)
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     STATUS = models.CharField(max_length=1, choices=CHOICES_SITUACAO, default="A")
     FUNCAO = models.CharField(max_length=1, choices=CHOICES_FUNCAO,blank=True, null=True)

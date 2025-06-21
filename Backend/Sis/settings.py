@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'simple_history',
+    'rest_framework',
+    'rest_framework_simplejwt',
   #  'django_sonar',
     'compressor',
     'debug_toolbar',
@@ -221,6 +223,16 @@ CACHES = {
         "OPTIONS": {"MAX_ENTRIES": 1000},
     }
 }
+
+REST_FRAMEWORK = {
+        'DEFAULT_PERMISSION_CLASSES': [
+            #'rest_framework.permissions.IsAuthenticated',
+            #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ],
+        'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 20
+}
+
 #CACHES = {
 #    "default": {
 #        "BACKEND": "django.core.cache.backends.redis.RedisCache",
