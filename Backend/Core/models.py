@@ -27,8 +27,6 @@ class CLIENTE(models.Model):
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
     DATA_CADASTRO = models.DateField(default=now)
-    ENDERECO_UF=models.CharField(max_length=2)
-    CONTRIBUINTE=models.CharField(max_length=1, default=9)
     STATUS = models.CharField(max_length=1,choices=CHOICES_SITUACAO,default='1')
 
     def __str__(self) -> str:
@@ -110,8 +108,6 @@ class ORDEN(models.Model):
             return not Review.objects.filter(cliente=self.CLIENTE).exists()
         return False
     
-    
-
 class CAIXA(models.Model):
 
     CHOICES_PAGAMENTO =(

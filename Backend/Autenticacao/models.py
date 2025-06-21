@@ -30,7 +30,6 @@ class USUARIO(AbstractUser):
     def __str__(self) -> str:
         return str(self.first_name)
 
-
 class Ativacao(models.Model):
     token = models.CharField(max_length=64)
     user = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
@@ -38,8 +37,7 @@ class Ativacao(models.Model):
 
     def __str__(self):
         return str(self.user)
-    
-    
+        
 class Desconto(models.Model):
     colaborador = models.ForeignKey(USUARIO, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=100)
