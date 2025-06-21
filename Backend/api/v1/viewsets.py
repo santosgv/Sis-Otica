@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from api.v1.serializers import ClientesSerializer,OrdensSerializer,UsuariosSerializer,ServicoSerializer,ProdutoSerializer,LaboratorioSerializer
 from Core.models import CLIENTE,ORDEN,SERVICO,Produto,LABORATORIO
 from Autenticacao.models import USUARIO
-from Core.utils import get_30_days,ultimo_dia_mes,get_10_days,get_today_data
+from Core.views import get_entrada_saida,vendas_ultimos_12_meses
+from Core.utils import get_30_days,ultimo_dia_mes,get_10_days,get_today_data,dados_caixa
 
 class UsuariosViewSet(viewsets.ModelViewSet):
     queryset = USUARIO.objects.filter()
@@ -69,3 +70,4 @@ class KanbanAPIView(APIView):
                 'total_entregue': entregue.count(),
             }
         })
+    
