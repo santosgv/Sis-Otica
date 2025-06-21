@@ -33,7 +33,6 @@ class LaboratoriosViewSet(viewsets.ModelViewSet):
 
 class KanbanAPIView(APIView):
     def get(self, request):
-        # Filtros equivalentes aos da view original
         solicitado = ORDEN.objects.filter(
             DATA_SOLICITACAO__gte=get_30_days(),
             DATA_SOLICITACAO__lte=ultimo_dia_mes(),
@@ -57,15 +56,6 @@ class KanbanAPIView(APIView):
             DATA_SOLICITACAO__lte=get_today_data(),
             STATUS='E'
         ).order_by('id')
-
-        # Serialização básica (você pode criar um Serializer mais elaborado depois)
-        def serialize_queryset(qs):
-            return [{
-                'id': item.id,
-                'data_solicitacao': item.DATA_SOLICITACAO,
-                'status': item.STATUS,
-                # Adicione outros campos necessários
-            } for item in qs]
 
         return Response({
             'solicitado': OrdensSerializer(solicitado,many=True).data,
