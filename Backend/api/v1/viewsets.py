@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from api.v1.serializers import ClientesSerializer,OrdensSerializer,UsuariosSerializer,ServicoSerializer,ProdutoSerializer,LaboratorioSerializer
 from Core.models import CLIENTE,ORDEN,SERVICO,Produto,LABORATORIO
 from Autenticacao.models import USUARIO
@@ -73,45 +75,26 @@ class KanbanAPIView(APIView):
 class UpdateCardStatusAPIView(APIView):
     def post(self, request, card_id):
         try:
-            # Obter o card e validar dados
             card = get_object_or_404(ORDEN, id=card_id)
             new_status = request.data.get('status')
-            
             if not new_status:
-                return Response({'error': 'Status é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Atualizar status
+                return Response(
+                    {'error': 'O campo "status" é obrigatório'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 3. Atualizar o card
             card.STATUS = new_status
             card.save()
-
-            # Retornar os dados atualizados do kanban
-            data = self.get_kanban_data()
-            return Response(data, status=status.HTTP_200_OK)
-
+            
+            # 4. Retornar apenas os dados necessários (sem tentar serializar o Response)
+            return Response({
+                'success': True,
+                'message': 'Status atualizado com sucesso',
+            }, status=status.HTTP_200_OK)
+            
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    def get_kanban_data(self):
-        """Método auxiliar para obter dados do kanban"""
-        return {
-            'solicitado': ORDEN.objects.filter(
-                DATA_SOLICITACAO__gte=get_30_days(),
-                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
-                STATUS='A'
-            ).order_by('id'),
-            'laboratorio': ORDEN.objects.filter(
-                DATA_SOLICITACAO__gte=get_30_days(),
-                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
-                STATUS='L'
-            ).order_by('id'),
-            'loja': ORDEN.objects.filter(
-                DATA_SOLICITACAO__gte=get_30_days(),
-                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
-                STATUS='J'
-            ).order_by('id'),
-            'entregue': ORDEN.objects.filter(
-                DATA_SOLICITACAO__gte=get_10_days(),
-                DATA_SOLICITACAO__lte=get_today_data(),
-                STATUS='E'
-            ).order_by('id'),
-        }
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
