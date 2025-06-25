@@ -1,6 +1,6 @@
 from django.urls import include, path
 from ..routers import router
-from .viewsets import KanbanAPIView
+from .viewsets import KanbanAPIView,UpdateCardStatusAPIView
 from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maiores_vendedores_meses,
                         transacoes_mensais,obter_os_em_aberto,dados_minhas_vendas,dados_clientes,
                         receber
@@ -16,6 +16,7 @@ urlpatterns = [
     path('', include(router.urls)),
     #path('dashboard/', RelatorioApiView.as_view(), name='api-dashboard'),
     path('kanban/',KanbanAPIView.as_view(),name='kanban'),
+    path('cards/<int:card_id>/update-status/', UpdateCardStatusAPIView.as_view(), name='update-card-status'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 

@@ -12,6 +12,10 @@ class ClientesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CLIENTE
         fields= '__all__'
+        extra_kwargs = {
+            'DATA_CADASTRO': {'read_only': True},  
+            'STATUS': {'read_only': True}
+        }
 
 class OrdensSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +26,7 @@ class ServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = SERVICO
         fields = ('id','SERVICO')
+        
 class LaboratorioSerializer(serializers.ModelSerializer):
     class Meta:
         model = LABORATORIO
@@ -31,3 +36,7 @@ class ProdutoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Produto
         fields = '__all__'
+        extra_kwargs = {
+            'codigo': {'read_only': True},  
+            'valor_total': {'read_only': True}
+        }

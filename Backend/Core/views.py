@@ -490,7 +490,6 @@ def Finalizar_os(request,id_os):
             logger.info(msg)
             return redirect('/Lista_Os')   
       
-
 def view_history(request, id):
     orden = get_object_or_404(ORDEN, id=id)
     history = orden.history.all()

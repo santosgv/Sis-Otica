@@ -31,7 +31,6 @@ class LaboratoriosViewSet(viewsets.ModelViewSet):
     queryset = LABORATORIO.objects.filter(ATIVO=True)
     serializer_class = LaboratorioSerializer
 
-
 class KanbanAPIView(APIView):
     def get(self, request):
         solicitado = ORDEN.objects.filter(
@@ -71,3 +70,48 @@ class KanbanAPIView(APIView):
             }
         })
     
+class UpdateCardStatusAPIView(APIView):
+    def post(self, request, card_id):
+        try:
+            # Obter o card e validar dados
+            card = get_object_or_404(ORDEN, id=card_id)
+            new_status = request.data.get('status')
+            
+            if not new_status:
+                return Response({'error': 'Status é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Atualizar status
+            card.STATUS = new_status
+            card.save()
+
+            # Retornar os dados atualizados do kanban
+            data = self.get_kanban_data()
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_kanban_data(self):
+        """Método auxiliar para obter dados do kanban"""
+        return {
+            'solicitado': ORDEN.objects.filter(
+                DATA_SOLICITACAO__gte=get_30_days(),
+                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+                STATUS='A'
+            ).order_by('id'),
+            'laboratorio': ORDEN.objects.filter(
+                DATA_SOLICITACAO__gte=get_30_days(),
+                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+                STATUS='L'
+            ).order_by('id'),
+            'loja': ORDEN.objects.filter(
+                DATA_SOLICITACAO__gte=get_30_days(),
+                DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+                STATUS='J'
+            ).order_by('id'),
+            'entregue': ORDEN.objects.filter(
+                DATA_SOLICITACAO__gte=get_10_days(),
+                DATA_SOLICITACAO__lte=get_today_data(),
+                STATUS='E'
+            ).order_by('id'),
+        }
