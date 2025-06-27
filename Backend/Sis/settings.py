@@ -28,7 +28,9 @@ else:
         "http://localhost:8000/",
         "http://127.0.0.1:8000/",
         "http://localhost:5173/",
-        "http://127.0.0.1:5173/"
+        "http://127.0.0.1:5173/",
+        "85.209.93.169",
+        "sgosistemas.com.br",
     ]
 
 
@@ -228,7 +230,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
         'DEFAULT_PERMISSION_CLASSES': [
-            #'rest_framework.permissions.IsAuthenticated',
+         #   'rest_framework.permissions.IsAuthenticated',
         ],
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': 25
