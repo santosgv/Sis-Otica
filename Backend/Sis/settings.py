@@ -78,6 +78,7 @@ SHARED_APPS = [
         'Autenticacao',
         'Core',
         'compressor',
+        "corsheaders",
 ]
 
 TENANT_APPS = [
@@ -94,6 +95,7 @@ TENANT_APPS = [
      'Core',
      'Autenticacao',
      'compressor',
+     "corsheaders",
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
