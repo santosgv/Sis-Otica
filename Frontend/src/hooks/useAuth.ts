@@ -2,11 +2,18 @@ import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { getAccessToken, clearTokens } from '../utils/auth';
 
+// Tipo para o payload do token JWT
+interface JwtPayload {
+  exp: number;
+  user_id?: number | string;
+  [key: string]: any; // permite campos extras
+}
+
 const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<JwtPayload | null>(null);
+  const [userId, setUserId] = useState<number | string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -19,16 +26,14 @@ const useAuth = () => {
     }
 
     try {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode<JwtPayload>(token);
       const now = Date.now() / 1000;
 
       if (decoded.exp > now) {
         setIsAuthenticated(true);
         setUser(decoded);
-        // Extract user_id
-        const id = decoded.user_id || null;
+        const id = decoded.user_id ?? null;
         setUserId(id);
-        // Store in localStorage
         if (id !== null) {
           localStorage.setItem('user_id', id.toString());
         }

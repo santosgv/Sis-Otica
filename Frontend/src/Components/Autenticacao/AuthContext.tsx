@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import api from "../../utils/axiosConfig";
 import useAuth from "../../hooks/useAuth";
 

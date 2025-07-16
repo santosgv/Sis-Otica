@@ -103,7 +103,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<ProtectedRoute allowedRoles={["G","V","C"]}><Home  /></ProtectedRoute>} />
               <Route path="/unauthorized" element={<Unauthorized /> } />
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
               <Route path='/logoff' element={<ProtectedRoute allowedRoles={["G","V","C"]}><Logoff /> </ProtectedRoute>} />
               <Route path="/clientes" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <Clientes /> </ProtectedRoute>} />
               <Route path="/cliente" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <ClienteEdicao /></ProtectedRoute>}></Route>

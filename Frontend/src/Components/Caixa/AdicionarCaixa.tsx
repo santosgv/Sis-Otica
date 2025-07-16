@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "C:/Users/Vitor/source/repos/santosgv/Sis-Otica/Frontend/src/utils/axiosConfig";
+import api from "../../utils/axiosConfig";
 
 interface AdicionarCaixaProps {
   onClose: () => void;
