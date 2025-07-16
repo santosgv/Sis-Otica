@@ -299,6 +299,7 @@ def export_os(request):
         return response
     except Exception as msg:
         logger.warn(msg)
+        return HttpResponse("Erro ao gerar o arquivo Excel.", status=500)
 
 def gerar_relatorio_estoque_conferido(request):
     # Crie um buffer para armazenar o PDF em memória

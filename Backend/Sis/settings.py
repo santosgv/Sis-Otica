@@ -21,18 +21,6 @@ SECRET_KEY =config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:8000/",
-        "http://127.0.0.1:8000/",
-        "http://localhost:5173/",
-        "http://127.0.0.1:5173/",
-        "85.209.93.169",
-        "sgosistemas.com.br",
-    ]
-
 
 ALLOWED_HOSTS =['*']
 
@@ -102,9 +90,11 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django_tenants.middleware.main.TenantMainMiddleware',
     'Sis.middleware.TenantActiveMiddleware',
     'elasticapm.contrib.django.middleware.TracingMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -116,7 +106,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
    #   'django_sonar.middlewares.requests.RequestsMiddleware',
 ]
 
@@ -250,7 +239,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
         'DEFAULT_PERMISSION_CLASSES': [
-         #   'rest_framework.permissions.IsAuthenticated',
+            'rest_framework.permissions.IsAuthenticated',
         ],
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': 25
@@ -376,8 +365,22 @@ EMAIL_USE_TLS=True
 EMAIL_PORT =587
 EMAIL_HOST='smtp.office365.com'
 
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS : True
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:8000/",
+        "http://127.0.0.1:8000/",
+        "http://localhost:5173/",
+        "http://127.0.0.1:5173/",
+        "http://localhost:5173/",
+        "http://localhost:5173",
+        "85.209.93.169",
+        "sgosistemas.com.br",
+    ]
+
 
 CORS_ALLOW_HEADERS = [
     "accept",

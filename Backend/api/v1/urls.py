@@ -1,9 +1,13 @@
 from django.urls import include, path
 from ..routers import router
-from .viewsets import KanbanAPIView,UpdateCardStatusAPIView
+from Core.utils import gerar_relatorio_estoque_conferido,export_os,export_clientes,Imprimir_os,create_pdf
+from .viewsets import (KanbanAPIView,UpdateCardStatusAPIView,FechamentoCaixaAPIView,
+                        DadosCaixaAPIView,MinhasVendasAPIView,LojaOsAPIView,
+                        EncerrarOsAPIView,EntregueOsAPIView,CanceladoOsAPIView,LaboratorioOsAPIView,
+                        PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView)
 from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maiores_vendedores_meses,
                         transacoes_mensais,obter_os_em_aberto,dados_minhas_vendas,dados_clientes,
-                        receber
+                        receber,fechar_caixa
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -14,7 +18,6 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('', include(router.urls)),
-    #path('dashboard/', RelatorioApiView.as_view(), name='api-dashboard'),
     path('kanban/',KanbanAPIView.as_view(),name='kanban'),
     path('cards/<int:card_id>/update-status/', UpdateCardStatusAPIView.as_view(), name='update-card-status'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -26,9 +29,27 @@ urlpatterns = [
     path('obter_os_em_aberto',obter_os_em_aberto,name='obter_os_em_aberto'),
     path('total_clientes_ativos',dados_clientes,name='total_clientes_ativos'),
     path('total_vendido_hoje',receber,name='total_vendido_hoje'),
+
+    # fechamento caixa
+    path('fechamento-caixa/', FechamentoCaixaAPIView.as_view(), name='fechamento-caixa'),
+    path('caixa_anterior/',DadosCaixaAnteriorApiView.as_view(), name='caixa_anterior'),
+    path('dados-caixa/', DadosCaixaAPIView.as_view(), name='dados-caixa'),
     
     # vendas por vendedor logado
-    path('minhas_vendas_mes_atual',dados_minhas_vendas,name='minhas_vendas_mes_atual'),
-    # essa view espera um renge de data inicio e fim.
-    path('maiores_vendedores_meses',maiores_vendedores_meses,name='maiores_vendedores_meses'),
+    path('minhas_vendas_mes_atual',MinhasVendasAPIView.as_view(),name='minhas_vendas_mes_atual'),
+    path("pedidos_vendedor/", PedidosDoVendedorAPIView.as_view(), name="pedidos_vendedor"),
+
+    # botoes
+    path('gerar_relatorio_estoque_conferido',gerar_relatorio_estoque_conferido ,name='gerar_relatorio_estoque_conferido'),
+    path('imprimir_os/<int:id_os>/',Imprimir_os,name='imprimir_os'),
+    path("loja_os/<int:id_os>/", LojaOsAPIView.as_view(), name="loja_os"),
+    path("encerrar_os/<int:id_os>/", EncerrarOsAPIView.as_view(), name="encerrar_os"),
+    path("cancelar_os/<int:id_os>/", CanceladoOsAPIView.as_view(), name="cancelar_os"),
+    path("entregar_os/<int:id_os>/", EntregueOsAPIView.as_view(), name="entregar_os"),
+    path("laboratorio_os/<int:id_os>/", LaboratorioOsAPIView.as_view(), name="laboratorio_os"),
+    path('export_os',export_os,name='export_os'),
+    path('export_clientes',export_clientes,name='export_clientes'),
+    path('etiquetas/<str:codigo>/<int:quantidade>/',create_pdf,name='etiquetas'),
+    path('fechar_caixa',fechar_caixa,name='fechar_caixa')
+
 ]

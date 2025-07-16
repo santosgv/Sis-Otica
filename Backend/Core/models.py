@@ -6,6 +6,8 @@ from django.conf import settings
 from simple_history.models import HistoricalRecords
 
 
+def current_date():
+    return now().date()
 
 class CLIENTE(models.Model):
 
@@ -26,7 +28,7 @@ class CLIENTE(models.Model):
     DATA_NASCIMENTO = models.DateField(blank=True, null=True)
     EMAIL = models.CharField(max_length=100,blank=True, null=True)
     FOTO =  models.ImageField(upload_to='foto_img',blank=True, null=True)
-    DATA_CADASTRO = models.DateField(default=now)
+    DATA_CADASTRO = models.DateTimeField(default=now)
     STATUS = models.CharField(max_length=1,choices=CHOICES_SITUACAO,default='1')
 
     def __str__(self) -> str:
@@ -63,7 +65,7 @@ class ORDEN(models.Model):
         ('E','CARNER'),
         ('F','PERMUTA'),
     )
-    DATA_SOLICITACAO = models.DateField(default=now)
+    DATA_SOLICITACAO = models.DateField(default=current_date)
     STATUS = models.CharField(max_length=1 , choices=CHOICES_SITUACAO, default='A')
     ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
@@ -214,7 +216,7 @@ class Produto(models.Model):
         fornecedor_nome = self.fornecedor.nome
         primeira_letra = fornecedor_nome[0]
         ultima_letra = fornecedor_nome[-1]
-        self.codigo =f"{self.nome}-{primeira_letra}{ultima_letra}-{settings.UNIDADE}{self.fornecedor.pk}{self.Tipo.pk}{self.Estilo.pk}{self.pk}"
+        self.codigo =f"{self.nome}-{primeira_letra}{ultima_letra}-{settings.UNIDADE}{self.fornecedor.pk}{self.Tipo.pk}{self.Estilo.pk}"
         self.valor_total = self.calcular_total()
         
         # Verificar se o campo valor_total está vazio
