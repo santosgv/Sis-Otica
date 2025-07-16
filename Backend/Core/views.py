@@ -1,5 +1,6 @@
 
 from django.contrib import messages
+from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
@@ -86,6 +87,7 @@ def home(request):
         return render(request,'home.html',{'alertas': alertas,'aniversariantes':aniversariantes})
     else:
         return render(request,'home.html')
+
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
@@ -627,7 +629,7 @@ def Caixa(request):
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
-@login_required(login_url='/auth/logar/')
+
 def fechar_caixa(request):
     # Filtrar o caixa do dia atual que ainda não foi fechado
     caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
@@ -656,6 +658,10 @@ def fechar_caixa(request):
         dado.fechar_caixa()
         dado.save()
 
+    Response(
+                    {"message": "Caixa Fechado com sucesso"},
+                    status=200
+                )
     messages.add_message(request, constants.SUCCESS, 'Caixa Fechado com sucesso')
     return redirect('/Caixa')
 
@@ -695,7 +701,7 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
-@login_required(login_url='/auth/logar/')
+
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=390)
@@ -723,7 +729,7 @@ def vendas_ultimos_12_meses(request):
 
     return JsonResponse({'data': data_vendas})
 
-@login_required(login_url='/auth/logar/')
+
 def maiores_vendedores_30_dias(request):
     vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=primeiro_dia_mes(),DATA_SOLICITACAO__lte=ultimo_dia_mes()).exclude(STATUS='C') \
         .values('VENDEDOR__first_name') \
@@ -737,7 +743,7 @@ def maiores_vendedores_30_dias(request):
   
     return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
 
-@login_required(login_url='/auth/logar/')
+
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
@@ -763,7 +769,7 @@ def maiores_vendedores_meses(request):
 
     return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
 
-@login_required(login_url='/auth/logar/')
+
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
     transacoes_mensais = CAIXA.objects.annotate(
@@ -826,7 +832,7 @@ def transacoes_mensais(request):
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
-@login_required(login_url='/auth/logar/')
+
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
         data_inicio = request.GET.get('data_inicio')
@@ -879,7 +885,7 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
-@login_required(login_url='/auth/logar/')
+
 def obter_os_em_aberto(request):    
     
     vendas = (
@@ -909,7 +915,7 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
-@login_required(login_url='/auth/logar/')
+
 def dados_minhas_vendas(request):
     id_user = request.user
     vendedor = ORDEN.objects.filter(
@@ -928,12 +934,12 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes': list(vendedor)})
 
-@login_required(login_url='/auth/logar/')
+
 def dados_clientes(request):
-    total_clientes = CLIENTE.objects.exclude(STATUS='2').aggregate(total_clientes=Count('id'))['total_clientes']
+    total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
 
-@login_required(login_url='/auth/logar/')
+
 def receber(request):
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
 

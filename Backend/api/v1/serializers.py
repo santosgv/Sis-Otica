@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Core.models import CLIENTE,ORDEN,SERVICO,LABORATORIO,Produto
+from Core.models import CLIENTE,ORDEN,SERVICO,LABORATORIO,Produto,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
 from Autenticacao.models import USUARIO
 
 
@@ -40,3 +40,43 @@ class ProdutoSerializer(serializers.ModelSerializer):
             'codigo': {'read_only': True},  
             'valor_total': {'read_only': True}
         }
+
+class CaixaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CAIXA
+        fields = '__all__'
+        extra_kwargs = {
+            'SALDO_FINAL':{'read_only':True}
+        }
+
+class FornecedorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fornecedor
+        fields = ('id','nome')
+
+class TipoUnitarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoUnitario
+        fields = ('id','nome')
+
+class EstiloSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Estilo
+        fields = ('id','nome')
+
+class TipoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tipo
+        fields = ('id','nome')
+
+class PedidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ORDEN
+        fields = [
+            'id',
+            'DATA_SOLICITACAO',
+            'OBSERVACAO',
+            'SERVICO',
+            'VALOR',
+            'FORMA_PAG'
+        ]
