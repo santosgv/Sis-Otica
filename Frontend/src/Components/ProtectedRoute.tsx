@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./Autenticacao/AuthContext";  // ajuste o caminho conforme necessário
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  children: React.ReactNode;
   allowedRoles: string[]; // exemplo: ["G", "C"]
 }
 

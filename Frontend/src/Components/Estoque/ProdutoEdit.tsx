@@ -48,6 +48,7 @@ const ProdutoEdit: React.FC = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     chavenfe: "",
+    codigo: '',
     nome: "",
     fornecedor: "",
     tipo: "",
@@ -278,7 +279,7 @@ const ProdutoEdit: React.FC = () => {
   };
 
 
-const handleGerarEtiquetas = async (codigo, quantidade = 1) => {
+const handleGerarEtiquetas = async (codigo: string, quantidade: number = 1) => {
   try {
     setLoading(true);
     setMensagem("");
@@ -513,7 +514,7 @@ const handleGerarEtiquetas = async (codigo, quantidade = 1) => {
             >
               Voltar
             </Button>
-            <Button className="bg-green-500 hover:bg-green-400  font-bold py-2 px-4 rounded" onClick={() => handleGerarEtiquetas(form.codigo, form.quantidade)}>Imprimir Etiqueta</Button>
+            <Button className="bg-green-500 hover:bg-green-400  font-bold py-2 px-4 rounded" onClick={() => handleGerarEtiquetas(String(form.codigo), Number(form.quantidade))}>Imprimir Etiqueta</Button>
           </div>
         </form>
         {/* Modal de confirmação de exclusão */}

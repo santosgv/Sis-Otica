@@ -1,14 +1,27 @@
 import { useState, useEffect } from "react";
 import api from "../../../utils/axiosConfig";
 
+interface Pedido {
+  id: number;
+  DATA_SOLICITACAO: string;
+  OBSERVACAO: string;
+  FORMA_PAG: string;
+  VALOR: number;
+  SERVICO: number;
+  SERVICO_NOME: string;
+}
+
+
+
 export function useMinhasVendas(dataInicio: string, dataFim: string) {
   const [vendasResumo, setVendasResumo] = useState<any[]>([]);
-  const [servicos, setServicos] = useState<{ id: number; nome: string }[]>([]);
+  const [servicos, setServicos] = useState<{ id: number; SERVICO: string }[]>([]);
   const [loadingServicos, setLoadingServicos] = useState(true);
-  const [pedidos, setPedidos] = useState([]);
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loadingResumo, setLoadingResumo] = useState(true);
   const [loadingPedidos, setLoadingPedidos] = useState(true);
   const [erro, setErro] = useState("");
+  
 
 
     // Mapeamento de formas de pagamento
