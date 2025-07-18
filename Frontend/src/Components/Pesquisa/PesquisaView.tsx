@@ -27,8 +27,8 @@ interface Laboratorio {
 interface VisualizarOS {
     id: number;
     solicitar_avaliacao?: boolean;
-    ANEXO?: { url: string };
-    ASSINATURA?: { url: string };
+    ANEXO?:  string | null;
+    ASSINATURA: string  | null;
     DATA_SOLICITACAO: string;
     PREVISAO_ENTREGA: string;
     VENDEDOR: Vendedor;
@@ -88,7 +88,8 @@ const formaPagLabels: Record<string, string> = {
 const OsView: React.FC<OsViewProps> = ({ unidade = "", VISUALIZAR_OS, messages = [] }) => {
     const [editMode, setEditMode] = React.useState(false);
     const [osData, setOsData] = React.useState({ ...VISUALIZAR_OS });
-    const [showMsg, setShowMsg] = React.useState(false);
+    type Msg = { type: "success" | "error"; message: string } | null;
+    const [showMsg, setShowMsg] = useState<Msg>(null);
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -113,18 +114,18 @@ const OsView: React.FC<OsViewProps> = ({ unidade = "", VISUALIZAR_OS, messages =
         });
     };
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        function handleChange(
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        ) {
         const { name, value } = e.target;
-        setOsData((prev) => ({ ...prev, [name]: value }));
         let newValue = value;
-        
+
         if (name === "VALOR" || name === "ENTRADA") {
-        newValue = formatCurrency(value);
+            newValue = formatCurrency(value);
         }
 
         setOsData((prev: any) => ({ ...prev, [name]: newValue }));
-
-    }
+        }
 
 
 
@@ -244,7 +245,7 @@ async function handleSave() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         {VISUALIZAR_OS.ANEXO && (
                             <a
-                                href={VISUALIZAR_OS.ANEXO}
+                                href={VISUALIZAR_OS.ANEXO || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 text-center py-2 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium shadow dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
@@ -254,7 +255,7 @@ async function handleSave() {
                         )}
                         {VISUALIZAR_OS.ASSINATURA && (
                             <a
-                                href={VISUALIZAR_OS.ASSINATURA.url}
+                                href={VISUALIZAR_OS.ASSINATURA || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 text-center py-2 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium shadow dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
@@ -342,7 +343,7 @@ async function handleSave() {
                                 name="LABORATORIO"
                                 readOnly
                                 className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700 focus:outline-none"
-                                value={osData.LABORATORIO}
+                                value={String(osData.LABORATORIO)}
                                 onChange={handleChange}
                             />
                         </div>
@@ -674,7 +675,7 @@ const PesquisaView: React.FC = () => {
           ASSINATURA: os.ASSINATURA || null,
           solicitar_avaliacao: false, 
         };
-        console.log()
+        
 
         setOsData(mappedOs);
         setLoading(false);

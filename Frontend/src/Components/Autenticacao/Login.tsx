@@ -18,7 +18,7 @@ const Home: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       const [loading, setLoading] = useState(false);
       
     
-    const handleChange = (e)  => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>)  => {
     const { name, value } = e.target;
         setCredentials({ ...credentials, [name]: value });
       };
@@ -51,11 +51,11 @@ const Home: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           window.location.assign("/");
         
     
-        } catch (err) {
+        } catch (err: unknown) {
+        const error = err as any;
           // Trata erros (ex.: credenciais inválidas)
           setError(
-            
-            err.response?.data?.detail || 'Erro ao fazer login. Verifique suas credenciais.'
+            error.response?.data?.detail || 'Erro ao fazer login. Verifique suas credenciais.'
           
           );
         } finally {
