@@ -6,7 +6,7 @@ export const getTenantBaseURL = (): string => {
   // Garante que o hostname seja válido
   if (!hostname) {
     console.warn('Hostname não identificado. Usando fallback.');
-    return 'http://localhost:8000/api/v1/';
+    return 'https://sgosistemas.com.br/api/v1/';
   }
 
   // Detecta se está em produção

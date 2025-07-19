@@ -37,10 +37,10 @@ export function usePesquisaList() {
     setLoading(true);
     setError(null);
     Promise.all([
-      api.get("http://localhost:8000/api/v1/ordens/"),
-      api.get("http://localhost:8000/api/v1/clientes/"),
-      api.get("http://localhost:8000/api/v1/usuarios/"),
-      api.get("http://localhost:8000/api/v1/servicos/"),
+      api.get("/ordens/"),
+      api.get("/clientes/"),
+      api.get("/usuarios/"),
+      api.get("/servicos/"),
     ])
       .then(([ordensRes, clientesRes, usuariosRes, servicosRes]) => {
         // ...mapeamento igual ao componente original...
