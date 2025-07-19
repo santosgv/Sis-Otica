@@ -35,6 +35,7 @@ import RealizaPagamento from "./Components/RealizarPagamento/RealizaPagamento";
 import ComissaoForm from "./Components/RealizarPagamento/ComissaoForm";
 import ComissaoDetail from "./Components/RealizarPagamento/ComissaoDetail";
 import ComissaoDelete from "./Components/RealizarPagamento/ComissaoDelete";
+import EditaPerfil from "./Components/Autenticacao/EditaPerfil";
 import { ToastProvider } from "./Components/ui/ToastContext";
 
 const App: React.FC = () => {
@@ -104,6 +105,7 @@ const App: React.FC = () => {
               <Route path="/" element={<ProtectedRoute allowedRoles={["G","V","C"]}><Home  /></ProtectedRoute>} />
               <Route path="/unauthorized" element={<Unauthorized /> } />
               <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
+              <Route path='/editar-perfil' element={<ProtectedRoute allowedRoles={["G","V","C"]}><EditaPerfil /> </ProtectedRoute>} />
               <Route path='/logoff' element={<ProtectedRoute allowedRoles={["G","V","C"]}><Logoff /> </ProtectedRoute>} />
               <Route path="/clientes" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <Clientes /> </ProtectedRoute>} />
               <Route path="/cliente" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <ClienteEdicao /></ProtectedRoute>}></Route>
