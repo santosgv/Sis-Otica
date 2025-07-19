@@ -113,23 +113,23 @@ const App: React.FC = () => {
               <Route path="/servicos-cadastro" element={<ServicosCadastro />} />
               <Route path="/laboratorio-cadastro" element={<LaboratorioCadastro />} />
               <Route path="/os" element={<ProtectedRoute allowedRoles={["G","V","C"]}><PesquisaView /> </ProtectedRoute> } />
-              <Route path="/kanban" element={<ProtectedRoute allowedRoles={["G","V","C"]}><Kanban /> </ProtectedRoute> } />
-              <Route path="/relatorios" element={<ProtectedRoute allowedRoles={["G"]}><Relatorios /> </ProtectedRoute> } />
-              <Route path="/estoque" element={<ProtectedRoute allowedRoles={["G"]}><Estoque /> </ProtectedRoute>  } />
-              <Route path="/produtos/:id" element={ <ProtectedRoute allowedRoles={["G"]}> <ProdutoEdit /> </ProtectedRoute>  } />
-              <Route path="/fornecedores" element={<ProtectedRoute allowedRoles={["G"]}><FornecedorList /> </ProtectedRoute> } />
-              <Route path="/tipos" element={<ProtectedRoute allowedRoles={["G"]}><TipoList /> </ProtectedRoute>} />
-              <Route path="/estilos" element={<ProtectedRoute allowedRoles={["G"]}><EstiloList /> </ProtectedRoute> } />
-              <Route path="/tipos-unitarios" element={<ProtectedRoute allowedRoles={["G"]}><TipoUnitarioList /> </ProtectedRoute> } />
-              <Route path="/caixa" element={ <ProtectedRoute allowedRoles={["G","C"]}> <Caixa /> </ProtectedRoute> } />
-              <Route path="/caixa-mes" element={<ProtectedRoute allowedRoles={["G","C"]}><VisualizarMesAnterior /> </ProtectedRoute>} />
-              <Route path="/caixa/adicionar" element={<ProtectedRoute allowedRoles={["G","C"]}> <AdicionarCaixa onClose={() => window.history.back()} /> </ProtectedRoute>  } />
-              <Route path="/minhas-vendas" element={<ProtectedRoute allowedRoles={["G","V","C"]}><MinhasVendas /> </ProtectedRoute> } />
-              <Route path="/folha-pagamento" element={<ProtectedRoute allowedRoles={["G"]}><FolhaPagamento /> </ProtectedRoute> } />
-              <Route path="/realizar-pagamento" element={<ProtectedRoute allowedRoles={["G"]}><RealizaPagamento /> </ProtectedRoute>} />
-              <Route path="/comissao/nova" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoForm /> </ProtectedRoute> } />
-              <Route path="/comissao/:id" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoDetail /> </ProtectedRoute>} />
-              <Route path="/comissao/:id/delete" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoDelete /> </ProtectedRoute> } />
+              <Route path="/kanban" element={<ProtectedRoute allowedRoles={["G","V","C"]} requiredPlan="premium"><Kanban /> </ProtectedRoute> } />
+              <Route path="/relatorios" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><Relatorios /> </ProtectedRoute> } />
+              <Route path="/estoque" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><Estoque /> </ProtectedRoute>  } />
+              <Route path="/produtos/:id" element={ <ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <ProdutoEdit /> </ProtectedRoute>  } />
+              <Route path="/fornecedores" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><FornecedorList /> </ProtectedRoute> } />
+              <Route path="/tipos" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><TipoList /> </ProtectedRoute>} />
+              <Route path="/estilos" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><EstiloList /> </ProtectedRoute> } />
+              <Route path="/tipos-unitarios" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><TipoUnitarioList /> </ProtectedRoute> } />
+              <Route path="/caixa" element={ <ProtectedRoute allowedRoles={["G","C"]} requiredPlan="premium"> <Caixa /> </ProtectedRoute> } />
+              <Route path="/caixa-mes" element={<ProtectedRoute allowedRoles={["G","C"]} requiredPlan="premium"><VisualizarMesAnterior /> </ProtectedRoute>} />
+              <Route path="/caixa/adicionar" element={<ProtectedRoute allowedRoles={["G","C"]} requiredPlan="premium"> <AdicionarCaixa onClose={() => window.history.back()} /> </ProtectedRoute>  } />
+              <Route path="/minhas-vendas" element={<ProtectedRoute allowedRoles={["G","V","C"]} requiredPlan="premium"><MinhasVendas /> </ProtectedRoute> } />
+              <Route path="/folha-pagamento" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><FolhaPagamento /> </ProtectedRoute> } />
+              <Route path="/realizar-pagamento" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><RealizaPagamento /> </ProtectedRoute>} />
+              <Route path="/comissao/nova" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoForm /> </ProtectedRoute> } />
+              <Route path="/comissao/:id" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoDetail /> </ProtectedRoute>} />
+              <Route path="/comissao/:id/delete" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoDelete /> </ProtectedRoute> } />
             </Routes>
           </main>
         </div>

@@ -11,6 +11,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean | null;
+    tipoPlano: 'free' | 'premium' | null;
     setAuthData: (userId: string | null) => void;
 
 }
@@ -18,12 +19,13 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: null,
+    tipoPlano: null,
     setAuthData: () => {}
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const { userId, loading: authLoading } = useAuth();
+    const { userId, isAuthenticated: authIsAuthenticated, tipoPlano, loading: authLoading } = useAuth();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     const fetchUserData = (userId: string) => {
@@ -68,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [isAuthenticated, userId]);
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, setAuthData,  }}>
+        <AuthContext.Provider value={{ user, isAuthenticated,tipoPlano, setAuthData,  }}>
             {children}
         </AuthContext.Provider>
     );
