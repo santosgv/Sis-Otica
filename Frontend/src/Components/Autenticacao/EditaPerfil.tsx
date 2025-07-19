@@ -8,11 +8,9 @@ interface User {
   FUNCAO: string;
 }
 
-interface EditUserProps {
-  onUpdate: () => void; // Callback para atualizar a lista após edição
-}
 
-const EditUser: React.FC<EditUserProps> = ({ onUpdate }) => {
+
+const EditUser: React.FC = ({ }) => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
