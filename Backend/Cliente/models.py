@@ -16,6 +16,7 @@ class Cliente(TenantMixin):
     razao_social=models.CharField(max_length=255)
     pago_ate = models.DateField(default=now)
     tipo_plano = models.CharField(max_length=20, choices=TIPO_PLANO_CHOICES, default='free')
+    on_trial = models.BooleanField(default=True, blank=True)
     descricao = models.TextField(blank=True)
     email = models.EmailField(null=True)
     unidade= models.CharField(max_length=6)
