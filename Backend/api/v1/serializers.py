@@ -1,7 +1,20 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.db import connection
 from Core.models import CLIENTE,ORDEN,SERVICO,LABORATORIO,Produto,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
 from Autenticacao.models import USUARIO
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+
+        # Adiciona o tipo de plano do tenant no token
+        tenant = connection.tenant
+        token['tipo_plano'] = tenant.tipo_plano
+
+        return token
 
 class UsuariosSerializer(serializers.ModelSerializer):
     class Meta:

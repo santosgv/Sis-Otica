@@ -1,7 +1,7 @@
 from django.urls import include, path
 from ..routers import router
 from Core.utils import gerar_relatorio_estoque_conferido,export_os,export_clientes,Imprimir_os,create_pdf
-from .viewsets import (KanbanAPIView,UpdateCardStatusAPIView,FechamentoCaixaAPIView,
+from .viewsets import (CustomTokenObtainPairView,KanbanAPIView,UpdateCardStatusAPIView,FechamentoCaixaAPIView,
                         DadosCaixaAPIView,MinhasVendasAPIView,LojaOsAPIView,
                         EncerrarOsAPIView,EntregueOsAPIView,CanceladoOsAPIView,LaboratorioOsAPIView,
                         PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView)
@@ -10,7 +10,7 @@ from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maior
                         receber,fechar_caixa
 )
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
+  #  TokenObtainPairView,
     TokenRefreshView,
 )
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('kanban/',KanbanAPIView.as_view(),name='kanban'),
     path('cards/<int:card_id>/update-status/', UpdateCardStatusAPIView.as_view(), name='update-card-status'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('vendas_ultimos_12_meses',vendas_ultimos_12_meses,name='vendas_ultimos_12_meses'),

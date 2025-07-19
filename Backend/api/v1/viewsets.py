@@ -1,10 +1,11 @@
 from rest_framework import viewsets
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from api.v1.serializers import (ClientesSerializer,OrdensSerializer,UsuariosSerializer,
+from api.v1.serializers import (CustomTokenObtainPairSerializer,ClientesSerializer,OrdensSerializer,UsuariosSerializer,
                                 ServicoSerializer,ProdutoSerializer,LaboratorioSerializer,
                                 CaixaSerializer,FornecedorSerializer,TipoUnitarioSerializer,
                                 EstiloSerializer,TipoSerializer,PedidoSerializer)
@@ -14,6 +15,9 @@ from django.db.models import Sum,Count, F, ExpressionWrapper, DecimalField
 from Core.views import get_entrada_saida,vendas_ultimos_12_meses,dados_minhas_vendas
 from Core.utils import get_30_days,ultimo_dia_mes,get_10_days,get_today_data,dados_caixa,primeiro_dia_mes
 from django.utils.dateparse import parse_date
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UsuariosViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

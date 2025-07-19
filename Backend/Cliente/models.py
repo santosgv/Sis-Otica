@@ -8,10 +8,14 @@ from django_tenants.models import DomainMixin, TenantMixin
 from django.utils import timezone
 
 class Cliente(TenantMixin):
+    TIPO_PLANO_CHOICES = [
+        ('free', 'Free'),
+        ('premium', 'Premium'),
+    ]
     Usuario = models.ForeignKey(USUARIO, on_delete=models.SET_NULL, null=True)
     razao_social=models.CharField(max_length=255)
     pago_ate = models.DateField(default=now)
-    on_trial = models.BooleanField(default=True, blank=True)
+    tipo_plano = models.CharField(max_length=20, choices=TIPO_PLANO_CHOICES, default='free')
     descricao = models.TextField(blank=True)
     email = models.EmailField(null=True)
     unidade= models.CharField(max_length=6)
