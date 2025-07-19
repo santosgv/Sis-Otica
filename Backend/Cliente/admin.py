@@ -38,5 +38,6 @@ class TenantAdmin(PublicTenantOnlyMixin,TenantAdminMixin, admin.ModelAdmin):
         "razao_social",
         "is_active",
         "pago_ate",
+        "tipo_plano",
         )
         inlines = [DomainInline]
