@@ -33,7 +33,7 @@ const comissoesMock = [
 // Certifique-se de que botões e ações fiquem acessíveis em telas pequenas.
 const ComissaoList: React.FC = () => {
     useEffect(() => {
-        document.documentElement.classList.add('dark');
+        // Removido: document.documentElement.classList.add('dark');
     }, []);
 
     return (

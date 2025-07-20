@@ -13,7 +13,7 @@ import { Input } from '../ui/Input';
 
 const ComissaoForm: React.FC = () => {
     useEffect(() => {
-        document.documentElement.classList.add('dark');
+        // Removido: document.documentElement.classList.add('dark');
     }, []);
 
     return (

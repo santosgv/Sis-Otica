@@ -4,7 +4,7 @@ from Core.utils import gerar_relatorio_estoque_conferido,export_os,export_client
 from .viewsets import (KanbanAPIView,UpdateCardStatusAPIView,FechamentoCaixaAPIView,
                         DadosCaixaAPIView,MinhasVendasAPIView,LojaOsAPIView,
                         EncerrarOsAPIView,EntregueOsAPIView,CanceladoOsAPIView,LaboratorioOsAPIView,
-                        PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView)
+                        PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView,FolhaPagamentoAPIView)
 from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maiores_vendedores_meses,
                         transacoes_mensais,obter_os_em_aberto,dados_minhas_vendas,dados_clientes,
                         receber,fechar_caixa
@@ -38,6 +38,9 @@ urlpatterns = [
     # vendas por vendedor logado
     path('minhas_vendas_mes_atual',MinhasVendasAPIView.as_view(),name='minhas_vendas_mes_atual'),
     path("pedidos_vendedor/", PedidosDoVendedorAPIView.as_view(), name="pedidos_vendedor"),
+
+    # folha pagamento
+    path('folha/<int:usuario_id>/<str:referencia>/', FolhaPagamentoAPIView.as_view(), name='folha_pagamento'),
 
     # botoes
     path('gerar_relatorio_estoque_conferido',gerar_relatorio_estoque_conferido ,name='gerar_relatorio_estoque_conferido'),

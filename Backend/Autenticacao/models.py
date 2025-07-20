@@ -41,7 +41,10 @@ class Ativacao(models.Model):
 class Desconto(models.Model):
     colaborador = models.ForeignKey(USUARIO, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=100)
-    percentual = models.FloatField()  
+    percentual = models.FloatField() 
+
+    def calcular_valor(self):
+        return self.colaborador.salario_bruto * (self.percentual / 100)
 
     def __str__(self):
         return f"{self.tipo} - {self.colaborador.first_name}"
@@ -57,6 +60,12 @@ class Comissao(models.Model):
 
     def calcula_horas_extras(self):
         return self.horas_extras * (self.colaborador.valor_hora * 1.50 )
+
+    def salario_liquido(self):
+        salario = self.colaborador.salario_bruto
+        total_descontos = sum([d.calcular_valor() for d in self.colaborador.desconto_set.all()])
+        total_proventos = self.calcular_comissao() + self.calcula_horas_extras()
+        return salario - total_descontos + total_proventos
 
     def __str__(self):
         return f"Comissão - {self.colaborador.username} - {self.data_referencia}"

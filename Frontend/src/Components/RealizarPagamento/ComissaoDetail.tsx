@@ -13,7 +13,7 @@ import React, { useEffect } from "react";
 
 const ComissaoDetail: React.FC = () => {
     useEffect(() => {
-        document.documentElement.classList.add('dark');
+        // Removido: document.documentElement.classList.add('dark');
     }, []);
 
     // Mock de dados

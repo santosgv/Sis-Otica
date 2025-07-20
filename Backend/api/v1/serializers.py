@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from Core.models import CLIENTE,ORDEN,SERVICO,LABORATORIO,Produto,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
-from Autenticacao.models import USUARIO
+from Autenticacao.models import USUARIO,Comissao
 
 
 class UsuariosSerializer(serializers.ModelSerializer):
@@ -80,3 +80,42 @@ class PedidoSerializer(serializers.ModelSerializer):
             'VALOR',
             'FORMA_PAG'
         ]
+
+
+class FolhaPagamentoSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='colaborador.first_name')
+    data_contratacao = serializers.DateField(source='colaborador.data_contratacao')
+    salario_bruto = serializers.FloatField(source='colaborador.salario_bruto')
+    comissao = serializers.SerializerMethodField()
+    horas_extras = serializers.SerializerMethodField()
+    descontos = serializers.SerializerMethodField()
+    salario_liquido = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comissao
+        fields = [
+            'nome', 'data_contratacao', 'salario_bruto',
+            'comissao', 'horas_extras', 'descontos', 'salario_liquido'
+        ]
+
+    def get_comissao(self, obj):
+        print("Calculating commission for:", obj.colaborador.first_name)
+        return obj.calcular_comissao()
+
+    def get_horas_extras(self, obj):
+        print("Calculating extra hours for:", obj.colaborador.first_name)
+        return obj.calcula_horas_extras()
+
+    def get_descontos(self, obj):
+        descontos = obj.colaborador.desconto_set.all()
+        return [
+            {
+                'tipo': d.tipo,
+                'percentual': d.percentual,
+                'valor': d.calcular_valor(),
+            } for d in descontos
+        ]
+
+    def get_salario_liquido(self, obj):
+        print("Calculating net salary for:", obj.colaborador.first_name)
+        return obj.salario_liquido()

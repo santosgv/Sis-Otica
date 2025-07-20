@@ -14,7 +14,7 @@ import { Button } from '../ui/Button';
 
 const ComissaoDelete: React.FC = () => {
     useEffect(() => {
-        document.documentElement.classList.add('dark');
+        // Removido: document.documentElement.classList.add('dark');
     }, []);
 
     return (
