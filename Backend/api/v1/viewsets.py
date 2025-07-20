@@ -383,6 +383,9 @@ class LaboratorioOsAPIView(APIView):
             print(e)
             return Response({"error": "Erro ao mover OS para a Laboratorio."}, status=500)
 
+from calendar import monthrange
+from datetime import datetime, date
+
 class FolhaPagamentoAPIView(APIView):
     #permission_classes = [IsAuthenticated]
 
@@ -392,8 +395,11 @@ class FolhaPagamentoAPIView(APIView):
             partes = referencia.split('-')
             if len(partes) != 2:
                 return Response({"error": "Formato de referência inválido. Use AAAA-MM."}, status=status.HTTP_400_BAD_REQUEST)
-            primeiro_dia = primeiro_dia_mes()
-            ultimo_dia = ultimo_dia_mes()
+
+            ano = int(partes[0])
+            mes = int(partes[1])
+            primeiro_dia = date(ano, mes, 1)
+            ultimo_dia = date(ano, mes, monthrange(ano, mes)[1])
 
             colaborador = get_object_or_404(USUARIO, id=usuario_id)
 
@@ -401,6 +407,10 @@ class FolhaPagamentoAPIView(APIView):
                 colaborador=colaborador,
                 data_referencia__range=(primeiro_dia, ultimo_dia)
             )
+            if not comissoes.exists():
+                total_comissao = 0
+                total_horas = 0
+                proventos = []
 
             descontos = Desconto.objects.filter(colaborador=colaborador)
 
@@ -442,6 +452,7 @@ class FolhaPagamentoAPIView(APIView):
 
             folha = {
                 "nome": colaborador.first_name,
+                "funcao": colaborador.FUNCAO,
                 "data_contratacao": colaborador.data_contratacao,
                 "salario_bruto": round(colaborador.salario_bruto, 2),
                 "descontos": descontos_data,

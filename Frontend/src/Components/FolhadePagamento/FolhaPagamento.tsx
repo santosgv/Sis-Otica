@@ -3,7 +3,14 @@
 
 import React, { useState, useEffect } from "react";
 import api from   '../../utils/axiosConfig';
-import { Input } from '../ui/Input';
+
+
+const funcaoLabel = (funcao?: string) => {
+    if (funcao === "G") return "Gerente";
+    if (funcao === "C") return "Caixa";
+    if (funcao === "V") return "Vendedor";
+    return "";
+};
 
 // Função utilitária para formatar valores monetários
 function formatMoney(valor: number) {
@@ -26,7 +33,7 @@ const meses = [
 ];
 
 const FolhaPagamento: React.FC = () => {
-    const [funcionarios, setFuncionarios] = useState<{ id: number, nome: string }[]>([]);
+    const [funcionarios, setFuncionarios] = useState<{ id: number, nome: string, funcao: string }[]>([]);
     const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<number | null>(null);
     const [anoSelecionado, setAnoSelecionado] = useState("2025");
     const [mesSelecionado, setMesSelecionado] = useState("07");
@@ -37,7 +44,7 @@ const FolhaPagamento: React.FC = () => {
             try {
                 const response = await api.get('/usuarios');
                 console.log ('Usuários:', response.data.results);
-                const data = response.data.results.map((user: any) => ({ id: user.id, nome: user.first_name }));
+                const data = response.data.results.map((user: any) => ({ id: user.id, nome: user.first_name, funcao: user.FUNCAO }));
                 setFuncionarios(data);
                 if (data.length > 0) setFuncionarioSelecionado(data[0].id);
             } catch (error) {
@@ -105,9 +112,10 @@ const FolhaPagamento: React.FC = () => {
             {folha && (
                 <div className="max-w-2xl grid gap-6">
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2">
-                        <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                            {folha.nome} — Contratado em {folha.data_contratacao}
+                        <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-100 text-center">
+                            {folha.nome}- {funcaoLabel(folha.funcao)}
                         </h5>
+                        <h6 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Contratado em {folha.data_contratacao}</h6>
 
                         <div className="font-semibold">Salário Bruto: {formatMoney(folha.salario_bruto)}</div>
 
