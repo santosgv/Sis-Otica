@@ -32,9 +32,10 @@ import { ThemeProvider } from "./ThemeContext/ThemeProvider";
 import MinhasVendas from "./Components/MinhasVendas/MinhasVendas";
 import FolhaPagamento from "./Components/FolhadePagamento/FolhaPagamento";
 import RealizaPagamento from "./Components/RealizarPagamento/RealizaPagamento";
-import ComissaoForm from "./Components/RealizarPagamento/ComissaoForm";
-import ComissaoDetail from "./Components/RealizarPagamento/ComissaoDetail";
-import ComissaoDelete from "./Components/RealizarPagamento/ComissaoDelete";
+import ComissaoList from "./Components/RealizarPagamento/ComissaoForm";
+import ComissaoCreateEdit from './Components/RealizarPagamento/ComissaoCreateEdit';
+import DescontoList from './Components/RealizarPagamento/DescontoList';
+import DescontoCreateEdit from './Components/RealizarPagamento/DescontoCreateEdit';
 import EditaPerfil from "./Components/Autenticacao/EditaPerfil";
 import { ToastProvider } from "./Components/ui/ToastContext";
 
@@ -129,9 +130,13 @@ const App: React.FC = () => {
               <Route path="/minhas-vendas" element={<ProtectedRoute allowedRoles={["G","V","C"]}><MinhasVendas /> </ProtectedRoute> } />
               <Route path="/folha-pagamento" element={<ProtectedRoute allowedRoles={["G"]}><FolhaPagamento /> </ProtectedRoute> } />
               <Route path="/realizar-pagamento" element={<ProtectedRoute allowedRoles={["G"]}><RealizaPagamento /> </ProtectedRoute>} />
-              <Route path="/comissao/nova" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoForm /> </ProtectedRoute> } />
-              <Route path="/comissao/:id" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoDetail /> </ProtectedRoute>} />
-              <Route path="/comissao/:id/delete" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoDelete /> </ProtectedRoute> } />
+              <Route path="/comissao" element={<ProtectedRoute allowedRoles={["G"]}><ComissaoList /> </ProtectedRoute> } />
+              <Route path="/comissao/create" element={  <ProtectedRoute allowedRoles={["G"]}> <ComissaoCreateEdit /> </ProtectedRoute> } />
+              <Route path="/comissao/edit/:id" element={<ProtectedRoute allowedRoles={["G"]}> <ComissaoCreateEdit /> </ProtectedRoute> } />
+              <Route path="/desconto" element={<ProtectedRoute allowedRoles={["G"]}> <DescontoList /></ProtectedRoute> } />
+              <Route path="/desconto/create" element={ <ProtectedRoute allowedRoles={["G"]}> <DescontoCreateEdit /> </ProtectedRoute>} />
+              <Route path="/desconto/edit/:id" element={<ProtectedRoute allowedRoles={["G"]}> <DescontoCreateEdit /> </ProtectedRoute> } />
+              
             </Routes>
           </main>
         </div>

@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from Core.models import CLIENTE,ORDEN,SERVICO,LABORATORIO,Produto,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
-from Autenticacao.models import USUARIO,Comissao
+from Autenticacao.models import USUARIO,Comissao, Desconto
 
 
 class UsuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model = USUARIO
-        fields = ('id','username','first_name','FUNCAO')
+        fields = ('id','username','first_name','FUNCAO','salario_bruto','comissao_percentual','valor_hora','data_contratacao')
 
 class ClientesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,7 +81,6 @@ class PedidoSerializer(serializers.ModelSerializer):
             'FORMA_PAG'
         ]
 
-
 class FolhaPagamentoSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='colaborador.first_name')
     data_contratacao = serializers.DateField(source='colaborador.data_contratacao')
@@ -119,3 +118,12 @@ class FolhaPagamentoSerializer(serializers.ModelSerializer):
     def get_salario_liquido(self, obj):
         print("Calculating net salary for:", obj.colaborador.first_name)
         return obj.salario_liquido()
+
+class ComissaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comissao
+        fields = '__all__'
+class DescontoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Desconto
+        fields = '__all__'

@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from calendar import monthrange
+from datetime import datetime, date
 from rest_framework.permissions import IsAuthenticated
 import calendar
 from rest_framework.views import APIView
@@ -8,7 +10,8 @@ from rest_framework import status
 from api.v1.serializers import (ClientesSerializer,OrdensSerializer,UsuariosSerializer,
                                 ServicoSerializer,ProdutoSerializer,LaboratorioSerializer,
                                 CaixaSerializer,FornecedorSerializer,TipoUnitarioSerializer,
-                                EstiloSerializer,TipoSerializer,PedidoSerializer,FolhaPagamentoSerializer)
+                                EstiloSerializer,TipoSerializer,PedidoSerializer,FolhaPagamentoSerializer,
+                                ComissaoSerializer,DescontoSerializer)
 from Core.models import CLIENTE,ORDEN,SERVICO,Produto,LABORATORIO,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
 from Autenticacao.models import USUARIO,Comissao,Desconto
 from django.db.models import Sum,Count, F, ExpressionWrapper, DecimalField
@@ -383,11 +386,8 @@ class LaboratorioOsAPIView(APIView):
             print(e)
             return Response({"error": "Erro ao mover OS para a Laboratorio."}, status=500)
 
-from calendar import monthrange
-from datetime import datetime, date
-
 class FolhaPagamentoAPIView(APIView):
-    #permission_classes = [IsAuthenticated]
+   # permission_classes = [IsAuthenticated]
 
     def get(self, request, usuario_id, referencia):
         try:
@@ -451,6 +451,7 @@ class FolhaPagamentoAPIView(APIView):
             total_descontos += inss + fgts + irrf
 
             folha = {
+                "id": colaborador.id,
                 "nome": colaborador.first_name,
                 "funcao": colaborador.FUNCAO,
                 "data_contratacao": colaborador.data_contratacao,
@@ -473,3 +474,13 @@ class FolhaPagamentoAPIView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ComissaoViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated]
+    queryset = Comissao.objects.all().order_by('-id')
+    serializer_class = ComissaoSerializer
+
+class DescontoViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated]
+    queryset = Desconto.objects.all().order_by('-id')
+    serializer_class = DescontoSerializer

@@ -4,11 +4,15 @@ from Core.utils import gerar_relatorio_estoque_conferido,export_os,export_client
 from .viewsets import (KanbanAPIView,UpdateCardStatusAPIView,FechamentoCaixaAPIView,
                         DadosCaixaAPIView,MinhasVendasAPIView,LojaOsAPIView,
                         EncerrarOsAPIView,EntregueOsAPIView,CanceladoOsAPIView,LaboratorioOsAPIView,
-                        PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView,FolhaPagamentoAPIView)
+                        PedidosDoVendedorAPIView,DadosCaixaAnteriorApiView,FolhaPagamentoAPIView,
+                        ComissaoViewSet,DescontoViewSet)
 from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maiores_vendedores_meses,
                         transacoes_mensais,obter_os_em_aberto,dados_minhas_vendas,dados_clientes,
                         receber,fechar_caixa
 )
+
+from api.views import baixar_pdf
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -42,7 +46,9 @@ urlpatterns = [
     # folha pagamento
     path('folha/<int:usuario_id>/<str:referencia>/', FolhaPagamentoAPIView.as_view(), name='folha_pagamento'),
 
+
     # botoes
+    path('baixar_pdf/<int:colaborador_id>/<str:referencia>/',baixar_pdf,name='baixar_pdf'),
     path('gerar_relatorio_estoque_conferido',gerar_relatorio_estoque_conferido ,name='gerar_relatorio_estoque_conferido'),
     path('imprimir_os/<int:id_os>/',Imprimir_os,name='imprimir_os'),
     path("loja_os/<int:id_os>/", LojaOsAPIView.as_view(), name="loja_os"),

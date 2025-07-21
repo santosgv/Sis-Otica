@@ -2,8 +2,10 @@
 // Atualizado para consumir dados da API real da folha de pagamento
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import api from   '../../utils/axiosConfig';
-
+import { Link } from "react-router-dom";
+import { Button } from '../ui/Button';
 
 const funcaoLabel = (funcao?: string) => {
     if (funcao === "G") return "Gerente";
@@ -11,6 +13,7 @@ const funcaoLabel = (funcao?: string) => {
     if (funcao === "V") return "Vendedor";
     return "";
 };
+
 
 // Função utilitária para formatar valores monetários
 function formatMoney(valor: number) {
@@ -38,6 +41,10 @@ const FolhaPagamento: React.FC = () => {
     const [anoSelecionado, setAnoSelecionado] = useState("2025");
     const [mesSelecionado, setMesSelecionado] = useState("07");
     const [folha, setFolha] = useState<any | null>(null);
+    const [loadingPDF, setLoadingPDF] = useState(false);
+    const [errorPDF, setErrorPDF] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFuncionarios = async () => {
@@ -69,8 +76,52 @@ const FolhaPagamento: React.FC = () => {
         fetchData();
     }, [funcionarioSelecionado, anoSelecionado, mesSelecionado]);
 
+    const handleDownloadPDF = async () => {
+        if (!funcionarioSelecionado || !anoSelecionado || !mesSelecionado) {
+            setErrorPDF('Selecione um funcionário e uma referência válida.');
+            return;
+        }
+
+        try {
+            setLoadingPDF(true);
+            setErrorPDF(null);
+            const referencia = `${anoSelecionado}-${mesSelecionado}`;
+            const response = await api.get(`/baixar_pdf/${funcionarioSelecionado}/${referencia}/`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `holerite_${funcionarioSelecionado}_${referencia}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err: any) {
+            console.error('Erro ao baixar PDF:', err.response?.data);
+            const errorMessage =
+                err.response?.data?.error || err.message || 'Erro ao baixar PDF. Tente novamente.';
+            setErrorPDF(errorMessage);
+        } finally {
+            setLoadingPDF(false);
+        }
+    };
+
+
     return (
+        
         <div className="w-full min-w-0 px-2 sm:px-4 md:px-8 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors font-inter">
+
+            <Link
+            to="/realizar-pagamento"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+            Pagamento
+            </Link>
+
+            <br />
+            <br />
+
             <div className="flex flex-col md:flex-row gap-2 mb-6 w-full max-w-2xl">
                 <div className="w-full md:w-1/4">
                     <label className="block text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Funcionário</label>
@@ -104,8 +155,11 @@ const FolhaPagamento: React.FC = () => {
                             <option key={m.value} value={m.value}>{m.label}</option>
                         ))}
                     </select>
+                    
                 </div>
+                    
             </div>
+            
 
             {!folha && <div className="text-center text-sm text-gray-500 dark:text-gray-300 my-8">Nenhuma folha encontrada para o período.</div>}
 
@@ -113,8 +167,17 @@ const FolhaPagamento: React.FC = () => {
                 <div className="max-w-2xl grid gap-6">
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2">
                         <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-100 text-center">
-                            {folha.nome}- {funcaoLabel(folha.funcao)}
+                            {folha.nome}- {funcaoLabel(folha.funcao)} 
                         </h5>
+                            <Button
+                            type="button"
+                            variant="outline"
+                            className="px-3 py-1 text-sm w-full sm:w-auto bg-green-600"
+                            onClick={handleDownloadPDF}
+                            disabled={loadingPDF}
+                        >
+                            {loadingPDF ? 'Baixando...' : 'Baixar Contracheque'}
+                        </Button>
                         <h6 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Contratado em {folha.data_contratacao}</h6>
 
                         <div className="font-semibold">Salário Bruto: {formatMoney(folha.salario_bruto)}</div>
