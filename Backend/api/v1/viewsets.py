@@ -1,6 +1,9 @@
 from rest_framework import viewsets
 from rest_framework_simplejwt.views import TokenObtainPairView
+from calendar import monthrange
+from datetime import datetime, date
 from rest_framework.permissions import IsAuthenticated
+import calendar
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -8,9 +11,10 @@ from rest_framework import status
 from api.v1.serializers import (CustomTokenObtainPairSerializer,ClientesSerializer,OrdensSerializer,UsuariosSerializer,
                                 ServicoSerializer,ProdutoSerializer,LaboratorioSerializer,
                                 CaixaSerializer,FornecedorSerializer,TipoUnitarioSerializer,
-                                EstiloSerializer,TipoSerializer,PedidoSerializer)
+                                EstiloSerializer,TipoSerializer,PedidoSerializer,FolhaPagamentoSerializer,
+                                ComissaoSerializer,DescontoSerializer)
 from Core.models import CLIENTE,ORDEN,SERVICO,Produto,LABORATORIO,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
-from Autenticacao.models import USUARIO
+from Autenticacao.models import USUARIO,Comissao,Desconto
 from django.db.models import Sum,Count, F, ExpressionWrapper, DecimalField
 from Core.views import get_entrada_saida,vendas_ultimos_12_meses,dados_minhas_vendas
 from Core.utils import get_30_days,ultimo_dia_mes,get_10_days,get_today_data,dados_caixa,primeiro_dia_mes
@@ -385,3 +389,102 @@ class LaboratorioOsAPIView(APIView):
         except Exception as e:
             print(e)
             return Response({"error": "Erro ao mover OS para a Laboratorio."}, status=500)
+
+class FolhaPagamentoAPIView(APIView):
+   # permission_classes = [IsAuthenticated]
+
+    def get(self, request, usuario_id, referencia):
+        try:
+
+            partes = referencia.split('-')
+            if len(partes) != 2:
+                return Response({"error": "Formato de referência inválido. Use AAAA-MM."}, status=status.HTTP_400_BAD_REQUEST)
+
+            ano = int(partes[0])
+            mes = int(partes[1])
+            primeiro_dia = date(ano, mes, 1)
+            ultimo_dia = date(ano, mes, monthrange(ano, mes)[1])
+
+            colaborador = get_object_or_404(USUARIO, id=usuario_id)
+
+            comissoes = Comissao.objects.filter(
+                colaborador=colaborador,
+                data_referencia__range=(primeiro_dia, ultimo_dia)
+            )
+            if not comissoes.exists():
+                total_comissao = 0
+                total_horas = 0
+                proventos = []
+
+            descontos = Desconto.objects.filter(colaborador=colaborador)
+
+            # Detalhes de comissão e hora extra
+            comissoes_detalhadas = []
+            total_comissao = 0
+            total_horas_extras = 0
+            for c in comissoes:
+                valor_comissao = c.calcular_comissao()
+                valor_horas = c.calcula_horas_extras()
+                total_comissao += valor_comissao
+                total_horas_extras += valor_horas
+                comissoes_detalhadas.append({
+                    "valor_vendas": c.valor_vendas,
+                    "percentual": colaborador.comissao_percentual,
+                    "comissao_gerada": round(valor_comissao, 2),
+                    "horas_extras": c.horas_extras,
+                    "valor_hora": colaborador.valor_hora,
+                    "horas_extras_valor": round(valor_horas, 2)
+                })
+
+            # Detalhes dos descontos
+            descontos_data = []
+            total_descontos = 0
+            for d in descontos:
+                valor_desconto = colaborador.salario_bruto * (d.percentual / 100)
+                total_descontos += valor_desconto
+                descontos_data.append({
+                    "tipo": d.tipo,
+                    "percentual": f"{d.percentual}%",
+                    "valor": round(valor_desconto, 2)
+                })
+
+            # Descontos fixos
+            inss = round(colaborador.salario_bruto * 0.075, 2)
+            fgts = round(colaborador.salario_bruto * 0.08, 2)
+            irrf = 0  # Pode aplicar lógica futura
+            total_descontos += inss + fgts + irrf
+
+            folha = {
+                "id": colaborador.id,
+                "nome": colaborador.first_name,
+                "funcao": colaborador.FUNCAO,
+                "data_contratacao": colaborador.data_contratacao,
+                "salario_bruto": round(colaborador.salario_bruto, 2),
+                "descontos": descontos_data,
+                "desconto_inss": inss,
+                "desconto_fgts": fgts,
+                "desconto_irrf": irrf,
+                "total_descontos": round(total_descontos, 2),
+                "proventos": comissoes_detalhadas,
+                "total_comissao": round(total_comissao, 2),
+                "total_horas": round(total_horas_extras, 2),
+                "salario_liquido": round(
+                    colaborador.salario_bruto + total_comissao + total_horas_extras - total_descontos,
+                    2
+                )
+            }
+
+            return Response(folha, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ComissaoViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated]
+    queryset = Comissao.objects.all().order_by('-id')
+    serializer_class = ComissaoSerializer
+
+class DescontoViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated]
+    queryset = Desconto.objects.all().order_by('-id')
+    serializer_class = DescontoSerializer

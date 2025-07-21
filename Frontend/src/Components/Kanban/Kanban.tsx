@@ -178,7 +178,7 @@ const Kanban: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="sticky top-20 left-0 w-full z-10 bg-white dark:bg-gray-900">
           <h3 className="text-center text-lg md:text-2xl font-bold mb-4 md:mb-6 text-gray-900 dark:text-gray-100">
-            Kanban - Últimos 10 Dias
+            Kanban - Últimos 30 Dias
           </h3>
           {error && (
             <div className="bg-red-100 text-red-800 p-4 rounded-lg dark:bg-red-900 dark:text-red-100 mb-4">

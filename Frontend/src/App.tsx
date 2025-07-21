@@ -32,9 +32,10 @@ import { ThemeProvider } from "./ThemeContext/ThemeProvider";
 import MinhasVendas from "./Components/MinhasVendas/MinhasVendas";
 import FolhaPagamento from "./Components/FolhadePagamento/FolhaPagamento";
 import RealizaPagamento from "./Components/RealizarPagamento/RealizaPagamento";
-import ComissaoForm from "./Components/RealizarPagamento/ComissaoForm";
-import ComissaoDetail from "./Components/RealizarPagamento/ComissaoDetail";
-import ComissaoDelete from "./Components/RealizarPagamento/ComissaoDelete";
+import ComissaoList from "./Components/RealizarPagamento/ComissaoForm";
+import ComissaoCreateEdit from './Components/RealizarPagamento/ComissaoCreateEdit';
+import DescontoList from './Components/RealizarPagamento/DescontoList';
+import DescontoCreateEdit from './Components/RealizarPagamento/DescontoCreateEdit';
 import EditaPerfil from "./Components/Autenticacao/EditaPerfil";
 import { ToastProvider } from "./Components/ui/ToastContext";
 
@@ -105,7 +106,7 @@ const App: React.FC = () => {
               <Route path="/" element={<ProtectedRoute allowedRoles={["G","V","C"]}><Home  /></ProtectedRoute>} />
               <Route path="/unauthorized" element={<Unauthorized /> } />
               <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
-              <Route path='/editar-perfil' element={<ProtectedRoute allowedRoles={["G","V","C"]}><EditaPerfil /> </ProtectedRoute>} />
+              <Route path='/editar-perfil' element={<ProtectedRoute allowedRoles={["G","V","C"]} requiredPlan="premium"><EditaPerfil /> </ProtectedRoute>} />
               <Route path='/logoff' element={<ProtectedRoute allowedRoles={["G","V","C"]}><Logoff /> </ProtectedRoute>} />
               <Route path="/clientes" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <Clientes /> </ProtectedRoute>} />
               <Route path="/cliente" element={<ProtectedRoute allowedRoles={["G","V","C"]}> <ClienteEdicao /></ProtectedRoute>}></Route>
@@ -129,9 +130,13 @@ const App: React.FC = () => {
               <Route path="/minhas-vendas" element={<ProtectedRoute allowedRoles={["G","V","C"]} requiredPlan="premium"><MinhasVendas /> </ProtectedRoute> } />
               <Route path="/folha-pagamento" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><FolhaPagamento /> </ProtectedRoute> } />
               <Route path="/realizar-pagamento" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><RealizaPagamento /> </ProtectedRoute>} />
-              <Route path="/comissao/nova" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoForm /> </ProtectedRoute> } />
-              <Route path="/comissao/:id" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoDetail /> </ProtectedRoute>} />
-              <Route path="/comissao/:id/delete" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoDelete /> </ProtectedRoute> } />
+              <Route path="/comissao" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"><ComissaoList /> </ProtectedRoute> } />
+              <Route path="/comissao/create" element={  <ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <ComissaoCreateEdit /> </ProtectedRoute> } />
+              <Route path="/comissao/edit/:id" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <ComissaoCreateEdit /> </ProtectedRoute> } />
+              <Route path="/desconto" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <DescontoList /></ProtectedRoute> } />
+              <Route path="/desconto/create" element={ <ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <DescontoCreateEdit /> </ProtectedRoute>} />
+              <Route path="/desconto/edit/:id" element={<ProtectedRoute allowedRoles={["G"]} requiredPlan="premium"> <DescontoCreateEdit /> </ProtectedRoute> } />
+              
             </Routes>
           </main>
         </div>
