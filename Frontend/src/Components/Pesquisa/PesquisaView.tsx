@@ -530,7 +530,7 @@ async function handleSave() {
                 </select>
                         ): (   
                             <div>
-                            <label className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Parcelas</label>
+                            
                             <input
                                 name="QUANTIDADE_PARCELA"
                                 readOnly={!editMode}
