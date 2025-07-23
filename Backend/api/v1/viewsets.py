@@ -40,7 +40,7 @@ class ServicosViewSet(viewsets.ModelViewSet):
     serializer_class = ServicoSerializer
 
 class ProdutosViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = Produto.objects.all().order_by('-id')
     serializer_class = ProdutoSerializer
 
@@ -315,7 +315,7 @@ class LojaOsAPIView(APIView):
         except ORDEN.DoesNotExist:
             return Response({"error": "OS não encontrada."}, status=404)
         except Exception as e:
-            print(e)
+
             return Response({"error": "Erro ao mover OS para a loja."}, status=500)
 
 class EncerrarOsAPIView(APIView):
@@ -387,7 +387,7 @@ class LaboratorioOsAPIView(APIView):
             return Response({"error": "Erro ao mover OS para a Laboratorio."}, status=500)
 
 class FolhaPagamentoAPIView(APIView):
-   # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, usuario_id, referencia):
         try:
@@ -476,11 +476,11 @@ class FolhaPagamentoAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ComissaoViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Comissao.objects.all().order_by('-id')
     serializer_class = ComissaoSerializer
 
 class DescontoViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Desconto.objects.all().order_by('-id')
     serializer_class = DescontoSerializer

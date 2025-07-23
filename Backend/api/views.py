@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from datetime import date
 from calendar import monthrange
+from Core.models import Produto
+from django.db.models import Value
+from django.db.models.functions import Replace
 from Autenticacao.models import USUARIO, Comissao, Desconto
 from django.http import HttpResponse, FileResponse
 import io
@@ -10,6 +13,10 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import os
 from django.conf import settings
+import json
+from django.http import JsonResponse
+from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
 
 def generate_pdf(
     nome_empresa,
@@ -203,3 +210,39 @@ def baixar_pdf(request, colaborador_id, referencia):
             status=500,
             content_type="application/json"
         )
+
+
+def search_products_api(request):
+    search_term = request.GET.get('search_products', '').replace('-', '')
+
+    produtos = Produto.objects.annotate(
+        codigo_sem_hifen=Replace('codigo', Value('-'), Value(''))
+    ).filter(
+        codigo_sem_hifen__icontains=search_term,
+        quantidade__gt=0
+    ).values('id', 'nome', 'codigo', 'preco_venda', 'quantidade')  # Inclua apenas os campos que você precisa
+
+    return JsonResponse(list(produtos), safe=False)
+
+
+@csrf_exempt
+def realizar_saida_api(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            produto_id = data.get("produto_id")
+            quantidade = int(data.get("quantidade", 1))
+            motivo = data.get("motivo", "Saída por venda")
+
+            with transaction.atomic():
+                produto = Produto.objects.select_for_update().get(codigo=produto_id)
+                if produto.quantidade < quantidade:
+                    return JsonResponse({"error": "Estoque insuficiente"}, status=400)
+                produto.quantidade -= quantidade
+                produto.save()
+
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            print(e)
+            return JsonResponse({"error": str(e)}, status=500)
