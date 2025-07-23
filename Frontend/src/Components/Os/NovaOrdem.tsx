@@ -248,10 +248,10 @@ const VisualizarOSForm: React.FC = () => {
         if (response.data && Array.isArray(response.data.results) && response.data.results.length > 0) {
         const produto = response.data.results[0];
         setProdutos([produto]);
-        setOsData((prev) => ({ ...prev, ARMACAO: String(produto.id) }));
+        setOsData((prev: typeof VisualizarOSForm) => ({ ...prev, ARMACAO: String(produto.id) }));
       } else {
         setProdutos([]);
-        setOsData((prev) => ({ ...prev, ARMACAO: "" }));
+        setOsData((prev: typeof VisualizarOSForm) => ({ ...prev, ARMACAO: "" }));
 }
       }
     } catch (error) {
