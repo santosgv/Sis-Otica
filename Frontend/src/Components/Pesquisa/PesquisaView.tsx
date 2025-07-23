@@ -24,6 +24,8 @@ interface Laboratorio {
   LABORATORIO: string; 
 }
 
+
+
 interface VisualizarOS {
     id: number;
     solicitar_avaliacao?: boolean;
@@ -129,6 +131,7 @@ const OsView: React.FC<OsViewProps> = ({ unidade = "", VISUALIZAR_OS, messages =
 
 
 
+
 async function handleSave() {
   try {
 
@@ -157,7 +160,6 @@ async function handleSave() {
       ARM: osData.ARM,
       MONTAGEM: osData.MONTAGEM,
       LENTES: osData.LENTES,
-      ARMACAO: osData.ARMACAO,
       OBSERVACAO: osData.OBSERVACAO,
       FORMA_PAG: osData.FORMA_PAG,
       VALOR: parseCurrency(osData.VALOR),
@@ -425,6 +427,7 @@ async function handleSave() {
                     {editMode ? (
                         <input
                         name="ARMACAO"
+                        readOnly
                         className="w-full bg-white dark:bg-gray-900 rounded-lg px-3 py-2 text-blue-900 dark:text-white border border-blue-300 dark:border-gray-600 focus:outline-none"
                         value={osData.ARMACAO}
                         onChange={handleChange}
@@ -433,6 +436,7 @@ async function handleSave() {
                     ) : (
                         <div className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700">
                         {osData.ARMACAO}
+                    
                         </div>
                     )}
                     </div>
@@ -609,7 +613,7 @@ const PesquisaView: React.FC = () => {
         // Buscar dados da ordem
         const osResponse = await api.get(`/ordens/${id}/`);
         const os = osResponse.data;
-        console.log("Ordem:", os); // Depuração
+      //  console.log("Ordem:", os); // Depuração
 
         // Buscar dados relacionados
         const [clienteResponse, vendedorResponse, servicoResponse, laboratorioResponse] = await Promise.all([
@@ -625,12 +629,14 @@ const PesquisaView: React.FC = () => {
           api.get(`/laboratorios/${os.LABORATORIO}/`).catch(() => ({
             data: { id: os.LABORATORIO, NOME: "Laboratório não encontrado" },
           })),
+         
         ]);
 
-        console.log("Cliente:", clienteResponse.data); // Depuração
-        console.log("Laboratório:", laboratorioResponse.data); // Depuração
-        console.log("Vendedor:", vendedorResponse.data); // Depuração
-        console.log("Serviço:", servicoResponse.data); // Depuração
+     //   console.log("Cliente:", clienteResponse.data); // Depuração
+     //   console.log("Laboratório:", laboratorioResponse.data); // Depuração
+     //   console.log("Vendedor:", vendedorResponse.data); // Depuração
+     //   console.log("Serviço:", servicoResponse.data); // Depuração
+        
 
         // Mapear os dados para o formato esperado por VisualizarOS
         const mappedOs: VisualizarOS = {
@@ -645,8 +651,9 @@ const PesquisaView: React.FC = () => {
             id: clienteResponse.data.id,
             NOME: clienteResponse.data.NOME || "Desconhecido",
           },
+          ARMACAO:os.ARMACAO,
           SERVICO: servicoResponse.data.SERVICO || "Desconhecido",
-          LABORATORIO: laboratorioResponse.data.LABORATORIO || "Desconhecido", // Ajuste conforme o campo retornado
+          LABORATORIO: laboratorioResponse.data.LABORATORIO || "Desconhecido",
           OD_ESF: os.OD_ESF || "",
           OD_CIL: os.OD_CIL || "",
           OD_EIXO: os.OD_EIXO || "",
@@ -664,7 +671,6 @@ const PesquisaView: React.FC = () => {
           ARM: os.ARM || "",
           MONTAGEM: os.MONTAGEM || "",
           LENTES: os.LENTES || "",
-          ARMACAO: os.ARMACAO || "",
           OBSERVACAO: os.OBSERVACAO || "",
           FORMA_PAG: os.FORMA_PAG || "",
           VALOR: os.VALOR || "",

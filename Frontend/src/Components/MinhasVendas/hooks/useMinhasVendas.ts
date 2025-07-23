@@ -79,7 +79,7 @@ export function useMinhasVendas(dataInicio: string, dataFim: string) {
           return;
         }
 
-        console.log("Chamando /minhas_vendas_mes_atual com:", { data_inicio: dataInicio, data_fim: dataFim });
+       // console.log("Chamando /minhas_vendas_mes_atual com:", { data_inicio: dataInicio, data_fim: dataFim });
         const res = await api.get("/minhas_vendas_mes_atual", {
           params: {
             data_inicio: dataInicio,
@@ -87,7 +87,7 @@ export function useMinhasVendas(dataInicio: string, dataFim: string) {
             withCredentials: true
           },
         });
-        console.log("Resposta /minhas_vendas_mes_atual:", res.data);
+       // console.log("Resposta /minhas_vendas_mes_atual:", res.data);
         setVendasResumo(res.data.minhas_vendas_mes || []);
       } catch (e) {
         console.error("Erro ao carregar resumo:", e);
@@ -118,7 +118,7 @@ export function useMinhasVendas(dataInicio: string, dataFim: string) {
           return;
         }
 
-        console.log("Chamando /pedidos_vendedor com:", { data_inicio: dataInicio, data_fim: dataFim });
+      //  console.log("Chamando /pedidos_vendedor com:", { data_inicio: dataInicio, data_fim: dataFim });
         const response = await api.get("/pedidos_vendedor", {
           params: {
             data_inicio: dataInicio,
@@ -126,7 +126,7 @@ export function useMinhasVendas(dataInicio: string, dataFim: string) {
             withCredentials: true
           },
         });
-        console.log("Resposta /pedidos_vendedor:", response.data);
+       // console.log("Resposta /pedidos_vendedor:", response.data);
         // Mapear o campo SERVICO para o nome do serviço
         const pedidosComNomeServico = response.data.pedidos.map((pedido: any) => ({
           ...pedido,

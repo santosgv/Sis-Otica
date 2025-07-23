@@ -11,7 +11,7 @@ from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maior
                         receber,fechar_caixa
 )
 
-from api.views import baixar_pdf
+from api.views import baixar_pdf,search_products_api,realizar_saida_api
 
 from rest_framework_simplejwt.views import (
   #  TokenObtainPairView,
@@ -45,6 +45,10 @@ urlpatterns = [
 
     # folha pagamento
     path('folha/<int:usuario_id>/<str:referencia>/', FolhaPagamentoAPIView.as_view(), name='folha_pagamento'),
+
+    # htmx
+    path('search_products/', search_products_api, name='search_products_api'),
+    path('realizar_saida_api/', realizar_saida_api, name='realizar_saida_api'),
 
 
     # botoes

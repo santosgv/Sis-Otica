@@ -26,11 +26,15 @@ interface Servico {
 interface Produto {
   id: number;
   nome: string;
+  codigo:string;
+  preco_venda: string;
+  quantidade: number;
 }
 
 interface Errors {
   [key: string]: string;
 }
+
 
 const VisualizarOSForm: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +50,7 @@ const VisualizarOSForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchArmacao, setSearchArmacao] = useState("");
   const [anexoFile, setAnexoFile] = useState<File | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Format number to 000.000.000.000.000,00
   const formatCurrency = (value: string): string => {
@@ -65,6 +70,8 @@ const VisualizarOSForm: React.FC = () => {
     const cleanValue = value.replace(/\./g, "").replace(",", ".");
     return cleanValue;
   };
+
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -94,26 +101,8 @@ const VisualizarOSForm: React.FC = () => {
     fetchData();
   }, [clienteId]);
 
-  useEffect(() => {
-    async function fetchProdutos() {
-      if (!searchArmacao) {
-        setProdutos([]);
-        return;
-      }
-      try {
-        const response = await api.get("/search_products", {
-          params: { q: searchArmacao },
-        });
-        setProdutos(response.data.results || []);
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
-        setErrors({ general: "Erro ao buscar produtos para Armação." });
-      }
-    }
 
-    const timeout = setTimeout(fetchProdutos, 500);
-    return () => clearTimeout(timeout);
-  }, [searchArmacao]);
+
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target;
@@ -227,7 +216,10 @@ const VisualizarOSForm: React.FC = () => {
       const response = await api.post("/ordens/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("API response:", response.data);
+
+      if (osData.ARMACAO) {
+        await realizarSaidaEstoque(osData.ARMACAO);
+      }
   
       navigate(`/os?id=${response.data.id}`);
     } catch (err: any) {
@@ -239,6 +231,56 @@ const VisualizarOSForm: React.FC = () => {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+  const fetchProdutos = async () => {
+    try {
+      if (searchTerm.trim() === "") {
+        // Buscar todos os produtos
+        const response = await api.get("/produtos/");
+        setProdutos(Array.isArray(response.data.results) ? response.data.results : response.data);
+      } else {
+        // Buscar pelo código exato removendo os hífens
+        const response = await api.get("/search_products/", {
+          params: { search_products: searchTerm.replace(/-/g, "") },
+        });
+
+        if (response.data && Array.isArray(response.data.results) && response.data.results.length > 0) {
+        const produto = response.data.results[0];
+        setProdutos([produto]);
+        setOsData((prev) => ({ ...prev, ARMACAO: String(produto.id) }));
+      } else {
+        setProdutos([]);
+        setOsData((prev) => ({ ...prev, ARMACAO: "" }));
+}
+      }
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    }
+  };
+
+  const debounce = setTimeout(fetchProdutos, 500); // debounce de 0.5s
+  return () => clearTimeout(debounce);
+}, [searchTerm]);
+
+
+
+    const realizarSaidaEstoque = async (produtoId: number) => {
+      try {
+        const response = await api.post('/realizar_saida_api/', {
+          produto_id: produtoId,
+          quantidade: 1,
+          motivo: 'Venda por OS',
+        });
+
+
+      } catch (error: any) {
+        const message =
+          error.response?.data?.error || 'Erro ao realizar saída de estoque';
+        console.error('Erro ao dar baixa no estoque:', message);
+        alert(message);
+      }
+    };
 
   if (loading) {
     return (
@@ -257,6 +299,7 @@ const VisualizarOSForm: React.FC = () => {
       </div>
     );
   }
+
 
   return (
     <section className="min-h-[calc(100vh-80px)] flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300 py-6 px-4 sm:px-6 lg:px-8">
@@ -544,12 +587,11 @@ const VisualizarOSForm: React.FC = () => {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    value={searchArmacao}
-                    onChange={(e) => setSearchArmacao(e.target.value)}
-                    placeholder="Pesquisar armação..."
-                    className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    onBlur={() => !osData.ARMACAO && setSearchArmacao("")}
-                  />
+                    placeholder="Buscar produto..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border p-2 rounded"
+                />
                   <svg
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
                     fill="none"
@@ -564,21 +606,22 @@ const VisualizarOSForm: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <select
-                  name="ARMACAO"
-                  value={osData.ARMACAO || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                >
-                  <option value="" disabled>
-                    Selecione uma armação
-                  </option>
-                  {produtos.map((produto) => (
-                    <option key={produto.id} value={produto.id}>
-                      {produto.nome}
-                    </option>
-                  ))}
-                </select>
+              <select
+                name="ARMACAO"
+                key={osData.ARMACAO}
+                value={osData.ARMACAO ?? ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              >
+                <option value="" disabled>
+                  Selecione uma armação
+                </option>
+                {produtos.map((produto) => (
+                  <option key={produto.id} value={String(produto.codigo)}>
+                  {produto.codigo} - {produto.nome} ({produto.quantidade} un.) - R$ {produto.preco_venda}
+                </option>
+                ))}
+              </select>
               </div>
               {errors.ARMACAO && <p className="text-red-500 text-sm mt-1">{errors.ARMACAO}</p>}
             </div>

@@ -155,7 +155,7 @@ const MinhasVendas: React.FC = () => {
                           <td className="px-4 py-2">
                             {formatDateToDisplay(pedido.DATA_SOLICITACAO)}
                           </td>
-                          <td className="px-4 py-2">{pedido.OBSERVACAO || "N/A"}</td>
+                          <td className="px-4 py-2">{pedido.OBSERVACAO || ""}</td>
                           <td className="px-4 py-2">
 
                         <Link
