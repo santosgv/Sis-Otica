@@ -74,7 +74,7 @@ function renderiza_vendedor(url) {
       const tkmedio = vendedor['ticket_medio'];
       // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
       const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas},00 em Vendas Ticket medio em ${tkmedio},00`;
+      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas} em Vendas Ticket medio em ${tkmedio}`;
 
       // Adicione o elemento à div de vendedores
       vendedorContainer.appendChild(vendedorElement);
@@ -147,7 +147,7 @@ function obter_os_em_aberto(url) {
     const totalValorContainer = document.getElementById('total_valor');
 
     totalVendasContainer.textContent = `Total de Vendas: ${totalVendas}`;
-    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor},00`;
+    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor}`;
   });
 }
 
