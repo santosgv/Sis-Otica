@@ -766,17 +766,6 @@ def maiores_vendedores_30_dias(request):
 
     return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
 
-    # Formata os valores com 2 casas decimais
-    vendedores = []
-    for v in vendedores_queryset:
-        vendedores.append({
-            'VENDEDOR__first_name': v['VENDEDOR__first_name'],
-            'total_pedidos': v['total_pedidos'],
-            'total_valor_vendas': formatar_decimal(v['total_valor_vendas']),
-            'ticket_medio': formatar_decimal(v['ticket_medio']),
-        })
-
-    return JsonResponse({'maiores_vendedores_30_dias': vendedores})
 
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
