@@ -746,7 +746,7 @@ def maiores_vendedores_30_dias(request):
         .order_by('-total_pedidos')[:5]
 
     vendedores_formatados = []
-    for vendedor in vendedores:
+    for vendedor in vendedores_queryset:
         vendedor_formatado = {
             'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
             'total_pedidos': vendedor['total_pedidos'],
@@ -789,18 +789,12 @@ def maiores_vendedores_meses(request):
     )) \
         .order_by('-total_pedidos')
 
-    vendedores_formatados = []
-    for vendedor in vendedores:
-        vendedor_formatado = {
-            'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
-            'total_pedidos': vendedor['total_pedidos'],
-            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas'])),
-            'ticket_medio': format(Decimal(vendedor['ticket_medio']))
-        }
-        vendedores_formatados.append(vendedor_formatado)
+    data_vendas = [{
+        'total_vendas': venda['total_vendas'],
+        'total_valor': venda['total_valor'],  # Inclua o valor total das vendas no resultado
+    } for venda in vendas]
 
-    return JsonResponse({'data':vendedores_formatados})
-
+    return JsonResponse({'data':data_vendas})
 
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
