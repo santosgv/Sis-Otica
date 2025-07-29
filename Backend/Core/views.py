@@ -740,8 +740,18 @@ def maiores_vendedores_30_dias(request):
         output_field=DecimalField(max_digits=10, decimal_places=2)
     )) \
         .order_by('-total_pedidos')[:5]
-  
-    return JsonResponse({'maiores_vendedores_30_dias': list(vendedores)})
+
+    vendedores_formatados = []
+    for vendedor in vendedores:
+        vendedor_formatado = {
+            'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
+            'total_pedidos': vendedor['total_pedidos'],
+            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas'])),
+            'ticket_medio': format(Decimal(vendedor['ticket_medio']))
+        }
+        vendedores_formatados.append(vendedor_formatado)
+
+    return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
 
 
 def maiores_vendedores_meses(request):
@@ -767,7 +777,7 @@ def maiores_vendedores_meses(request):
         }
         vendedores_formatados.append(vendedor_formatado)
 
-    return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
+    return JsonResponse({'data':vendedores_formatados})
 
 
 def transacoes_mensais(request):
@@ -932,7 +942,17 @@ def dados_minhas_vendas(request):
     )) \
     .order_by('-total_pedidos')[:1]
 
-    return JsonResponse({'minhas_vendas_mes': list(vendedor)})
+    vendedores_formatados = []
+    for _ in vendedor:
+        vendedor_formatado = {
+            'VENDEDOR__first_name': _['VENDEDOR__first_name'],
+            'total_pedidos': _['total_pedidos'],
+            'total_valor_vendas': format(Decimal(_['total_valor_vendas'])),
+            'ticket_medio': format(Decimal(_['ticket_medio']))
+        }
+        vendedores_formatados.append(vendedor_formatado)
+
+    return JsonResponse({'minhas_vendas_mes':vendedores_formatados})
 
 
 def dados_clientes(request):
