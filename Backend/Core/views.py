@@ -28,6 +28,12 @@ from .forms import ReviewForm,FornecedorForm, TipoUnitarioForm, EstiloForm,TipoF
 
 logger = logging.getLogger('MyApp')
 
+def formatar_decimal(valor):
+    if valor is None:
+        return None
+    valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
+
 
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
@@ -750,8 +756,8 @@ def maiores_vendedores_30_dias(request):
         vendedor_formatado = {
             'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
             'total_pedidos': vendedor['total_pedidos'],
-            'total_valor_vendas': format(Decimal(vendedor['total_valor_vendas'])),
-            'ticket_medio': format(Decimal(vendedor['ticket_medio']))
+            'total_valor_vendas': formatar_decimal(vendedor['total_valor_vendas']),
+            'ticket_medio': formatar_decimal(vendedor['ticket_medio'])
         }
         vendedores_formatados.append(vendedor_formatado)
 
@@ -768,13 +774,6 @@ def maiores_vendedores_30_dias(request):
         })
 
     return JsonResponse({'maiores_vendedores_30_dias': vendedores})
-
-
-def formatar_decimal(valor):
-    if valor is None:
-        return None
-    valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-    return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
 
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
@@ -963,8 +962,8 @@ def dados_minhas_vendas(request):
         vendedor_formatado = {
             'VENDEDOR__first_name': _['VENDEDOR__first_name'],
             'total_pedidos': _['total_pedidos'],
-            'total_valor_vendas': format(Decimal(_['total_valor_vendas'])),
-            'ticket_medio': format(Decimal(_['ticket_medio']))
+            'total_valor_vendas': formatar_decimal(_['total_valor_vendas']),
+            'ticket_medio': formatar_decimal(_['ticket_medio'])
         }
         vendedores_formatados.append(vendedor_formatado)
 
