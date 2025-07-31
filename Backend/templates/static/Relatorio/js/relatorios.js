@@ -61,22 +61,44 @@ function renderiza_total_vendas_12_meses(url){
 function renderiza_vendedor(url) {
   fetch(url, {
     method: 'get',
-  }).then(function(result) {
-    return result.json()
-  }).then(function(data) {
+  })
+  .then(function(result) {
+    return result.json();
+  })
+  .then(function(data) {
     const vendedores = data.maiores_vendedores_30_dias;
-    const vendedorContainer = document.getElementById('vendedor');
+    const totalVendasPeriodo = data.total_vendas_periodo;
+    const ticketMedioTotal = data.ticket_medio_total;
 
+    const vendedorContainer = document.getElementById('vendedor');
+    vendedorContainer.innerHTML = ''; // limpa o container antes de renderizar
+
+    // Cria um elemento para mostrar o resumo geral
+    const resumoElement = document.createElement('div');
+    resumoElement.innerHTML = `
+      <h3>Resumo do Período</h3>
+      <p><strong>Total de Vendas:</strong> R$ ${totalVendasPeriodo}</p>
+      <p><strong>Ticket Médio Geral:</strong> R$ ${ticketMedioTotal}</p>
+      <hr>
+    `;
+    vendedorContainer.appendChild(resumoElement);
+
+    // Itera pelos vendedores e adiciona ao DOM
     vendedores.forEach(function(vendedor) {
       const vendedorNome = vendedor['VENDEDOR__first_name'];
       const totalPedidos = vendedor['total_pedidos'];
       const totalvendas = vendedor['total_valor_vendas'];
       const tkmedio = vendedor['ticket_medio'];
-      // Crie elementos HTML para exibir o nome do vendedor e o total de pedidos
-      const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalvendas} em Vendas Ticket medio em ${tkmedio}`;
 
-      // Adicione o elemento à div de vendedores
+      const vendedorElement = document.createElement('div');
+      vendedorElement.innerHTML = `
+        <p>
+          <strong>${vendedorNome}</strong>: ${totalPedidos} pedidos |
+          R$ ${totalvendas} em vendas |
+          Ticket médio: R$ ${tkmedio}
+        </p>
+      `;
+
       vendedorContainer.appendChild(vendedorElement);
     });
   });
