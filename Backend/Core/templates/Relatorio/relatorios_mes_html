@@ -72,6 +72,8 @@
                     const totalvendas = vendedor['total_valor_vendas'];
                     const tkmedio = vendedor['ticket_medio'];
 
+                    console.log(vendedor);
+
                     const vendedorElement = document.createElement('div');
                     vendedorElement.innerHTML = `<strong>${vendedorNome}</strong>: ${totalPedidos} Pedidos, R$ ${totalvendas},00 em Vendas, Ticket médio: R$ ${tkmedio},00`;
 

@@ -738,11 +738,25 @@ def vendas_ultimos_12_meses(request):
 
 
 def maiores_vendedores_30_dias(request):
-    vendedores_queryset = ORDEN.objects.filter(
+    # Base do queryset filtrando os pedidos válidos no período
+    queryset_base = ORDEN.objects.filter(
         DATA_SOLICITACAO__gte=primeiro_dia_mes(),
         DATA_SOLICITACAO__lte=ultimo_dia_mes()
-    ).exclude(STATUS='C') \
-        .values('VENDEDOR__first_name') \
+    ).exclude(STATUS='C')
+
+    # Cálculo de totais globais
+    totais = queryset_base.aggregate(
+        total_vendas=Sum('VALOR'),
+        total_pedidos=Count('id')
+    )
+
+    ticket_medio_geral = (
+        totais['total_vendas'] / totais['total_pedidos']
+        if totais['total_pedidos'] else 0
+    )
+
+    # Maiores vendedores com total e ticket médio
+    vendedores_queryset = queryset_base.values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .annotate(ticket_medio=ExpressionWrapper(
@@ -751,6 +765,7 @@ def maiores_vendedores_30_dias(request):
         )) \
         .order_by('-total_pedidos')[:5]
 
+    # Formatação para o JSON
     vendedores_formatados = []
     for vendedor in vendedores_queryset:
         vendedor_formatado = {
@@ -761,29 +776,60 @@ def maiores_vendedores_30_dias(request):
         }
         vendedores_formatados.append(vendedor_formatado)
 
-    return JsonResponse({'maiores_vendedores_30_dias':vendedores_formatados})
+    return JsonResponse({
+        'maiores_vendedores_30_dias': vendedores_formatados,
+        'total_vendas_periodo': formatar_decimal(totais['total_vendas']),
+        'ticket_medio_total': formatar_decimal(ticket_medio_geral)
+    })
 
 
 
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-    vendedores = ORDEN.objects.filter(DATA_SOLICITACAO__gte=data_inicio,DATA_SOLICITACAO__lte=data_fim).exclude(STATUS='C') \
-        .values('VENDEDOR__first_name') \
+    # Base do queryset filtrando os pedidos válidos no período
+    queryset_base = ORDEN.objects.filter(
+        DATA_SOLICITACAO__gte=data_inicio,
+        DATA_SOLICITACAO__lte=data_fim
+    ).exclude(STATUS='C')
+
+    # Cálculo de totais globais
+    totais = queryset_base.aggregate(
+        total_vendas=Sum('VALOR'),
+        total_pedidos=Count('id')
+    )
+
+    ticket_medio_geral = (
+        totais['total_vendas'] / totais['total_pedidos']
+        if totais['total_pedidos'] else 0
+    )
+
+    # Maiores vendedores com total e ticket médio
+    vendedores_queryset = queryset_base.values('VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .annotate(ticket_medio=ExpressionWrapper(
-        F('total_valor_vendas') / F('total_pedidos'),
-        output_field=DecimalField(max_digits=10, decimal_places=2)
-    )) \
-        .order_by('-total_pedidos')
+            F('total_valor_vendas') / F('total_pedidos'),
+            output_field=DecimalField(max_digits=10, decimal_places=2)
+        )) \
+        .order_by('-total_pedidos')[:5]
 
-    data_vendas = [{
-        'total_vendas': venda['total_vendas'],
-        'total_valor': venda['total_valor'],  # Inclua o valor total das vendas no resultado
-    } for venda in vendas]
+    # Formatação para o JSON
+    vendedores_formatados = []
+    for vendedor in vendedores_queryset:
+        vendedor_formatado = {
+            'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
+            'total_pedidos': vendedor['total_pedidos'],
+            'total_valor_vendas': formatar_decimal(vendedor['total_valor_vendas']),
+            'ticket_medio': formatar_decimal(vendedor['ticket_medio'])
+        }
+        vendedores_formatados.append(vendedor_formatado)
 
-    return JsonResponse({'data':data_vendas})
+    return JsonResponse({
+        'maiores_vendedores_30_dias': vendedores_formatados,
+        'total_vendas_periodo': formatar_decimal(totais['total_vendas']),
+        'ticket_medio_total': formatar_decimal(ticket_medio_geral)
+    })
 
 def transacoes_mensais(request):
     # Realiza uma agregação dos valores das transações por mês e tipo
