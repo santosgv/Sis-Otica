@@ -389,119 +389,97 @@ const VisualizarOSForm: React.FC = () => {
             </div>
           </div>
 
+                  <hr />
           {/* Receita */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Receita</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
-              <div className="sm:col-start-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OD ESF</label>
-                <input
-                  type="text"
-                  name="OD_ESF"
-                  maxLength={6}
-                  value={osData.OD_ESF || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="ESF"
-                />
-                {errors.OD_ESF && <p className="text-red-500 text-sm mt-1">{errors.OD_ESF}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OD CIL</label>
-                <input
-                  type="text"
-                  name="OD_CIL"
-                  maxLength={6}
-                  value={osData.OD_CIL || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="CIL"
-                />
-                {errors.OD_CIL && <p className="text-red-500 text-sm mt-1">{errors.OD_CIL}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OD EIXO</label>
-                <input
-                  type="text"
-                  name="OD_EIXO"
-                  maxLength={6}
-                  value={osData.OD_EIXO || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="EIXO"
-                  required={!!osData.OD_CIL}
-                />
-                {errors.OD_EIXO && <p className="text-red-500 text-sm mt-1">{errors.OD_EIXO}</p>}
-              </div>
-              <div className="sm:col-start-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OE ESF</label>
-                <input
-                  type="text"
-                  name="OE_ESF"
-                  maxLength={6}
-                  value={osData.OE_ESF || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="ESF"
-                />
-                {errors.OE_ESF && <p className="text-red-500 text-sm mt-1">{errors.OE_ESF}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OE CIL</label>
-                <input
-                  type="text"
-                  name="OE_CIL"
-                  maxLength={6}
-                  value={osData.OE_CIL || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="CIL"
-                />
-                {errors.OE_CIL && <p className="text-red-500 text-sm mt-1">{errors.OE_CIL}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OE EIXO</label>
-                <input
-                  type="text"
-                  name="OE_EIXO"
-                  maxLength={6}
-                  value={osData.OE_EIXO || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="EIXO"
-                  required={!!osData.OE_CIL}
-                />
-                {errors.OE_EIXO && <p className="text-red-500 text-sm mt-1">{errors.OE_EIXO}</p>}
-              </div>
-              <div className="sm:col-start-2 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">AD</label>
-                <input
-                  type="text"
-                  name="AD"
-                  maxLength={6}
-                  value={osData.AD || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="AD"
-                />
-                {errors.AD && <p className="text-red-500 text-sm mt-1">{errors.AD}</p>}
-              </div>
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Anexo</label>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">Receita</h3>
+            <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-4 items-center">
+              {/* Linha OD */}
+              <div className="justify-self-end font-medium text-gray-700 dark:text-gray-200">OD</div>
+              <input
+                type="text"
+                name="OD_ESF"
+                maxLength={6}
+                value={osData.OD_ESF || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="ESF"
+              />
+              <input
+                type="text"
+                name="OD_CIL"
+                maxLength={6}
+                value={osData.OD_CIL || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="CIL"
+              />
+              <input
+                type="text"
+                name="OD_EIXO"
+                maxLength={6}
+                value={osData.OD_EIXO || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="EIXO"
+              />
+
+              {/* Linha OE */}
+              <div className="justify-self-end font-medium text-gray-700 dark:text-gray-200">OE</div>
+              <input
+                type="text"
+                name="OE_ESF"
+                maxLength={6}
+                value={osData.OE_ESF || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="ESF"
+              />
+              <input
+                type="text"
+                name="OE_CIL"
+                maxLength={6}
+                value={osData.OE_CIL || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="CIL"
+              />
+              <input
+                type="text"
+                name="OE_EIXO"
+                maxLength={6}
+                value={osData.OE_EIXO || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="EIXO"
+              />
+
+              {/* Linha AD */}
+              <div className="justify-self-end font-medium text-gray-700 dark:text-gray-200">AD</div>
+              <input
+                type="text"
+                name="AD"
+                maxLength={6}
+                value={osData.AD || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border"
+                placeholder="AD"
+              />
+              <div className="col-span-2">
                 <input
                   type="file"
                   name="ANEXO"
                   onChange={handleFileChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-4 py-2 rounded-lg border"
                 />
-                {errors.ANEXO && <p className="text-red-500 text-sm mt-1">{errors.ANEXO}</p>}
               </div>
             </div>
           </div>
 
+                  <hr />
           {/* Laboratório */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Laboratório</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">Laboratório</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
               <div className="sm:col-span-2 lg:col-span-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
@@ -562,7 +540,7 @@ const VisualizarOSForm: React.FC = () => {
 
           {/* Lentes */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Lentes</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">Lentes</h3>
             <div className="grid grid-cols-1">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Lentes</label>
@@ -647,10 +625,10 @@ const VisualizarOSForm: React.FC = () => {
               </div>
             </div>
           </div>
-
+                <hr />
           {/* Financeiro */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Financeiro</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">Financeiro</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">

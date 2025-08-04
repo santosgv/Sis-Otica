@@ -192,7 +192,7 @@ async function handleSave() {
 }
 
     return (
-        <section className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 flex flex-col items-center py-10 px-2 sm:px-4 md:px-8">
+        <section className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 flex flex-col justify-center items-center py-10 px-2 sm:px-4 md:px-8">
             <div className="w-full px-2 md:px-10">
                 {/* Botão Voltar */}
                 <div className="mb-4 flex justify-start">
@@ -271,43 +271,12 @@ async function handleSave() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full">
                         {/* Data Pedido */}
                         <div>
-                            <label className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Data Pedido</label>
-                           
-                                <div className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700">
-                                    {formatLocalDate(osData.DATA_SOLICITACAO)}
-                                </div>
-                            
+                        <label className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Data Pedido</label>
+                        <div className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700">
+                            {formatLocalDate(osData.DATA_SOLICITACAO)}
                         </div>
-                        {/* Previsão Entrega */}
-                        <div>
-                            <label className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Previsão Entrega</label>
-                            {editMode ? (
-                                <input
-                                type="date"
-                                name="PREVISAO_ENTREGA"
-                                value={osData.PREVISAO_ENTREGA?.slice(0, 10) || ""}
-                                onChange={handleChange}
-                                min={new Date().toISOString().split("T")[0]}
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                required
-                                />
-                            ) : (
-                                <div className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700">
-                                   {formatLocalDate(osData.PREVISAO_ENTREGA)}
-                                </div>
-                            )}
                         </div>
-                        {/* Vendedor */}
-                        <div>
-                            <label htmlFor="vendedor-input" className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Vendedor</label>
-                            <input
-                                id="vendedor-input"
-                                name="VENDEDOR"
-                                readOnly
-                                className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700 focus:outline-none"
-                                value={osData.VENDEDOR.first_name}
-                            />
-                        </div>
+
                         {/* Cliente */}
                         <div>
                             <label htmlFor="cliente-input" className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Cliente</label>
@@ -325,6 +294,27 @@ async function handleSave() {
                                 />
                             </Link>
                         </div>
+                        {/* Previsão Entrega */}
+                        <div>
+                            <label className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Previsão Entrega</label>
+                             
+                                <div className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700">
+                                   {formatLocalDate(osData.PREVISAO_ENTREGA)}
+                                </div>
+                            
+                        </div>
+                        {/* Vendedor */}
+                        <div>
+                            <label htmlFor="vendedor-input" className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Vendedor</label>
+                            <input
+                                id="vendedor-input"
+                                name="VENDEDOR"
+                                readOnly
+                                className="w-full bg-blue-50 dark:bg-gray-800 rounded-lg px-3 py-2 text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-gray-700 focus:outline-none"
+                                value={osData.VENDEDOR.first_name}
+                            />
+                        </div>
+                        
                         {/* Tipo de Serviço */}
                         <div>
                             <label htmlFor="servico-input" className="block text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Tipo de Serviço</label>
@@ -386,6 +376,8 @@ async function handleSave() {
                             )}
                         </div>
                         ))}
+
+                        
 
                         {/* Montagem */}
                         <div>
