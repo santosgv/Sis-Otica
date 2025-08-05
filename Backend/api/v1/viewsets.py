@@ -1,8 +1,7 @@
 from rest_framework import viewsets
 from calendar import monthrange
-from datetime import datetime, date
+from datetime import date
 from rest_framework.permissions import IsAuthenticated
-import calendar
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -15,9 +14,11 @@ from api.v1.serializers import (ClientesSerializer,OrdensSerializer,UsuariosSeri
 from Core.models import CLIENTE,ORDEN,SERVICO,Produto,LABORATORIO,CAIXA,Fornecedor,TipoUnitario,Estilo,Tipo
 from Autenticacao.models import USUARIO,Comissao,Desconto
 from django.db.models import Sum,Count, F, ExpressionWrapper, DecimalField
-from Core.views import get_entrada_saida,vendas_ultimos_12_meses,dados_minhas_vendas
-from Core.utils import get_30_days,ultimo_dia_mes,get_10_days,get_today_data,dados_caixa,primeiro_dia_mes
+from Core.utils import get_30_days,ultimo_dia_mes,get_today_data,primeiro_dia_mes
 from django.utils.dateparse import parse_date
+
+
+
 
 class UsuariosViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
