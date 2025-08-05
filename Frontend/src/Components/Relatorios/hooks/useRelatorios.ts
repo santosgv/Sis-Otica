@@ -74,6 +74,7 @@ export function useRelatorios() {
           total_valor: parseFloat(osData.total_valor) || 0,
         });
 
+
         const receberRes = await api.get("/total_vendido_hoje");
         setReceberHoje(parseFloat(receberRes.data.total_vendido_hoje) || 0);
 

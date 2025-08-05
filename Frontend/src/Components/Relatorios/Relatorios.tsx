@@ -146,7 +146,7 @@ const navigate = useNavigate();
                         <div className="flex flex-col justify-center items-center py-3 md:py-4 gap-1 md:gap-2">
                             <h5 className="font-bold text-base md:text-lg mb-1 dark:text-white">Ordens De Serviço Em Aberto Mês</h5>
                             <div className="dark:text-blue-100 text-xs md:text-base">Total de Vendas: {osEmAberto.total_vendas}</div>
-                            <div className="dark:text-blue-100 text-xs md:text-base">Total de Valor: R$ {osEmAberto.total_valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
+                            <div className="dark:text-blue-100 text-xs md:text-base">Total de Valor: R$ {osEmAberto.total_valor}</div>
                         </div>
                     </div>
                 </div>
