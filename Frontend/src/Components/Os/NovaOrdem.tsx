@@ -565,7 +565,6 @@ const VisualizarOSForm: React.FC = () => {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Buscar produto..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border p-2 rounded"

@@ -8,6 +8,32 @@ body {
   font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
+.aniversariantes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-aniversariante {
+  position: relative;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 250px;
+  background: #d90909;
+}
+
+.card-aniversariante button:first-of-type {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+
 /*
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

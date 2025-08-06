@@ -5,8 +5,10 @@ from datetime import date
 from calendar import monthrange
 from Core.models import Produto
 from django.db.models import Value
-from django.db.models.functions import Replace
+from django.db.models.functions import Replace,ExtractMonth, ExtractDay
 from Autenticacao.models import USUARIO, Comissao, Desconto
+from Core.models import CLIENTE
+from Core.utils import criar_mensagem_parabens
 from django.http import HttpResponse, FileResponse
 import io
 from reportlab.pdfgen import canvas
@@ -17,6 +19,10 @@ import json
 from django.http import JsonResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from django.core.cache import cache
+from rest_framework.response import Response
+from django.utils import timezone
 
 def generate_pdf(
     nome_empresa,
@@ -224,7 +230,6 @@ def search_products_api(request):
 
     return JsonResponse(list(produtos), safe=False)
 
-
 @csrf_exempt
 def realizar_saida_api(request):
     if request.method == "POST":
@@ -246,3 +251,33 @@ def realizar_saida_api(request):
         except Exception as e:
             print(e)
             return JsonResponse({"error": str(e)}, status=500)
+
+
+@api_view(['GET'])
+def aniversariantes_mes(request):
+    cached_aniversariantes = cache.get('all_aniversariantes_mes')
+    if cached_aniversariantes is None:
+        today = timezone.now()
+        current_month = today.month
+
+        aniversariantes = CLIENTE.objects.annotate(
+            birth_month=ExtractMonth('DATA_NASCIMENTO'),
+            birth_day=ExtractDay('DATA_NASCIMENTO')
+        ).filter(
+            birth_month=current_month
+        ).only('id', 'NOME', 'TELEFONE', 'DATA_NASCIMENTO', 'EMAIL').order_by('birth_day')
+
+        cached_aniversariantes = [
+            {
+                'id': cliente.id,
+                'nome': cliente.NOME,
+                'telefone': cliente.TELEFONE.replace("(", "").replace(")", "").replace("-", ""),
+                'data_nascimento': cliente.DATA_NASCIMENTO.strftime('%Y-%m-%d'),
+                'email': cliente.EMAIL,
+                'mensagem': criar_mensagem_parabens(cliente.NOME),
+            }
+            for cliente in aniversariantes
+        ]
+        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=129600)
+
+    return Response(cached_aniversariantes)
