@@ -275,7 +275,7 @@ def aniversariantes_mes(request):
                 'telefone': cliente.TELEFONE.replace("(", "").replace(")", "").replace("-", ""),
                 'data_nascimento': cliente.DATA_NASCIMENTO.strftime('%Y-%m-%d'),
                 'email': cliente.EMAIL,
-                'mensagem': criar_mensagem_parabens(cliente.NOME),
+                'mensagem': criar_mensagem_parabens("teste"),
             }
             for cliente in aniversariantes
         ]
