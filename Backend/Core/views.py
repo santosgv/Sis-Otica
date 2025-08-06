@@ -786,7 +786,6 @@ def maiores_vendedores_30_dias(request):
     })
 
 
-
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
