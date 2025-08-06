@@ -1,5 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-
+import Cards from "./cards";
 
 
 const Home: React.FC= ({  }) => {
@@ -9,6 +9,7 @@ const Home: React.FC= ({  }) => {
     return (
         <>
         <div className="relative bg-white dark:bg-gray-900 py-8 px-4 flex flex-col items-center transition-colors duration-300">
+            <Cards />
             <h1>Home</h1>
         </div>
         </>

@@ -11,7 +11,7 @@ from Core.views import (vendas_ultimos_12_meses,maiores_vendedores_30_dias,maior
                         receber,fechar_caixa
 )
 
-from api.views import baixar_pdf,search_products_api,realizar_saida_api
+from api.views import baixar_pdf,search_products_api,realizar_saida_api,aniversariantes_mes
 
 from rest_framework_simplejwt.views import (
   #  TokenObtainPairView,
@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('', include(router.urls)),
     path('kanban/',KanbanAPIView.as_view(),name='kanban'),
+    path('aniversariantes_mes/', aniversariantes_mes, name='aniversariantes_mes'),
     path('cards/<int:card_id>/update-status/', UpdateCardStatusAPIView.as_view(), name='update-card-status'),
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

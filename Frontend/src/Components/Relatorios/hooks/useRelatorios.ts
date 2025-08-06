@@ -71,8 +71,9 @@ export function useRelatorios() {
         const osData = osRes.data.data?.[0] || { total_vendas: 0, total_valor: 0 };
         setOsEmAberto({
           total_vendas: osData.total_vendas || 0,
-          total_valor: parseFloat(osData.total_valor) || 0,
+          total_valor: parseFloat(osData.total_valor.replace(/\./g, "").replace(",", ".")) || 0,
         });
+
 
         const receberRes = await api.get("/total_vendido_hoje");
         setReceberHoje(parseFloat(receberRes.data.total_vendido_hoje) || 0);
@@ -84,15 +85,17 @@ export function useRelatorios() {
           vendedoresData.slice(0, 5).map((v: any) => ({
             nome: v.VENDEDOR__first_name,
             pedidos: v.total_pedidos,
-            vendas: parseFloat(v.total_valor_vendas) || 0,
-            ticket: parseFloat(v.ticket_medio) || 0,
+            vendas: parseFloat(v.total_valor_vendas.replace(/\./g, "").replace(",", ".")) || 0,
+            ticket: parseFloat(v.ticket_medio.replace(/\./g, "").replace(",", ".")) || 0,
           }))
         );
 
         setVendedoresChartData({
           labels: vendedoresData.slice(0, 5).map((v: any) => v.VENDEDOR__first_name),
           data: vendedoresData.slice(0, 5).map((v: any) => parseFloat(v.total_valor_vendas) || 0),
+          
         });
+        
       } catch (error) {
         console.error("Erro ao carregar dados dos cards:", error);
         setFuncionariosMes([]);
