@@ -254,6 +254,7 @@ def realizar_saida_api(request):
 
 
 @api_view(['GET'])
+@csrf_exempt
 def aniversariantes_mes(request):
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
