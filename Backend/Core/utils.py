@@ -3,7 +3,7 @@ from decouple import config
 import pandas as pd
 from django.conf import settings
 from django.db.models import Sum
-from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE
+from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE,ParcelaOrdem
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
@@ -25,6 +25,7 @@ import qrcode
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import black
 from pathlib import Path
+from decimal import Decimal
 
 logger = logging.getLogger('MyApp')
 
@@ -480,3 +481,23 @@ def entradas_meses_passados(request):
     )
     
     return render(request, 'parcial/meses_passados.html', {'entradas': entradas})
+
+def criar_parcelas(os):
+    ordem = ORDEN.objects.get(id=os)
+    if not ordem.QUANTIDADE_PARCELA or ordem.QUANTIDADE_PARCELA <= 1:
+        return
+
+    valor_total = ordem.VALOR
+    entrada = Decimal(ordem.ENTRADA or 0)
+    restante = valor_total - entrada
+
+    valor_parcela = (restante / ordem.QUANTIDADE_PARCELA).quantize(Decimal("0.01"))
+
+    for i in range(1, ordem.QUANTIDADE_PARCELA + 1):
+        data_vencimento = get_today_data() + timedelta(days=30 * i)
+        ParcelaOrdem.objects.create(
+            ordem=ordem,
+            numero=i,
+            valor=valor_parcela,
+            data_vencimento=data_vencimento
+        )

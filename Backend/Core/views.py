@@ -11,7 +11,9 @@ from django.core.paginator import Paginator
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days
+from .utils import (criar_mensagem_parabens,realizar_entrada,
+                    realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
+                    get_10_days,get_30_days,criar_parcelas)
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -282,6 +284,7 @@ def Cadastrar_os(request,id_cliente):
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
                 else:
                     ARMACAO =''
+
                 
                 cadastrar_os = ORDEN(
                 ANEXO= ANEXO,
@@ -317,6 +320,8 @@ def Cadastrar_os(request,id_cliente):
 
                 
                 cadastrar_os.save()
+                if int(QUANTIDADE_PARCELA) > 1:
+                    criar_parcelas(cadastrar_os.id)
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
                 return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
@@ -704,6 +709,14 @@ def cadastro_caixa(request):
                 FORMA=forma
             )
             caixa.save()
+
+            if tipo == 'E' and referencia_obj:
+                parcela = referencia_obj.parcelas.filter(pago=False).order_by('numero').first()
+                if parcela:
+                    parcela.pago = True
+                    parcela.data_pagamento = get_today_data()
+                    parcela.caixa = caixa
+                    parcela.save()
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
