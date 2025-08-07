@@ -335,6 +335,10 @@ def Cadastrar_os(request,id_cliente):
 
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
+
+    pendentes = ParcelaOrdem.objects.filter(pago=False)
+
+    return render(request, 'Os/ordens_pendentes.html',{'pendentes':pendentes})
     # Filtra ordens com parcelas criadas e status relevantes
     ordens_com_parcelas = ORDEN.objects.filter(
         STATUS__in=['A', 'L', 'J'],

@@ -10,28 +10,22 @@ Os Pendente de pagamento
 <table class="table"  border="1" cellpadding="8" cellspacing="0">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>OS</th>
             <th>Cliente</th>
-            <th>Data</th>
-            <th>Valor Total</th>
-            <th>Valor Pago</th>
-            <th>Restante</th>
-            <th>Status</th>
+            <th>Data Venciamento</th>
+            <th>Valor A ser Pago</th>
             <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-        {% for item in ordens_pendentes %}
+        {% for item in pendentes %}
         <tr>
             <td>{{ item.ordem.id }}</td>
             <td>{{ item.ordem.CLIENTE.NOME }}</td>
-            <td>{{ item.ordem.DATA_SOLICITACAO }}</td>
-            <td>R$ {{ item.valor_total|floatformat:2 }}</td>
-            <td>R$ {{ item.valor_pago|floatformat:2 }}</td>
-            <td>R$ {{ item.valor_restante|floatformat:2 }}</td>
-            <td>{{ item.ordem.get_STATUS_display }}</td>
+            <td>{{ item.data_vencimento }}</td>
+            <td>R$ {{ item.valor|floatformat:2 }}</td>
             <td>
-                <a href="/Visualizar_os/{{ item.ordem.id }}" class="btn btn-primary">Visualizar</a>
+                <a href="/Visualizar_os/{{ item.ordem }}" class="btn btn-primary">Visualizar</a>
             </td>
         </tr>
         {% empty %}
