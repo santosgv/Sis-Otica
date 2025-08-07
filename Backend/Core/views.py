@@ -3,7 +3,9 @@ from django.contrib import messages
 from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque,
+                          EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,
+                          Tipo,Estilo,AlertaEstoque,Estilo,ParcelaOrdem)
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -273,18 +275,16 @@ def Cadastrar_os(request,id_cliente):
                 FORMA_PAG = request.POST.get('PAGAMENTO')
                 valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
                 valor = Decimal(valor_str)
+                entrada_str =Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
+                entrada = Decimal(entrada_str)
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-                if request.POST.get('ENTRADA') == '':
-                    ENTRADA =0
-                else:
-                    ENTRADA = request.POST.get('ENTRADA')
+                print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
 
                 if ARMACAO != None:
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
                 else:
                     ARMACAO =''
-
                 
                 cadastrar_os = ORDEN(
                 ANEXO= ANEXO,
@@ -316,11 +316,11 @@ def Cadastrar_os(request,id_cliente):
                 FORMA_PAG= FORMA_PAG,
                 VALOR= valor,
                 QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-                ENTRADA= ENTRADA )
+                ENTRADA= entrada )
 
                 
                 cadastrar_os.save()
-                if int(QUANTIDADE_PARCELA) > 1:
+                if int(QUANTIDADE_PARCELA) > 1 and entrada < valor:
                     criar_parcelas(cadastrar_os.id)
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
@@ -331,6 +331,24 @@ def Cadastrar_os(request,id_cliente):
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
+
+
+@login_required(login_url='/auth/logar/')
+def ordens_faltando_pagamento(request):
+    ordens = ORDEN.objects.filter(STATUS__in=['A', 'L', 'J'])  # apenas ativas
+    ordens_pendentes = []
+
+    for ordem in ordens:
+        total_pago = Decimal(ordem.ENTRADA or 0)
+        if total_pago < ordem.VALOR:
+            ordens_pendentes.append({
+                'ordem': ordem,
+                'valor_total': ordem.VALOR,
+                'valor_pago': total_pago,
+                'valor_restante': ordem.VALOR - total_pago,
+            })
+
+    return render(request, 'Os/ordens_pendentes.html', {'ordens_pendentes': ordens_pendentes})
 
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
@@ -711,12 +729,20 @@ def cadastro_caixa(request):
             caixa.save()
 
             if tipo == 'E' and referencia_obj:
-                parcela = referencia_obj.parcelas.filter(pago=False).order_by('numero').first()
-                if parcela:
+                parcelas = ParcelaOrdem.objects.filter(ordem=referencia_obj, pago=False).order_by('data_vencimento')
+                valor_restante = float(valor_str)
+            
+            for parcela in parcelas:
+                if valor_restante <= 0:
+                    break
+
+                valor_parcela = float(parcela.valor)
+
+                if valor_restante >= valor_parcela:
                     parcela.pago = True
-                    parcela.data_pagamento = get_today_data()
-                    parcela.caixa = caixa
                     parcela.save()
+                    valor_restante -= valor_parcela
+
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 

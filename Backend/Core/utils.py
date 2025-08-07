@@ -487,8 +487,8 @@ def criar_parcelas(os):
     if not ordem.QUANTIDADE_PARCELA or ordem.QUANTIDADE_PARCELA <= 1:
         return
 
-    valor_total = ordem.VALOR
-    entrada = Decimal(ordem.ENTRADA or 0)
+    valor_total = Decimal(ordem.VALOR)
+    entrada = Decimal(ordem.ENTRADA)
     restante = valor_total - entrada
 
     valor_parcela = (restante / ordem.QUANTIDADE_PARCELA).quantize(Decimal("0.01"))

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+<title>{% block 'title' %}
+Os Pendente de pagamento
+  {% endblock %}</title>
+
+{% block 'body'%}
+<h2 class="text-center">Ordens com Pagamento Pendente</h2>
+<div class="container-fluid text-center">
+<table class="table"  border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Valor Total</th>
+            <th>Valor Pago</th>
+            <th>Restante</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in ordens_pendentes %}
+        <tr>
+            <td>{{ item.ordem.id }}</td>
+            <td>{{ item.ordem.CLIENTE.NOME }}</td>
+            <td>{{ item.ordem.DATA_SOLICITACAO }}</td>
+            <td>R$ {{ item.valor_total|floatformat:2 }}</td>
+            <td>R$ {{ item.valor_pago|floatformat:2 }}</td>
+            <td>R$ {{ item.valor_restante|floatformat:2 }}</td>
+            <td>{{ item.ordem.get_STATUS_display }}</td>
+            <td>
+                <a href="/Visualizar_os/{{ item.ordem.id }}" class="btn btn-primary">Visualizar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8">Nenhuma ordem pendente de pagamento.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
