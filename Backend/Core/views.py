@@ -275,7 +275,7 @@ def Cadastrar_os(request,id_cliente):
                 FORMA_PAG = request.POST.get('PAGAMENTO')
                 valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
                 valor = Decimal(valor_str)
-                entrada_str =Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
+                entrada_str =request.POST.get('ENTRADA').replace(".", "").replace(",", ".")
                 entrada = Decimal(entrada_str)
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
@@ -335,20 +335,29 @@ def Cadastrar_os(request,id_cliente):
 
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
-    ordens = ORDEN.objects.filter(STATUS__in=['A', 'L', 'J'])  # apenas ativas
+    # Filtra ordens com parcelas criadas e status relevantes
+    ordens_com_parcelas = ORDEN.objects.filter(
+        STATUS__in=['A', 'L', 'J'],
+        parcelas__isnull=False
+    ).distinct()
+
     ordens_pendentes = []
 
-    for ordem in ordens:
-        total_pago = Decimal(ordem.ENTRADA or 0)
-        if total_pago < ordem.VALOR:
+    for ordem in ordens_com_parcelas:
+        valor_total = Decimal(ordem.VALOR or Decimal(0))
+        valor_pago = Decimal(ordem.ENTRADA or Decimal(0))
+
+        if valor_pago < valor_total:
             ordens_pendentes.append({
                 'ordem': ordem,
-                'valor_total': ordem.VALOR,
-                'valor_pago': total_pago,
-                'valor_restante': ordem.VALOR - total_pago,
+                'valor_total': valor_total,
+                'valor_pago': valor_pago,
+                'valor_restante': valor_total - valor_pago,
             })
 
-    return render(request, 'Os/ordens_pendentes.html', {'ordens_pendentes': ordens_pendentes})
+    return render(request, 'Os/ordens_pendentes.html', {
+        'ordens_pendentes': ordens_pendentes
+    })
 
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
@@ -740,6 +749,8 @@ def cadastro_caixa(request):
 
                 if valor_restante >= valor_parcela:
                     parcela.pago = True
+                    parcela.data_pagamento = get_today_data()
+                    parcela.caixa=get_object_or_404(CAIXA,id=caixa.id)
                     parcela.save()
                     valor_restante -= valor_parcela
 
