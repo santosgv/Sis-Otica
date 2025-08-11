@@ -671,7 +671,6 @@ def Caixa(request):
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
-
 def fechar_caixa(request):
     # Filtrar o caixa do dia atual que ainda não foi fechado
     caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
@@ -761,7 +760,6 @@ def cadastro_caixa(request):
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
 
-
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=390)
@@ -788,8 +786,6 @@ def vendas_ultimos_12_meses(request):
     } for venda in vendas]
 
     return JsonResponse({'data': data_vendas})
-
-
 
 def maiores_vendedores_30_dias(request):
     # Base do queryset filtrando os pedidos válidos no período
@@ -835,8 +831,6 @@ def maiores_vendedores_30_dias(request):
         'total_vendas_periodo': formatar_decimal(totais['total_vendas']),
         'ticket_medio_total': formatar_decimal(ticket_medio_geral)
     })
-
-
 
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
@@ -947,7 +941,6 @@ def transacoes_mensais(request):
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
-
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
         data_inicio = request.GET.get('data_inicio')
@@ -1000,7 +993,6 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
-
 def obter_os_em_aberto(request):    
     
     vendas = (
@@ -1030,7 +1022,6 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
-
 def dados_minhas_vendas(request):
     id_user = request.user
     vendedor = ORDEN.objects.filter(
@@ -1059,6 +1050,24 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes':vendedores_formatados})
 
+def vendas_lentes(request):
+    lentes_mais_vendidas = (
+        ORDEN.objects
+        .filter(
+            DATA_SOLICITACAO__gte=primeiro_dia_mes(),
+            DATA_SOLICITACAO__lte=ultimo_dia_mes()
+        )
+        .exclude(STATUS='C')
+        .exclude(LENTES__isnull=True)
+        .exclude(LENTES='')
+        .values('LENTES')
+        .annotate(total=Count('LENTES'))
+        .order_by('-total')[:5]
+    )
+
+    return JsonResponse({
+        'vendas_lentes': list(lentes_mais_vendidas)
+    })
 
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']

@@ -232,3 +232,38 @@ function recebe_hoje(url) {
 
   });
 }
+
+
+function renderiza_lentes(url) {
+  fetch(url, { method: 'get' })
+    .then(result => result.json())
+    .then(data => {
+      const lentes = data.vendas_lentes; // vem do JsonResponse do Django
+
+      const lentesContainer = document.getElementById('lentes');
+      lentesContainer.innerHTML = ''; // limpa antes de renderizar
+
+      // título
+      const tituloElement = document.createElement('h3');
+      tituloElement.textContent = 'Top 5 Lentes Mais Vendidas do Mês';
+      lentesContainer.appendChild(tituloElement);
+
+      if (!lentes || lentes.length === 0) {
+        lentesContainer.innerHTML += '<p>Nenhuma venda encontrada.</p>';
+        return;
+      }
+
+      // cria lista
+      const listaElement = document.createElement('ul');
+      lentes.forEach(lente => {
+        const item = document.createElement('li');
+        item.innerHTML = `<strong>${lente.LENTES}</strong> — ${lente.total} vendas`;
+        listaElement.appendChild(item);
+      });
+
+      lentesContainer.appendChild(listaElement);
+    })
+    .catch(err => {
+      console.error('Erro ao buscar dados de lentes:', err);
+    });
+}

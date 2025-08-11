@@ -38,6 +38,14 @@ Relatorios
       </div>
     </div>
   </div>
+    <div class="row text-center">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Lentes</h5>
+        <p class="card-text"><span style="margin-left: 15px;" id="lentes"></span></p>
+      </div>
+    </div>
+  </div>
   <br>
   <div class="row">
     <div class="col">
@@ -96,6 +104,12 @@ Relatorios
       obter_os_em_aberto('{% url "Core:obter_os_em_aberto" %}');
       obter_clientes('{% url "Core:dados_clientes" %}');
       recebe_hoje('{% url "Core:receber" %}');
+      renderiza_lentes('{% url "Core:vendas_lentes" %}');
 }
 </script>
+<style>
+  ul {
+    list-style-type: none;
+    padding: 0;}
+</style>
 {% endblock %}

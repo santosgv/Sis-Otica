@@ -66,6 +66,7 @@ urlpatterns = [
     path('Caixa',views.Caixa, name='Caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
     path('cadastro_caixa',views.cadastro_caixa, name='cadastro_caixa'),
+    path('vendas_lentes',views.vendas_lentes, name='vendas_lentes'),
     path('vendas_ultimos_12_meses',views.vendas_ultimos_12_meses,name='vendas_ultimos_12_meses'),
     path('maiores_vendedores_30_dias',views.maiores_vendedores_30_dias,name='maiores_vendedores_30_dias'),
     path('transacoes_mensais',views.transacoes_mensais,name='transacoes_mensais'),
