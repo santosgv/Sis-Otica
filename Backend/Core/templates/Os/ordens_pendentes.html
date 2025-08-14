@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block 'head' %}
+<link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+{% endblock %}
+
+
+
 <title>{% block 'title' %}
 Os Pendente de pagamento
   {% endblock %}</title>
+
+
 
 {% block 'body'%}
 <h2 class="text-center">Ordens com Pagamento Pendente</h2>
@@ -14,16 +23,18 @@ Os Pendente de pagamento
             <th>Cliente</th>
             <th>Data Venciamento</th>
             <th>Valor A ser Pago</th>
+            <th>Parcela</th>
             <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-        {% for item in pendentes %}
+        {% for item in results %}
         <tr>
             <td>{{ item.ordem.id }}</td>
             <td>{{ item.ordem.CLIENTE.NOME }}</td>
             <td>{{ item.data_vencimento }}</td>
             <td>R$ {{ item.valor|floatformat:2 }}</td>
+            <td>{{ item.numero}}/{{ item.ordem.QUANTIDADE_PARCELA }}</td>
             <td>
                 <a href="/Visualizar_os/{{ item.ordem }}" class="btn btn-primary">Visualizar</a>
             </td>
@@ -33,5 +44,22 @@ Os Pendente de pagamento
         {% endfor %}
     </tbody>
 </table>
+
+            <div class="pagination">
+              
+              <samp class="step-links">
+                    {% if results.has_previous %}
+                    <a href="?page={{results.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
+                    {% endif %}
+
+                      <samp class="current">
+                        {{results.number}} de {{results.paginator.num_pages}}
+                      </samp>
+
+                    {% if results.has_next %}
+                    <a href="?page={{results.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
+                    {% endif %}
+              </samp>
+            </div>
 </div>
 {% endblock %}

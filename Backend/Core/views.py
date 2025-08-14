@@ -336,33 +336,14 @@ def Cadastrar_os(request,id_cliente):
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
 
-    pendentes = ParcelaOrdem.objects.filter(pago=False)
+    pendentes = ParcelaOrdem.objects.filter(pago=False).order_by('data_vencimento').select_related('ordem').all()
 
-    return render(request, 'Os/ordens_pendentes.html',{'pendentes':pendentes})
-    # Filtra ordens com parcelas criadas e status relevantes
-    ordens_com_parcelas = ORDEN.objects.filter(
-        STATUS__in=['A', 'L', 'J'],
-        parcelas__isnull=False
-    ).distinct()
+    pagina = Paginator(pendentes, 25)
+    page = request.GET.get('page')
+    results = pagina.get_page(page)
 
-    ordens_pendentes = []
-
-    for ordem in ordens_com_parcelas:
-        valor_total = Decimal(ordem.VALOR or Decimal(0))
-        valor_pago = Decimal(ordem.ENTRADA or Decimal(0))
-
-        if valor_pago < valor_total:
-            ordens_pendentes.append({
-                'ordem': ordem,
-                'valor_total': valor_total,
-                'valor_pago': valor_pago,
-                'valor_restante': valor_total - valor_pago,
-            })
-
-    return render(request, 'Os/ordens_pendentes.html', {
-        'ordens_pendentes': ordens_pendentes
-    })
-
+    return render(request, 'Os/ordens_pendentes.html',{'results':results})
+ 
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
     if request.method == "GET":
