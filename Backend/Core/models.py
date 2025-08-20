@@ -279,3 +279,15 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Avaliação {self.nota} - {self.cliente.NOME}"
+    
+class ParcelaOrdem(models.Model):
+    ordem = models.ForeignKey(ORDEN, on_delete=models.CASCADE, related_name="parcelas")
+    numero = models.IntegerField() 
+    data_vencimento = models.DateField()
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    pago = models.BooleanField(default=False)
+    data_pagamento = models.DateField(null=True, blank=True)
+    caixa = models.ForeignKey(CAIXA, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"Parcela {self.numero}/{self.ordem.QUANTIDADE_PARCELA} - Ordem {self.ordem.id}"

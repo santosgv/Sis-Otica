@@ -3,7 +3,9 @@ from django.contrib import messages
 from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque, EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,Tipo,Estilo,AlertaEstoque,Estilo
+from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque,
+                          EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,
+                          Tipo,Estilo,AlertaEstoque,Estilo,ParcelaOrdem)
 from django.shortcuts import get_object_or_404
 from Autenticacao.models import USUARIO
 from django.contrib.auth.decorators import login_required
@@ -11,8 +13,10 @@ from django.core.paginator import Paginator
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .utils import criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days,get_tenant
-from .utils import get_tenant,criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days
+from .utils import (criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days,get_tenant
+from .utils import get_tenant,criar_mensagem_parabens,realizar_entrada,
+                    realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
+                    get_10_days,get_30_days,criar_parcelas)
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -274,12 +278,11 @@ def Cadastrar_os(request,id_cliente):
                 FORMA_PAG = request.POST.get('PAGAMENTO')
                 valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
                 valor = Decimal(valor_str)
+                entrada_str =request.POST.get('ENTRADA').replace(".", "").replace(",", ".")
+                entrada = Decimal(entrada_str)
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-                if request.POST.get('ENTRADA') == '':
-                    ENTRADA =0
-                else:
-                    ENTRADA = request.POST.get('ENTRADA')
+                print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
 
                 if ARMACAO != None:
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
@@ -316,10 +319,12 @@ def Cadastrar_os(request,id_cliente):
                 FORMA_PAG= FORMA_PAG,
                 VALOR= valor,
                 QUANTIDADE_PARCELA= QUANTIDADE_PARCELA,
-                ENTRADA= ENTRADA )
+                ENTRADA= entrada )
 
                 
                 cadastrar_os.save()
+                if int(QUANTIDADE_PARCELA) > 1 and entrada < valor:
+                    criar_parcelas(cadastrar_os.id)
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
                 return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
@@ -330,6 +335,18 @@ def Cadastrar_os(request,id_cliente):
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
 
+
+@login_required(login_url='/auth/logar/')
+def ordens_faltando_pagamento(request):
+
+    pendentes = ParcelaOrdem.objects.filter(pago=False).order_by('data_vencimento').select_related('ordem').all()
+
+    pagina = Paginator(pendentes, 25)
+    page = request.GET.get('page')
+    results = pagina.get_page(page)
+
+    return render(request, 'Os/ordens_pendentes.html',{'results':results})
+ 
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
     if request.method == "GET":
@@ -638,7 +655,6 @@ def Caixa(request):
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
-
 def fechar_caixa(request):
     # Filtrar o caixa do dia atual que ainda não foi fechado
     caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
@@ -707,9 +723,26 @@ def cadastro_caixa(request):
                 FORMA=forma
             )
             caixa.save()
+
+            if tipo == 'E' and referencia_obj:
+                parcelas = ParcelaOrdem.objects.filter(ordem=referencia_obj, pago=False).order_by('data_vencimento')
+                valor_restante = float(valor_str)
+            
+            for parcela in parcelas:
+                if valor_restante <= 0:
+                    break
+
+                valor_parcela = float(parcela.valor)
+
+                if valor_restante >= valor_parcela:
+                    parcela.pago = True
+                    parcela.data_pagamento = get_today_data()
+                    parcela.caixa=get_object_or_404(CAIXA,id=caixa.id)
+                    parcela.save()
+                    valor_restante -= valor_parcela
+
             messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
             return redirect('/Caixa')
-
 
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
@@ -737,8 +770,6 @@ def vendas_ultimos_12_meses(request):
     } for venda in vendas]
 
     return JsonResponse({'data': data_vendas})
-
-
 
 def maiores_vendedores_30_dias(request):
     # Base do queryset filtrando os pedidos válidos no período
@@ -784,6 +815,7 @@ def maiores_vendedores_30_dias(request):
         'total_vendas_periodo': formatar_decimal(totais['total_vendas']),
         'ticket_medio_total': formatar_decimal(ticket_medio_geral)
     })
+
 
 
 def maiores_vendedores_meses(request):
@@ -895,7 +927,6 @@ def transacoes_mensais(request):
 def caixa_mes_anterior(request):
     return render(request, 'Caixa/caixa_mes_anterior.html')
 
-
 def obter_valores_registros_meses_anteriores(request):
     if request.method == "GET":
         data_inicio = request.GET.get('data_inicio')
@@ -948,7 +979,6 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
-
 def obter_os_em_aberto(request):    
     
     vendas = (
@@ -978,7 +1008,6 @@ def relatorios(request):
 def relatorio_mes_anterior(request):
     return render(request, 'Relatorio/relatorios_mes_html')
 
-
 def dados_minhas_vendas(request):
     id_user = request.user
     vendedor = ORDEN.objects.filter(
@@ -1007,6 +1036,24 @@ def dados_minhas_vendas(request):
 
     return JsonResponse({'minhas_vendas_mes':vendedores_formatados})
 
+def vendas_lentes(request):
+    lentes_mais_vendidas = (
+        ORDEN.objects
+        .filter(
+            DATA_SOLICITACAO__gte=primeiro_dia_mes(),
+            DATA_SOLICITACAO__lte=ultimo_dia_mes()
+        )
+        .exclude(STATUS='C')
+        .exclude(LENTES__isnull=True)
+        .exclude(LENTES='')
+        .values('LENTES')
+        .annotate(total=Count('LENTES'))
+        .order_by('-total')[:5]
+    )
+
+    return JsonResponse({
+        'vendas_lentes': list(lentes_mais_vendidas)
+    })
 
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']

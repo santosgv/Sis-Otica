@@ -254,6 +254,7 @@ def realizar_saida_api(request):
 
 
 @api_view(['GET'])
+@csrf_exempt
 def aniversariantes_mes(request):
     cached_aniversariantes = cache.get('all_aniversariantes_mes')
     if cached_aniversariantes is None:
@@ -272,7 +273,7 @@ def aniversariantes_mes(request):
                 'id': cliente.id,
                 'nome': cliente.NOME,
                 'telefone': cliente.TELEFONE.replace("(", "").replace(")", "").replace("-", ""),
-                'data_nascimento': cliente.DATA_NASCIMENTO.strftime('%Y-%m-%d'),
+                'data_nascimento': cliente.DATA_NASCIMENTO.strftime('%d-%m-%Y'),
                 'email': cliente.EMAIL,
                 'mensagem': criar_mensagem_parabens(cliente.NOME),
             }
