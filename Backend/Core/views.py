@@ -13,8 +13,7 @@ from django.core.paginator import Paginator
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .utils import (criar_mensagem_parabens,realizar_entrada,realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,get_10_days,get_30_days,get_tenant
-from .utils import get_tenant,criar_mensagem_parabens,realizar_entrada,
+from .utils import (get_tenant,criar_mensagem_parabens,realizar_entrada,
                     realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
                     get_10_days,get_30_days,criar_parcelas)
 from django.utils.timezone import now,timedelta
