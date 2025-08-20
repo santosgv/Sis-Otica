@@ -8,7 +8,7 @@ from django.db.models import Value
 from django.db.models.functions import Replace,ExtractMonth, ExtractDay
 from Autenticacao.models import USUARIO, Comissao, Desconto
 from Core.models import CLIENTE
-from Core.utils import criar_mensagem_parabens
+from Core.utils import criar_mensagem_parabens,get_tenant
 from django.http import HttpResponse, FileResponse
 import io
 from reportlab.pdfgen import canvas
@@ -256,7 +256,15 @@ def realizar_saida_api(request):
 @api_view(['GET'])
 @csrf_exempt
 def aniversariantes_mes(request):
-    cached_aniversariantes = cache.get('all_aniversariantes_mes')
+    tenant_id = get_tenant(request)
+
+    if not tenant_id:
+        return Response({'detail': 'Tenant não identificado.'}, status=400)
+
+    cache_key = f'aniversariantes_mes_tenant_{tenant_id}'
+
+    cached_aniversariantes = cache.get(cache_key)
+
     if cached_aniversariantes is None:
         today = timezone.now()
         current_month = today.month
@@ -275,10 +283,10 @@ def aniversariantes_mes(request):
                 'telefone': cliente.TELEFONE.replace("(", "").replace(")", "").replace("-", ""),
                 'data_nascimento': cliente.DATA_NASCIMENTO.strftime('%d-%m-%Y'),
                 'email': cliente.EMAIL,
-                'mensagem': criar_mensagem_parabens(cliente.NOME),
+                'mensagem': criar_mensagem_parabens(request,cliente.NOME),
             }
             for cliente in aniversariantes
         ]
-        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=129600)
+        cache.set('cache_key', cached_aniversariantes, timeout=129600)
 
     return Response(cached_aniversariantes)
