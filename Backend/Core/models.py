@@ -290,3 +290,32 @@ class ParcelaOrdem(models.Model):
 
     def __str__(self):
         return f"Parcela {self.numero}/{self.ordem.QUANTIDADE_PARCELA} - Ordem {self.ordem.id}"
+    
+class NotaFiscal(models.Model):
+    ordem = models.OneToOneField("ORDEN", on_delete=models.CASCADE, related_name="nota_fiscal")
+    
+    uuid = models.UUIDField()
+    status = models.CharField(max_length=50)
+    motivo = models.CharField(max_length=255)
+    nfe = models.CharField(max_length=20)
+    serie = models.CharField(max_length=10)
+    chave = models.CharField(max_length=60, unique=True)
+    modelo = models.CharField(max_length=10)
+    epec = models.BooleanField(default=False)
+
+    # Links
+    xml = models.URLField()
+    danfe = models.URLField()
+    danfe_simples = models.URLField(blank=True, null=True)
+    danfe_etiqueta = models.URLField(blank=True, null=True)
+
+    # Log resumido
+    cstat = models.CharField(max_length=10, blank=True, null=True)
+    xmotivo = models.CharField(max_length=255, blank=True, null=True)
+    nprot = models.CharField(max_length=50, blank=True, null=True)
+    dhrecbto = models.DateTimeField(blank=True, null=True)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"NFe {self.nfe} - {self.status}"
