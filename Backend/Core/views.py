@@ -1430,7 +1430,7 @@ def emitir_nfe_view(request, id_os):
     # Valor total da OS
     total = float(VISUALIZAR_OS.VALOR)
     # Chama a API da WebmaniaBR
-    resposta = emitir_nfe(cliente, produtos, total)
+    resposta = emitir_nfe(request,cliente, produtos, total)
 
     if resposta.get("status") == "aprovado":
         log = resposta.get("log", {})

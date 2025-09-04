@@ -2,7 +2,7 @@ import http.client
 import json
 from Core.utils import get_tenant
 
-def emitir_nfe(cliente, produtos, total):
+def emitir_nfe(request,cliente, produtos, total):
     """
     Emite NF-e via WebmaniaBR
     :param cliente: dict com dados do cliente
