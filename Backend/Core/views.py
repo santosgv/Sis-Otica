@@ -1,9 +1,11 @@
 
+from datetime import datetime
 from django.contrib import messages
 from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
-from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque,
+from Core.services.webmaniabr import emitir_nfe
+from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, NotaFiscal, Review,SaidaEstoque,
                           EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,
                           Tipo,Estilo,AlertaEstoque,Estilo,ParcelaOrdem)
 from django.shortcuts import get_object_or_404
@@ -355,7 +357,7 @@ def Visualizar_os(request,id_os):
                                                        'unidade':get_tenant(request).unidade
                                                    })
     else:
-        return render(request,'Os/Visualizar_os.htmll')
+        return render(request,'Os/Visualizar_os.html')
     
 @transaction.atomic    
 @login_required(login_url='/auth/logar/')
@@ -1376,3 +1378,82 @@ def historico_compras(request, cliente_id):
     cliente = get_object_or_404(CLIENTE, id=cliente_id)
     compras = ORDEN.objects.filter(CLIENTE=cliente).order_by('-DATA_SOLICITACAO')
     return render(request, 'Cliente/historico_compras.html', {'cliente': cliente, 'compras': compras})
+
+
+@login_required(login_url='/auth/logar/')
+def emitir_nfe_view(request, id_os):
+    VISUALIZAR_OS = get_object_or_404(ORDEN, id=id_os)
+
+        # Pega os dados do cliente da OS
+    cliente = {
+            "cpf": VISUALIZAR_OS.CLIENTE.CPF,
+            "nome": VISUALIZAR_OS.CLIENTE.NOME,
+            "endereco": VISUALIZAR_OS.CLIENTE.LOGRADOURO,
+            "complemento": '',
+            "numero": VISUALIZAR_OS.CLIENTE.NUMERO,
+            "bairro": VISUALIZAR_OS.CLIENTE.BAIRRO,
+            "cidade": VISUALIZAR_OS.CLIENTE.CIDADE,
+            "uf": 'MG',
+            "cep": VISUALIZAR_OS.CLIENTE.CEP,
+            "telefone": VISUALIZAR_OS.CLIENTE.TELEFONE,
+            "email": 'santosgomesv@gmail.com',
+        }
+
+    produtos = []
+    # Produto 1: Serviço
+    if VISUALIZAR_OS.SERVICO:
+        produtos.append({
+            "nome": str(VISUALIZAR_OS.SERVICO),
+            "codigo": f"SERV-{VISUALIZAR_OS.SERVICO.id}",
+            "quantidade": 1,
+            "subtotal": float(VISUALIZAR_OS.VALOR),
+            "total": float(VISUALIZAR_OS.VALOR),
+        })
+    # Produto 2: Armação (se preenchido)
+    if VISUALIZAR_OS.ARMACAO and VISUALIZAR_OS.ARMACAO != "N/D":
+        produtos.append({
+            "nome": str(VISUALIZAR_OS.ARMACAO),
+            "codigo": "ARMACAO",
+            "quantidade": 1,
+            "subtotal": 0.00,
+            "total": 0.00,
+        })
+    # Produto 3: Lentes (se preenchido)
+    if VISUALIZAR_OS.LENTES and VISUALIZAR_OS.LENTES != "N/D":
+        produtos.append({
+            "nome": str(VISUALIZAR_OS.LENTES),
+            "codigo": "LENTES",
+            "quantidade": 1,
+            "subtotal": 0.00,
+            "total": 0.00,
+        })
+    # Valor total da OS
+    total = float(VISUALIZAR_OS.VALOR)
+    # Chama a API da WebmaniaBR
+    resposta = emitir_nfe(cliente, produtos, total)
+
+    if resposta.get("status") == "aprovado":
+        log = resposta.get("log", {})
+        prot = log.get("aProt", [{}])[0] if log.get("aProt") else {}
+        NotaFiscal.objects.create(
+        ordem=VISUALIZAR_OS,
+        uuid=resposta.get("uuid"),
+        status=resposta.get("status"),
+        motivo=resposta.get("motivo"),
+        nfe=resposta.get("nfe"),
+        serie=resposta.get("serie"),
+        chave=resposta.get("chave"),
+        modelo=resposta.get("modelo"),
+        epec=resposta.get("epec"),
+        xml=resposta.get("xml"),
+        danfe=resposta.get("danfe"),
+        danfe_simples=resposta.get("danfe_simples"),
+        danfe_etiqueta=resposta.get("danfe_etiqueta"),
+        cstat=log.get("cStat"),
+        xmotivo=log.get("xMotivo"),
+        nprot=prot.get("nProt"),
+        dhrecbto=datetime.fromisoformat(prot.get("dhRecbto")) if prot.get("dhRecbto") else None,
+    )
+        
+    messages.add_message(request, constants.SUCCESS, 'NFS emitida com sucesso')
+    return redirect(f'/Visualizar_os/{VISUALIZAR_OS.id}')

@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.db import transaction
 from calendar import monthrange
 from datetime import date
 from rest_framework.permissions import IsAuthenticated
@@ -44,7 +45,7 @@ class ServicosViewSet(viewsets.ModelViewSet):
     serializer_class = ServicoSerializer
 
 class ProdutosViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Produto.objects.all().order_by('-id')
     serializer_class = ProdutoSerializer
 
@@ -55,6 +56,7 @@ class LaboratoriosViewSet(viewsets.ModelViewSet):
 
 class KanbanAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         solicitado = ORDEN.objects.filter(
             DATA_SOLICITACAO__gte=get_30_days(),
@@ -95,6 +97,8 @@ class KanbanAPIView(APIView):
     
 class UpdateCardStatusAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
+    @transaction.atomic()
     def post(self, request, card_id):
         try:
             card = get_object_or_404(ORDEN, id=card_id)
@@ -128,6 +132,7 @@ class CaixaViewSet(viewsets.ModelViewSet):
 
 class FechamentoCaixaAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         try:
             # Último caixa fechado (em dinheiro)
@@ -168,6 +173,7 @@ class FechamentoCaixaAPIView(APIView):
 
 class DadosCaixaAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         queryset = CAIXA.objects.filter(
             DATA__gte=primeiro_dia_mes(),
@@ -178,6 +184,7 @@ class DadosCaixaAPIView(APIView):
         serializer = CaixaSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @transaction.atomic()
     def post(self, request):
         serializer = CaixaSerializer(data=request.data)
         if serializer.is_valid():
@@ -185,7 +192,8 @@ class DadosCaixaAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    @transaction.atomic()
     def put(self, request, pk=None):
         """
         PUT requer um ID no corpo ou pode ser implementado com a rota /api/dados-caixa/<pk>/
@@ -224,6 +232,7 @@ class TipoViewSet(viewsets.ModelViewSet):
 
 class MinhasVendasAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         try:
             id_user = request.user.id
@@ -253,6 +262,8 @@ class MinhasVendasAPIView(APIView):
 
 class PedidosDoVendedorAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    
     def get(self, request):
         user = request.user.id
         data_inicio = request.GET.get("data_inicio")
@@ -286,6 +297,8 @@ class PedidosDoVendedorAPIView(APIView):
 
 class DadosCaixaAnteriorApiView(APIView):
     permission_classes = [IsAuthenticated]
+
+    
     def get(self,request):
         data_inicio = request.GET.get("data_inicio")
         data_fim = request.GET.get("data_fim")
@@ -307,6 +320,8 @@ class DadosCaixaAnteriorApiView(APIView):
 
 class LojaOsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @transaction.atomic()
     def post(self, request, id_os):
         try:
             loja_os = ORDEN.objects.get(id=id_os)
@@ -324,6 +339,8 @@ class LojaOsAPIView(APIView):
 
 class EncerrarOsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @transaction.atomic()
     def post(self, request, id_os):
         try:
             loja_os = ORDEN.objects.get(id=id_os)
@@ -341,6 +358,8 @@ class EncerrarOsAPIView(APIView):
 
 class EntregueOsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @transaction.atomic()
     def post(self, request, id_os):
         try:
             loja_os = ORDEN.objects.get(id=id_os)
@@ -358,6 +377,8 @@ class EntregueOsAPIView(APIView):
 
 class CanceladoOsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @transaction.atomic()
     def post(self, request, id_os):
         try:
             loja_os = ORDEN.objects.get(id=id_os)
@@ -375,6 +396,8 @@ class CanceladoOsAPIView(APIView):
 
 class LaboratorioOsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @transaction.atomic()
     def post(self, request, id_os):
         try:
             loja_os = ORDEN.objects.get(id=id_os)

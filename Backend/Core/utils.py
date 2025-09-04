@@ -7,7 +7,7 @@ from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,C
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
-from django.http import FileResponse,HttpResponse
+from django.http import FileResponse,HttpResponse,JsonResponse
 import io
 import os
 from django.template.loader import render_to_string
@@ -27,6 +27,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import black
 from pathlib import Path
 from decimal import Decimal
+from .services.webmaniabr import emitir_nfe
 
 logger = logging.getLogger('MyApp')
 
@@ -513,3 +514,4 @@ def criar_parcelas(os):
             valor=valor_parcela,
             data_vencimento=data_vencimento
         )
+

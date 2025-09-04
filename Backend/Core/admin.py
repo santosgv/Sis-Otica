@@ -2,13 +2,13 @@ from django.contrib import admin
 from Autenticacao.models import USUARIO
 from Core.models import (Review,LABORATORIO,CLIENTE,ORDEN,CAIXA,SERVICO,Fornecedor,
                          TipoUnitario,Produto,EntradaEstoque,SaidaEstoque,MovimentoEstoque,
-                         Tipo,Estilo,AlertaEstoque,ParcelaOrdem)
+                         Tipo,Estilo,AlertaEstoque,ParcelaOrdem,NotaFiscal)
 
 
 
 admin.site.register(CAIXA)
 admin.site.register(LABORATORIO)
-
+admin.site.register(NotaFiscal)
 admin.site.register(CLIENTE)
 admin.site.register(SERVICO)
 admin.site.register(ORDEN)
