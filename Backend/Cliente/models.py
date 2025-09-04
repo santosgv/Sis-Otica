@@ -20,6 +20,10 @@ class Cliente(TenantMixin):
     descricao = models.TextField(blank=True)
     email = models.EmailField(null=True)
     unidade= models.CharField(max_length=6)
+    consumer_key= models.CharField(max_length=255, null=True)
+    consumer_secret= models.CharField(max_length=255, null=True)
+    access_token= models.CharField(max_length=255, null=True)
+    access_token_secret= models.CharField(max_length=255, null=True)
 
     is_active = models.BooleanField(default=False, blank=True)
     created_on = models.DateField(auto_now_add=True)

@@ -1,5 +1,6 @@
 import http.client
 import json
+from Core.utils import get_tenant
 
 def emitir_nfe(cliente, produtos, total):
     """
@@ -83,10 +84,10 @@ def emitir_nfe(cliente, produtos, total):
     headers = {
         'cache-control': "no-cache",
         'content-type': "application/json",
-        'x-consumer-key': "@",
-        'x-consumer-secret': "@",
-        'x-access-token': "5458-@",
-        'x-access-token-secret': "@"
+        'x-consumer-key': f"{get_tenant(request).consumer_key}",
+        'x-consumer-secret': f"{get_tenant(request).consumer_secret}",
+        'x-access-token': f"{get_tenant(request).access_token}",
+        'x-access-token-secret': f"{get_tenant(request).access_token_secret}"
     }
 
     conn.request("POST", "/api/1/nfe/emissao/", json_payload, headers)
