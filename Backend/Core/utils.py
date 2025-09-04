@@ -21,7 +21,6 @@ import logging
 from PIL import Image
 from barcode import Code128
 from barcode.writer import ImageWriter
-from django_tenants.utils import get_tenant_model
 import qrcode
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import black
@@ -32,6 +31,7 @@ from .services.webmaniabr import emitir_nfe
 logger = logging.getLogger('MyApp')
 
 def get_tenant(request):
+    from django_tenants.utils import get_tenant_model
     TenantModel = get_tenant_model()
     tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
     return tenant
