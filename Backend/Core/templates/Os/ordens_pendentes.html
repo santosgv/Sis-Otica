@@ -2,64 +2,408 @@
 {% load static %}
 
 {% block 'head' %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
+<style>
+  .page-header {
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 0;
+    margin-bottom: 1.75rem;
+  }
+  .page-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    margin: 0;
+  }
+  .page-header small {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+
+  .card-table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid #e9ecef;
+  }
+  .card-table .table { margin: 0; }
+  .card-table .table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    padding: .75rem 1rem;
+    white-space: nowrap;
+  }
+  .card-table .table tbody tr { transition: background .12s; }
+  .card-table .table tbody tr:hover { background: #f8f9fa; }
+  .card-table .table td {
+    vertical-align: middle;
+    padding: .75rem 1rem;
+    font-size: .875rem;
+    color: #343a40;
+    border-top: 1px solid #f1f3f5;
+  }
+
+  .badge-parcela {
+    background: #fff3cd;
+    color: #856404;
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-valor {
+    font-size: .9rem;
+    font-weight: 700;
+    color: #198754;
+  }
+  .badge-venc { font-size: .8rem; color: #6c757d; }
+
+  .btn-baixa {
+    background: transparent;
+    border: 1.5px solid #0d6efd;
+    color: #0d6efd;
+    border-radius: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .btn-baixa:hover { background: #0d6efd; color: #fff; }
+
+  /* ===== Modal ===== */
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  }
+  .modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.25rem;
+    align-items: center;
+  }
+  .modal-header .modal-title {
+    font-size: .95rem;
+    font-weight: 600;
+    color: #212529;
+  }
+  .modal-body { padding: 1.25rem; }
+  .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: .875rem 1.25rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin-bottom: 1.25rem;
+  }
+  .info-item label {
+    display: block;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: 2px;
+  }
+  .info-item span {
+    font-size: .875rem;
+    font-weight: 500;
+    color: #212529;
+  }
+  .info-item.valor-destaque span {
+    font-size: 1.2rem;
+    color: #198754;
+    font-weight: 700;
+  }
+
+  .divider-modal {
+    border: none;
+    border-top: 1px solid #e9ecef;
+    margin: 1rem 0;
+  }
+  .forma-label {
+    font-size: .72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    margin-bottom: .75rem;
+  }
+
+  .metodos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: .5rem;
+  }
+  .btn-metodo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border: 1.5px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+    font-size: .75rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  .btn-metodo i {
+    font-size: 1.3rem;
+    color: #adb5bd;
+    transition: color .15s;
+  }
+  .btn-metodo:hover {
+    border-color: #86b7fe;
+    background: #f0f6ff;
+    color: #0d6efd;
+  }
+  .btn-metodo:hover i { color: #0d6efd; }
+  .btn-metodo.ativo {
+    border: 2px solid #0d6efd;
+    background: #e8f0fe;
+    color: #0d6efd;
+  }
+  .btn-metodo.ativo i { color: #0d6efd; }
+
+  .btn-confirmar {
+    background: #198754;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-confirmar:hover { background: #157347; }
+
+  .btn-cancelar-modal {
+    background: transparent;
+    border: 1px solid #dee2e6;
+    border-radius: 7px;
+    font-size: .85rem;
+    color: #6c757d;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-cancelar-modal:hover { background: #f8f9fa; }
+
+  /* Paginação */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1.5rem;
+    font-size: .85rem;
+    color: #6c757d;
+  }
+  .pagination-wrapper a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    transition: background .12s;
+    text-decoration: none;
+  }
+  .pagination-wrapper a:hover { background: #f0f6ff; }
+  .pagination-wrapper img { width: 16px; height: 16px; }
+</style>
 {% endblock %}
 
+<title>{% block 'title' %}Os Pendente de pagamento{% endblock %}</title>
 
-
-<title>{% block 'title' %}
-Os Pendente de pagamento
-  {% endblock %}</title>
-
-
-
-{% block 'body'%}
-<h2 class="text-center">Ordens com Pagamento Pendente</h2>
-<div class="container-fluid text-center">
-<table class="table"  border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>OS</th>
-            <th>Cliente</th>
-            <th>Data Venciamento</th>
-            <th>Valor A ser Pago</th>
-            <th>Parcela</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in results %}
-        <tr>
-            <td>{{ item.ordem.id }}</td>
-            <td>{{ item.ordem.CLIENTE.NOME }}</td>
-            <td>{{ item.data_vencimento }}</td>
-            <td>R$ {{ item.valor|floatformat:2 }}</td>
-            <td>{{ item.numero}}/{{ item.ordem.QUANTIDADE_PARCELA }}</td>
-            <td>
-                <a href="/Visualizar_os/{{ item.ordem }}" class="btn btn-primary">Visualizar</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="8">Nenhuma ordem pendente de pagamento.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-            <div class="pagination">
-              
-              <samp class="step-links">
-                    {% if results.has_previous %}
-                    <a href="?page={{results.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
-                    {% endif %}
-
-                      <samp class="current">
-                        {{results.number}} de {{results.paginator.num_pages}}
-                      </samp>
-
-                    {% if results.has_next %}
-                    <a href="?page={{results.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
-                    {% endif %}
-              </samp>
-            </div>
+{% block 'body' %}
+<div class="page-header">
+  <div class="container-fluid">
+    <h2>
+      <i class="fas fa-clock me-2 text-warning"></i>
+      Pagamentos pendentes
+    </h2>
+    <small>Parcelas aguardando baixa</small>
+  </div>
 </div>
+
+<div class="container-fluid">
+  <div class="card-table">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>OS</th>
+          <th>Cliente</th>
+          <th>Parcela</th>
+          <th>Vencimento</th>
+          <th>Valor</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for parcela in results %}
+        <tr>
+          <td><strong>#{{ parcela.ordem.id }}</strong></td>
+          <td>{{ parcela.ordem.CLIENTE }}</td>
+          <td>
+            <span class="badge-parcela">
+              {{ parcela.numero }} / {{ parcela.ordem.QUANTIDADE_PARCELA }}
+            </span>
+          </td>
+          <td><span class="badge-venc">{{ parcela.data_vencimento }}</span></td>
+          <td><span class="badge-valor">R$ {{ parcela.valor }}</span></td>
+          <td>
+            <button
+              class="btn-baixa"
+              data-bs-toggle="modal"
+              data-bs-target="#modal-{{ parcela.id }}">
+              Dar baixa
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-wrapper">
+    {% if results.has_previous %}
+    <a href="?page={{ results.previous_page_number }}" title="Anterior">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII=" alt="anterior">
+    </a>
+    {% endif %}
+    <span>{{ results.number }} de {{ results.paginator.num_pages }}</span>
+    {% if results.has_next %}
+    <a href="?page={{ results.next_page_number }}" title="Próxima">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg==" alt="próxima">
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modais fora da tabela (Bootstrap exige isso) -->
+{% for parcela in results %}
+<div class="modal fade" id="modal-{{ parcela.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ parcela.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel-{{ parcela.id }}">
+          <i class="fas fa-cash-register me-2 text-secondary" style="font-size:.9rem"></i>
+          Dar baixa na parcela
+          <span class="badge-parcela ms-2">{{ parcela.numero }}/{{ parcela.ordem.QUANTIDADE_PARCELA }}</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>OS</label>
+            <span>#{{ parcela.ordem.id }}</span>
+          </div>
+          <div class="info-item">
+            <label>Cliente</label>
+            <span>{{ parcela.ordem.CLIENTE }}</span>
+          </div>
+          <div class="info-item">
+            <label>Vencimento</label>
+            <span>{{ parcela.data_vencimento }}</span>
+          </div>
+          <div class="info-item valor-destaque">
+            <label>Valor da parcela</label>
+            <span>R$ {{ parcela.valor }}</span>
+          </div>
+        </div>
+
+        <hr class="divider-modal">
+
+        <form method="POST" action="{% url 'Core:pagar_parcela' parcela.id %}" id="form-{{ parcela.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="forma_pagamento" id="forma-{{ parcela.id }}" value="">
+
+          <p class="forma-label">Forma de pagamento</p>
+          <div class="metodos-grid">
+            {% for codigo, label in formas_pagamento %}
+            <button
+              type="button"
+              class="btn-metodo"
+              data-parcela="{{ parcela.id }}"
+              data-forma="{{ codigo }}"
+              onclick="escolherForma('{{ parcela.id }}', '{{ codigo }}', this)">
+              {% if codigo == 'A' %}<i class="fas fa-qrcode"></i>
+              {% elif codigo == 'B' %}<i class="fas fa-money-bill-wave"></i>
+              {% elif codigo == 'C' %}<i class="fas fa-credit-card"></i>
+              {% elif codigo == 'D' %}<i class="far fa-credit-card"></i>
+              {% elif codigo == 'E' %}<i class="fas fa-file-invoice-dollar"></i>
+              {% elif codigo == 'F' %}<i class="fas fa-exchange-alt"></i>
+              {% endif %}
+              {{ label }}
+            </button>
+            {% endfor %}
+          </div>
+
+          <div class="modal-footer px-0 pb-0 mt-3">
+            <button type="button" class="btn-cancelar-modal" data-bs-dismiss="modal">Cancelar</button>
+            <button
+              type="submit"
+              class="btn-confirmar"
+              onclick="return validarForma('{{ parcela.id }}')">
+              <i class="fas fa-check me-1"></i> Confirmar pagamento
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+function escolherForma(parcelaId, forma, btn) {
+  document.querySelectorAll(`.btn-metodo[data-parcela="${parcelaId}"]`)
+    .forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  document.getElementById('forma-' + parcelaId).value = forma;
+}
+
+function validarForma(parcelaId) {
+  if (!document.getElementById('forma-' + parcelaId).value) {
+    alert('Selecione uma forma de pagamento antes de confirmar.');
+    return false;
+  }
+  return true;
+}
+
+/* Limpa seleção ao fechar o modal */
+document.querySelectorAll('.modal').forEach(function(modal) {
+  modal.addEventListener('hidden.bs.modal', function() {
+    var id = modal.id.replace('modal-', '');
+    document.querySelectorAll(`.btn-metodo[data-parcela="${id}"]`)
+      .forEach(b => b.classList.remove('ativo'));
+    var input = document.getElementById('forma-' + id);
+    if (input) input.value = '';
+  });
+});
+</script>
 {% endblock %}

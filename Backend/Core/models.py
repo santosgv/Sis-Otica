@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Sum
 from Autenticacao.models import USUARIO
 from django.utils.timezone import now
+import uuid
 from django.conf import settings
 from simple_history.models import HistoricalRecords
 
@@ -97,6 +98,7 @@ class ORDEN(models.Model):
     VALOR =  models.DecimalField(max_digits=10, decimal_places=2)
     QUANTIDADE_PARCELA = models.IntegerField(blank=True, null=True,default='N/D')
     ENTRADA = models.CharField(max_length=100)
+    VALOR_PAGO = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     DATA_ENCERRAMENTO = models.DateTimeField(blank=True, null=True)
     history = HistoricalRecords()
     
@@ -134,6 +136,7 @@ class CAIXA(models.Model):
     FORMA = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, default="B")
     FECHADO = models.BooleanField(default=False)
     SALDO_FINAL =models.FloatField(default=0)
+    ENTRADA =  models.FloatField(default=0)
 
     def __str__(self) -> str:
         return str(self.id)
@@ -280,42 +283,21 @@ class Review(models.Model):
         return f"Avaliação {self.nota} - {self.cliente.NOME}"
     
 class ParcelaOrdem(models.Model):
-    ordem = models.ForeignKey(ORDEN, on_delete=models.CASCADE, related_name="parcelas")
-    numero = models.IntegerField() 
-    data_vencimento = models.DateField()
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-    pago = models.BooleanField(default=False)
+    CHOICES_PAGAMENTO = (
+        ('A', 'PIX'),
+        ('B', 'DINHEIRO'),
+        ('C', 'DEBITO'),
+        ('D', 'CREDITO'),
+        ('E', 'CARNER'),
+        ('F', 'PERMUTA'),
+    )
+
+    ordem          = models.ForeignKey(ORDEN, on_delete=models.CASCADE, related_name="parcelas")
+    numero         = models.IntegerField()
+    data_vencimento= models.DateField()
+    valor          = models.DecimalField(max_digits=10, decimal_places=2)
+    pago           = models.BooleanField(default=False)
     data_pagamento = models.DateField(null=True, blank=True)
-    caixa = models.ForeignKey(CAIXA, null=True, blank=True, on_delete=models.SET_NULL)
-
-    def __str__(self):
-        return f"Parcela {self.numero}/{self.ordem.QUANTIDADE_PARCELA} - Ordem {self.ordem.id}"
+    forma_pagamento= models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, null=True, blank=True)  # novo
+    caixa          = models.ForeignKey(CAIXA, null=True, blank=True, on_delete=models.SET_NULL)
     
-class NotaFiscal(models.Model):
-    ordem = models.OneToOneField("ORDEN", on_delete=models.CASCADE, related_name="nota_fiscal")
-    
-    uuid = models.UUIDField()
-    status = models.CharField(max_length=50)
-    motivo = models.CharField(max_length=255)
-    nfe = models.CharField(max_length=20)
-    serie = models.CharField(max_length=10)
-    chave = models.CharField(max_length=60, unique=True)
-    modelo = models.CharField(max_length=10)
-    epec = models.BooleanField(default=False)
-
-    # Links
-    xml = models.URLField()
-    danfe = models.URLField()
-    danfe_simples = models.URLField(blank=True, null=True)
-    danfe_etiqueta = models.URLField(blank=True, null=True)
-
-    # Log resumido
-    cstat = models.CharField(max_length=10, blank=True, null=True)
-    xmotivo = models.CharField(max_length=255, blank=True, null=True)
-    nprot = models.CharField(max_length=50, blank=True, null=True)
-    dhrecbto = models.DateTimeField(blank=True, null=True)
-
-    criado_em = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"NFe {self.nfe} - {self.status}"

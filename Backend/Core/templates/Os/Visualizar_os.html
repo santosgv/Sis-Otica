@@ -185,114 +185,119 @@ Vizualiar O.S
           <textarea class="form-control"  readonly id="OBSERVACAO" name="OBSERVACAO" rows="3">{{VISUALIZAR_OS.OBSERVACAO}}</textarea>
         </div>
         <hr>
-        <div class="text center">
-          <div class="row">
-          <label for="NUMERO">FINANCEIRO</label>
-          <div class="form-group col-md-2">
-            <label for="inputState">Pagamento</label>
-            <select required id="PAGAMENTO" readonly name="PAGAMENTO" onChange="link()" class="form-control">
-                {% if VISUALIZAR_OS.FORMA_PAG == "A" %}
-                    <option value="A">Pix</option>
-                {% endif%}
-                {% if VISUALIZAR_OS.FORMA_PAG == "B" %}
-                <option value="B">Dinheiro</option>
-                {% endif%}
-                {% if VISUALIZAR_OS.FORMA_PAG == "C" %}
-              <option value="C">Debito</option>
-                {% endif%}
-                {% if VISUALIZAR_OS.FORMA_PAG == "D" %}
-              <option value="D">Credito</option>
-                {% endif%}
-                {% if VISUALIZAR_OS.FORMA_PAG == "E" %}
-              <option value="E">Carne</option>
-                {% endif%}
-                {% if VISUALIZAR_OS.FORMA_PAG == "F" %}
-              <option value="F">Permuta</option>
-                {% endif%}
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Valor</label>
-            <input required type="text" readonly value="{{VISUALIZAR_OS.VALOR}}" class="form-control" id="VALOR" name="VALOR">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Parcelas</label>
-            <select required id="QUANTIDADE_PARCELA" readonly name="QUANTIDADE_PARCELA" class="form-control">
-                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 1 %}
-                <option value="1">1x</option>
-                {% endif%}
 
-                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 2 %}
-              <option value="2">2x</option>
-              {% endif%}
+        <hr>
+<div class="text-center">
+  <div class="row">
+    <label for="NUMERO">FINANCEIRO</label>
 
-                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 3 %}
-              <option value="3">3x</option>
-              {% endif%}
+    <div class="form-group col-md-2">
+      <label>Pagamento</label>
+      <select required id="PAGAMENTO" readonly name="PAGAMENTO" class="form-control">
+        {% if VISUALIZAR_OS.FORMA_PAG == "A" %}<option value="A">Pix</option>{% endif %}
+        {% if VISUALIZAR_OS.FORMA_PAG == "B" %}<option value="B">Dinheiro</option>{% endif %}
+        {% if VISUALIZAR_OS.FORMA_PAG == "C" %}<option value="C">Débito</option>{% endif %}
+        {% if VISUALIZAR_OS.FORMA_PAG == "D" %}<option value="D">Crédito</option>{% endif %}
+        {% if VISUALIZAR_OS.FORMA_PAG == "E" %}<option value="E">Carnê</option>{% endif %}
+        {% if VISUALIZAR_OS.FORMA_PAG == "F" %}<option value="F">Permuta</option>{% endif %}
+      </select>
+    </div>
 
-                {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 4 %}
-              <option value="4">4x</option>
-              {% endif%}
+    <div class="form-group col-md-2">
+      <label>Valor Total</label>
+      <input type="text" readonly value="{{ VISUALIZAR_OS.VALOR|floatformat:2 }}"
+             class="form-control" id="VALOR" name="VALOR">
+    </div>
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 5 %}
-              <option value="5">5x</option>
-              {% endif%}
+    <div class="form-group col-md-2">
+      <label>Parcelas</label>
+      <input type="text" readonly class="form-control"
+             value="{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}x">
+    </div>
+<div class="form-group col-md-2">
+  <label>Entrada</label>
+  <input type="text" readonly class="form-control"
+         value="{{ VISUALIZAR_OS.ENTRADA|floatformat:2 }}">
+</div>
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 6 %}
-              <option value="6">6x</option>
-              {% endif%}
+<div class="form-group col-md-2">
+  <label>Total Pago</label>
+  <input type="text" readonly
+         value="{{ VISUALIZAR_OS.VALOR_PAGO|floatformat:2 }}"
+         class="form-control"
+         style="background:#d1fae5; color:#065f46; font-weight:600;">
+</div>
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 7 %}
-              <option value="7">7x</option>
-              {% endif%}
+<div class="form-group col-md-2">
+  <label>Falta Pagar</label>
+  <input type="text" readonly
+         value="{{ falta_pagar|floatformat:2 }}"
+         class="form-control"
+         style="{% if falta_pagar <= 0 %}background:#d1fae5;color:#065f46;{% else %}background:#fee2e2;color:#991b1b;{% endif %} font-weight:600;">
+</div>
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 8 %}
-              <option value="8">8x</option>
-              {% endif%}
+    <div class="form-group col-md-2">
+      <label>Status</label>
+      {% if VISUALIZAR_OS.STATUS == "A" %}<h4><span class="badge badge-secondary">SOLICITADO</span></h4>{% endif %}
+      {% if VISUALIZAR_OS.STATUS == "E" %}<h4><span class="badge badge-success">ENTREGUE</span></h4>{% endif %}
+      {% if VISUALIZAR_OS.STATUS == "C" %}<h4><span class="badge badge-danger">CANCELADO</span></h4>{% endif %}
+      {% if VISUALIZAR_OS.STATUS == "L" %}<h4><span class="badge badge-primary">LABORATÓRIO</span></h4>{% endif %}
+      {% if VISUALIZAR_OS.STATUS == "J" %}<h4><span class="badge badge-warning">LOJA</span></h4>{% endif %}
+    </div>
+  </div>
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 9 %}
-              <option value="9">9x</option>
-              {% endif%}
+  <!-- Tabela de parcelas -->
+  {% if parcelas %}
+  <div class="row mt-3">
+    <div class="col-12">
+      <table class="table table-sm table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>Parcela</th>
+            <th>Vencimento</th>
+            <th>Valor</th>
+            <th>Forma</th>
+            <th>Status</th>
+            <th>Pago em</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for parcela in parcelas %}
+          <tr>
+            <td>{{ parcela.numero }}/{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}</td>
+            <td>{{ parcela.data_vencimento }}</td>
+            <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+            <td>
+              {% if parcela.forma_pagamento == "A" %}PIX
+              {% elif parcela.forma_pagamento == "B" %}Dinheiro
+              {% elif parcela.forma_pagamento == "C" %}Débito
+              {% elif parcela.forma_pagamento == "D" %}Crédito
+              {% elif parcela.forma_pagamento == "E" %}Carnê
+              {% elif parcela.forma_pagamento == "F" %}Permuta
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if parcela.pago %}
+                <span class="badge badge-success">Pago</span>
+              {% else %}
+                <span class="badge badge-warning">Pendente</span>
+              {% endif %}
+            </td>
+            <td>{{ parcela.data_pagamento|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
 
-              {% if VISUALIZAR_OS.QUANTIDADE_PARCELA == 10 %}
-              <option value="10">10x</option>
-              {% endif%}
-            </select>
-          </div>
-          
-          <div class="form-group col-md-2">
-            <label for="inputZip">Valor Pago</label>
-            <input required type="text" readonly value="{{VISUALIZAR_OS.ENTRADA|floatformat:2}}" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" class="form-control" id="ENTRADA" name="ENTRADA">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Status</label>
-            {% if VISUALIZAR_OS.STATUS == "A" %}
-            <h4><span class="badge badge-secondary">SOLICITADO</span></h4>
-            {% endif %}
-
-            {% if VISUALIZAR_OS.STATUS == "E" %}
-            <h4><span class="badge badge-success">ENTREGUE</span></h4>
-             {% endif %}
-
-             {% if VISUALIZAR_OS.STATUS == "C" %}
-             <h4><span class="badge badge-danger">CANCELADO</span></h4>
-             {% endif %}
-
-             {% if VISUALIZAR_OS.STATUS == "L" %}
-             <h4><span class="badge badge-primary">LABORATÓRIO</span></h4>
-             {% endif %}
-
-             {% if VISUALIZAR_OS.STATUS == "J" %}
-             <h4><span class="badge badge-warning">LOJA</span></h4>
-             {% endif %}
-           
-          </div>
-        </div>
-        </div>
+</div>
+       
         <div style="margin: 15px;">
         {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
         <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
-        <a href="{% url 'Core:emitir_nfe' VISUALIZAR_OS.id  %}"  class="btn btn-success" >EMITIR NFE</a>
+         <a href="{% url 'Core:emitir_nfe' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Gerar Xml</a> 
         {% endif %}
         <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
         {% if VISUALIZAR_OS.STATUS == "A" %}

@@ -49,6 +49,7 @@ urlpatterns = [
     path('Lista_Os',views.Lista_Os,name='Lista_Os'),
     path('Cadastrar_os/<int:id_cliente>',views.Cadastrar_os,name='Cadastrar_os'),
     path('ordens_pendentes/', views.ordens_faltando_pagamento, name='ordens_pendentes'),
+    path('pagar_parcela/<int:parcela_id>/', views.pagar_parcela, name='pagar_parcela'),
     path('Visualizar_os/<int:id_os>',views.Visualizar_os,name='Visualizar_os'),
     path('emitir_nfe/<int:id_os>',views.emitir_nfe_view,name='emitir_nfe'),
     path('Editar_os/<int:id_os>',views.Editar_os,name='Editar_os'),

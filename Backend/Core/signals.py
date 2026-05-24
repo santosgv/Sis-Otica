@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import Sum
@@ -13,11 +15,14 @@ def verificar_estoque_minimo(sender, instance, **kwargs):
 def atualizar_valor_pago_ordem(sender, instance, **kwargs):
     ordem = instance.ordem
 
-    # Soma das parcelas pagas
-    total_pago = ordem.parcelas.filter(pago=True).aggregate(
-        total=Sum('valor')
-    )['total'] or 0
+    entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
 
-    # Atualiza o campo ENTRADA com o total pago
-    ordem.ENTRADA = total_pago
-    ordem.save(update_fields=['ENTRADA'])
+    total_parcelas_pagas = ordem.parcelas.filter(pago=True).aggregate(
+        total=Sum('valor')
+    )['total'] or Decimal('0')
+
+    # VALOR_PAGO = sinal original + parcelas pagas
+    novo_valor_pago = entrada + total_parcelas_pagas
+
+    # Atualiza sem passar pelo HistoricalRecords (evita o erro do F() no INSERT)
+    ORDEN.objects.filter(pk=ordem.pk).update(VALOR_PAGO=novo_valor_pago)

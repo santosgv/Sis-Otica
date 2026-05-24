@@ -17,6 +17,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from django.utils.timezone import timedelta
+from dateutil.relativedelta import relativedelta
 import logging
 from PIL import Image
 from barcode import Code128
@@ -25,7 +26,7 @@ import qrcode
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import black
 from pathlib import Path
-from decimal import Decimal
+from decimal import Decimal,ROUND_HALF_UP
 from .services.webmaniabr import emitir_nfe
 
 logger = logging.getLogger('MyApp')
@@ -483,7 +484,9 @@ def entradas_meses_passados(request):
     
     return render(request, 'parcial/meses_passados.html', {'entradas': entradas})
 
-def criar_parcelas(os):
+
+#def criar_parcelas(os):
+"""
     ordem = ORDEN.objects.get(id=os)
     if not ordem.QUANTIDADE_PARCELA or ordem.QUANTIDADE_PARCELA <= 1:
         return
@@ -502,4 +505,84 @@ def criar_parcelas(os):
             valor=valor_parcela,
             data_vencimento=data_vencimento
         )
+"""
+def criar_parcelas(os):
 
+    ordem = ORDEN.objects.get(id=os)
+
+    entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
+    valor_total = Decimal(str(ordem.VALOR))
+    qtd = int(ordem.QUANTIDADE_PARCELA)
+
+    valor_restante = valor_total - entrada
+
+    if valor_restante <= 0 or qtd <= 0:
+        return
+
+    valor_parcela = (valor_restante / qtd).quantize(
+        Decimal('0.01'), rounding=ROUND_HALF_UP
+    )
+
+    parcelas = []
+    soma = Decimal('0')
+
+    for i in range(1, qtd + 1):
+        vencimento = date.today() + relativedelta(months=i)
+
+        # Última parcela: ajusta o resíduo de arredondamento
+        if i == qtd:
+            valor_esta = valor_restante - soma
+        else:
+            valor_esta = valor_parcela
+            soma += valor_parcela
+
+        parcelas.append(ParcelaOrdem(
+            ordem=ordem,
+            numero=i,
+            data_vencimento=vencimento,
+            valor=valor_esta,
+            pago=False,
+        ))
+
+    ParcelaOrdem.objects.bulk_create(parcelas)
+
+def registrar_entrada_caixa(ordem):
+    entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
+    if entrada <= 0:
+        return
+
+    CAIXA.objects.create(
+        DESCRICAO=f'Entrada OS #{ordem.id} - {ordem.CLIENTE}',
+        REFERENCIA=ordem,
+        TIPO='E',
+        VALOR=float(entrada),
+        FORMA=ordem.FORMA_PAG or 'B',
+    )
+
+    # Inicializa VALOR_PAGO com a entrada
+    ordem.VALOR_PAGO = entrada
+    ordem.save(update_fields=['VALOR_PAGO'])
+
+
+def registrar_pagamento_parcela(parcela, forma_pagamento):
+    if parcela.pago:
+        raise ValueError('Esta parcela já foi paga.')
+
+    FORMAS_VALIDAS = {'A', 'B', 'C', 'D', 'E', 'F'}
+    if forma_pagamento not in FORMAS_VALIDAS:
+        raise ValueError('Forma de pagamento inválida.')
+
+    caixa = CAIXA.objects.create(
+        DESCRICAO=f'Parcela {parcela.numero} - OS #{parcela.ordem.id} - {parcela.ordem.CLIENTE}',
+        REFERENCIA=parcela.ordem,
+        TIPO='E',
+        VALOR=float(parcela.valor),
+        FORMA=forma_pagamento,
+    )
+
+    parcela.pago = True
+    parcela.data_pagamento = date.today()
+    parcela.forma_pagamento = forma_pagamento
+    parcela.caixa = caixa
+    parcela.save(update_fields=['pago', 'data_pagamento', 'forma_pagamento', 'caixa'])
+    # O signal post_save do ParcelaOrdem já atualiza VALOR_PAGO automaticamente

@@ -1,11 +1,13 @@
 
 from datetime import datetime
+import os
 from django.contrib import messages
+from django.db import models
 from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.services.webmaniabr import emitir_nfe
-from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, NotaFiscal, Review,SaidaEstoque,
+from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque,
                           EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,
                           Tipo,Estilo,AlertaEstoque,Estilo,ParcelaOrdem)
 from django.shortcuts import get_object_or_404
@@ -17,12 +19,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .utils import (criar_mensagem_parabens,realizar_entrada,
                     realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
-                    get_10_days,get_30_days,criar_parcelas)
+                    get_10_days,get_30_days,criar_parcelas,
+                    registrar_entrada_caixa,
+                    registrar_pagamento_parcela)
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from decimal import Decimal,ROUND_HALF_UP
 import logging
 from django.db import transaction
@@ -321,6 +325,9 @@ def Cadastrar_os(request,id_cliente):
 
                 
                 cadastrar_os.save()
+
+                registrar_entrada_caixa(cadastrar_os)
+
                 if int(QUANTIDADE_PARCELA) > 1 and entrada < valor:
                     criar_parcelas(cadastrar_os.id)
 
@@ -336,25 +343,66 @@ def Cadastrar_os(request,id_cliente):
 
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
-
-    pendentes = ParcelaOrdem.objects.filter(pago=False).order_by('data_vencimento').select_related('ordem').all()
+    pendentes = (ParcelaOrdem.objects
+                 .filter(pago=False)
+                 .order_by('data_vencimento')
+                 .select_related('ordem'))
 
     pagina = Paginator(pendentes, 25)
-    page = request.GET.get('page')
+    page   = request.GET.get('page')
     results = pagina.get_page(page)
 
-    return render(request, 'Os/ordens_pendentes.html',{'results':results})
+    # mesmo choices do model, passado pro template
+    formas_pagamento = ParcelaOrdem.CHOICES_PAGAMENTO
+
+    return render(request, 'Os/ordens_pendentes.html', {
+        'results': results,
+        'formas_pagamento': formas_pagamento,
+    })
+
+@login_required
+def pagar_parcela(request, parcela_id):
+    if request.method != 'POST':
+        return redirect('ordens_faltando_pagamento')
+
+    parcela = get_object_or_404(ParcelaOrdem, id=parcela_id)
+    forma = request.POST.get('forma_pagamento', '').strip()
+
+    if not forma:
+        messages.add_message(request, constants.WARNING, 'Selecione uma forma de pagamento.')
+        return redirect('ordens_faltando_pagamento')
+
+    try:
+        with transaction.atomic():
+            registrar_pagamento_parcela(parcela, forma)
+        messages.add_message(
+            request, constants.SUCCESS,
+            f'Parcela {parcela.numero} da OS #{parcela.ordem.id} paga com sucesso!'
+        )
+    except ValueError as e:
+        messages.add_message(request, constants.WARNING, str(e))
+    except Exception as e:
+        logger.warning(e)
+        messages.add_message(request, constants.ERROR, 'Erro ao registrar pagamento.')
+
+    return redirect('/ordens_pendentes')
  
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
     if request.method == "GET":
+        from decimal import Decimal
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
-       
-        return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
-                                                       'unidade':settings.UNIDADE
-                                                   })
+
+        falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - VISUALIZAR_OS.VALOR_PAGO
+
+        return render(request, 'Os/Visualizar_os.html', {
+            'VISUALIZAR_OS': VISUALIZAR_OS,
+            'unidade': settings.UNIDADE,
+            'falta_pagar': falta_pagar,
+            'parcelas': VISUALIZAR_OS.parcelas.order_by('numero'),
+        })
     else:
-        return render(request,'Os/Visualizar_os.html')
+        return render(request, 'Os/Visualizar_os.html')
     
 @transaction.atomic    
 @login_required(login_url='/auth/logar/')
@@ -1377,78 +1425,87 @@ def historico_compras(request, cliente_id):
 
 @login_required(login_url='/auth/logar/')
 def emitir_nfe_view(request, id_os):
-    VISUALIZAR_OS = get_object_or_404(ORDEN, id=id_os)
+    visualizar_os = get_object_or_404(ORDEN, id=id_os)
 
-        # Pega os dados do cliente da OS
+    # ==========================================
+    # CLIENTE
+    # ==========================================
     cliente = {
-            "cpf": VISUALIZAR_OS.CLIENTE.CPF,
-            "nome": VISUALIZAR_OS.CLIENTE.NOME,
-            "endereco": VISUALIZAR_OS.CLIENTE.LOGRADOURO,
-            "complemento": '',
-            "numero": VISUALIZAR_OS.CLIENTE.NUMERO,
-            "bairro": VISUALIZAR_OS.CLIENTE.BAIRRO,
-            "cidade": VISUALIZAR_OS.CLIENTE.CIDADE,
-            "uf": 'MG',
-            "cep": VISUALIZAR_OS.CLIENTE.CEP,
-            "telefone": VISUALIZAR_OS.CLIENTE.TELEFONE,
-            "email": 'santosgomesv@gmail.com',
-        }
+        "cpf": visualizar_os.CLIENTE.CPF,
+        "nome": visualizar_os.CLIENTE.NOME,
+        "endereco": visualizar_os.CLIENTE.LOGRADOURO,
+        "complemento": "",
+        "numero": visualizar_os.CLIENTE.NUMERO,
+        "bairro": visualizar_os.CLIENTE.BAIRRO,
+        "cidade": visualizar_os.CLIENTE.CIDADE,
+        "uf": "MG",
+        "cep": visualizar_os.CLIENTE.CEP,
+        "telefone": visualizar_os.CLIENTE.TELEFONE,
+        "email": "santosgomesv@gmail.com",
+    }
 
+    # ==========================================
+    # PRODUTOS
+    # ==========================================
     produtos = []
-    # Produto 1: Serviço
-    if VISUALIZAR_OS.SERVICO:
+
+    # Serviço principal
+    if visualizar_os.SERVICO:
         produtos.append({
-            "nome": str(VISUALIZAR_OS.SERVICO),
-            "codigo": f"SERV-{VISUALIZAR_OS.SERVICO.id}",
+            "nome": str(visualizar_os.SERVICO),
+            "codigo": f"SERV-{visualizar_os.SERVICO.id}",
             "quantidade": 1,
-            "subtotal": float(VISUALIZAR_OS.VALOR),
-            "total": float(VISUALIZAR_OS.VALOR),
+            "total": Decimal(visualizar_os.VALOR)
         })
-    # Produto 2: Armação (se preenchido)
-    if VISUALIZAR_OS.ARMACAO and VISUALIZAR_OS.ARMACAO != "N/D":
+
+    # Armação
+    if visualizar_os.ARMACAO and visualizar_os.ARMACAO != "N/D":
         produtos.append({
-            "nome": str(VISUALIZAR_OS.ARMACAO),
+            "nome": str(visualizar_os.ARMACAO),
             "codigo": "ARMACAO",
             "quantidade": 1,
-            "subtotal": 0.00,
-            "total": 0.00,
+            "total": Decimal("0.00")
         })
-    # Produto 3: Lentes (se preenchido)
-    if VISUALIZAR_OS.LENTES and VISUALIZAR_OS.LENTES != "N/D":
+
+    # Lentes
+    if visualizar_os.LENTES and visualizar_os.LENTES != "N/D":
         produtos.append({
-            "nome": str(VISUALIZAR_OS.LENTES),
+            "nome": str(visualizar_os.LENTES),
             "codigo": "LENTES",
             "quantidade": 1,
-            "subtotal": 0.00,
-            "total": 0.00,
+            "total": Decimal("0.00")
         })
-    # Valor total da OS
-    total = float(VISUALIZAR_OS.VALOR)
-    # Chama a API da WebmaniaBR
-    resposta = emitir_nfe(cliente, produtos, total)
 
-    if resposta.get("status") == "aprovado":
-        log = resposta.get("log", {})
-        prot = log.get("aProt", [{}])[0] if log.get("aProt") else {}
-        NotaFiscal.objects.create(
-        ordem=VISUALIZAR_OS,
-        uuid=resposta.get("uuid"),
-        status=resposta.get("status"),
-        motivo=resposta.get("motivo"),
-        nfe=resposta.get("nfe"),
-        serie=resposta.get("serie"),
-        chave=resposta.get("chave"),
-        modelo=resposta.get("modelo"),
-        epec=resposta.get("epec"),
-        xml=resposta.get("xml"),
-        danfe=resposta.get("danfe"),
-        danfe_simples=resposta.get("danfe_simples"),
-        danfe_etiqueta=resposta.get("danfe_etiqueta"),
-        cstat=log.get("cStat"),
-        xmotivo=log.get("xMotivo"),
-        nprot=prot.get("nProt"),
-        dhrecbto=datetime.fromisoformat(prot.get("dhRecbto")) if prot.get("dhRecbto") else None,
-    )
-        
-    messages.add_message(request, constants.SUCCESS, 'NFS emitida com sucesso')
-    return redirect(f'/Visualizar_os/{VISUALIZAR_OS.id}')
+    total = Decimal(visualizar_os.VALOR)
+
+    try:
+        # ==========================================
+        # GERA XML
+        # ==========================================
+        caminho_xml = emitir_nfe(
+            cliente=cliente,
+            produtos=produtos,
+            total=total,
+            numero_nf=visualizar_os.id,
+            serie=1
+        )
+
+        # ==========================================
+        # DOWNLOAD DO XML
+        # ==========================================
+        response = FileResponse(
+            open(caminho_xml, 'rb'),
+            as_attachment=True,
+            filename=os.path.basename(caminho_xml)
+        )
+
+        return response
+
+    except Exception as e:
+        messages.add_message(
+            request,
+            constants.ERROR,
+            f'Erro ao gerar XML: {str(e)}'
+        )
+
+        return redirect(f'/Visualizar_os/{visualizar_os.id}')
