@@ -168,7 +168,7 @@ def ultimo_dia_mes():
     return last_date
 
 def dados_caixa():
-    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False).order_by('-id')
+    dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False,ABERTO=True).order_by('-id')
     return dado
 
 def Imprimir_os(request,id_os):
@@ -557,6 +557,7 @@ def registrar_entrada_caixa(ordem):
         TIPO='E',
         VALOR=float(entrada),
         FORMA=ordem.FORMA_PAG or 'B',
+        ABERTO=True,
     )
 
     # Inicializa VALOR_PAGO com a entrada
@@ -578,6 +579,7 @@ def registrar_pagamento_parcela(parcela, forma_pagamento):
         TIPO='E',
         VALOR=float(parcela.valor),
         FORMA=forma_pagamento,
+        ABERTO=True,
     )
 
     parcela.pago = True

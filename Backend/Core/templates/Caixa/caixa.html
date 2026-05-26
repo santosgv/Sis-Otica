@@ -126,7 +126,9 @@
             <span>&nbspR$ {{ saldo_total }}</span>
           </div>
           <div>
+            {% if caixa_aberto %}
             <a type="button" class="btn btn-warning" href="{% url 'Core:fechar_caixa' %}">Fechar Caixa</a>
+            {% endif %}
           </div>
         </div>
         

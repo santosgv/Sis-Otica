@@ -103,7 +103,6 @@ def home(request):
     else:
         return render(request,'home.html')
 
-
 @login_required(login_url='/auth/logar/')
 def clientes(request):
         cliente_lista = CLIENTE.objects.order_by('NOME').order_by('-DATA_CADASTRO').filter(STATUS=1).only('id').all().values()
@@ -339,7 +338,6 @@ def Cadastrar_os(request,id_cliente):
             cliente = CLIENTE.objects.get(id=id_cliente)
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
-
 
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
@@ -662,10 +660,10 @@ def update_card_status(request, card_id):
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
     # Buscar o último caixa fechado sem filtro de data
-    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+    #ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True,ABERTO=False, FORMA='B').order_by('DATA').last()
     
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
-    saldo_anterior = ultimo_caixa_fechado.VALOR if ultimo_caixa_fechado else 0
+    #saldo_anterior = ultimo_caixa_fechado.VALOR if ultimo_caixa_fechado else 0
 
     # Calcula entradas e saídas do dia corrente
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -675,7 +673,7 @@ def get_entrada_saida(self):
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo atual
-    saldo_total_dinheiro = saldo + saldo_anterior
+    saldo_total_dinheiro = saldo # + saldo_anterior
 
     # Calcula entradas totais (sem considerar apenas dinheiro)
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0

@@ -18,7 +18,6 @@ def search(request):
 
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
-
 def search_by_id(request):
     search = request.GET.get('search_by_id')
     oss = ORDEN.objects.filter(id__icontains=search)
