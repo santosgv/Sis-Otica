@@ -33,7 +33,23 @@
             {% endfor %}
         {% endif %}
     </div>
-    
+                      <!-- Botão de abertura — só aparece se NÃO houver caixa aberto -->
+        {% if not caixa_aberto %}
+        <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+          <span><i class="fas fa-exclamation-triangle me-2"></i> Nenhum caixa aberto hoje. Registre a abertura para lançar movimentações.</span>
+          <button class="btn btn-success btn-sm ms-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalAbrirCaixa">
+            <i class="fas fa-lock-open me-1"></i> Abrir Caixa
+          </button>
+        </div>
+        {% else %}
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          Caixa aberto hoje com valor de abertura:
+          <strong class="ms-1">R$ {{ caixa_aberto.VALOR|floatformat:2 }}</strong>
+        </div>
+        {% endif %}
     <section class="container-fluid text-center">
       <div class="row">
         <!-- Table Column -->
@@ -88,14 +104,15 @@
               {% endfor %}
             </tbody>
           </table>
+          {% if caixa_aberto %}
           <a href="{% url 'Core:cadastro_caixa' %}">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABHklEQVR4nO2WTUrDUBSFv010UJuI69C6AKEGt6HGuhZnlpYOOuzcn50k4ipMnJlQCdxCCC/JfYlPMsiBOwmBj3veefc+GDVAnQIPwDsQA99SsXwLAf8vgTNgBWTAoaVyYA+c9YXeAKkCWK0ECLpCH6UDW2i5+2WXTvMe0DJc3bmntPccmCttP9GAt8pujtL8u9ZcmcwBOBMna7W0OD8b8AG4bwK/OQS/NIE/HYLjJnBSk15bmdKe2IIvOoAvbcEfDq2OBhmu0CH4tgnsOxogP20DpNDGAfgZ5eI3pduUdlN6q/UFTFHqysLytrV4rYWW53bfh0DxRuukQGm7yd4FPTUBniSZmi53NmeqkSer7VWmUCoVyXC401yZUfy3fgGUCo4V1aA/HAAAAABJRU5ErkJggg==" />
           </a>
+          {% endif %}
         </div>
         <!-- Cards Column -->
          
         <div class="col-lg-2 col-md-12">
-          <a type="button" class="btn btn-success" href="#">Abrir Caixa</a>
           <div class="_caixa mb-3">
             <span>Saldo em dinheiro</span>
           </div>
@@ -114,6 +131,60 @@
         </div>
         
       </div>
+
+
+      <!-- Modal Abrir Caixa -->
+<div class="modal fade" id="modalAbrirCaixa" tabindex="-1"
+     aria-labelledby="modalAbrirCaixaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+    <div class="modal-content" style="border-radius:12px; border:none; box-shadow:0 8px 32px rgba(0,0,0,.18)">
+
+      <div class="modal-header" style="border-bottom:1px solid #e9ecef">
+        <h5 class="modal-title fw-semibold" id="modalAbrirCaixaLabel">
+          <i class="fas fa-cash-register me-2 text-success"></i>
+          Abrir Caixa
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <form method="POST" action="{% url 'Core:abrir_caixa' %}">
+        {% csrf_token %}
+        <div class="modal-body" style="padding:1.25rem">
+          <div class="mb-3">
+            <label for="valor_abertura"
+                   class="form-label"
+                   style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6c757d">
+              Valor em caixa (troco inicial)
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">R$</span>
+              <input type="text"
+                     class="form-control"
+                     id="valor_abertura"
+                     name="valor_abertura"
+                     placeholder="0,00"
+                     autocomplete="off"
+                     style="font-size:1.1rem;font-weight:600">
+            </div>
+            <small class="text-muted" style="font-size:.75rem">
+              Informe o valor em dinheiro disponível no caixa para iniciar o dia.
+            </small>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="border-top:1px solid #e9ecef">
+          <button type="button" class="btn btn-outline-secondary btn-sm"
+                  data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="fas fa-check me-1"></i> Confirmar abertura
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
     </section>
               
               <div class="pagination">
@@ -135,6 +206,15 @@
               {% else%}
               <h1 class="text-center">Acesso apenas para Gerentes e Caixa !</h1>
               {% endif%}
+              <script>
+          // Máscara simples de moeda no campo de abertura
+          document.getElementById('valor_abertura').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            v = (parseInt(v || '0') / 100).toFixed(2);
+            v = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            e.target.value = v;
+          });
+          </script>
               <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
   {% endblock %}

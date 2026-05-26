@@ -135,14 +135,14 @@ class CAIXA(models.Model):
     VALOR = models.FloatField()
     FORMA = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, default="B")
     FECHADO = models.BooleanField(default=False)
-    SALDO_FINAL =models.FloatField(default=0)
-    ENTRADA =  models.FloatField(default=0)
+    ABERTO =  models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return str(self.id)
     
     def fechar_caixa(self):
         self.FECHADO = True
+        self.ABERTO = False
         return
 
 class Fornecedor(models.Model):

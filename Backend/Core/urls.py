@@ -66,6 +66,7 @@ urlpatterns = [
     path('Dashabord',views.Dashabord,name='Dashabord'),
     path('update_card_status/<int:card_id>', views.update_card_status, name='update_card_status'),
     path('Caixa',views.Caixa, name='Caixa'),
+    path('abrir_caixa/', views.abrir_caixa, name='abrir_caixa'),
     path('fechar_caixa',views.fechar_caixa, name='fechar_caixa'),
     path('cadastro_caixa',views.cadastro_caixa, name='cadastro_caixa'),
     path('vendas_lentes',views.vendas_lentes, name='vendas_lentes'),

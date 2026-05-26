@@ -665,7 +665,7 @@ def get_entrada_saida(self):
     ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
     
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
-    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
+    saldo_anterior = ultimo_caixa_fechado.VALOR if ultimo_caixa_fechado else 0
 
     # Calcula entradas e saídas do dia corrente
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -680,12 +680,19 @@ def get_entrada_saida(self):
     # Calcula entradas totais (sem considerar apenas dinheiro)
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
 
-    return entradas, saidas, saldo_total_dinheiro, entradas_total
+    return entradas, saidas,saldo_total_dinheiro, entradas_total
 
 @login_required(login_url='/auth/logar/')
 def Caixa(request):
     if request.method == "GET":
         try:
+
+            caixa_aberto_hoje = CAIXA.objects.filter(
+            ABERTO=True,
+            FECHADO=False,
+            DATA=get_today_data()
+        ).first()
+            
             dadoscaixa = dados_caixa()
             entradas,saida,saldo_total_dinheiro,entradas_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
@@ -694,6 +701,7 @@ def Caixa(request):
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
                                                       'saida':saida,
+                                                      'caixa_aberto': caixa_aberto_hoje,
                                                       'saldo':saldo_total_dinheiro,
                                                       'saldo_total':entradas_total})
         except Exception as msg:
@@ -701,31 +709,68 @@ def Caixa(request):
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
+@login_required(login_url='/auth/logar/')
+def abrir_caixa(request):
+    if request.method != 'POST':
+        return redirect('/Caixa')
+
+    # Verifica se já existe caixa aberto hoje
+    caixa_aberto = CAIXA.objects.filter(
+        ABERTO=True,
+        FECHADO=False,
+        DATA=get_today_data()
+    ).exists()
+
+    if caixa_aberto:
+        messages.add_message(request, constants.WARNING, 'Já existe um caixa aberto hoje.')
+        return redirect('/Caixa')
+
+    valor_str = request.POST.get('valor_abertura', '0').replace('.', '').replace(',', '.')
+
+    try:
+        valor = float(valor_str)
+    except ValueError:
+        messages.add_message(request, constants.ERROR, 'Valor inválido.')
+        return redirect('/Caixa')
+
+    CAIXA.objects.create(
+        DATA=get_today_data(),
+        DESCRICAO='Abertura de caixa',
+        REFERENCIA=None,
+        TIPO='E',
+        VALOR=valor,
+        FORMA='B',   # dinheiro por padrão na abertura
+        ABERTO=True,
+        FECHADO=False,
+    )
+
+    messages.add_message(request, constants.SUCCESS, 'Caixa aberto com sucesso.')
+    return redirect('/Caixa')
+
 def fechar_caixa(request):
     # Filtrar o caixa do dia atual que ainda não foi fechado
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False,ABERTO=True).order_by('-id')
 
     # Buscar o último caixa fechado, independentemente de datas
-    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+    #ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
 
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
-    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
+    #saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
 
     # Calcula entradas e saídas do dia corrente
-    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False,ABERTO=True).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False,ABERTO=True).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     
     # Calcula o saldo do dia
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo do dia para obter o saldo total
-    saldo_total = round(saldo + saldo_anterior, 2)
+    saldo_total = round(saldo, 2)
 
     #print(saldo_total, 'saldo final ao fechar')
 
     # Atualiza o saldo final e fecha o caixa do dia
     for dado in caixa:
-        dado.SALDO_FINAL = saldo_total
         dado.fechar_caixa()
         dado.save()
 
@@ -739,56 +784,92 @@ def fechar_caixa(request):
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
-    if request.method =="GET":
-        os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()
-        return render(request,'Caixa/caixa_fluxo.html',{
-            'OsS':os_disponiveis,
-            'data':get_today_data()
+    if request.method == "GET":
+        os_disponiveis = ORDEN.objects.exclude(
+            STATUS='C'
+        ).exclude(
+            STATUS='E'
+        ).all()
+
+        return render(request, 'Caixa/caixa_fluxo.html', {
+            'OsS': os_disponiveis,
+            'data': get_today_data()
         })
-    else:
-        with transaction.atomic():
-            descricao =request.POST.get('DESCRICAO')
-            referencia = request.POST.get('REFERENCIA')
-            tipo= request.POST.get('TIPO')
-            valor_str = request.POST.get('VALOR')
-            forma= request.POST.get('FORMA')
 
-            valor_str = valor_str.replace('.', '').replace(',', '.')
+    with transaction.atomic():
 
-            
-            if referencia and referencia != 'null':
-                referencia_obj = get_object_or_404(ORDEN, id=referencia)
-            else:
-                referencia_obj = None
-            caixa = CAIXA.objects.create(
-                DATA=get_today_data(),
-                VALOR=valor_str,
-                DESCRICAO=descricao,
-                REFERENCIA= referencia_obj,
-                TIPO=tipo,
-                FORMA=forma
+        descricao = request.POST.get('DESCRICAO')
+        referencia = request.POST.get('REFERENCIA')
+        tipo = request.POST.get('TIPO')
+        valor_str = request.POST.get('VALOR')
+        forma = request.POST.get('FORMA')
+
+        valor_str = valor_str.replace('.', '').replace(',', '.')
+
+        # ======================================
+        # REFERÊNCIA DA ORDEM (SE EXISTIR)
+        # ======================================
+        if referencia and referencia != 'null':
+            referencia_obj = get_object_or_404(
+                ORDEN,
+                id=referencia
             )
-            caixa.save()
+        else:
+            referencia_obj = None
 
-            if tipo == 'E' and referencia_obj:
-                parcelas = ParcelaOrdem.objects.filter(ordem=referencia_obj, pago=False).order_by('data_vencimento')
+        # ======================================
+        # CRIA ENTRADA/SAÍDA DE CAIXA
+        # ======================================
+        caixa = CAIXA.objects.create(
+            DATA=get_today_data(),
+            VALOR=valor_str,
+            DESCRICAO=descricao,
+            REFERENCIA=referencia_obj,
+            TIPO=tipo,
+            FORMA=forma,
+            ABERTO=True
+        )
+
+        # ======================================
+        # PROCESSA PARCELAS APENAS SE:
+        # - É ENTRADA
+        # - EXISTE REFERÊNCIA
+        # - EXISTEM PARCELAS
+        # ======================================
+        if tipo == 'E' and referencia_obj:
+
+            parcelas = ParcelaOrdem.objects.filter(
+                ordem=referencia_obj,
+                pago=False
+            ).order_by('data_vencimento')
+
+            # Só entra se encontrou parcelas
+            if parcelas.exists():
+
                 valor_restante = float(valor_str)
-            
-            for parcela in parcelas:
-                if valor_restante <= 0:
-                    break
 
-                valor_parcela = float(parcela.valor)
+                for parcela in parcelas:
 
-                if valor_restante >= valor_parcela:
-                    parcela.pago = True
-                    parcela.data_pagamento = get_today_data()
-                    parcela.caixa=get_object_or_404(CAIXA,id=caixa.id)
-                    parcela.save()
-                    valor_restante -= valor_parcela
+                    if valor_restante <= 0:
+                        break
 
-            messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
-            return redirect('/Caixa')
+                    valor_parcela = float(parcela.valor)
+
+                    if valor_restante >= valor_parcela:
+                        parcela.pago = True
+                        parcela.data_pagamento = get_today_data()
+                        parcela.caixa = caixa
+                        parcela.save()
+
+                        valor_restante -= valor_parcela
+
+        messages.add_message(
+            request,
+            constants.SUCCESS,
+            'Cadastrado com sucesso'
+        )
+
+        return redirect('/Caixa')
 
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
@@ -1102,7 +1183,6 @@ def vendas_lentes(request):
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
-
 
 def receber(request):
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
