@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load filters %}
 {% load compress %}
 {% load static %}
 
@@ -216,7 +217,7 @@ Vizualiar O.S
 <div class="form-group col-md-2">
   <label>Entrada</label>
   <input type="text" readonly class="form-control"
-         value="{{ VISUALIZAR_OS.ENTRADA|floatformat:2 }}">
+         value="{{ VISUALIZAR_OS.ENTRADA|money }}">
 </div>
 
 <div class="form-group col-md-2">
