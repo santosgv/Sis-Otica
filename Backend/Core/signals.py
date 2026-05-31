@@ -39,4 +39,4 @@ def atualizar_valor_pago_ordem_sem_parcela(sender, instance, **kwargs):
             VALOR_PAGO=entrada
         )
 
-        print("VALOR_PAGO atualizado")
+        #print("VALOR_PAGO atualizado")

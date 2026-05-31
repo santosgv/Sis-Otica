@@ -281,7 +281,7 @@ def Cadastrar_os(request,id_cliente):
                 entrada = Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-                print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
+                #print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
 
                 if ARMACAO != None:
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
@@ -392,7 +392,7 @@ def Visualizar_os(request,id_os):
 
         falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - Decimal(str(VISUALIZAR_OS.VALOR_PAGO))
 
-        print(VISUALIZAR_OS.VALOR,VISUALIZAR_OS.VALOR_PAGO)
+        #print(VISUALIZAR_OS.VALOR,VISUALIZAR_OS.VALOR_PAGO)
 
         return render(request, 'Os/Visualizar_os.html', {
             'VISUALIZAR_OS': VISUALIZAR_OS,
@@ -704,7 +704,7 @@ def Caixa(request):
                                                       'saldo':saldo_total_dinheiro,
                                                       'saldo_total':entradas_total})
         except Exception as msg:
-            print(msg)
+            #print(msg)
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
