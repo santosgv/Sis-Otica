@@ -205,7 +205,7 @@ Vizualiar O.S
 
     <div class="form-group col-md-2">
       <label>Valor Total</label>
-      <input type="text" readonly value="{{ VISUALIZAR_OS.VALOR|floatformat:2 }}"
+      <input type="text" readonly value="{{ VISUALIZAR_OS.VALOR|money }}"
              class="form-control" id="VALOR" name="VALOR">
     </div>
 
@@ -223,7 +223,7 @@ Vizualiar O.S
 <div class="form-group col-md-2">
   <label>Total Pago</label>
   <input type="text" readonly
-         value="{{ VISUALIZAR_OS.VALOR_PAGO|floatformat:2 }}"
+         value="{{ VISUALIZAR_OS.VALOR_PAGO|money }}"
          class="form-control"
          style="background:#d1fae5; color:#065f46; font-weight:600;">
 </div>
@@ -231,7 +231,7 @@ Vizualiar O.S
 <div class="form-group col-md-2">
   <label>Falta Pagar</label>
   <input type="text" readonly
-         value="{{ falta_pagar|floatformat:2 }}"
+         value="{{ falta_pagar|money }}"
          class="form-control"
          style="{% if falta_pagar <= 0 %}background:#d1fae5;color:#065f46;{% else %}background:#fee2e2;color:#991b1b;{% endif %} font-weight:600;">
 </div>

@@ -26,3 +26,17 @@ def atualizar_valor_pago_ordem(sender, instance, **kwargs):
 
     # Atualiza sem passar pelo HistoricalRecords (evita o erro do F() no INSERT)
     ORDEN.objects.filter(pk=ordem.pk).update(VALOR_PAGO=novo_valor_pago)
+
+@receiver(post_save, sender=ORDEN)
+def atualizar_valor_pago_ordem_sem_parcela(sender, instance, **kwargs):
+
+    entrada = instance.ENTRADA or Decimal("0.00")
+
+    # Evita save desnecessário
+    if instance.VALOR_PAGO != entrada:
+
+        ORDEN.objects.filter(id=instance.id).update(
+            VALOR_PAGO=entrada
+        )
+
+        print("VALOR_PAGO atualizado")

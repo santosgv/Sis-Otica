@@ -205,7 +205,7 @@ def Imprimir_os(request,id_os):
         
         PDF.drawString(240,539,str(PRINT_OS.VALOR))
         PDF.drawString(385,539,str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(520,539,str(PRINT_OS.ENTRADA))
+        PDF.drawString(520,539,str(PRINT_OS.VALOR_PAGO))
         # parte laboratorio
         PDF.setFont('Courier-Bold', 12)
         PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))

@@ -276,11 +276,9 @@ def Cadastrar_os(request,id_cliente):
                 LENTES = request.POST.get('LENTES')
                 ARMACAO = request.POST.get('ARMACAO')
                 OBSERVACAO = request.POST.get('OBSERVACAO')
-                FORMA_PAG = request.POST.get('PAGAMENTO')
-                valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-                valor = Decimal(valor_str)
-                entrada_str =request.POST.get('ENTRADA').replace(".", "").replace(",", ".")
-                entrada = Decimal(entrada_str)
+                FORMA_PAG = request.POST.get('PAGAMENTO') 
+                valor = Decimal(request.POST.get('VALOR').replace(".", "").replace(",", "."))
+                entrada = Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
                 print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
@@ -327,8 +325,9 @@ def Cadastrar_os(request,id_cliente):
 
                 registrar_entrada_caixa(cadastrar_os)
 
-                if int(QUANTIDADE_PARCELA) > 1 and entrada < valor:
+                if int(QUANTIDADE_PARCELA) > 0 and entrada < valor:
                     criar_parcelas(cadastrar_os.id)
+                    
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
                 return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
@@ -391,7 +390,9 @@ def Visualizar_os(request,id_os):
         from decimal import Decimal
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
 
-        falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - VISUALIZAR_OS.VALOR_PAGO
+        falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - Decimal(str(VISUALIZAR_OS.VALOR_PAGO))
+
+        print(VISUALIZAR_OS.VALOR,VISUALIZAR_OS.VALOR_PAGO)
 
         return render(request, 'Os/Visualizar_os.html', {
             'VISUALIZAR_OS': VISUALIZAR_OS,
