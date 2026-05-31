@@ -30,7 +30,7 @@ def atualizar_valor_pago_ordem(sender, instance, **kwargs):
 @receiver(post_save, sender=ORDEN)
 def atualizar_valor_pago_ordem_sem_parcela(sender, instance, **kwargs):
 
-    entrada = instance.ENTRADA or Decimal("0.00")
+    entrada = instance.ENTRADA.replace(".", "").replace(",", ".") or Decimal("0.00")
 
     # Evita save desnecessário
     if instance.VALOR_PAGO != entrada:
