@@ -243,6 +243,8 @@ def Cadastrar_os(request,id_cliente):
                                                       })
     else:
         try:
+            valor_raw = Decimal(request.POST.get('VALOR').replace(".", "").replace(",", "."))
+            entrada_raw = Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
             with transaction.atomic():
                 if 'ANEXO' in  request.FILES:
                     ANEXO = request.FILES['ANEXO']
@@ -277,8 +279,8 @@ def Cadastrar_os(request,id_cliente):
                 ARMACAO = request.POST.get('ARMACAO')
                 OBSERVACAO = request.POST.get('OBSERVACAO')
                 FORMA_PAG = request.POST.get('PAGAMENTO') 
-                valor = Decimal(request.POST.get('VALOR').replace(".", "").replace(",", "."))
-                entrada = Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
+                valor = valor_raw
+                entrada = entrada_raw
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
                 #print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')

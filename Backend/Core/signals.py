@@ -15,7 +15,7 @@ def verificar_estoque_minimo(sender, instance, **kwargs):
 def atualizar_valor_pago_ordem(sender, instance, **kwargs):
     ordem = instance.ordem
 
-    entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
+    entrada = Decimal(str(ordem.ENTRADA.replace(".", "").replace(",", "."))) if ordem.ENTRADA else Decimal('0')
 
     total_parcelas_pagas = ordem.parcelas.filter(pago=True).aggregate(
         total=Sum('valor')
@@ -28,15 +28,17 @@ def atualizar_valor_pago_ordem(sender, instance, **kwargs):
     ORDEN.objects.filter(pk=ordem.pk).update(VALOR_PAGO=novo_valor_pago)
 
 @receiver(post_save, sender=ORDEN)
-def atualizar_valor_pago_ordem_sem_parcela(sender, instance, **kwargs):
+def atualizar_valor_pago_ordem_sem_parcela(sender, instance, created, **kwargs):
+    # Só executa na CRIAÇÃO — atualizações de status não devem resetar VALOR_PAGO
+    if not created:
+        return
 
-    entrada = instance.ENTRADA.replace(".", "").replace(",", ".") or Decimal("0.00")
+    try:
+        entrada_str = str(instance.ENTRADA or '0').replace(".", "").replace(",", ".")
+        entrada = Decimal(entrada_str)
+    except Exception:
+        entrada = Decimal('0')
 
-    # Evita save desnecessário
-    if instance.VALOR_PAGO != entrada:
-
-        ORDEN.objects.filter(id=instance.id).update(
-            VALOR_PAGO=entrada
-        )
-
-        #print("VALOR_PAGO atualizado")
+    # Só atualiza se VALOR_PAGO ainda estiver zerado (evita loop)
+    if instance.VALOR_PAGO == Decimal('0'):
+        ORDEN.objects.filter(id=instance.id).update(VALOR_PAGO=entrada)
