@@ -509,6 +509,9 @@ def entradas_meses_passados(request):
 def criar_parcelas(os):
 
     ordem = ORDEN.objects.get(id=os)
+    
+    if ordem.STATUS == 'C':
+        return
 
     entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
     valor_total = Decimal(str(ordem.VALOR))

@@ -15,6 +15,9 @@ def verificar_estoque_minimo(sender, instance, **kwargs):
 def atualizar_valor_pago_ordem(sender, instance, **kwargs):
     ordem = instance.ordem
 
+    if instance.STATUS == 'C':
+        return
+
     entrada = Decimal(str(ordem.ENTRADA.replace(".", "").replace(",", "."))) if ordem.ENTRADA else Decimal('0')
 
     total_parcelas_pagas = ordem.parcelas.filter(pago=True).aggregate(
@@ -34,6 +37,8 @@ def atualizar_valor_pago_ordem_sem_parcela(sender, instance, created, **kwargs):
         return
 
     try:
+        if instance.STATUS == 'C':
+            return
         entrada_str = str(instance.ENTRADA or '0').replace(".", "").replace(",", ".")
         entrada = Decimal(entrada_str)
     except Exception:
@@ -42,3 +47,17 @@ def atualizar_valor_pago_ordem_sem_parcela(sender, instance, created, **kwargs):
     # Só atualiza se VALOR_PAGO ainda estiver zerado (evita loop)
     if instance.VALOR_PAGO == Decimal('0'):
         ORDEN.objects.filter(id=instance.id).update(VALOR_PAGO=entrada)
+
+
+@receiver(post_save, sender=ORDEN)
+def cancela_parcela(sender, instance, created, **kwargs):
+    # Só age em atualizações, não em criações
+    if created:
+        return
+
+    if instance.STATUS == 'C':
+        # Cancela todas as parcelas não pagas da ordem
+        # Parcelas já pagas são mantidas intactas — o dinheiro já entrou no caixa
+        instance.parcelas.filter(
+            pago=False
+        ).delete()
