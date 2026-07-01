@@ -1,86 +1,156 @@
-version: '3'
+#version: '3'
+
+#services:
+#  elasticsearch:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+#    container_name: elasticsearch
+#    environment:
+#      - discovery.type=single-node
+#    ports:
+#      - 9200:9200
+#    volumes:
+#      - esdata:/usr/share/elasticsearch/data
+#    networks:
+#      - elastic
+#
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.14.0
+#    container_name: kibana
+#    ports:
+#      - 5601:5601
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - elastic
+#
+#  metricbeat:
+#    image: docker.elastic.co/beats/metricbeat:7.14.0
+#    container_name: metricbeat
+#    user: root
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+#      - /proc:/hostfs/proc:ro
+#      - /:/hostfs:ro
+#      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+#    command: metricbeat -e -system.hostfs=/hostfs
+#    restart: on-failure
+#    depends_on:
+#      - kibana
+#    networks:
+#      - elastic
+#    
+#  heartbeat:
+#      image: docker.elastic.co/beats/heartbeat:7.13.0
+#      container_name: heartbeat
+#      volumes:
+#      - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+#      environment:
+#      - setup.kibana.host=kibana:5601
+#      networks:
+#      - elastic
+#  apm:
+#      image: docker.elastic.co/apm/apm-server-oss:7.13.0
+#      container_name: apm
+#      volumes:
+#      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
+#      ports:
+#      - "8200:8200"
+#      restart: on-failure
+#      networks:
+#      - elastic
+#
+#  postgres:
+#    image: postgres:latest
+#    container_name: postgres
+#    environment:
+#      POSTGRES_DB: Otica
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: root
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - elastic
+#
+#networks:
+#  elastic:
+#    driver: bridge
+#
+#volumes:
+#  esdata:
+#    driver: local
+#
+#  pgdata:
+#    driver: local
+
+version: '3.9'
 
 services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-    ports:
-      - 9200:9200
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - elastic
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.14.0
-    container_name: kibana
-    ports:
-      - 5601:5601
-    depends_on:
-      - elasticsearch
-    networks:
-      - elastic
-
-  metricbeat:
-    image: docker.elastic.co/beats/metricbeat:7.14.0
-    container_name: metricbeat
-    user: root
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      - /proc:/hostfs/proc:ro
-      - /:/hostfs:ro
-      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-    command: metricbeat -e -system.hostfs=/hostfs
-    restart: on-failure
-    depends_on:
-      - kibana
-    networks:
-      - elastic
-    
-  heartbeat:
-      image: docker.elastic.co/beats/heartbeat:7.13.0
-      container_name: heartbeat
-      volumes:
-      - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
-      environment:
-      - setup.kibana.host=kibana:5601
-      networks:
-      - elastic
-  apm:
-      image: docker.elastic.co/apm/apm-server-oss:7.13.0
-      container_name: apm
-      volumes:
-      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
-      ports:
-      - "8200:8200"
-      restart: on-failure
-      networks:
-      - elastic
-
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    image: postgres:16-alpine  # Versão mais leve
+    container_name: sgo_postgres
+    restart: always
+    
     environment:
-      POSTGRES_DB: Otica
+      POSTGRES_DB: sgo
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD: SenhaSegura#
+      PGDATA: /var/lib/postgresql/data/pgdata  # Melhor prática
+    
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Opcional, para acesso externo
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
     networks:
-      - elastic
+      - sgo_network
 
-networks:
-  elastic:
-    driver: bridge
+  web:
+    build: .
+    container_name: sgo_web
+    working_dir: /app/Backend
+    
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn Sis.wsgi:application --bind 0.0.0.0:8000
+      "
+    
+    volumes:
+      - .:/app
+      - static_volume:/app/Backend/staticfiles  # Volumes para arquivos estáticos
+    
+    ports:
+      - "8000:8000"
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    environment:
+      - DATABASE_URL=postgresql://postgres:SenhaSegura#@postgres:5432/sgo
+    
+    networks:
+      - sgo_network
 
 volumes:
-  esdata:
-    driver: local
+  postgres_data:
+    name: sgo_postgres_data  # Nome explícito para fácil identificação
+  static_volume:
+    name: sgo_static_volume
 
-  pgdata:
-    driver: local
+networks:
+  sgo_network:
+    name: sgo_network
+    driver: bridge

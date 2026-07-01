@@ -11,6 +11,8 @@ CACHE/
 # C extensions
 *.so
 
+static/
+
 # Distribution / packaging
 .Python
 build/

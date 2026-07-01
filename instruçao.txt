@@ -1,0 +1,34 @@
+# Para subir com dados existentes
+docker-compose up -d
+
+# Para recriar do zero (PERDE DADOS)
+docker-compose down -v
+docker-compose up -d
+
+# Para backup dos dados
+docker run --rm -v sgo_postgres_data:/data alpine tar czf - /data > backup_postgres.tar.gz
+
+# Para restaurar backup
+cat backup_postgres.tar.gz | docker run -i --rm -v sgo_postgres_data:/data alpine tar xzf - -C /
+
+
+# comandos uteis
+
+# Verificar volumes
+docker volume ls | grep sgo
+
+# Inspecionar volume
+docker volume inspect sgo_postgres_data
+
+# Limpar dados (cuidado!)
+docker-compose down -v
+
+# Backup automático
+docker-compose exec -T postgres pg_dump -U postgres sgo > backup.sql
+
+# Restaurar backup
+cat backup.sql | docker-compose exec -T postgres psql -U postgres sgo
+
+
+# Criar superuser
+docker-compose exec web python manage.py createsuperuser
