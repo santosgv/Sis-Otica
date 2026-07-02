@@ -12,41 +12,24 @@ def verificar_estoque_minimo(sender, instance, **kwargs):
         AlertaEstoque.objects.create(produto=instance, mensagem=mensagem)
 
 @receiver(post_save, sender=ParcelaOrdem)
-def atualizar_valor_pago_ordem(sender, instance, **kwargs):
-    ordem = instance.ordem
+def atualizar_valor_pago_ordem(sender, instance, created, **kwargs):
 
-    if instance.STATUS == 'C':
+
+    if instance.ordem.STATUS == 'C':
         return
 
-    entrada = Decimal(str(ordem.ENTRADA.replace(".", "").replace(",", "."))) if ordem.ENTRADA else Decimal('0')
+    entrada = Decimal(instance.ordem.ENTRADA or Decimal("0.00"))
 
-    total_parcelas_pagas = ordem.parcelas.filter(pago=True).aggregate(
+    total_parcelas_pagas = instance.ordem.parcelas.filter(pago=True).aggregate(
         total=Sum('valor')
     )['total'] or Decimal('0')
 
-    # VALOR_PAGO = sinal original + parcelas pagas
     novo_valor_pago = entrada + total_parcelas_pagas
 
-    # Atualiza sem passar pelo HistoricalRecords (evita o erro do F() no INSERT)
-    ORDEN.objects.filter(pk=ordem.pk).update(VALOR_PAGO=novo_valor_pago)
+    ORDEN.objects.filter(id=instance.ordem.id).update(
+    VALOR_PAGO=novo_valor_pago
+    )
 
-@receiver(post_save, sender=ORDEN)
-def atualizar_valor_pago_ordem_sem_parcela(sender, instance, created, **kwargs):
-    # Só executa na CRIAÇÃO — atualizações de status não devem resetar VALOR_PAGO
-    if not created:
-        return
-
-    try:
-        if instance.STATUS == 'C':
-            return
-        entrada_str = str(instance.ENTRADA or '0').replace(".", "").replace(",", ".")
-        entrada = Decimal(entrada_str)
-    except Exception:
-        entrada = Decimal('0')
-
-    # Só atualiza se VALOR_PAGO ainda estiver zerado (evita loop)
-    if instance.VALOR_PAGO == Decimal('0'):
-        ORDEN.objects.filter(id=instance.id).update(VALOR_PAGO=entrada)
 
 
 @receiver(post_save, sender=ORDEN)
