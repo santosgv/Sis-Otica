@@ -5,6 +5,7 @@ __pycache__/
 
 #django
 media/
+static/
 migrations/
 tmp/
 CACHE/
