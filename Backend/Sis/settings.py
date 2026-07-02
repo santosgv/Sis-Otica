@@ -305,6 +305,8 @@ USE_TZ = True
 INTERNAL_IPS = [
     "localhost",
     "127.0.0.1",
+    'http://vps51524.publiccloud.com.br/',
+    'vps51524.publiccloud.com.br',
     
 ]
 

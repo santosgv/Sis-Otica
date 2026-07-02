@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import Sum
@@ -10,14 +12,35 @@ def verificar_estoque_minimo(sender, instance, **kwargs):
         AlertaEstoque.objects.create(produto=instance, mensagem=mensagem)
 
 @receiver(post_save, sender=ParcelaOrdem)
-def atualizar_valor_pago_ordem(sender, instance, **kwargs):
-    ordem = instance.ordem
+def atualizar_valor_pago_ordem(sender, instance, created, **kwargs):
 
-    # Soma das parcelas pagas
-    total_pago = ordem.parcelas.filter(pago=True).aggregate(
+
+    if instance.ordem.STATUS == 'C':
+        return
+
+    entrada = Decimal(instance.ordem.ENTRADA or Decimal("0.00"))
+
+    total_parcelas_pagas = instance.ordem.parcelas.filter(pago=True).aggregate(
         total=Sum('valor')
-    )['total'] or 0
+    )['total'] or Decimal('0')
 
-    # Atualiza o campo ENTRADA com o total pago
-    ordem.ENTRADA = total_pago
-    ordem.save(update_fields=['ENTRADA'])
+    novo_valor_pago = entrada + total_parcelas_pagas
+
+    ORDEN.objects.filter(id=instance.ordem.id).update(
+    VALOR_PAGO=novo_valor_pago
+    )
+
+
+
+@receiver(post_save, sender=ORDEN)
+def cancela_parcela(sender, instance, created, **kwargs):
+    # Só age em atualizações, não em criações
+    if created:
+        return
+
+    if instance.STATUS == 'C':
+        # Cancela todas as parcelas não pagas da ordem
+        # Parcelas já pagas são mantidas intactas — o dinheiro já entrou no caixa
+        instance.parcelas.filter(
+            pago=False
+        ).delete()

@@ -32,3 +32,7 @@ ALTER TABLE Autenticacao_usuario ADD COLUMN comissao_percentual FLOAT;
 ALTER TABLE Autenticacao_usuario ADD COLUMN valor_hora FLOAT;
 
 ALTER TABLE Autenticacao_usuario ADD COLUMN data_contratacao DATE;
+
+ALTER TABLE Core_ORDEN ADD COLUMN VALOR_PAGO FLOAT;
+
+ALTER TABLE Core_caixa ADD COLUMN ABERTO INTEGER

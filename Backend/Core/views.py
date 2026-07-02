@@ -1,11 +1,13 @@
 
 from datetime import datetime
+import os
 from django.contrib import messages
+from django.db import models
 from rest_framework.response import Response
 from django.contrib.messages import constants
 from django.shortcuts import redirect, render
 from Core.services.webmaniabr import emitir_nfe
-from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, NotaFiscal, Review,SaidaEstoque,
+from Core.models import (LABORATORIO,ORDEN,CLIENTE,CAIXA,SERVICO, Review,SaidaEstoque,
                           EntradaEstoque,Fornecedor, MovimentoEstoque,TipoUnitario,Produto,
                           Tipo,Estilo,AlertaEstoque,Estilo,ParcelaOrdem)
 from django.shortcuts import get_object_or_404
@@ -17,12 +19,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .utils import (get_tenant,criar_mensagem_parabens,realizar_entrada,
                     realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
-                    get_10_days,get_30_days,criar_parcelas)
+                    get_10_days,get_30_days,criar_parcelas,
+                    registrar_entrada_caixa,
+                    registrar_pagamento_parcela)
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
 from django.db.models.functions import TruncMonth,ExtractMonth, ExtractYear,ExtractDay
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from decimal import Decimal,ROUND_HALF_UP
 import logging
 from django.db import transaction
@@ -101,7 +105,6 @@ def home(request):
         return render(request,'home.html',{'alertas': alertas,'aniversariantes':aniversariantes})
     else:
         return render(request,'home.html')
-
 
 @login_required(login_url='/auth/logar/')
 def clientes(request):
@@ -243,6 +246,8 @@ def Cadastrar_os(request,id_cliente):
                                                       })
     else:
         try:
+            valor_raw = Decimal(request.POST.get('VALOR').replace(".", "").replace(",", "."))
+            entrada_raw = Decimal(request.POST.get('ENTRADA').replace(".", "").replace(",", "."))
             with transaction.atomic():
                 if 'ANEXO' in  request.FILES:
                     ANEXO = request.FILES['ANEXO']
@@ -276,14 +281,12 @@ def Cadastrar_os(request,id_cliente):
                 LENTES = request.POST.get('LENTES')
                 ARMACAO = request.POST.get('ARMACAO')
                 OBSERVACAO = request.POST.get('OBSERVACAO')
-                FORMA_PAG = request.POST.get('PAGAMENTO')
-                valor_str = request.POST.get('VALOR').replace(".", "").replace(",", ".")
-                valor = Decimal(valor_str)
-                entrada_str =request.POST.get('ENTRADA').replace(".", "").replace(",", ".")
-                entrada = Decimal(entrada_str)
+                FORMA_PAG = request.POST.get('PAGAMENTO') 
+                valor = valor_raw
+                entrada = entrada_raw
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-                print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
+                #print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
 
                 if ARMACAO != None:
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
@@ -324,8 +327,12 @@ def Cadastrar_os(request,id_cliente):
 
                 
                 cadastrar_os.save()
-                if int(QUANTIDADE_PARCELA) > 1 and entrada < valor:
+
+                registrar_entrada_caixa(cadastrar_os)
+
+                if int(QUANTIDADE_PARCELA) > 0 and entrada < valor:
                     criar_parcelas(cadastrar_os.id)
+                    
 
                 messages.add_message(request, constants.SUCCESS, 'O.S Cadastrado com sucesso')
                 return redirect(f'/Visualizar_os/{cadastrar_os.id}')  
@@ -336,28 +343,70 @@ def Cadastrar_os(request,id_cliente):
             messages.add_message(request, constants.ERROR, 'Erro interno ao salvar a OS')
             return redirect(request,'/Lista_Os')  
 
-
 @login_required(login_url='/auth/logar/')
 def ordens_faltando_pagamento(request):
-
-    pendentes = ParcelaOrdem.objects.filter(pago=False).order_by('data_vencimento').select_related('ordem').all()
+    pendentes = (ParcelaOrdem.objects
+                 .filter(pago=False)
+                 .order_by('data_vencimento')
+                 .select_related('ordem'))
 
     pagina = Paginator(pendentes, 25)
-    page = request.GET.get('page')
+    page   = request.GET.get('page')
     results = pagina.get_page(page)
 
-    return render(request, 'Os/ordens_pendentes.html',{'results':results})
+    # mesmo choices do model, passado pro template
+    formas_pagamento = ParcelaOrdem.CHOICES_PAGAMENTO
+
+    return render(request, 'Os/ordens_pendentes.html', {
+        'results': results,
+        'formas_pagamento': formas_pagamento,
+    })
+
+@login_required
+def pagar_parcela(request, parcela_id):
+    if request.method != 'POST':
+        return redirect('ordens_faltando_pagamento')
+
+    parcela = get_object_or_404(ParcelaOrdem, id=parcela_id)
+    forma = request.POST.get('forma_pagamento', '').strip()
+
+    if not forma:
+        messages.add_message(request, constants.WARNING, 'Selecione uma forma de pagamento.')
+        return redirect('ordens_faltando_pagamento')
+
+    try:
+        with transaction.atomic():
+            registrar_pagamento_parcela(parcela, forma)
+        messages.add_message(
+            request, constants.SUCCESS,
+            f'Parcela {parcela.numero} da OS #{parcela.ordem.id} paga com sucesso!'
+        )
+    except ValueError as e:
+        messages.add_message(request, constants.WARNING, str(e))
+    except Exception as e:
+        logger.warning(e)
+        messages.add_message(request, constants.ERROR, 'Erro ao registrar pagamento.')
+
+    return redirect('/ordens_pendentes')
  
 @login_required(login_url='/auth/logar/')
 def Visualizar_os(request,id_os):
     if request.method == "GET":
+        from decimal import Decimal
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
        
-        return render(request,'Os/Visualizar_os.html',{'VISUALIZAR_OS':VISUALIZAR_OS,
-                                                       'unidade':get_tenant(request).unidade
-                                                   })
+
+        falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - Decimal(str(VISUALIZAR_OS.VALOR_PAGO))
+
+
+        return render(request, 'Os/Visualizar_os.html', {
+            'VISUALIZAR_OS': VISUALIZAR_OS,
+            'unidade':get_tenant(request).unidade,
+            'falta_pagar': falta_pagar,
+            'parcelas': VISUALIZAR_OS.parcelas.order_by('numero'),
+        })
     else:
-        return render(request,'Os/Visualizar_os.html')
+        return render(request, 'Os/Visualizar_os.html')
     
 @transaction.atomic    
 @login_required(login_url='/auth/logar/')
@@ -617,10 +666,10 @@ def update_card_status(request, card_id):
 @login_required(login_url='/auth/logar/')
 def get_entrada_saida(self):
     # Buscar o último caixa fechado sem filtro de data
-    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+    #ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True,ABERTO=False, FORMA='B').order_by('DATA').last()
     
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
-    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
+    #saldo_anterior = ultimo_caixa_fechado.VALOR if ultimo_caixa_fechado else 0
 
     # Calcula entradas e saídas do dia corrente
     entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
@@ -630,17 +679,24 @@ def get_entrada_saida(self):
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo atual
-    saldo_total_dinheiro = saldo + saldo_anterior
+    saldo_total_dinheiro = saldo # + saldo_anterior
 
     # Calcula entradas totais (sem considerar apenas dinheiro)
     entradas_total = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
 
-    return entradas, saidas, saldo_total_dinheiro, entradas_total
+    return entradas, saidas,saldo_total_dinheiro, entradas_total
 
 @login_required(login_url='/auth/logar/')
 def Caixa(request):
     if request.method == "GET":
         try:
+
+            caixa_aberto_hoje = CAIXA.objects.filter(
+            ABERTO=True,
+            FECHADO=False,
+            DATA=get_today_data()
+        ).first()
+            
             dadoscaixa = dados_caixa()
             entradas,saida,saldo_total_dinheiro,entradas_total= get_entrada_saida(request)
             pagina = Paginator(dadoscaixa,15)
@@ -649,38 +705,76 @@ def Caixa(request):
             return render(request,'Caixa/caixa.html',{'dados':dados,
                                                       'entrada':entradas,
                                                       'saida':saida,
+                                                      'caixa_aberto': caixa_aberto_hoje,
                                                       'saldo':saldo_total_dinheiro,
                                                       'saldo_total':entradas_total})
         except Exception as msg:
-            print(msg)
+            #print(msg)
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
+@login_required(login_url='/auth/logar/')
+def abrir_caixa(request):
+    if request.method != 'POST':
+        return redirect('/Caixa')
+
+    # Verifica se já existe caixa aberto hoje
+    caixa_aberto = CAIXA.objects.filter(
+        ABERTO=True,
+        FECHADO=False,
+        DATA=get_today_data()
+    ).exists()
+
+    if caixa_aberto:
+        messages.add_message(request, constants.WARNING, 'Já existe um caixa aberto hoje.')
+        return redirect('/Caixa')
+
+    valor_str = request.POST.get('valor_abertura', '0').replace('.', '').replace(',', '.')
+
+    try:
+        valor = float(valor_str)
+    except ValueError:
+        messages.add_message(request, constants.ERROR, 'Valor inválido.')
+        return redirect('/Caixa')
+
+    CAIXA.objects.create(
+        DATA=get_today_data(),
+        DESCRICAO='Abertura de caixa',
+        REFERENCIA=None,
+        TIPO='E',
+        VALOR=valor,
+        FORMA='B',   # dinheiro por padrão na abertura
+        ABERTO=True,
+        FECHADO=False,
+    )
+
+    messages.add_message(request, constants.SUCCESS, 'Caixa aberto com sucesso.')
+    return redirect('/Caixa')
+
 def fechar_caixa(request):
     # Filtrar o caixa do dia atual que ainda não foi fechado
-    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False).order_by('-id')
+    caixa = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=get_today_data(), FECHADO=False,ABERTO=True).order_by('-id')
 
     # Buscar o último caixa fechado, independentemente de datas
-    ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
+    #ultimo_caixa_fechado = CAIXA.objects.filter(FECHADO=True, FORMA='B').order_by('DATA').last()
 
     # Se encontrar um caixa fechado, obtém o saldo final; caso contrário, saldo anterior é 0
-    saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
+    #saldo_anterior = ultimo_caixa_fechado.SALDO_FINAL if ultimo_caixa_fechado else 0
 
     # Calcula entradas e saídas do dia corrente
-    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
-    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    entradas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='E', FORMA='B', FECHADO=False,ABERTO=True).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
+    saidas = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(), DATA__lte=ultimo_dia_mes(), TIPO='S', FORMA='B', FECHADO=False,ABERTO=True).aggregate(Sum('VALOR'))['VALOR__sum'] or 0
     
     # Calcula o saldo do dia
     saldo = round(entradas - saidas, 2)
 
     # Adiciona o saldo anterior ao saldo do dia para obter o saldo total
-    saldo_total = round(saldo + saldo_anterior, 2)
+    saldo_total = round(saldo, 2)
 
     #print(saldo_total, 'saldo final ao fechar')
 
     # Atualiza o saldo final e fecha o caixa do dia
     for dado in caixa:
-        dado.SALDO_FINAL = saldo_total
         dado.fechar_caixa()
         dado.save()
 
@@ -694,56 +788,92 @@ def fechar_caixa(request):
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
 def cadastro_caixa(request):
-    if request.method =="GET":
-        os_disponiveis= ORDEN.objects.exclude(STATUS='C').exclude(STATUS='E').all()
-        return render(request,'Caixa/caixa_fluxo.html',{
-            'OsS':os_disponiveis,
-            'data':get_today_data()
+    if request.method == "GET":
+        os_disponiveis = ORDEN.objects.exclude(
+            STATUS='C'
+        ).exclude(
+            STATUS='E'
+        ).all()
+
+        return render(request, 'Caixa/caixa_fluxo.html', {
+            'OsS': os_disponiveis,
+            'data': get_today_data()
         })
-    else:
-        with transaction.atomic():
-            descricao =request.POST.get('DESCRICAO')
-            referencia = request.POST.get('REFERENCIA')
-            tipo= request.POST.get('TIPO')
-            valor_str = request.POST.get('VALOR')
-            forma= request.POST.get('FORMA')
 
-            valor_str = valor_str.replace('.', '').replace(',', '.')
+    with transaction.atomic():
 
-            
-            if referencia and referencia != 'null':
-                referencia_obj = get_object_or_404(ORDEN, id=referencia)
-            else:
-                referencia_obj = None
-            caixa = CAIXA.objects.create(
-                DATA=get_today_data(),
-                VALOR=valor_str,
-                DESCRICAO=descricao,
-                REFERENCIA= referencia_obj,
-                TIPO=tipo,
-                FORMA=forma
+        descricao = request.POST.get('DESCRICAO')
+        referencia = request.POST.get('REFERENCIA')
+        tipo = request.POST.get('TIPO')
+        valor_str = request.POST.get('VALOR')
+        forma = request.POST.get('FORMA')
+
+        valor_str = valor_str.replace('.', '').replace(',', '.')
+
+        # ======================================
+        # REFERÊNCIA DA ORDEM (SE EXISTIR)
+        # ======================================
+        if referencia and referencia != 'null':
+            referencia_obj = get_object_or_404(
+                ORDEN,
+                id=referencia
             )
-            caixa.save()
+        else:
+            referencia_obj = None
 
-            if tipo == 'E' and referencia_obj:
-                parcelas = ParcelaOrdem.objects.filter(ordem=referencia_obj, pago=False).order_by('data_vencimento')
+        # ======================================
+        # CRIA ENTRADA/SAÍDA DE CAIXA
+        # ======================================
+        caixa = CAIXA.objects.create(
+            DATA=get_today_data(),
+            VALOR=valor_str,
+            DESCRICAO=descricao,
+            REFERENCIA=referencia_obj,
+            TIPO=tipo,
+            FORMA=forma,
+            ABERTO=True
+        )
+
+        # ======================================
+        # PROCESSA PARCELAS APENAS SE:
+        # - É ENTRADA
+        # - EXISTE REFERÊNCIA
+        # - EXISTEM PARCELAS
+        # ======================================
+        if tipo == 'E' and referencia_obj:
+
+            parcelas = ParcelaOrdem.objects.filter(
+                ordem=referencia_obj,
+                pago=False
+            ).order_by('data_vencimento')
+
+            # Só entra se encontrou parcelas
+            if parcelas.exists():
+
                 valor_restante = float(valor_str)
-            
-            for parcela in parcelas:
-                if valor_restante <= 0:
-                    break
 
-                valor_parcela = float(parcela.valor)
+                for parcela in parcelas:
 
-                if valor_restante >= valor_parcela:
-                    parcela.pago = True
-                    parcela.data_pagamento = get_today_data()
-                    parcela.caixa=get_object_or_404(CAIXA,id=caixa.id)
-                    parcela.save()
-                    valor_restante -= valor_parcela
+                    if valor_restante <= 0:
+                        break
 
-            messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
-            return redirect('/Caixa')
+                    valor_parcela = float(parcela.valor)
+
+                    if valor_restante >= valor_parcela:
+                        parcela.pago = True
+                        parcela.data_pagamento = get_today_data()
+                        parcela.caixa = caixa
+                        parcela.save()
+
+                        valor_restante -= valor_parcela
+
+        messages.add_message(
+            request,
+            constants.SUCCESS,
+            'Cadastrado com sucesso'
+        )
+
+        return redirect('/Caixa')
 
 def vendas_ultimos_12_meses(request):
     hoje = get_today_data()
@@ -1059,7 +1189,6 @@ def vendas_lentes(request):
 def dados_clientes(request):
     total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
-
 
 def receber(request):
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
@@ -1382,78 +1511,87 @@ def historico_compras(request, cliente_id):
 
 @login_required(login_url='/auth/logar/')
 def emitir_nfe_view(request, id_os):
-    VISUALIZAR_OS = get_object_or_404(ORDEN, id=id_os)
+    visualizar_os = get_object_or_404(ORDEN, id=id_os)
 
-        # Pega os dados do cliente da OS
+    # ==========================================
+    # CLIENTE
+    # ==========================================
     cliente = {
-            "cpf": VISUALIZAR_OS.CLIENTE.CPF,
-            "nome": VISUALIZAR_OS.CLIENTE.NOME,
-            "endereco": VISUALIZAR_OS.CLIENTE.LOGRADOURO,
-            "complemento": '',
-            "numero": VISUALIZAR_OS.CLIENTE.NUMERO,
-            "bairro": VISUALIZAR_OS.CLIENTE.BAIRRO,
-            "cidade": VISUALIZAR_OS.CLIENTE.CIDADE,
-            "uf": 'MG',
-            "cep": VISUALIZAR_OS.CLIENTE.CEP,
-            "telefone": VISUALIZAR_OS.CLIENTE.TELEFONE,
-            "email": 'santosgomesv@gmail.com',
-        }
+        "cpf": visualizar_os.CLIENTE.CPF,
+        "nome": visualizar_os.CLIENTE.NOME,
+        "endereco": visualizar_os.CLIENTE.LOGRADOURO,
+        "complemento": "",
+        "numero": visualizar_os.CLIENTE.NUMERO,
+        "bairro": visualizar_os.CLIENTE.BAIRRO,
+        "cidade": visualizar_os.CLIENTE.CIDADE,
+        "uf": "MG",
+        "cep": visualizar_os.CLIENTE.CEP,
+        "telefone": visualizar_os.CLIENTE.TELEFONE,
+        "email": "santosgomesv@gmail.com",
+    }
 
+    # ==========================================
+    # PRODUTOS
+    # ==========================================
     produtos = []
-    # Produto 1: Serviço
-    if VISUALIZAR_OS.SERVICO:
+
+    # Serviço principal
+    if visualizar_os.SERVICO:
         produtos.append({
-            "nome": str(VISUALIZAR_OS.SERVICO),
-            "codigo": f"SERV-{VISUALIZAR_OS.SERVICO.id}",
+            "nome": str(visualizar_os.SERVICO),
+            "codigo": f"SERV-{visualizar_os.SERVICO.id}",
             "quantidade": 1,
-            "subtotal": float(VISUALIZAR_OS.VALOR),
-            "total": float(VISUALIZAR_OS.VALOR),
+            "total": Decimal(visualizar_os.VALOR)
         })
-    # Produto 2: Armação (se preenchido)
-    if VISUALIZAR_OS.ARMACAO and VISUALIZAR_OS.ARMACAO != "N/D":
+
+    # Armação
+    if visualizar_os.ARMACAO and visualizar_os.ARMACAO != "N/D":
         produtos.append({
-            "nome": str(VISUALIZAR_OS.ARMACAO),
+            "nome": str(visualizar_os.ARMACAO),
             "codigo": "ARMACAO",
             "quantidade": 1,
-            "subtotal": 0.00,
-            "total": 0.00,
+            "total": Decimal("0.00")
         })
-    # Produto 3: Lentes (se preenchido)
-    if VISUALIZAR_OS.LENTES and VISUALIZAR_OS.LENTES != "N/D":
+
+    # Lentes
+    if visualizar_os.LENTES and visualizar_os.LENTES != "N/D":
         produtos.append({
-            "nome": str(VISUALIZAR_OS.LENTES),
+            "nome": str(visualizar_os.LENTES),
             "codigo": "LENTES",
             "quantidade": 1,
-            "subtotal": 0.00,
-            "total": 0.00,
+            "total": Decimal("0.00")
         })
-    # Valor total da OS
-    total = float(VISUALIZAR_OS.VALOR)
-    # Chama a API da WebmaniaBR
-    resposta = emitir_nfe(request,cliente, produtos, total)
 
-    if resposta.get("status") == "aprovado":
-        log = resposta.get("log", {})
-        prot = log.get("aProt", [{}])[0] if log.get("aProt") else {}
-        NotaFiscal.objects.create(
-        ordem=VISUALIZAR_OS,
-        uuid=resposta.get("uuid"),
-        status=resposta.get("status"),
-        motivo=resposta.get("motivo"),
-        nfe=resposta.get("nfe"),
-        serie=resposta.get("serie"),
-        chave=resposta.get("chave"),
-        modelo=resposta.get("modelo"),
-        epec=resposta.get("epec"),
-        xml=resposta.get("xml"),
-        danfe=resposta.get("danfe"),
-        danfe_simples=resposta.get("danfe_simples"),
-        danfe_etiqueta=resposta.get("danfe_etiqueta"),
-        cstat=log.get("cStat"),
-        xmotivo=log.get("xMotivo"),
-        nprot=prot.get("nProt"),
-        dhrecbto=datetime.fromisoformat(prot.get("dhRecbto")) if prot.get("dhRecbto") else None,
-    )
-        
-    messages.add_message(request, constants.SUCCESS, 'NFS emitida com sucesso')
-    return redirect(f'/Visualizar_os/{VISUALIZAR_OS.id}')
+    total = Decimal(visualizar_os.VALOR)
+
+    try:
+        # ==========================================
+        # GERA XML
+        # ==========================================
+        caminho_xml = emitir_nfe(
+            cliente=cliente,
+            produtos=produtos,
+            total=total,
+            numero_nf=visualizar_os.id,
+            serie=1
+        )
+
+        # ==========================================
+        # DOWNLOAD DO XML
+        # ==========================================
+        response = FileResponse(
+            open(caminho_xml, 'rb'),
+            as_attachment=True,
+            filename=os.path.basename(caminho_xml)
+        )
+
+        return response
+
+    except Exception as e:
+        messages.add_message(
+            request,
+            constants.ERROR,
+            f'Erro ao gerar XML: {str(e)}'
+        )
+
+        return redirect(f'/Visualizar_os/{visualizar_os.id}')
