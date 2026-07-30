@@ -469,6 +469,20 @@ def gerar_carner_pdf(request, ordem_id):
     response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
     return response
 
+from decimal import Decimal, InvalidOperation
+
+def parse_decimal(value):
+    if value is None or value == '' or value == 'N/D':
+        return Decimal("0.00")
+    
+    # Remove caracteres não numéricos (exceto vírgula e ponto)
+    value = str(value).replace('R$', '').replace(' ', '').strip()
+    value = value.replace(',', '.')  # Substitui vírgula por ponto
+    
+    try:
+        return Decimal(value)
+    except (InvalidOperation, ValueError, TypeError):
+        return Decimal("0.00")
 
 from django.shortcuts import render
 from .models import CAIXA
