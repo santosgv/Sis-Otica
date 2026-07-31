@@ -11,81 +11,130 @@
 {% endblock %}
 
 {% block 'body'%}
-<div class="text-center">
-  {% if alertas %}
-  <br>
-  <div class="alert alert-warning">
-      <ul>
-          {% for alerta in alertas %}
-              <li>{{ alerta.mensagem }}</li>
-          {% endfor %}
-      </ul>
+
+<!-- Mensagens de alerta -->
+{% if alertas %}
+<div class="mb-4">
+  {% for alerta in alertas %}
+  <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm" role="alert">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div class="flex-grow-1">{{ alerta.mensagem }}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
   </div>
+  {% endfor %}
+</div>
 {% endif %}
+
+<!-- Cabeçalho de boas-vindas -->
+<div class="p-4 p-md-5 mb-4 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #BB3452 0%, #8a2540 100%);">
+  <div class="d-flex align-items-center gap-3">
+    <i class="fa-solid fa-hand-sparkles fa-2x"></i>
+    <div>
+      <h1 class="h3 fw-bold mb-1">Bem-vindo{% if user.first_name %}, {{ user.first_name }}{% endif %}!</h1>
+      <p class="mb-0 opacity-75">Aqui está um resumo do que precisa da sua atenção hoje.</p>
+    </div>
+  </div>
 </div>
 
-
-  <div class="card-body text-center">
-    <h1>bem vindo!</h1>
+<!-- Aniversariantes -->
+<div class="mb-4">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <i class="fa-solid fa-cake-candles fa-lg text-primary"></i>
+    <h2 class="h5 fw-bold mb-0">Ações de marketing pendentes</h2>
     {% if aniversariantes %}
-    <div class="row centralizar">
-      <h1>Ações de marketing pendentes</h1>
-      <hr>
-      {% for cliente in aniversariantes %}
-      <div class="text-center card border-primary mb-3" id="cliente-{{ cliente.id }}" style="max-width: 18rem; margin-right: 5px;">
-        <div class="card-header">Aniversariante do Mes {{cliente.DATA_NASCIMENTO}}</div>
-        <div class="card-body text-primary">
-          <h5 class="card-title">{{cliente.NOME}}</h5>
-          <p class="card-text">Email: {{cliente.EMAIL}}</p>
-          <p class="card-text">Telefone: {{cliente.TELEFONE}} <a href="https://wa.me/55{{cliente.TELEFONE}}?text={{cliente.MENSAGEM_ANIVERSARIO}}" target="_blank" rel="noopener noreferrer"  onclick="fecharCard({{ cliente.id }})"><img width="35" height="35" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></p>
+    <span class="badge bg-primary rounded-pill" id="contador-aniversariantes">{{ aniversariantes|length }}</span>
+    {% endif %}
+  </div>
+
+  {% if aniversariantes %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3" id="aniversariantes-container">
+    {% for cliente in aniversariantes %}
+    <div class="col" id="cliente-{{ cliente.id }}">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width:40px; height:40px;">
+              <i class="fa-solid fa-cake-candles"></i>
+            </span>
+            <div>
+              <div class="fw-bold">{{ cliente.NOME }}</div>
+              <div class="small text-muted">Aniversário: {{ cliente.DATA_NASCIMENTO }}</div>
+            </div>
+          </div>
+          <hr class="my-2">
+          <p class="small mb-1 d-flex align-items-center gap-2">
+            <i class="fa-solid fa-envelope text-muted"></i> {{ cliente.EMAIL }}
+          </p>
+          <p class="small mb-0 d-flex align-items-center justify-content-between">
+            <span class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-phone text-muted"></i> {{ cliente.TELEFONE }}
+            </span>
+            <a href="https://wa.me/55{{ cliente.TELEFONE }}?text={{ cliente.MENSAGEM_ANIVERSARIO }}"
+               target="_blank" rel="noopener noreferrer"
+               onclick="fecharCard({{ cliente.id }})"
+               class="btn btn-success btn-sm d-inline-flex align-items-center gap-1">
+              <i class="fa-brands fa-whatsapp"></i> Enviar
+            </a>
+          </p>
         </div>
       </div>
-      <br>
-      {% endfor %}
-      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card border-0 shadow-sm" id="aniversariantes-vazio">
+    <div class="card-body text-center text-muted py-5">
+      <i class="fa-regular fa-face-smile fa-2x mb-2 d-block"></i>
+      Nenhum aniversariante neste mês.
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 
 
+<script>
+  function fecharCard(clienteId) {
+      const card = document.getElementById('cliente-' + clienteId);
+      if (card) {
+        card.style.transition = 'opacity 0.3s ease';
+        card.style.opacity = '0';
+        setTimeout(() => {
+          card.remove(); // remove do DOM de vez, não só esconde
 
-    <div class="pagination">
-      <samp class="step-links">
-            {% if clientes.has_previous %}
-            <a href="?page={{clientes.previous_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxUlEQVR4nO2XQQrCMBBFH6gHUBdV8ABeQc0tep/eRgTrDTyDuLG68BZ6AKUwwiyKqyYzpf0QCJnF+8lkyAQGtas1MMZIAXgBRwsTO4F/ZJQpTQTgLeCzmh+AUUp4KbvWa/uYJkID/KdcpaNIDV8CD4ldgGnMC3cCJiqWAZXErsC8N/CFNfzeS/gKeMaEb/6UmobXpTZrG+7CQK2tZf47ZaKyNpENJtRJ3FKkI1g+xy4aEhctmYumtKlEk7flLj4mLr5mdFJfjvGIRFYr/lMAAAAASUVORK5CYII="></a>
-            {% endif %}
-
-              <samp class="current">
-                {{clientes.number}} de {{clientes.paginator.num_pages}}
-              </samp>
-
-            {% if clientes.has_next %}
-            <a href="?page={{clientes.next_page_number}}"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA0ElEQVR4nO2XPQoCMRBGH6wHyNr5U1h6BWEL77D32duooEfwBoK1RAvv4G6vCAFDUBaLzIQlA4GQ5n35ZoZMIMd/MQKWKML3wAOopOEFsAGebnXAWhK+c+AWOHr7SvLmrQO+U3GQEtF4ttfeuZiIEjg70AWYaIgwwMmBLDD9kaKohWkCETNtEdcsgo8Tc+103IGFhoix16K3wImwRVeDE2B66mAbMwWmpx0zvIttu9W03X55jKLCS+3nuNEeSArtkUx9KE1iLE/iY5LE14xBxgtb/Ig367sTTAAAAABJRU5ErkJggg=="></a>
-            {% endif %}
-      </samp>
-    </div>
-
-
-
-
-
-      
-    </div>
-
-    <script>
-      function fecharCard(clienteId) {
-          // Esconder o card no frontend
-          document.getElementById('cliente-' + clienteId).style.display = 'none';
-          
-          // Enviar requisição para o backend para atualizar o cache
-          fetch('/fechar_card/', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': '{{ csrf_token }}'
-              },
-              body: JSON.stringify({ cliente_id: clienteId })
-          });
+          // atualiza o contador do badge em tempo real
+          const badge = document.getElementById('contador-aniversariantes');
+          if (badge) {
+            const novoTotal = Math.max(0, parseInt(badge.textContent, 10) - 1);
+            if (novoTotal === 0) {
+              badge.remove(); // some o badge quando zera
+              const container = document.getElementById('aniversariantes-container');
+              if (container) {
+                container.outerHTML = `
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center text-muted py-5">
+                      <i class="fa-regular fa-face-smile fa-2x mb-2 d-block"></i>
+                      Nenhum aniversariante neste mês.
+                    </div>
+                  </div>`;
+              }
+            } else {
+              badge.textContent = novoTotal;
+            }
+          }
+        }, 300);
       }
-  </script>
+
+      // Enviar requisição para o backend para atualizar o cache
+      fetch('/fechar_card/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({ cliente_id: clienteId })
+      });
+  }
+</script>
 
 {% endblock %}

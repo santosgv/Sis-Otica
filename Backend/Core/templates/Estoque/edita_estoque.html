@@ -12,114 +12,118 @@ Entrada Produto
 
 {% block 'body'%}
 
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Entrada Estoque</li>
+  </ol>
+</nav>
 
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: var(--bs-white);">
-      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
-      <li class="breadcrumb-item"><a href="{% url 'Core:estoque'%}">Estoque</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Entrada Estoque</li>
-    </ol>
-  </nav>
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+      <i class="fa-solid fa-box text-primary"></i> Entrada de Produto
+    </h2>
 
-<div class="text-center">
-
-  <div class="container mt-5">
-    <h2 class="mb-4">Entrada de Produto</h2>
     <form method="post">
-        {% csrf_token %}
-        <div class="form-row">
-          <div class="form-group col-md-12">
-            <label for="inputEmail4">Chave NF</label>
-            <input  type="text" class="form-control" data-mask="00000000000000000000000000000000000000000000" id="chavenfe" name="chavenfe" value="{{edita_produto.chavenfe}}">
-          </div>
-          <div class="form-group col-md-4">
-            <label for="inputPassword4">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" value="{{edita_produto.nome}}">
-          </div>
-          <div class="form-group col-md-4">
-            <label for="inputState">Fornecedor</label>
-            <select id="fornecedor" name="fornecedor" class="form-control">
-                <option value="{{edita_produto.fornecedor.id}}" hidden  selected>{{edita_produto.fornecedor}}</option>
-              {% for fornecedor in  fornecedores %}
-              <option value="{{fornecedor.id}}">{{fornecedor.nome}}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputState">Tipo</label>
-            <select id="tipo" name="tipo" class="form-control">
-                <option value="{{edita_produto.Tipo.id}}" hidden selected>{{edita_produto.Tipo}}</option>
-              {% for tipo in  tipos %}
-              <option value="{{tipo.pk}}">{{tipo}}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputState">Estilo</label>
-            <select id="estilo" name="estilo" class="form-control">
-                <option value="{{edita_produto.Estilo.id}}" hidden selected>{{edita_produto.Estilo}}</option>
-              {% for estilo in  estilos %}
-              <option value="{{estilo.pk}}">{{estilo}}</option>
-              {% endfor %}
-            </select>
-          </div>
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="form-group col-md-12">
+          <label for="chavenfe" class="form-label fw-semibold">Chave NF</label>
+          <input type="text" class="form-control" data-mask="00000000000000000000000000000000000000000000" id="chavenfe" name="chavenfe" value="{{edita_produto.chavenfe}}">
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-2">
-            <label for="inputCity">Preço unitario</label>
-            <input type="text" class="form-control" id="preco_unitario" name="preco_unitario" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" value="{{edita_produto.preco_unitario}}">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Preco venda</label>
-            <input type="text" class="form-control" id="preco_venda" name="preco_venda" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" value="{{edita_produto.preco_venda}}">
-          </div>
-          <div class="form-group col-md-4">
-            <label for="inputZip">Quantidade</label>
-            <input type="text" class="form-control" id="quantidade" name="quantidade" value="{{edita_produto.quantidade}}">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Quantidade minima</label>
-            <input type="text" class="form-control" id="quantidade_minima" name="quantidade_minima" value="{{edita_produto.quantidade_minima}}">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputState">Tipo Unitario</label>
-            <select id="tipo_unitario" name="tipo_unitario" class="form-control">
-                <option value="{{edita_produto.tipo_unitario.id}}" hidden selected>{{edita_produto.tipo_unitario}}</option>
-              {% for und in  unitarios %}
-              <option value="{{und.id}}">{{und}}</option>
-              {% endfor %}
-            </select>
-          </div>
+        <div class="form-group col-md-4">
+          <label for="nome" class="form-label fw-semibold">Nome</label>
+          <input type="text" class="form-control" id="nome" name="nome" value="{{edita_produto.nome}}">
         </div>
-        <div class="form-group">
-            {% if edita_produto.importado != True %}
-          <div class="form-check-inline">
-            <input class="form-check-input" type="checkbox" id="importado" name="importado" value="true">
-            <label class="form-check-label" for="gridCheck">
-              Importado
-            </label>
-          </div>
-          {% endif %}
-          {% if edita_produto.conferido != True %}
-          <div class="form-check-inline">
-            <input class="form-check-input" type="checkbox" id="conferido" name="conferido" value="true">
-            <label class="form-check-label" for="gridCheck">
-              Conferido
-            </label>
-          </div>
-          {% endif %}
+        <div class="form-group col-md-4">
+          <label for="fornecedor" class="form-label fw-semibold">Fornecedor</label>
+          <select id="fornecedor" name="fornecedor" class="form-select">
+            <option value="{{edita_produto.fornecedor.id}}" hidden selected>{{edita_produto.fornecedor}}</option>
+            {% for fornecedor in fornecedores %}
+            <option value="{{fornecedor.id}}">{{fornecedor.nome}}</option>
+            {% endfor %}
+          </select>
         </div>
-        <button type="submit" class="btn btn-primary">Editar</button>
-        <a class="btn btn-success" href="{% url 'Core:create_pdf' edita_produto.codigo edita_produto.quantidade %}">Imprimir Etiquetas</a>
-      </form>
+        <div class="form-group col-md-2">
+          <label for="tipo" class="form-label fw-semibold">Tipo</label>
+          <select id="tipo" name="tipo" class="form-select">
+            <option value="{{edita_produto.Tipo.id}}" hidden selected>{{edita_produto.Tipo}}</option>
+            {% for tipo in tipos %}
+            <option value="{{tipo.pk}}">{{tipo}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="estilo" class="form-label fw-semibold">Estilo</label>
+          <select id="estilo" name="estilo" class="form-select">
+            <option value="{{edita_produto.Estilo.id}}" hidden selected>{{edita_produto.Estilo}}</option>
+            {% for estilo in estilos %}
+            <option value="{{estilo.pk}}">{{estilo}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="form-group col-md-2">
+          <label for="preco_unitario" class="form-label fw-semibold">Preço unitário</label>
+          <input type="text" class="form-control" id="preco_unitario" name="preco_unitario" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" value="{{edita_produto.preco_unitario}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="preco_venda" class="form-label fw-semibold">Preço venda</label>
+          <input type="text" class="form-control" id="preco_venda" name="preco_venda" data-mask='000.000.000.000.000,00' maxlength="6" data-mask-reverse="true" value="{{edita_produto.preco_venda}}">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="quantidade" class="form-label fw-semibold">Quantidade</label>
+          <input type="text" class="form-control" id="quantidade" name="quantidade" value="{{edita_produto.quantidade}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="quantidade_minima" class="form-label fw-semibold">Quantidade mínima</label>
+          <input type="text" class="form-control" id="quantidade_minima" name="quantidade_minima" value="{{edita_produto.quantidade_minima}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="tipo_unitario" class="form-label fw-semibold">Tipo Unitário</label>
+          <select id="tipo_unitario" name="tipo_unitario" class="form-select">
+            <option value="{{edita_produto.tipo_unitario.id}}" hidden selected>{{edita_produto.tipo_unitario}}</option>
+            {% for und in unitarios %}
+            <option value="{{und.id}}">{{und}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      {% if edita_produto.importado != True or edita_produto.conferido != True %}
+      <div class="d-flex gap-4 mt-3">
+        {% if edita_produto.importado != True %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="importado" name="importado" value="true">
+          <label class="form-check-label" for="importado">Importado</label>
+        </div>
+        {% endif %}
+        {% if edita_produto.conferido != True %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="conferido" name="conferido" value="true">
+          <label class="form-check-label" for="conferido">Conferido</label>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Editar
+        </button>
+        <a class="btn btn-success d-inline-flex align-items-center gap-2" href="{% url 'Core:create_pdf' edita_produto.codigo edita_produto.quantidade %}">
+          <i class="fa-solid fa-print"></i> Imprimir Etiquetas
+        </a>
+      </div>
+    </form>
   </div>
-
 </div>
-  
 
-
-
-</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 {% endblock %}

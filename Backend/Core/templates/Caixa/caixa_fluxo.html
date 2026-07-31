@@ -4,94 +4,102 @@
 
 {% block 'head' %}
 {% compress css %}
-<html lang="pt-br">
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 <link rel="stylesheet" href="{% static 'Relatorio/css/css.css' %}">
 {% endcompress %}
 <title>{% block 'title' %}
     Fluxo Caixa
     {% endblock %}</title>
+{% endblock %}
 
-  {% endblock %}
+{% block 'body'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:Caixa'%}">Caixa</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Fluxo Caixa</li>
+  </ol>
+</nav>
 
-  {% block 'body'%}
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: var(--bs-white);">
-      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
-      <li class="breadcrumb-item"><a href="{% url 'Core:Caixa'%}">Caixa</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Fluxo Caixa</li>
-    </ol>
-  </nav>
-      <div class="text-center">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{message.tags}}">
-                    {{message}}
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <section class="container-fluid text-center">
-        <div class="form_">
-          <div class="text-center">
-            <label for="" class="titulo">Cadastro Caixa</label>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{message.tags}}">
+            {{message}}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<section class="container-fluid">
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+      <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+        <i class="fa-solid fa-cash-register text-primary"></i> Cadastro Caixa
+      </h2>
+
+      <form method="POST" class="form_cliente" action="#">{% csrf_token %}
+        <div class="row g-3">
+          <div class="form-group col-md-2">
+            <label for="DATA" class="form-label fw-semibold">Data</label>
+            <input class="form-control bg-light" type="text" value="{{data}}" name="DATA" id="DATA" readonly>
           </div>
-            <form method="POST" class="form_cliente" action="#">{% csrf_token %}
-                <div class="form-row">
-                <div class="form-group col-md-2">
-                    <label for="DATA_NASCIMENTO">Data</label>
-                    <input class="form-control" type="text" value="{{data}}" name="DATA" id="DATA" readonly>
-                  </div>
 
-                  <div class="form-group col-md-2">
-                    <label for="search_os">Pesquisa</label>
-                    <div class="input-group">
-                      <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search_os" name="search_os" class="form-control" hx-get="/search_caixa" hx-target="#os-select" hx-trigger="keyup changed delay:500ms" placeholder="Os">
-                        <select id="os-select" name="REFERENCIA" class="form-control">
-                            <option value="" disabled selected>Os</option>
-                            {% include 'parcial/select_os.html' %}
-                        </select>
-                    </div>
-                </div>
-                  <div class="form-group col-md-3">
-                    <label for="inputZip">Valor</label>
-                    <input required class="form-control" data-mask='000.000,00' maxlength="6" data-mask-reverse="true" id="VALOR" name="VALOR" required>
-                  </div>
-                  <div class="form-group col-md-3">
-                    <label for="inputState">Forma Pagamento</label>
-                    <select  name="FORMA" id="FORMA" class="form-control" required>
-                      <option value="A">Pix</option>
-                      <option value="B">Dinheiro</option>
-                      <option value="C">Debito</option>
-                      <option value="D">Credito</option>
-                      <option value="E">Carne</option>
-                      <option value="F">Permuta</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputState">TIPO</label>
-                    <select id="TIPO" name="TIPO" class="form-control" required>
-                      <option selected value="E">Entrada</option>
-                      <option value="S">Saida</option>
-                    </select>
-                  </div>
-                </div>
-                  <div class="form-group">
-                    <label for="exampleFormControlTextarea1">DESCRICAO</label>
-                    <textarea class="form-control" id="DESCRICAO" name="DESCRICAO" rows="3" required></textarea>
-                  </div>
-             </div>
-             <button type="submit" class="btn btn-primary">Finalizar</button>
-            </form>   
+          <div class="form-group col-md-2">
+            <label for="search_os" class="form-label fw-semibold">Pesquisa</label>
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+              <input type="text" id="search_os" name="search_os" class="form-control" hx-get="/search_caixa" hx-target="#os-select" hx-trigger="keyup changed delay:500ms" placeholder="Os">
+              <select id="os-select" name="REFERENCIA" class="form-select">
+                <option value="" disabled selected>Os</option>
+                {% include 'parcial/select_os.html' %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group col-md-3">
+            <label for="VALOR" class="form-label fw-semibold">Valor</label>
+            <input required class="form-control" data-mask='000.000,00' maxlength="6" data-mask-reverse="true" id="VALOR" name="VALOR">
+          </div>
+
+          <div class="form-group col-md-3">
+            <label for="FORMA" class="form-label fw-semibold">Forma Pagamento</label>
+            <select name="FORMA" id="FORMA" class="form-select" required>
+              <option value="A">Pix</option>
+              <option value="B">Dinheiro</option>
+              <option value="C">Débito</option>
+              <option value="D">Crédito</option>
+              <option value="E">Carnê</option>
+              <option value="F">Permuta</option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-2">
+            <label for="TIPO" class="form-label fw-semibold">Tipo</label>
+            <select id="TIPO" name="TIPO" class="form-select" required>
+              <option selected value="E">Entrada</option>
+              <option value="S">Saída</option>
+            </select>
           </div>
         </div>
-      </section>
 
-      <script src="{% static 'Unidades/js/os.js' %}"></script>
-      <script src="{% static 'Unidades/js/os_Segundo.js' %}"></script>
-      <script src="{% static 'Unidades/js/carne.js' %}"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-      </html>
-  {% endblock %}
+        <div class="form-group mt-3">
+          <label for="DESCRICAO" class="form-label fw-semibold">Descrição</label>
+          <textarea class="form-control" id="DESCRICAO" name="DESCRICAO" rows="3" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4 d-inline-flex align-items-center gap-2">
+          <i class="fa-solid fa-check"></i> Finalizar
+        </button>
+      </form>
+
+    </div>
+  </div>
+</section>
+
+<script src="{% static 'Unidades/js/os.js' %}"></script>
+<script src="{% static 'Unidades/js/os_Segundo.js' %}"></script>
+<script src="{% static 'Unidades/js/carne.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+{% endblock %}

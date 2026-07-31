@@ -1,9 +1,10 @@
-from decimal import Decimal
+from decimal import Decimal,InvalidOperation
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import Sum
 from .models import Produto, AlertaEstoque,ParcelaOrdem, ORDEN
+from .utils import parse_decimal
 
 @receiver(post_save, sender=Produto)
 def verificar_estoque_minimo(sender, instance, **kwargs):
@@ -18,7 +19,7 @@ def atualizar_valor_pago_ordem(sender, instance, created, **kwargs):
     if instance.ordem.STATUS == 'C':
         return
 
-    entrada = Decimal(instance.ordem.ENTRADA or Decimal("0.00"))
+    entrada = parse_decimal(instance.ordem.ENTRADA)
 
     total_parcelas_pagas = instance.ordem.parcelas.filter(pago=True).aggregate(
         total=Sum('valor')

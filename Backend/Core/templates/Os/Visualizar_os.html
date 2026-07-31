@@ -6,359 +6,409 @@
 {% block 'head' %}
 <style>
     .fixed-header {
-            position: fixed;
-            top: 0;
-            width: 70%;
-            background-color: white; /* Cor de fundo para o título */
-            z-index: 1000; /* Para garantir que o título fique acima de outros elementos */
-            padding: 10px 0; /* Espaçamento interno */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-        }
+        position: fixed;
+        top: 0;
+        width: 70%;
+        background-color: white;
+        z-index: 1000;
+        padding: 10px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 </style>
 
 {% compress css %}
 <link rel="stylesheet" href="{% static 'Unidades/css/cadastro_cliente.css' %}">
 {% endcompress %}
 <title>{% block 'title' %}
-Vizualiar O.S
+Visualizar O.S
   {% endblock %}</title>
 {% endblock %}
 
 {% block 'body'%}
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: var(--bs-white);">
-      <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Pagina Principal</a></li>
-      <li class="breadcrumb-item"><a href="{% url 'Core:Lista_Os'%}">Listar O.S</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Visualizar O.S</li>
-      <li class="breadcrumb-item"><a href="{% url 'Core:view_history' VISUALIZAR_OS.id %}">Historico</a></li>
-    </ol>
-  </nav>
-  <section class="container-fluid text-center">
-    <div class="text-center">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{message.tags}}">
-                    {{message}}
-                </div>
-            {% endfor %}
-        {% endif %}
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home'%}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:Lista_Os'%}">Listar O.S</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Visualizar O.S</li>
+    <li class="breadcrumb-item"><a href="{% url 'Core:view_history' VISUALIZAR_OS.id %}">Histórico</a></li>
+  </ol>
+</nav>
 
-        {% if VISUALIZAR_OS.solicitar_avaliacao %}
-          <div style="background-color: yellow; padding: 10px; border: 1px solid #ccc;">
-              <p>⚠️ Como foi a experiencia com esse cliente. <a href="{% url 'Core:avaliar_cliente' VISUALIZAR_OS.CLIENTE.id %}">Clique aqui para avaliar</a>.</p>
-          </div>
-      {% endif %}
+<section class="container-fluid">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {{message.tags}}">
+        {{message}}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if VISUALIZAR_OS.solicitar_avaliacao %}
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Como foi a experiência com esse cliente?
+        <a href="{% url 'Core:avaliar_cliente' VISUALIZAR_OS.CLIENTE.id %}" class="fw-semibold">Clique aqui para avaliar</a>.
+      </span>
     </div>
+  {% endif %}
 
-    
-    <form method="POST" class="form_cliente">{% csrf_token %}
-      <h1 id="form-header">{{unidade}}{{VISUALIZAR_OS.id}}</h1>
-        <div class="row">
-        {% if VISUALIZAR_OS.ANEXO %}
-        <div class="form-group col-md-6">
-          <a href="{{VISUALIZAR_OS.ANEXO.url}}" target="_blank">Visualizar Anexo</a>
-        </div>
-        {% endif %}
-        {% if VISUALIZAR_OS.ASSINATURA %}
-        <div class="form-group col-md-6">
-          <a href="{{VISUALIZAR_OS.ASSINATURA.url}}" target="_blank">Visualizar Assinatura</a>
-        </div>
-        {% endif %}
-      </div>
-      <div class="row">
-        <div class="form-group col-md-6">
-          <label for="data_pedido">Data Pedido:</label>
-          {{VISUALIZAR_OS.DATA_SOLICITACAO|date:"D d M Y"}}
-        </div>
-        <div class="form-group col-md-6">
-          <label for="previsao_entrega">Previsâo Entrega:</label>
-          {{VISUALIZAR_OS.PREVISAO_ENTREGA|date:"D d M Y"}}
-        </div>
-      </div>
-        <div class="row">
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+      <form method="POST" class="form_cliente">{% csrf_token %}
+        <h1 id="form-header" class="fw-bold mb-4 text-center">{{unidade}}{{VISUALIZAR_OS.id}}</h1>
+
+        {% if VISUALIZAR_OS.ANEXO or VISUALIZAR_OS.ASSINATURA %}
+        <div class="row mb-3">
+          {% if VISUALIZAR_OS.ANEXO %}
           <div class="form-group col-md-6">
-            <label for="VENDEDOR" >Vendedor</label>
-            <input readonly class="form-control" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}" >
+            <a href="{{VISUALIZAR_OS.ANEXO.url}}" target="_blank" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <i class="fa-solid fa-paperclip"></i> Visualizar Anexo
+            </a>
+          </div>
+          {% endif %}
+          {% if VISUALIZAR_OS.ASSINATURA %}
+          <div class="form-group col-md-6">
+            <a href="{{VISUALIZAR_OS.ASSINATURA.url}}" target="_blank" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <i class="fa-solid fa-signature"></i> Visualizar Assinatura
+            </a>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="form-group col-md-6">
+            <label for="data_pedido" class="form-label fw-semibold">Data Pedido</label>
+            <p class="form-control-plaintext">{{VISUALIZAR_OS.DATA_SOLICITACAO|date:"D d M Y"}}</p>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="previsao_entrega" class="form-label fw-semibold">Previsão Entrega</label>
+            <p class="form-control-plaintext">{{VISUALIZAR_OS.PREVISAO_ENTREGA|date:"D d M Y"}}</p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="form-group col-md-6">
+            <label for="VENDEDOR" class="form-label fw-semibold">Vendedor</label>
+            <input readonly class="form-control bg-light" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}">
             <input type="text" id="VENDEDOR" style="display: none;" name="VENDEDOR" value="{{VISUALIZAR_OS.VENDEDOR.first_name}}">
           </div>
           <div class="form-group col-md-6">
-            <label for="CLIENTE">Cliente</label>
-            <a href="/cliente/{{VISUALIZAR_OS.CLIENTE.id}}"  target="_blank"><input readonly class="form-control"  id="CLIENTE" name="CLIENTE" value="{{VISUALIZAR_OS.CLIENTE}}" ></a>
+            <label for="CLIENTE" class="form-label fw-semibold">Cliente</label>
+            <a href="/cliente/{{VISUALIZAR_OS.CLIENTE.id}}" target="_blank" class="text-decoration-none">
+              <input readonly class="form-control bg-light" style="cursor:pointer;" id="CLIENTE" name="CLIENTE" value="{{VISUALIZAR_OS.CLIENTE}}">
+            </a>
           </div>
         </div>
-        <hr>
-        <div class="row text-center">
-          <div class="form-row">
-            <div class="form-group col">
-              <label for="inputState">Tipo de Serviço</label>
-              <select  id="SERVICO" readonly name="SERVICO" class="form-control">
-                <option selected>{{VISUALIZAR_OS.SERVICO}}</option>
-              </select>
-            </div>
+
+        <hr class="my-4">
+
+        <div class="row g-3">
+          <div class="form-group col-md-6">
+            <label for="SERVICO" class="form-label fw-semibold">Tipo de Serviço</label>
+            <input id="SERVICO" readonly class="form-control bg-light" name="SERVICO" value="{{VISUALIZAR_OS.SERVICO}}">      
+          </div>
+          <div class="form-group col-md-6">
+            <label for="lab" class="form-label fw-semibold">Laboratório</label>
+            <input id="lab" readonly name="lab" class="form-control bg-light" value="{{VISUALIZAR_OS.LABORATORIO}}">
           </div>
         </div>
-        <div class="row text-center">
-          <div class="form-row">
-            <div class="form-group col">
-              <label for="inputState">Laboratorio</label>
-              <select  id="lab" readonly name="lab" class="form-control">
-                <option selected>{{VISUALIZAR_OS.LABORATORIO}}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="inputEmail3" class="col-sm-1 col-form-label">OD</label>
+
+        <hr class="my-4">
+
+        <label class="form-label fw-semibold d-flex align-items-center gap-2">
+          <i class="fa-solid fa-eye text-primary"></i> Receita
+        </label>
+
+        <div class="row g-2 align-items-end mb-2">
+          <label class="col-sm-1 col-form-label">OD</label>
           <div class="col-sm-3">
-            <input  type="text" class="form-control" name="OD_ESF" id="OD_ESF" value="{{VISUALIZAR_OS.OD_ESF}}"  readonly>
+            <input type="text" class="form-control" name="OD_ESF" id="OD_ESF" value="{{VISUALIZAR_OS.OD_ESF}}" readonly>
           </div>
-        <div class="col-sm-3">
-          <input type="text" class="form-control"  name="OD_CIL" id="OD_CIL" value="{{VISUALIZAR_OS.OD_CIL}}"  readonly>
-        </div>
-        <div class="col-sm-3">
-          <input type="text" class="form-control"  name="OD_EIXO" id="OD_EIXO" value="{{VISUALIZAR_OS.OD_EIXO}}"  readonly>
-        </div>
-
-        </div>
-        <div class="form-group row">
-          <label for="inputEmail3" class="col-sm-1 col-form-label">OE</label>
           <div class="col-sm-3">
-            <input type="text" class="form-control" name="OE_ESF" id="OE_ESF" value="{{VISUALIZAR_OS.OE_ESF}}"  readonly>
+            <input type="text" class="form-control" name="OD_CIL" id="OD_CIL" value="{{VISUALIZAR_OS.OD_CIL}}" readonly>
           </div>
-        <div class="col-sm-3">
-          <input type="text" class="form-control" name="OE_CIL" id="OE_CIL" value="{{VISUALIZAR_OS.OE_CIL}}"  readonly>
-        </div>
-        <div class="col-sm-3">
-          <input type="text" class="form-control" name="OE_EIXO" id="OE_EIXO"  value="{{VISUALIZAR_OS.OE_EIXO}}"  readonly>
-        </div>
-        </div>
-        <div class="form-group row">
-          <label for="inputEmail3" class="col-sm-1 col-form-label">AD</label>
           <div class="col-sm-3">
-            <input type="text" class="form-control" name="AD" id="AD" value="{{VISUALIZAR_OS.AD}}"  readonly>
+            <input type="text" class="form-control" name="OD_EIXO" id="OD_EIXO" value="{{VISUALIZAR_OS.OD_EIXO}}" readonly>
           </div>
         </div>
-        <hr> 
-            <label for="">Laboratorio</label>
-            <div class="form-row">
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="DNP" name="DNP" value="{{VISUALIZAR_OS.DNP}}"  readonly>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="P" name="P" value="{{VISUALIZAR_OS.P}}"  readonly>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="DPA" name="DPA" value="{{VISUALIZAR_OS.DPA}}"  readonly>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="DIAG" name="DIAG" value="{{VISUALIZAR_OS.DIAG}}"  readonly>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="V" name="V" value="{{VISUALIZAR_OS.V}}"  readonly>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" id="H" name="H" value="{{VISUALIZAR_OS.H}}"  readonly>
-              </div>
+
+        <div class="row g-2 align-items-end mb-2">
+          <label class="col-sm-1 col-form-label">OE</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="OE_ESF" id="OE_ESF" value="{{VISUALIZAR_OS.OE_ESF}}" readonly>
+          </div>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="OE_CIL" id="OE_CIL" value="{{VISUALIZAR_OS.OE_CIL}}" readonly>
+          </div>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="OE_EIXO" id="OE_EIXO" value="{{VISUALIZAR_OS.OE_EIXO}}" readonly>
+          </div>
+        </div>
+
+        <div class="row g-2 align-items-end">
+          <label class="col-sm-1 col-form-label">AD</label>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" name="AD" id="AD" value="{{VISUALIZAR_OS.AD}}" readonly>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <label class="form-label fw-semibold d-flex align-items-center gap-2">
+          <i class="fa-solid fa-ruler-combined text-primary"></i> Laboratório
+        </label>
+
+        <div class="row g-2 mb-2">
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="DNP" name="DNP" value="{{VISUALIZAR_OS.DNP}}" readonly>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="P" name="P" value="{{VISUALIZAR_OS.P}}" readonly>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="DPA" name="DPA" value="{{VISUALIZAR_OS.DPA}}" readonly>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="DIAG" name="DIAG" value="{{VISUALIZAR_OS.DIAG}}" readonly>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="V" name="V" value="{{VISUALIZAR_OS.V}}" readonly>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="H" name="H" value="{{VISUALIZAR_OS.H}}" readonly>
+          </div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="ALT" name="ALT" value="{{VISUALIZAR_OS.ALT}}" readonly>
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="ARM" name="ARM" value="{{VISUALIZAR_OS.ARM}}" readonly>
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="MONTAGEM" name="MONTAGEM" value="{{VISUALIZAR_OS.MONTAGEM}}" readonly>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="form-group col-md-12 mb-3">
+          <label for="LENTES" class="form-label fw-semibold">Lentes</label>
+          <input required class="form-control" readonly value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES">
+        </div>
+        <div class="form-group col-md-12 mb-3">
+          <label for="ARMACAO" class="form-label fw-semibold">Armação</label>
+          <input required class="form-control" readonly value="{{VISUALIZAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO">
+        </div>
+        <div class="form-group mb-3">
+          <label for="OBSERVACAO" class="form-label fw-semibold">Observação</label>
+          <textarea class="form-control" readonly id="OBSERVACAO" name="OBSERVACAO" rows="3">{{VISUALIZAR_OS.OBSERVACAO}}</textarea>
+        </div>
+
+        <hr class="my-4">
+
+        <label class="form-label fw-semibold d-flex align-items-center gap-2">
+          <i class="fa-solid fa-sack-dollar text-primary"></i> Financeiro da Venda
+        </label>
+
+        <div class="row g-2">
+          <div class="form-group col-md-2">
+              <label class="form-label">Pagamento</label>
+              <input type="text" 
+                    id="PAGAMENTO" 
+                    name="PAGAMENTO" 
+                    class="form-control" 
+                    readonly 
+                    value="
+                    {% if VISUALIZAR_OS.FORMA_PAG == 'A' %}Pix
+                    {% elif VISUALIZAR_OS.FORMA_PAG == 'B' %}Dinheiro
+                    {% elif VISUALIZAR_OS.FORMA_PAG == 'C' %}Débito
+                    {% elif VISUALIZAR_OS.FORMA_PAG == 'D' %}Crédito
+                    {% elif VISUALIZAR_OS.FORMA_PAG == 'E' %}Carnê
+                    {% elif VISUALIZAR_OS.FORMA_PAG == 'F' %}Permuta
+                    {% else %}Não informado
+                    {% endif %}">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label class="form-label">Valor Total</label>
+            <input type="text" readonly value="{{ VISUALIZAR_OS.VALOR|money }}"
+                   class="form-control" id="VALOR" name="VALOR">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label class="form-label">Parcelas</label>
+            <input type="text" readonly class="form-control"
+                   value="{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}x">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label class="form-label">Entrada</label>
+            <input type="text" readonly class="form-control"
+                   value="{{ VISUALIZAR_OS.ENTRADA|money }}">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label class="form-label">Total Pago</label>
+            <input type="text" readonly
+                   value="{{ VISUALIZAR_OS.VALOR_PAGO|money }}"
+                   class="form-control"
+                   style="background:#d1fae5; color:#065f46; font-weight:600;">
+          </div>
+
+          <div class="form-group col-md-2">
+            <label class="form-label">Falta Pagar</label>
+            <input type="text" readonly
+                   value="{{ falta_pagar|money }}"
+                   class="form-control"
+                   style="{% if falta_pagar <= 0 %}background:#d1fae5;color:#065f46;{% else %}background:#fee2e2;color:#991b1b;{% endif %} font-weight:600;">
+          </div>
+
+          <div class="form-group col-md-2 d-flex flex-column">
+            <label class="form-label">Status</label>
+            {% if VISUALIZAR_OS.STATUS == "A" %}<span class="badge bg-secondary align-self-start fs-6">SOLICITADO</span>{% endif %}
+            {% if VISUALIZAR_OS.STATUS == "E" %}<span class="badge bg-success align-self-start fs-6">ENTREGUE</span>{% endif %}
+            {% if VISUALIZAR_OS.STATUS == "C" %}<span class="badge bg-danger align-self-start fs-6">CANCELADO</span>{% endif %}
+            {% if VISUALIZAR_OS.STATUS == "L" %}<span class="badge bg-primary align-self-start fs-6">LABORATÓRIO</span>{% endif %}
+            {% if VISUALIZAR_OS.STATUS == "J" %}<span class="badge bg-warning text-dark align-self-start fs-6">LOJA</span>{% endif %}
+          </div>
+        </div>
+
+        {% if parcelas %}
+        <div class="row mt-4">
+          <div class="col-12">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2">
+              <i class="fa-solid fa-list-check text-primary"></i> Parcelas
+            </label>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Parcela</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Forma</th>
+                    <th>Status</th>
+                    <th>Pago em</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for parcela in parcelas %}
+                  <tr>
+                    <td>{{ parcela.numero }}/{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}</td>
+                    <td>{{ parcela.data_vencimento }}</td>
+                    <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+                    <td>
+                      {% if parcela.forma_pagamento == "A" %}PIX
+                      {% elif parcela.forma_pagamento == "B" %}Dinheiro
+                      {% elif parcela.forma_pagamento == "C" %}Débito
+                      {% elif parcela.forma_pagamento == "D" %}Crédito
+                      {% elif parcela.forma_pagamento == "E" %}Carnê
+                      {% elif parcela.forma_pagamento == "F" %}Permuta
+                      {% else %}—{% endif %}
+                    </td>
+                    <td>
+                      {% if parcela.pago %}
+                        <span class="badge bg-success">Pago</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">Pendente</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ parcela.data_pagamento|default:"—" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
-            <hr>
-            <div class="form-row">
-              <div class="col-md-4">
-                <input type="text" class="form-control" id="ALT" name="ALT" value="{{VISUALIZAR_OS.ALT}}"  readonly>
-              </div>
-              <div class="col-md-4">
-                <input type="text" class="form-control" id="ARM" name="ARM" value="{{VISUALIZAR_OS.ARM}}"  readonly>
-              </div>
-              <div class="col-md-4">
-                <input type="text" class="form-control" id="MONTAGEM" name="MONTAGEM" value="{{VISUALIZAR_OS.MONTAGEM}}"  readonly>
-              </div>
-            </div>
-            <hr>
-        <div class="form-group col-md-12">
-          <label for="FILIAL">Lentes</label>
-          <input required class="form-control" readonly value="{{VISUALIZAR_OS.LENTES}}" id="LENTES" name="LENTES"  >
+          </div>
         </div>
-        <div class="form-group col-md-12">
-          <label for="FILIAL">Armação</label>
-          <input required class="form-control" readonly value="{{VISUALIZAR_OS.ARMACAO}}" id="ARMACAO" name="ARMACAO"  >
+        {% endif %}
+
+        <hr class="my-4">
+
+        <div class="d-flex flex-wrap gap-2">
+          {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
+          <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id %}" class="btn btn-secondary d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-pen"></i> Editar
+          </a>
+          <a href="{% url 'Core:emitir_nfe' VISUALIZAR_OS.id %}" class="btn btn-success d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-file-code"></i> Gerar Xml
+          </a>
+          {% endif %}
+          <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id %}" class="btn btn-warning d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-print"></i> Imprimir
+          </a>
+
+          {% if VISUALIZAR_OS.STATUS == "A" %}
+          <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id %}" class="btn btn-warning d-inline-flex align-items-center gap-2">Mover para Loja</a>
+          <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id %}" class="btn btn-info d-inline-flex align-items-center gap-2">Mover Laboratório</a>
+          <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id %}" class="btn btn-success d-inline-flex align-items-center gap-2">Entregue</a>
+          <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id %}" class="btn btn-danger d-inline-flex align-items-center gap-2">Cancelar</a>
+          {% endif %}
+          {% if VISUALIZAR_OS.STATUS == "E" %}
+          <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id %}" class="btn btn-warning disabled">Mover para Loja</a>
+          <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id %}" class="btn btn-info disabled">Mover Laboratório</a>
+          <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id %}" class="btn btn-success disabled">Entregue</a>
+          <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id %}" class="btn btn-danger disabled">Cancelar</a>
+          {% endif %}
+          {% if VISUALIZAR_OS.STATUS == "L" %}
+          <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id %}" class="btn btn-warning">Mover para Loja</a>
+          <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id %}" class="btn btn-info disabled">Mover Laboratório</a>
+          <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id %}" class="btn btn-success">Entregue</a>
+          <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id %}" class="btn btn-danger">Cancelar</a>
+          {% endif %}
+          {% if VISUALIZAR_OS.STATUS == "J" %}
+          <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id %}" class="btn btn-warning disabled">Mover para Loja</a>
+          <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id %}" class="btn btn-info">Mover Laboratório</a>
+          <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id %}" class="btn btn-success">Entregue</a>
+          <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id %}" class="btn btn-danger">Cancelar</a>
+          {% endif %}
+          {% if VISUALIZAR_OS.STATUS == "C" %}
+          <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id %}" class="btn btn-warning disabled">Mover para Loja</a>
+          <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id %}" class="btn btn-info disabled">Mover Laboratório</a>
+          <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id %}" class="btn btn-success disabled">Entregue</a>
+          <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id %}" class="btn btn-danger disabled">Cancelar</a>
+          {% endif %}
+
+          {% if VISUALIZAR_OS.FORMA_PAG == "E" %}
+          <a href="{% url 'Core:gerar_carner_pdf' VISUALIZAR_OS.id %}" class="btn btn-info d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-book"></i> Gerar Carnê
+          </a>
+          {% endif %}
+
+          <a href="{% url 'Core:Finalizar_os' VISUALIZAR_OS.id %}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-flag-checkered"></i> Finalizar
+          </a>
         </div>
-        <div class="form-group">
-          <label for="exampleFormControlTextarea1">Obeservaçâo</label>
-          <textarea class="form-control"  readonly id="OBSERVACAO" name="OBSERVACAO" rows="3">{{VISUALIZAR_OS.OBSERVACAO}}</textarea>
-        </div>
-        <hr>
-
-        <hr>
-<div class="text-center">
-  <div class="row">
-    <label for="NUMERO"> Financeiro Da Venda</label>
-    <div class="form-group col-md-2">
-      <label>Pagamento</label>
-      <select required id="PAGAMENTO" readonly name="PAGAMENTO" class="form-control">
-        {% if VISUALIZAR_OS.FORMA_PAG == "A" %}<option value="A">Pix</option>{% endif %}
-        {% if VISUALIZAR_OS.FORMA_PAG == "B" %}<option value="B">Dinheiro</option>{% endif %}
-        {% if VISUALIZAR_OS.FORMA_PAG == "C" %}<option value="C">Débito</option>{% endif %}
-        {% if VISUALIZAR_OS.FORMA_PAG == "D" %}<option value="D">Crédito</option>{% endif %}
-        {% if VISUALIZAR_OS.FORMA_PAG == "E" %}<option value="E">Carnê</option>{% endif %}
-        {% if VISUALIZAR_OS.FORMA_PAG == "F" %}<option value="F">Permuta</option>{% endif %}
-      </select>
-    </div>
-
-    <div class="form-group col-md-2">
-      <label>Valor Total</label>
-      <input type="text" readonly value="{{ VISUALIZAR_OS.VALOR|money }}"
-             class="form-control" id="VALOR" name="VALOR">
-    </div>
-
-    <div class="form-group col-md-2">
-      <label>Parcelas</label>
-      <input type="text" readonly class="form-control"
-             value="{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}x">
-    </div>
-<div class="form-group col-md-2">
-  <label>Entrada</label>
-  <input type="text" readonly class="form-control"
-         value="{{ VISUALIZAR_OS.ENTRADA|money }}">
-</div>
-
-<div class="form-group col-md-2">
-  <label>Total Pago</label>
-  <input type="text" readonly
-         value="{{ VISUALIZAR_OS.VALOR_PAGO|money }}"
-         class="form-control"
-         style="background:#d1fae5; color:#065f46; font-weight:600;">
-</div>
-
-<div class="form-group col-md-2">
-  <label>Falta Pagar</label>
-  <input type="text" readonly
-         value="{{ falta_pagar|money }}"
-         class="form-control"
-         style="{% if falta_pagar <= 0 %}background:#d1fae5;color:#065f46;{% else %}background:#fee2e2;color:#991b1b;{% endif %} font-weight:600;">
-</div>
-
-    <div class="form-group col-md-2">
-      <label>Status</label>
-      {% if VISUALIZAR_OS.STATUS == "A" %}<h4><span class="badge badge-secondary">SOLICITADO</span></h4>{% endif %}
-      {% if VISUALIZAR_OS.STATUS == "E" %}<h4><span class="badge badge-success">ENTREGUE</span></h4>{% endif %}
-      {% if VISUALIZAR_OS.STATUS == "C" %}<h4><span class="badge badge-danger">CANCELADO</span></h4>{% endif %}
-      {% if VISUALIZAR_OS.STATUS == "L" %}<h4><span class="badge badge-primary">LABORATÓRIO</span></h4>{% endif %}
-      {% if VISUALIZAR_OS.STATUS == "J" %}<h4><span class="badge badge-warning">LOJA</span></h4>{% endif %}
-    </div>
-  </div>
-
-  <!-- Tabela de parcelas -->
-  {% if parcelas %}
-  <div class="row mt-3">
-    <div class="col-12">
-      <table class="table table-sm table-bordered">
-        <thead class="thead-light">
-          <tr>
-            <th>Parcela</th>
-            <th>Vencimento</th>
-            <th>Valor</th>
-            <th>Forma</th>
-            <th>Status</th>
-            <th>Pago em</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for parcela in parcelas %}
-          <tr>
-            <td>{{ parcela.numero }}/{{ VISUALIZAR_OS.QUANTIDADE_PARCELA }}</td>
-            <td>{{ parcela.data_vencimento }}</td>
-            <td>R$ {{ parcela.valor|floatformat:2 }}</td>
-            <td>
-              {% if parcela.forma_pagamento == "A" %}PIX
-              {% elif parcela.forma_pagamento == "B" %}Dinheiro
-              {% elif parcela.forma_pagamento == "C" %}Débito
-              {% elif parcela.forma_pagamento == "D" %}Crédito
-              {% elif parcela.forma_pagamento == "E" %}Carnê
-              {% elif parcela.forma_pagamento == "F" %}Permuta
-              {% else %}—{% endif %}
-            </td>
-            <td>
-              {% if parcela.pago %}
-                <span class="badge badge-success">Pago</span>
-              {% else %}
-                <span class="badge badge-warning">Pendente</span>
-              {% endif %}
-            </td>
-            <td>{{ parcela.data_pagamento|default:"—" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  {% endif %}
-
-</div>
-       
-        <div style="margin: 15px;">
-        {% if user.FUNCAO == "G" or user.FUNCAO == "V" %}
-        <a href="{% url 'Core:Editar_os' VISUALIZAR_OS.id  %}"  class="btn btn-secondary" >Editar</a>
-         <a href="{% url 'Core:emitir_nfe' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Gerar Xml</a> 
-        {% endif %}
-        <a href="{% url 'Core:Imprimir_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Imprimir</a>
-        {% if VISUALIZAR_OS.STATUS == "A" %}
-        <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Mover para Loja</a>
-        <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Mover Laboratorio</a>
-        <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
-        <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
-        {% endif %}
-        {% if VISUALIZAR_OS.STATUS == "E" %}
-        <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
-        <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
-        <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
-        <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
-        {% endif %}
-        {% if VISUALIZAR_OS.STATUS == "L" %}
-        <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning" >Mover para Loja</a>
-        <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
-        <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
-        <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
-        {% endif %}
-        {% if VISUALIZAR_OS.STATUS == "J" %}
-        <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
-        <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Mover Laboratorio</a>
-        <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success" >Entregue</a>
-        <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger" >Cancelar</a>
-        {% endif %}
-        {% if VISUALIZAR_OS.STATUS == "C" %}
-        <a href="{% url 'Core:Loja_os' VISUALIZAR_OS.id  %}"  class="btn btn-warning disabled" >Mover para Loja</a>
-        <a href="{% url 'Core:Laboratorio_os' VISUALIZAR_OS.id  %}"  class="btn btn-info disabled" >Mover Laboratorio</a>
-        <a href="{% url 'Core:Encerrar_os' VISUALIZAR_OS.id  %}"  class="btn btn-success disabled" >Entregue</a>
-        <a href="{% url 'Core:Cancelar_os' VISUALIZAR_OS.id  %}"  class="btn btn-danger disabled" >Cancelar</a>
-        {% endif %}
-
-        {% if VISUALIZAR_OS.FORMA_PAG == "E" %}
-        <a href="{% url 'Core:gerar_carner_pdf' VISUALIZAR_OS.id  %}"  class="btn btn-info" >Gerar Carner</a>
-        {% endif %}
-        <a href="{% url 'Core:Finalizar_os' VISUALIZAR_OS.id  %}"  class="btn btn-dark" >Finalizar</a>
-      </div>
       </form>
-  </section>
-  <script>
-  window.addEventListener('scroll', function() {
-            var header = document.getElementById('form-header');
-            if (header) {
-                var headerOffset = header.offsetTop;
-                var pageOffset = window.pageYOffset;
-                var fixedPosition = 500;
+    </div>
+  </div>
+</section>
 
-                if (pageOffset >= fixedPosition) {
-                    header.classList.add('fixed-header');
-                } else {
-                    header.classList.remove('fixed-header');
-                }
-            }
-        });
+<script>
+  window.addEventListener('scroll', function() {
+    var header = document.getElementById('form-header');
+    if (header) {
+      var headerOffset = header.offsetTop;
+      var pageOffset = window.pageYOffset;
+      var fixedPosition = 500;
+
+      if (pageOffset >= fixedPosition) {
+        header.classList.add('fixed-header');
+      } else {
+        header.classList.remove('fixed-header');
+      }
+    }
+  });
 </script>
 
-  <script src="{% static 'Unidades/js/os.js' %}"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
-
+<script src="{% static 'Unidades/js/os.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://harvesthq.github.io/chosen/chosen.jquery.js" type="text/javascript"></script>
 
 {%endblock%}
