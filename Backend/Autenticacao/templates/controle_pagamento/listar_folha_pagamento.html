@@ -17,13 +17,13 @@
     <div class="card mb-3">
         <div class="card-header">
             <h5 class="card-title text-center">{{ item.colaborador.first_name }}  {% if item.colaborador.FUNCAO == "G" %}
-                <span class="badge badge-info">Gerente</span>
+                <span class="badge rounded-pill bg-primary">Gerente</span>
                 {% endif %}
                 {% if item.colaborador.FUNCAO == "C" %}
-                <span class="badge badge-info">Caixa</span>
+                <span class="badge rounded-pill bg-secondary">Caixa</span>
                 {% endif %}
                 {% if item.colaborador.FUNCAO == "V" %}
-                <span class="badge badge-info">Vendedor</span>
+                <span class="badge rounded-pill bg-info text-dark">Vendedor</span>
                 {% endif %} </h5>
         </div>
         <div class="card-body">
