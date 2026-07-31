@@ -12,89 +12,146 @@ Relatorios
 {% endblock %}
 
 {% block 'body'%}
-<div class="text-center">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="alert {{message.tags}}">
-              {{message}}
-          </div>
-      {% endfor %}
-  {% endif %}
-</div>
-{% if user.FUNCAO == "G" %}
-<div class="container-fluid">
-  <br>
-  <div class="btn-toolbar mb-3" role="group" aria-label="Basic example">
-    <a type="button" class="btn btn-dark" href="{% url 'Core:relatorio_mes_anterior' %}"  >Vendedores Mês anteriores</a>
-    <a href="{% url 'Core:export_clientes' %}" type="button" class="btn btn-success">Exportar Clientes</a>
-    <a href="{% url 'Core:export_os' %}" type="button" class="btn btn-info">Exportar OS</a>
-    <a href="{% url 'Core:ordens_pendentes' %}" type="button" class="btn btn-warning">OS pendente de pagamento</a>
-  </div>
-  <div class="row text-center">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Funcionários do mês</h5>
-        <p class="card-text"><span style="margin-left: 15px;" id="vendedor"></span> <span style="margin-left: 15px;" id="qtd"></span></p>
-      </div>
-    </div>
-  </div>
-    <div class="row text-center">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Lentes</h5>
-        <p class="card-text"><span style="margin-left: 15px;" id="lentes"></span></p>
-      </div>
-    </div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="col">
-      <div class="card text-center text-white bg-primary mb-3" style="height: 150px;">
-        <div class="card-body" style="align-content: center;">
-          <h5 class="card-title">Ordens De Serviço Em Aberto Mês</h5>
-          <p class="card-text" id="total_vendas"></p><p class="card-text" id="total_valor"></p>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{message.tags}}">
+            {{message}}
         </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card text-center text-white bg-warning mb-3"  style="height: 150px;">
-        <div class="card-body" style="align-content: center;">
-          <h5 class="card-title">Total de Clientes Cadastrados</h5>
-          <p class="card-text" id="clientes"></p><p class="card-text"></p>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card text-center text-white bg-success mb-3" style="height: 150px;">
-        <div class="card-body" style="align-content: center;">
-          <h5 class="card-title">Receber Hoje</h5>
-          <p class="card-text" id="receber"></p><p class="card-text"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-      <div class="row">
-        <div class="col-md">
-          <h1 class="text-center">Total de Vendas nos ultimos 12 Meses:</h1>
-            <canvas id="vendas_12m" width="250" height="200"></canvas>
- 
-      </div>
-      <div class="col-md">
-      <h1 class="text-center">Fluxo de Caixa Mensal nos ultimos 12 Meses:</h1>
-      <canvas id="fluxo_mensal" width="250" height="200"></canvas>
-    </div>
-</div>
-<br>
-    {% else%}
-    <h1 class="text-center">Acesso apenas para Gerentes !</h1>
+    {% endfor %}
 {% endif %}
+
+{% if user.FUNCAO == "G" %}
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-dark d-inline-flex align-items-center gap-2" href="{% url 'Core:relatorio_mes_anterior' %}">
+    <i class="fa-solid fa-calendar-days"></i> Vendedores Mês Anteriores
+  </a>
+  <!-- 
+  <a class="btn btn-success d-inline-flex align-items-center gap-2" href="{% url 'Core:export_clientes' %}">
+    <i class="fa-solid fa-file-export"></i> Exportar Clientes
+  </a>
+  <a class="btn btn-info d-inline-flex align-items-center gap-2" href="{% url 'Core:export_os' %}">
+    <i class="fa-solid fa-file-export"></i> Exportar OS
+  </a>
+  -->
+  <a class="btn btn-warning d-inline-flex align-items-center gap-2" href="{% url 'Core:ordens_pendentes' %}">
+    <i class="fa-solid fa-clock"></i> OS Pendente de Pagamento
+  </a>
 </div>
+
+<!-- Funcionários / Lentes -->
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body d-flex align-items-center gap-3">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary flex-shrink-0" style="width:48px; height:48px;">
+          <i class="fa-solid fa-star fa-lg"></i>
+        </span>
+        <div>
+          <h5 class="card-title mb-1">Funcionário do Mês</h5>
+          <p class="card-text mb-0">
+            <span id="vendedor" class="fw-semibold"></span>
+            <span id="qtd" class="text-muted ms-2"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body d-flex align-items-center gap-3">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 text-info flex-shrink-0" style="width:48px; height:48px;">
+          <i class="fa-solid fa-eye fa-lg"></i>
+        </span>
+        <div>
+          <h5 class="card-title mb-1">Lentes</h5>
+          <p class="card-text mb-0">
+            <span id="lentes" class="fw-semibold"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-white bg-primary border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center justify-content-between" style="min-height:120px;">
+        <div>
+          <h6 class="card-title text-uppercase small opacity-75 mb-2">Ordens de Serviço em Aberto (Mês)</h6>
+          <p class="card-text fs-4 fw-bold mb-0" id="total_vendas"></p>
+          <p class="card-text mb-0" id="total_valor"></p>
+        </div>
+        <i class="fa-solid fa-file-invoice fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card text-white bg-warning border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center justify-content-between" style="min-height:120px;">
+        <div>
+          <h6 class="card-title text-uppercase small opacity-75 mb-2">Total de Clientes Cadastrados</h6>
+          <p class="card-text fs-4 fw-bold mb-0" id="clientes"></p>
+        </div>
+        <i class="fa-solid fa-users fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card text-white bg-success border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center justify-content-between" style="min-height:120px;">
+        <div>
+          <h6 class="card-title text-uppercase small opacity-75 mb-2">Receber Hoje</h6>
+          <p class="card-text fs-4 fw-bold mb-0" id="receber"></p>
+        </div>
+        <i class="fa-solid fa-sack-dollar fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-chart-line text-primary"></i> Total de Vendas nos Últimos 12 Meses
+        </h2>
+        <canvas id="vendas_12m" width="250" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-chart-column text-primary"></i> Fluxo de Caixa Mensal nos Últimos 12 Meses
+        </h2>
+        <canvas id="fluxo_mensal" width="250" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="card border-0 shadow-sm">
+  <div class="card-body text-center text-muted py-5">
+    <i class="fa-solid fa-lock fa-2x mb-3 d-block"></i>
+    <h4>Acesso apenas para Gerentes!</h4>
+  </div>
+</div>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{% static 'Relatorio\js\relatorios.js' %}"></script>
-
+<script src="{% static 'Relatorio/js/relatorios.js' %}"></script>
 
 <script>
     window.onload = function(e){
