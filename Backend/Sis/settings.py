@@ -147,11 +147,11 @@ DATABASES = {
         'USER': config('BANCO_USER'),
         'PASSWORD': config('BANCO_PASSWORD'),
         'HOST': config('BANCO_HOST'),
-        'PORT': '5432',
+        'PORT': config('BANCO_PORT'),
         'CONN_MAX_AGE': 500,
         'MAX_CONNS': 20,
         'OPTIONS': {
-      #      'sslmode': 'require',
+        #    'sslmode': 'require',
         },
     }
 }
@@ -175,7 +175,7 @@ TENANT_MODEL = "Cliente.Cliente"
 
 TENANT_DOMAIN_MODEL = "Cliente.Domain"
 
-TENANT_COLOR_ADMIN_APPS = False
+TENANT_COLOR_ADMIN_APPS = True
 
 
 
