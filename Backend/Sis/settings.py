@@ -31,7 +31,8 @@ DATE_FORMAT = "d-m-Y"
 
 # Application definition
 
-INSTALLED_APPS = [
+SHARED_APPS = [
+    'django_tenants', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,51 +40,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'simple_history',
     'rest_framework',
     'rest_framework_simplejwt',
-    "corsheaders",
-  #  'django_sonar',
-    'compressor',
-    'debug_toolbar',
-    'elasticapm.contrib.django',
-    'Autenticacao',
-    'Core',
+    'Cliente',
 ]
 
-SHARED_APPS = [
-    'django_tenants', 
-    'Cliente',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'simple_history',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'elasticapm.contrib.django',
-        'debug_toolbar',
-        'Autenticacao',
-        'Core',
-        'compressor',
-        "corsheaders",
-]
 
 TENANT_APPS = [
-    # The following Django contrib apps must be in TENANT_APPS
-    'django.contrib.contenttypes',
-    'debug_toolbar',
-    'simple_history',
-    'elasticapm.contrib.django',
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    # tenant-specific apps
      'Core',
      'Autenticacao',
      'compressor',
      "corsheaders",
+     'simple_history',
+     'debug_toolbar',
+     #'django_sonar',
+     
 ]
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
@@ -106,7 +77,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-   #   'django_sonar.middlewares.requests.RequestsMiddleware',
+    #'django_sonar.middlewares.requests.RequestsMiddleware',
 ]
 
 ROOT_URLCONF = 'Sis.urls'
