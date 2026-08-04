@@ -1,5 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'base_auth.html' %}
 {% load static %}
+
+{% block 'title' %}Logar | Sistema Óticas{% endblock %}
 
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'autenticacao/css/autenticacao.css' %}">
@@ -8,14 +10,7 @@
 
 {% block 'body' %}
 <div id="fundo">
-{% if messages %}
-<br>
-{% for message in messages %}
-<div class="alert {{message.tags}}">
-{{message}}
-</div>
-{% endfor %}
-{% endif %}
+
 
     <div class="box text-center logar">
         <form action="{% url 'logar' %}" method="post">{% csrf_token %}
