@@ -1,5 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'base_auth.html' %}
 {% load static %}
+
+{% block 'title' %}Cadastrar | Sistema Óticas{% endblock %}
 
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'autenticacao/css/autenticacao.css' %}">
@@ -19,9 +21,8 @@
                     </div>
                 {% endfor %}
         {% endif %}
-            <h1 class="titulo font-degrade borda-bottom-degrade">INSCREVA-SE</h2>
             <br>
-            <input id="data_nascimento" style="width: 30%;"  name="data_nascimento" type="date">
+            <input id="data_nascimento"  name="data_nascimento" type="date">
             <br>
             <span class="span-descricao"></span>
             <input type="text" class="form-control input-cadastro" name="username" placeholder="Login de usuário">
@@ -38,7 +39,7 @@
             <span class="span-descricao"></span>
             <div class="row">
                 <div class="form-row">
-                  <div class="form-group col-md-6">
+                  <div class="form-group">
                     <select id="funcao" name="funcao" class="form-control" required>
                       <option selected>Escolha Sua Funcao...</option>
                       <option value="V">Vendedor</option>

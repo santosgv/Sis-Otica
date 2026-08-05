@@ -1,5 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'base_auth.html' %}
 {% load static %}
+
+{% block 'title' %}Logar | Sistema Óticas{% endblock %}
 
 {% block 'head' %}
 <link rel="stylesheet" href="{% static 'autenticacao/css/autenticacao.css' %}">
@@ -7,20 +9,20 @@
 {% endblock %}
 
 {% block 'body' %}
+<p>Acesse sua conta para continuar</p>
 <div id="fundo">
-{% if messages %}
-<br>
-{% for message in messages %}
-<div class="alert {{message.tags}}">
-{{message}}
-</div>
-{% endfor %}
-{% endif %}
+
+                        {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{message.tags}}">
+                        {{message}}
+                    </div>
+                {% endfor %}
+        {% endif %}
 
     <div class="box text-center logar">
         <form action="{% url 'logar' %}" method="post">{% csrf_token %}
             <div class="logar-form">
-            <h1 class="titulo font-degrade borda-bottom-degrade">LOGAR</h2>
             <br>
             <label class="span-descricao"></label>
             <input type="text" class="form-control input-cadastro bnt" name="username" placeholder="Digite Seu Usuario">
@@ -29,9 +31,7 @@
             <input type="password" class="form-control input-cadastro bnt" name="password" placeholder="Senha">
             <br>
         </div>
-            <input  type="submit" value="Logar" class="bto-success bto-group-lg bto-lg">
-            <!-- <a type="button" class="btn btn-secondary" href="{% url 'cadastro'%}">cadastrar</a> -->
-            <a type="button" class="btn btn-secondary" href="{% url 'password_reset'%}">Esqueceu sua senha ?</a>
+            <input  type="submit" value="Logar" class="btn btn-success">
             <div>
                 <br>
           
@@ -40,4 +40,15 @@
             
     </div>
 </div>
+
+            <!-- Rodapé -->
+            <div class="login-footer">
+                <a href="{% url 'password_reset' %}">
+                    <i class="fas fa-key mr-1"></i> Esqueceu sua senha?
+                </a>
+                <span class="divider"></span>
+                <a href="{% url 'cadastro' %}"style="display: none;">
+                    <i class="fas fa-user-plus mr-1"></i> Criar conta
+                </a>
+            </div>
 {% endblock %}
