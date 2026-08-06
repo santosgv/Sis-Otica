@@ -47,7 +47,14 @@ def formatar_decimal(valor):
 
 
 def get_aniversariantes_mes(request):
-    cached_aniversariantes = cache.get('all_aniversariantes_mes')
+    tenant_id = get_tenant(request)
+
+    if not tenant_id:
+        return Response({'detail': 'Tenant não identificado.'}, status=400)
+
+    cache_key = f'aniversariantes_mes_tenant_{tenant_id}'
+
+    cached_aniversariantes = cache.get(cache_key)
     if cached_aniversariantes is None:
         today = timezone.now()
         current_month = today.month
@@ -73,7 +80,7 @@ def get_aniversariantes_mes(request):
         ]
         
 
-        cache.set('all_aniversariantes_mes', cached_aniversariantes, timeout=129600)
+        cache.set('cache_key', cached_aniversariantes, timeout=129600)
     return cached_aniversariantes
 
 @csrf_exempt
