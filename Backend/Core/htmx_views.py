@@ -23,6 +23,21 @@ def search_by_id(request):
     oss = ORDEN.objects.filter(id__icontains=search)
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
 
+def search_by_city(request):
+    search = request.GET.get('search_by_city')
+    cidades = CLIENTE.objects.filter(CIDADE__icontains=search)
+    ordens_de_servico_por_cidade = {}
+    for cidade in cidades:
+        ordens_de_servico = ORDEN.objects.filter(CLIENTE=cidade)
+        ordens_de_servico_por_cidade[cidade] = ordens_de_servico
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico_por_cidade})
+
+def search_by_lentes(request):
+    search = request.GET.get('search_by_lentes')
+    print(search)
+    oss = ORDEN.objects.filter(LENTES__icontains=search)
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
+
 def search_products(request):
     search_term = request.GET.get('search_products', '').replace('-', '')
     produtos = Produto.objects.annotate(

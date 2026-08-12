@@ -4,6 +4,17 @@
     {% endblock %}</title>
 
 {% block 'body' %}
+
+    <div class="text-center">
+      {% if messages %}
+          {% for message in messages %}
+              <div class="alert {{message.tags}}">
+                  {{message}}
+              </div>
+          {% endfor %}
+      {% endif %}
+  </div>
+
 <div class="page-header">
   <div>
     <h1 class="page-header-title">
@@ -81,7 +92,7 @@
               <label class="form-check-label fw-semibold" for="nda">Lembrete de troca de status</label>
             </div>
             <div class="text-muted small ms-4 mt-1">
-              Avisa o cliente sobre alterações no status da OS. <!--   Requer: <code>manage.py enviar_whatsapp_diario</code> -->
+              Avisa o cliente sobre alterações no status da OS.    Requer: <code>manage.py enviar_whatsapp_diario</code>
             </div>
           </div>
           <div>
@@ -91,7 +102,7 @@
               <label class="form-check-label fw-semibold" for="na">Avisos da OS entregue</label>
             </div>
             <div class="text-muted small ms-4 mt-1">
-              Notifica clientes Entrega da OS <!--   Requer: <code>manage.py enviar_whatsapp_diario</code> -->
+              Notifica clientes Entrega da OS   Requer: <code>manage.py enviar_whatsapp_diario</code> 
             </div>
           </div>
           <div>
@@ -171,7 +182,7 @@
       </ol>
       <div class="mt-3 small text-muted">
         <i class="bi bi-shield-check me-1 text-success"></i>
-        Nossa plataforma utiliza a Evolution API para integrar o WhatsApp Business <!-- <code>docker compose up -d</code> -->
+        Nossa plataforma utiliza a Evolution API para integrar o WhatsApp Business <code>docker compose up -d</code>
       </div>
     </div>
     <div class="form-card text-center py-5">
