@@ -196,8 +196,8 @@ def notificar_os_criada(instance_name: str, ordem) -> dict:
         f"🤝 Agradecemos pela confiança!\n"
         f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão"
     )
-
-    return enviar_texto(instance_name, _telefone(ordem), msg)
+    print(msg)
+    #return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_os_entregue(instance_name: str, ordem) -> dict:
     msg = (
@@ -212,7 +212,8 @@ def notificar_os_entregue(instance_name: str, ordem) -> dict:
         f"*Cuide bem da sua visão!* 👁️\n"
         f"*Ótica {settings.UNIDADE}*"
     )
-    return enviar_texto(instance_name, _telefone(ordem), msg)
+    print(msg)
+    #return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
     status_legenda = {
@@ -220,16 +221,32 @@ def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
         'J': 'pronto para retirada',
     }
     descricao = status_legenda.get(status_novo, status_novo)
-    
-    msg = (
-        f"🔄 *Atualização do Pedido #{ordem.pk}*\n\n"
+
+    if descricao == 'em produção no laboratório':
+        msg = (
+            f"🔄 *Atualização do Pedido #{ordem.pk}*\n\n"
+            f"Olá, {ordem.CLIENTE.NOME}!\n"
+            f"Seu pedido agora está *{descricao}*.\n\n"
+            f"📅 *Previsão de Entrega:* {ordem.PREVISAO_ENTREGA.strftime('%d/%m/%Y')}\n\n"
+            f"Fique atento! Em breve enviaremos mais novidades.\n"
+            f"😊 Equipe Ótica {settings.UNIDADE}"
+        )
+        print(msg)
+        #return enviar_texto(instance_name, _telefone(ordem), msg)
+    if descricao == 'pronto para retirada':
+        msg = (
+        f"🎉 *Pedido Pronto para Retirada!*\n\n"
         f"Olá, {ordem.CLIENTE.NOME}!\n"
-        f"Seu pedido agora está *{descricao}*.\n\n"
-        f"📅 *Previsão de Entrega:* {ordem.PREVISAO_ENTREGA.strftime('%d/%m/%Y')}\n\n"
-        f"Fique atento! Em breve enviaremos mais novidades.\n"
-        f"😊 Equipe Ótica {settings.UNIDADE}"
-    )
-    return enviar_texto(instance_name, _telefone(ordem), msg)
+        f"Seu pedido *#{ordem.pk}* já está disponível na nossa loja.\n\n"
+        f"📅 *Previsão de Entrega:* {ordem.PREVISAO_ENTREGA.strftime('%d/%m/%Y')}\n"
+        f"💰 *Valor:* R$ {ordem.VALOR:.2f}".replace('.', ',') + "\n\n"
+        f"📌 *Para retirar, não se esqueça:*\n"
+        f"• Traga um documento de identificação com foto\n"
+        f"• Apresente este número de pedido\n\n"
+        f"😊 Estamos ansiosos para vê-lo!\n"
+        f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão")
+        print(msg)
+        #return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_cancelamento(instance_name: str, ordem) -> dict:
     msg = (
@@ -245,7 +262,8 @@ def notificar_cancelamento(instance_name: str, ordem) -> dict:
         f"😊 Equipe Ótica {settings.UNIDADE}"
 
     )
-    return enviar_texto(instance_name, _telefone(ordem), msg)
+    print(msg)
+    #return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def mensagem_lembrete_anual(instance_name: str, ordem)-> dict:
     msg = (
@@ -258,4 +276,5 @@ def mensagem_lembrete_anual(instance_name: str, ordem)-> dict:
         f"*Sua visão merece o melhor!* 😉\n"
         f"*Ótica {settings.UNIDADE}*"
     )
-    return enviar_texto(instance_name, _telefone(ordem), msg)
+    print(msg)
+    #return enviar_texto(instance_name, _telefone(ordem), msg)
