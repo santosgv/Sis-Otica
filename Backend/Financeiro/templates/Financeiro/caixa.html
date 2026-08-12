@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block 'title' %}Caixa (Financeiro){% endblock %}
+
+{% block 'body' %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home' %}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Financeiro:dashboard' %}">Financeiro</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Caixa</li>
+  </ol>
+</nav>
+
+<div class="alert alert-info">
+  <i class="fa-solid fa-circle-info me-1"></i>
+  Esta é a tela de caixa do novo módulo <strong>Financeiro</strong>, independente da
+  tela "Caixa" original do menu lateral (que continua funcionando normalmente).
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row g-3 mb-4">
+  {% for linha in linhas %}
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-semibold">{{ linha.conta.nome }}</div>
+            <div class="text-muted small">{{ linha.conta.get_tipo_display }}</div>
+          </div>
+          {% if linha.fechamento_aberto %}
+            <span class="badge bg-success">Aberto</span>
+          {% else %}
+            <span class="badge bg-secondary">Fechado</span>
+          {% endif %}
+        </div>
+        <div class="fs-4 fw-bold mt-2">R$ {{ linha.saldo_atual|floatformat:2 }}</div>
+
+        {% if linha.fechamento_aberto %}
+        <form method="post" action="{% url 'Financeiro:fechar_caixa' linha.fechamento_aberto.id %}" class="mt-3">
+          {% csrf_token %}
+          <label class="form-label small">Saldo Contado</label>
+          <input type="text" name="SALDO_CONTADO" class="form-control form-control-sm mb-2" placeholder="Ex: 500,00" required>
+          <label class="form-label small">Motivo (se houver diferença)</label>
+          <input type="text" name="MOTIVO_DIFERENCA" class="form-control form-control-sm mb-2">
+          <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+            <i class="fa-solid fa-lock"></i> Fechar Caixa
+          </button>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'Financeiro:abrir_caixa' %}" class="mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="CONTA_ID" value="{{ linha.conta.id }}">
+          <button type="submit" class="btn btn-sm btn-outline-success w-100">
+            <i class="fa-solid fa-lock-open"></i> Abrir Caixa
+          </button>
+        </form>
+        {% endif %}
+
+        <div class="row g-1 mt-2">
+          <div class="col-6">
+            <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal"
+                    data-bs-target="#modalSangria{{ linha.conta.id }}">
+              <i class="fa-solid fa-arrow-down"></i> Sangria
+            </button>
+          </div>
+          <div class="col-6">
+            <button class="btn btn-sm btn-outline-primary w-100" data-bs-toggle="modal"
+                    data-bs-target="#modalSuprimento{{ linha.conta.id }}">
+              <i class="fa-solid fa-arrow-up"></i> Suprimento
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Sangria -->
+  <div class="modal fade" id="modalSangria{{ linha.conta.id }}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'Financeiro:sangria' %}">
+          {% csrf_token %}
+          <input type="hidden" name="CONTA_ID" value="{{ linha.conta.id }}">
+          <div class="modal-header">
+            <h5 class="modal-title">Sangria — {{ linha.conta.nome }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label class="form-label">Valor</label>
+            <input type="text" name="VALOR" class="form-control mb-2" placeholder="Ex: 100,00" required>
+            <label class="form-label">Motivo</label>
+            <input type="text" name="MOTIVO" class="form-control" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-warning">Confirmar Sangria</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Suprimento -->
+  <div class="modal fade" id="modalSuprimento{{ linha.conta.id }}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'Financeiro:suprimento' %}">
+          {% csrf_token %}
+          <input type="hidden" name="CONTA_ID" value="{{ linha.conta.id }}">
+          <div class="modal-header">
+            <h5 class="modal-title">Suprimento — {{ linha.conta.nome }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label class="form-label">Valor</label>
+            <input type="text" name="VALOR" class="form-control mb-2" placeholder="Ex: 100,00" required>
+            <label class="form-label">Descrição</label>
+            <input type="text" name="DESCRICAO" class="form-control">
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Confirmar Suprimento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-center text-muted py-5">
+    Nenhuma conta financeira cadastrada ainda. Cadastre uma pelo Django admin
+    (<code>/admin/Financeiro/contafinanceira/</code>).
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white fw-semibold">Movimentos Recentes</div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead class="thead-light">
+        <tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="text-end">Valor</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for m in movimentos_recentes %}
+        <tr>
+          <td>{{ m.data|date:"d/m/Y" }}</td>
+          <td>{{ m.get_tipo_display }}</td>
+          <td>{{ m.descricao }}</td>
+          <td class="text-end">R$ {{ m.valor|floatformat:2 }}</td>
+          <td>
+            {% if m.status == 'estornado' %}<span class="badge bg-secondary">Estornado</span>
+            {% else %}<span class="badge bg-light text-dark">Confirmado</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum movimento ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

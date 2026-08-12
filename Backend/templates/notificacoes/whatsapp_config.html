@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+<title>{% block 'title' %}
+   WhatsApp for Business
+    {% endblock %}</title>
+
+{% block 'body' %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header-title">
+      <i class="bi bi-whatsapp me-2" style="color:#25d366;"></i>WhatsApp
+    </h1>
+    <p class="page-header-sub">Envie notificações de OS diretamente pelo seu número</p>
+  </div>
+</div>
+
+
+
+{% if config.estado_atual == 'conectado' %}
+{# ══ CONECTADO ══════════════════════════════════════════════ #}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="form-card text-center py-4">
+      <div style="width:72px;height:72px;background:#f0fdf4;border-radius:50%;
+           display:flex;align-items:center;justify-content:center;
+           font-size:2rem;color:#25d366;margin:0 auto 16px;">
+        <i class="fa-brands fa-whatsapp"></i>
+      </div>
+      <div class="fw-bold text-success mb-1">Conectado</div>
+      {% if config.numero_vinculado %}
+      <div class="text-muted small mb-3">{{ config.numero_vinculado }}</div>
+      {% endif %}
+      <hr />
+      <dl class="text-start small mb-4">
+        <dt class="text-muted">Total enviados</dt>
+        <dd class="fw-semibold mb-2">{{ config.total_enviados }}</dd>
+        <dt class="text-muted">Último envio</dt>
+        <dd class="mb-2">{{ config.ultimo_envio_em|date:"d/m/Y H:i"|default:"—" }}</dd>
+        <dt class="text-muted">Configurado em</dt>
+        <dd>{{ config.configurado_em|date:"d/m/Y" }}</dd>
+      </dl>
+      <form method="post" action="{% url 'notificacoes:whatsapp_desconectar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="logout">
+        <button type="submit" class="btn btn-outline-warning w-100 mb-2"
+                onclick="return confirm('Desconectar o número? Você precisará escanear o QR novamente.')">
+          <i class="bi bi-plug me-2"></i>Desconectar
+        </button>
+      </form>
+      <form method="post" action="{% url 'notificacoes:whatsapp_desconectar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="deletar">
+        <button type="submit" class="btn btn-outline-danger w-100"
+                onclick="return confirm('Remover completamente a integração WhatsApp?')">
+          <i class="bi bi-trash me-2"></i>Remover instância
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="form-card mb-4">
+      <h6 class="fw-bold mb-4 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:1px;">
+        <i class="bi bi-bell me-2"></i>Notificações Automáticas
+      </h6>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="salvar_preferencias">
+        <div class="d-flex flex-column gap-3">
+          <div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="notif_os_criada"
+                     id="nlc" {% if config.notif_os_criada %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="nlc">Confirmar OS criada</label>
+            </div>
+            <div class="text-muted small ms-4 mt-1">Envia mensagem ao cliente assim que uma OS é registrada.</div>
+          </div>
+          <div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="notif_troca_status"
+                     id="nda" {% if config.notif_troca_status %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="nda">Lembrete de troca de status</label>
+            </div>
+            <div class="text-muted small ms-4 mt-1">
+              Avisa o cliente sobre alterações no status da OS. <!--   Requer: <code>manage.py enviar_whatsapp_diario</code> -->
+            </div>
+          </div>
+          <div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="notif_os_entregue"
+                     id="na" {% if config.notif_os_entregue %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="na">Avisos da OS entregue</label>
+            </div>
+            <div class="text-muted small ms-4 mt-1">
+              Notifica clientes Entrega da OS <!--   Requer: <code>manage.py enviar_whatsapp_diario</code> -->
+            </div>
+          </div>
+          <div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="notif_cancelamento"
+                     id="ncl" {% if config.notif_cancelamento %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="ncl">Informar cancelamento</label>
+            </div>
+            <div class="text-muted small ms-4 mt-1">Notifica o cliente quando uma OS é cancelada.</div>
+          </div>
+
+        <div>
+          <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="notif_lembrete_anual"
+                     id="nla" {% if config.notif_lembrete_anual %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="nla">Lembrete anual</label>
+            </div>
+            <div class="text-muted small ms-4 mt-1">Envia lembrete anual aos clientes.</div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>Salvar preferências
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="form-card">
+      <h6 class="fw-bold mb-4 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:1px;">
+        <i class="bi bi-send me-2"></i>Enviar Mensagem de Teste
+      </h6>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-8">
+          <label class="form-label">Telefone (com DDD)</label>
+          <input type="text" id="telefone_teste" class="form-control" placeholder="11999998888">
+        </div>
+        <div class="col-md-4">
+          <button type="button" class="btn btn-success w-100" id="btnTeste">
+            <i class="bi bi-whatsapp me-2"></i>Enviar teste
+          </button>
+        </div>
+        <div class="col-12" id="resultado_teste"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% elif config.estado_atual == 'desconectado' %}
+{# ══ INSTÂNCIA EXISTE MAS DESCONECTADA ══════════════════════ #}
+<div class="row justify-content-center">
+  <div class="col-lg-6 text-center">
+    <div class="form-card py-5">
+      <div style="font-size:3rem;color:#94a3b8;margin-bottom:16px;">
+        <i class="bi bi-phone-fill"></i>
+      </div>
+      <h5 class="fw-bold mb-2">Número desconectado</h5>
+      <p class="text-muted mb-4">Escaneie o QR code para reconectar seu número.</p>
+      <a href="{% url 'notificacoes:whatsapp_qr' %}" class="btn btn-success px-5">
+        <i class="bi bi-qr-code me-2"></i>Escanear QR Code
+      </a>
+    </div>
+  </div>
+</div>
+
+{% else %}
+{# ══ NÃO CONFIGURADO ════════════════════════════════════════ #}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="p-4 rounded-3 mb-4" style="background:#f0fdf4;border:1px solid #86efac;">
+      <h6 class="fw-bold text-success mb-2"><i class="bi bi-info-circle me-2"></i>Como funciona</h6>
+      <ol class="small mb-0" style="line-height:2.2;">
+        <li>Clique em <strong>Conectar WhatsApp</strong></li>
+        <li>Abra o WhatsApp no celular → Menu → <em>Aparelhos conectados</em> → <em>Conectar aparelho</em></li>
+        <li>Escaneie o QR code exibido na tela</li>
+        <li>Pronto — notificações serão enviadas pelo seu número</li>
+      </ol>
+      <div class="mt-3 small text-muted">
+        <i class="bi bi-shield-check me-1 text-success"></i>
+        Nossa plataforma utiliza a Evolution API para integrar o WhatsApp Business <!-- <code>docker compose up -d</code> -->
+      </div>
+    </div>
+    <div class="form-card text-center py-5">
+      <div style="font-size:3.5rem;color:#25d366;margin-bottom:16px;">
+        <i class="bi bi-whatsapp"></i>
+      </div>
+      <h5 class="fw-bold mb-2">Conecte seu WhatsApp</h5>
+      <p class="text-muted mb-4">Use seu número para enviar confirmações, lembretes e avisos de atraso.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="conectar">
+        <button type="submit" class="btn btn-success btn-lg px-5">
+          <i class="bi bi-qr-code me-2"></i>Conectar WhatsApp
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('btnTeste')?.addEventListener('click', () => {
+  const tel = document.getElementById('telefone_teste').value.trim();
+  const res = document.getElementById('resultado_teste');
+  if (!tel) {
+    res.innerHTML = '<div class="alert alert-warning py-2 small mt-2">Informe um telefone.</div>';
+    return;
+  }
+  res.innerHTML = '<div class="text-muted small mt-2">Enviando...</div>';
+  const fd = new FormData();
+  fd.append('telefone', tel);
+  fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  fetch('{% url "notificacoes:whatsapp_teste" %}', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      res.innerHTML = d.ok
+        ? `<div class="alert alert-success py-2 small mt-2">✅ ${d.mensagem}</div>`
+        : `<div class="alert alert-danger py-2 small mt-2">❌ ${d.erro}</div>`;
+    })
+    .catch(() => {
+      res.innerHTML = '<div class="alert alert-danger py-2 small mt-2">Erro de conexão.</div>';
+    });
+});
+</script>
+{% endblock %}

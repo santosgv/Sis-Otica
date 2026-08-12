@@ -373,7 +373,7 @@ def pagar_parcela(request, parcela_id):
 
     try:
         with transaction.atomic():
-            registrar_pagamento_parcela(parcela, forma)
+            registrar_pagamento_parcela(parcela, forma,request.user)
         messages.add_message(
             request, constants.SUCCESS,
             f'Parcela {parcela.numero} da OS #{parcela.ordem.id} paga com sucesso!'
@@ -393,8 +393,6 @@ def Visualizar_os(request,id_os):
         VISUALIZAR_OS = ORDEN.objects.get(id=id_os)
 
         falta_pagar = Decimal(str(VISUALIZAR_OS.VALOR)) - Decimal(str(VISUALIZAR_OS.VALOR_PAGO))
-
-        #print(VISUALIZAR_OS.VALOR,VISUALIZAR_OS.VALOR_PAGO)
 
         return render(request, 'Os/Visualizar_os.html', {
             'VISUALIZAR_OS': VISUALIZAR_OS,

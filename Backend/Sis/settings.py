@@ -49,6 +49,8 @@ INSTALLED_APPS = [
  #   'elasticapm.contrib.django',
     'Autenticacao',
     'Core',
+    'integracoes',
+    'Financeiro',
 ]
 
 #SHARED_APPS = [
@@ -386,3 +388,5 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
+WHATSAPP_API_VERSION  = 'v20.0'
+EVOLUTION_API_KEY=config('EVOLUTION_API_KEY')

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block 'title' %}Dashboard Financeiro{% endblock %}
+
+{% block 'body' %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home' %}">Página Principal</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Financeiro</li>
+  </ol>
+</nav>
+
+<div class="d-flex gap-2 mb-4">
+  <a href="{% url 'Financeiro:dashboard' %}" class="btn btn-outline-secondary active">
+    <i class="fa-solid fa-chart-line"></i> Dashboard
+  </a>
+  <a href="{% url 'Financeiro:contas_a_receber' %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-down"></i> Contas a Receber
+  </a>
+  <a href="{% url 'Financeiro:contas_a_pagar' %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-up"></i> Contas a Pagar
+  </a>
+  <a href="{% url 'Financeiro:caixa' %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-cash-register"></i> Caixa
+  </a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Saldo Total</div>
+        <div class="fs-4 fw-bold">R$ {{ dados.saldo_total|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Resultado do Mês</div>
+        <div class="fs-4 fw-bold {% if dados.resultado_mes < 0 %}text-danger{% else %}text-success{% endif %}">
+          R$ {{ dados.resultado_mes|floatformat:2 }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Total a Receber</div>
+        <div class="fs-4 fw-bold">R$ {{ dados.total_a_receber|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Total a Pagar</div>
+        <div class="fs-4 fw-bold">R$ {{ dados.total_a_pagar|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Entradas Hoje</div>
+        <div class="fs-5 text-success">R$ {{ dados.entradas_hoje|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="text-muted small">Saídas Hoje</div>
+        <div class="fs-5 text-danger">R$ {{ dados.saidas_hoje|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 h-100 {% if dados.total_vencido > 0 %}border-danger{% endif %}">
+      <div class="card-body">
+        <div class="text-muted small">Total Vencido</div>
+        <div class="fs-5 {% if dados.total_vencido > 0 %}text-danger fw-bold{% endif %}">
+          R$ {{ dados.total_vencido|floatformat:2 }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white fw-semibold">
+        <i class="fa-solid fa-calendar-check text-success me-2"></i>Recebimentos Próximos (7 dias)
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for parcela in dados.recebimentos_proximos %}
+            <tr>
+              <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+              <td>OS #{{ parcela.ordem_id }} — {{ parcela.ordem.CLIENTE.NOME }}</td>
+              <td class="text-end">R$ {{ parcela.valor|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="text-muted text-center py-3">Nenhum recebimento nos próximos 7 dias.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white fw-semibold">
+        <i class="fa-solid fa-calendar-xmark text-danger me-2"></i>Pagamentos Próximos (7 dias)
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for parcela in dados.pagamentos_proximos %}
+            <tr>
+              <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+              <td>{{ parcela.conta_pagar.descricao }}</td>
+              <td class="text-end">R$ {{ parcela.valor|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="text-muted text-center py-3">Nenhum pagamento nos próximos 7 dias.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block 'title' %}Contas a Pagar{% endblock %}
+
+{% block 'body' %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home' %}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Financeiro:dashboard' %}">Financeiro</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Contas a Pagar</li>
+  </ol>
+</nav>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="row g-3 flex-grow-1 me-3">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0"><div class="card-body py-2">
+        <div class="text-muted small">Em Aberto</div>
+        <div class="fw-bold">R$ {{ resumo.em_aberto.valor|floatformat:2 }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 border-danger"><div class="card-body py-2">
+        <div class="text-muted small">Vencidas</div>
+        <div class="fw-bold text-danger">R$ {{ resumo.vencidas.valor|floatformat:2 }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0"><div class="card-body py-2">
+        <div class="text-muted small">A Vencer</div>
+        <div class="fw-bold">R$ {{ resumo.a_vencer.valor|floatformat:2 }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0"><div class="card-body py-2">
+        <div class="text-muted small">Pagas</div>
+        <div class="fw-bold text-success">R$ {{ resumo.pagas.valor|floatformat:2 }}</div>
+      </div></div>
+    </div>
+  </div>
+  <a href="{% url 'Financeiro:nova_conta_pagar' %}" class="btn btn-primary text-nowrap">
+    <i class="fa-solid fa-plus"></i> Nova Conta
+  </a>
+</div>
+
+{% for conta in contas %}
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <div>
+      <strong>{{ conta.descricao }}</strong>
+      {% if conta.fornecedor %}<span class="text-muted"> — {{ conta.fornecedor.nome }}</span>{% endif %}
+    </div>
+    <span class="badge
+      {% if conta.status == 'paga' %}bg-success
+      {% elif conta.status == 'parcial' %}bg-warning text-dark
+      {% else %}bg-secondary{% endif %}">
+      {{ conta.get_status_display }}
+    </span>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead class="thead-light">
+        <tr><th>Parcela</th><th>Vencimento</th><th class="text-end">Valor</th><th>Status</th><th style="width:220px;">Pagar</th></tr>
+      </thead>
+      <tbody>
+        {% for parcela in conta.parcelas.all %}
+        <tr class="{% if not parcela.pago and parcela.data_vencimento < hoje %}table-danger{% endif %}">
+          <td>{{ parcela.numero }}</td>
+          <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+          <td class="text-end">R$ {{ parcela.valor|floatformat:2 }}</td>
+          <td>
+            {% if parcela.pago %}<span class="text-success"><i class="fa-solid fa-check"></i> Paga</span>
+            {% else %}<span class="text-muted">Em aberto</span>{% endif %}
+          </td>
+          <td>
+            {% if not parcela.pago %}
+            <form method="post" action="{% url 'Financeiro:pagar_parcela' parcela.id %}" class="d-flex gap-1">
+              {% csrf_token %}
+              <input type="text" name="VALOR" class="form-control form-control-sm" placeholder="Valor" value="{{ parcela.valor|floatformat:2 }}" required>
+              <button type="submit" class="btn btn-sm btn-success" title="Pagar">
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% empty %}
+<div class="text-center text-muted py-5">Nenhuma conta a pagar cadastrada.</div>
+{% endfor %}
+{% endblock %}

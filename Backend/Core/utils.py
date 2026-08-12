@@ -582,7 +582,43 @@ def registrar_entrada_caixa(ordem):
     ordem.save(update_fields=['VALOR_PAGO'])
 
 
-def registrar_pagamento_parcela(parcela, forma_pagamento):
+#def registrar_pagamento_parcela(parcela, forma_pagamento):
+#    if parcela.pago:
+#        raise ValueError('Esta parcela já foi paga.')
+#
+#    FORMAS_VALIDAS = {'A', 'B', 'C', 'D', 'E', 'F'}
+#    if forma_pagamento not in FORMAS_VALIDAS:
+#        raise ValueError('Forma de pagamento inválida.')
+#
+#    caixa = CAIXA.objects.create(
+#        DESCRICAO=f'Parcela {parcela.numero} - OS #{parcela.ordem.id} - {parcela.ordem.CLIENTE}',
+#        REFERENCIA=parcela.ordem,
+#        TIPO='E',
+#        VALOR=float(parcela.valor),
+#        FORMA=forma_pagamento,
+#        ABERTO=True,
+#    )
+#
+#    parcela.pago = True
+#    parcela.data_pagamento = date.today()
+#    parcela.forma_pagamento = forma_pagamento
+#    parcela.caixa = caixa
+#    parcela.save(update_fields=['pago', 'data_pagamento', 'forma_pagamento', 'caixa'])
+#    # O signal post_save do ParcelaOrdem já atualiza VALOR_PAGO automaticamente
+
+
+def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
+    """Registra o pagamento integral de uma parcela.
+
+    A partir da Fase 6, a fonte da verdade da baixa (validação de excedente,
+    lock de concorrência, histórico) é o Service Layer do app `Financeiro`
+    (`Financeiro.services.receber_parcela`). O registro em `Core.CAIXA` é
+    mantido em paralelo apenas como ponte para a tela de Caixa existente, que
+    ainda lê de `Core.CAIXA` — isso será eliminado na Fase 8, quando a tela de
+    Caixa passar a ler de `Financeiro.MovimentoFinanceiro`.
+    """
+    from Financeiro.services import conta_padrao_caixa, receber_parcela
+
     if parcela.pago:
         raise ValueError('Esta parcela já foi paga.')
 
@@ -590,6 +626,16 @@ def registrar_pagamento_parcela(parcela, forma_pagamento):
     if forma_pagamento not in FORMAS_VALIDAS:
         raise ValueError('Forma de pagamento inválida.')
 
+    # Fonte da verdade: Financeiro (valida excedente, usa select_for_update)
+    receber_parcela(
+        parcela.id,
+        parcela.valor,
+        conta_padrao_caixa(),
+        usuario,
+        forma_pagamento=forma_pagamento,
+    )
+
+    # Bridge legado: mantém Core.CAIXA populado para a tela de Caixa atual
     caixa = CAIXA.objects.create(
         DESCRICAO=f'Parcela {parcela.numero} - OS #{parcela.ordem.id} - {parcela.ordem.CLIENTE}',
         REFERENCIA=parcela.ordem,
@@ -598,10 +644,6 @@ def registrar_pagamento_parcela(parcela, forma_pagamento):
         FORMA=forma_pagamento,
         ABERTO=True,
     )
-
-    parcela.pago = True
-    parcela.data_pagamento = date.today()
-    parcela.forma_pagamento = forma_pagamento
+    parcela.refresh_from_db()
     parcela.caixa = caixa
-    parcela.save(update_fields=['pago', 'data_pagamento', 'forma_pagamento', 'caixa'])
-    # O signal post_save do ParcelaOrdem já atualiza VALOR_PAGO automaticamente
+    parcela.save(update_fields=['caixa'])

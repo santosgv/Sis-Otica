@@ -60,7 +60,7 @@
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'estoque' %}active{% endif %}" href="{% url 'Core:estoque' %}">
                         <i class="fa-solid fa-boxes-stacked fa-fw"></i> Estoque
                     </a>
-                    <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'Caixa' %}active{% endif %}" href="{% url 'Core:Caixa' %}">
+                    <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'Financeiro:dashboard' %}active{% endif %}" href="{% url 'Financeiro:dashboard' %}">
                         <i class="fa-solid fa-cash-register fa-fw"></i> Caixa
                     </a>
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'minhas_vendas' %}active{% endif %}" href="{% url 'Core:minhas_vendas' %}">
@@ -68,6 +68,9 @@
                     </a>
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'listar_folha_pagamento' %}active{% endif %}" href="{% url 'listar_folha_pagamento' %}">
                         <i class="fa-solid fa-file-invoice-dollar fa-fw"></i> Folha de Pagamento
+                    </a>
+                    <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'whatsapp_config' %}active{% endif %}" href="{% url 'notificacoes:whatsapp_config' %}">
+                        <i class="fa-brands fa-whatsapp fa-fw"></i> Integrar WhatsApp
                     </a>
                     {% if user.FUNCAO == "G" %}
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'colaborador_list' %}active{% endif %}" href="{% url 'colaborador_list' %}">
@@ -144,6 +147,8 @@
     <a href="mailto:emanuelrodrigues017@gmail.com,santosgomesv@gmail.com?subject=Preciso de Ajuda&body=Olá, preciso de ajuda com o seguinte Sistema:" target="_blank" class="btn-ajuda shadow">
         <i class="fas fa-question-circle"></i> Ajuda
     </a>
+    {% block extra_js %}
+    {% endblock %}
 
     <footer class="text-center">
         <div class="text-center p-3" style="background-color:#BB3452; color: #fff;">
