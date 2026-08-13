@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _instance_name(empresa) -> str:
     """Gera nome único de instância para a empresa."""
-    return f'locagest_{empresa}'
+    return f'SGO_{empresa}'
 
 
 # ─────────────────────────────────────────────────────────────
