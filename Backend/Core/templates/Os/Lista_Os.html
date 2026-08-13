@@ -23,77 +23,71 @@
   Pesquisando... 
  </span> 
 <div class="text-center">
-  <nav class="navbar navbar-light bg-white">
-    <div class="form-row">
-    <form class="form-inline">
-      <input class="form-control mr-sm-2" type="search" 
-       name="search" placeholder="Cliente" 
-       hx-get="search/" 
-       hx-trigger="input changed delay:500ms, search" 
-       hx-target="#search-results" 
-       hx-indicator=".htmx-indicator">
-    </form>
-    <form class="form-inline">
-      <input class="form-control col-md-4" type="search" 
-       name="search_by_id" placeholder="OS" 
-       hx-get="search_by_id/" 
-       hx-trigger="input changed delay:500ms, search" 
-       hx-target="#search-results" 
-       hx-indicator=".htmx-indicator">
-    </form>
-    <!--     <form class="form-inline">
-      <input class="form-control col-md-4" type="search" 
-       name="search_by_city" placeholder="Cidade" 
-       hx-get="search_by_city/" 
-       hx-trigger="input changed delay:500ms, search" 
-       hx-target="#search-results" 
-       hx-indicator=".htmx-indicator">
-    </form>
-    -->
-    <form class="form-inline">
-      <input class="form-control col-md-4" type="search" 
-       name="search_by_lentes" placeholder="Lentes" 
-       hx-get="search_by_lentes/" 
-       hx-trigger="input changed delay:500ms, search" 
-       hx-target="#search-results" 
-       hx-indicator=".htmx-indicator">
-    </form>
-    <form action="{% url 'Core:Lista_Os' %}" method="get" class="form-inline">
-      <div class="row">
-        <div class="col-md">
-          <select id="status" name="status" class="custom-select mr-4">
-            <option value="" disabled selected>Status</option>
-            <option value="A">SOLICITADO</option>
-            <option value="E">ENTREGUE</option>
-            <option value="C">CANCELADO</option>
-            <option value="L">LABORATÓRIO</option>
-            <option value="F">FINALIZADO</option>
-            <option value="J">LOJA</option>
-          </select>
-        </div>
-        <div class="col-md">
-          <input class="form-control mr-2" type="date" name="data_inicio" placeholder="Data Início">
-        </div>
-        <div class="col-md">
-          <input class="form-control mr-2" type="date" name="data_fim" placeholder="Data Fim">
-        </div>
-        <div class="col-md">
-          <button type="submit" class="btn btn-primary">Aplicar</button>
-        </div>
-  </div>
-  </form>
-  
-  </div>
-    <div class="text-center">
-      {% if messages %}
-          {% for message in messages %}
-              <div class="alert {{message.tags}}">
-                  {{message}}
-              </div>
-          {% endfor %}
-      {% endif %}
-  </div>
-  </nav>
+
+  <nav class="navbar navbar-light bg-white py-2">
+    <div class="container-fluid">
+        <!-- Formulário único contendo todos os filtros -->
+        <form action="{% url 'Core:Lista_Os' %}" method="get" class="d-flex flex-wrap align-items-center gap-2 w-100">
+            <!-- Busca por Cliente -->
+            <input class="form-control" type="search" 
+                   name="search" placeholder="Cliente" 
+                   hx-get="search/" 
+                   hx-trigger="input changed delay:500ms, search" 
+                   hx-target="#search-results" 
+                   hx-indicator=".htmx-indicator" 
+                   style="width: 150px;">
+
+            <!-- Busca por OS -->
+            <input class="form-control" type="search" 
+                   name="search_by_id" placeholder="OS" 
+                   hx-get="search_by_id/" 
+                   hx-trigger="input changed delay:500ms, search" 
+                   hx-target="#search-results" 
+                   hx-indicator=".htmx-indicator" 
+                   style="width: 120px;">
+
+            <!-- Busca por Lentes -->
+            <input class="form-control" type="search" 
+                   name="search_by_lentes" placeholder="Lentes" 
+                   hx-get="search_by_lentes/" 
+                   hx-trigger="input changed delay:500ms, search" 
+                   hx-target="#search-results" 
+                   hx-indicator=".htmx-indicator" 
+                   style="width: 150px;">
+
+            <!-- Filtro Status -->
+            <select name="status" class="form-select" style="width: 140px;">
+                <option value="" disabled selected>Status</option>
+                <option value="A">SOLICITADO</option>
+                <option value="E">ENTREGUE</option>
+                <option value="C">CANCELADO</option>
+                <option value="L">LABORATÓRIO</option>
+                <option value="F">FINALIZADO</option>
+                <option value="J">LOJA</option>
+            </select>
+
+            <!-- Data Início -->
+            <input class="form-control" type="date" name="data_inicio" placeholder="Data Início" style="width: 150px;">
+
+            <!-- Data Fim -->
+            <input class="form-control" type="date" name="data_fim" placeholder="Data Fim" style="width: 150px;">
+
+            <!-- Botão Aplicar -->
+            <button type="submit" class="btn btn-primary">Aplicar</button>
+        </form>
+    </div>
+    <!-- Mensagens (mantido fora do form) -->
+    <div class="text-center w-100">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{message.tags}}">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</nav>
+
                 <table id="myTable" class="table table-hover">
                   <span id="search-results"></span>
                     <tr class="thead">
