@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load filters %}
 {% load compress %}
 {% load static %}
 
@@ -52,7 +53,7 @@
 {% else %}
 <div class="alert alert-success d-flex align-items-center gap-2 shadow-sm" role="alert">
   <i class="fas fa-check-circle"></i>
-  <span>Caixa aberto hoje com valor de abertura: <strong>R$ {{ caixa_aberto.VALOR|floatformat:2 }}</strong></span>
+  <span>Caixa aberto hoje com valor de abertura: <strong>R$ {{ caixa_aberto.VALOR|money }}</strong></span>
 </div>
 {% endif %}
 
@@ -103,7 +104,7 @@
                     <span class="badge bg-danger">Saída</span>
                     {% endif %}
                   </td>
-                  <td>R$ {{ dado.VALOR }}</td>
+                  <td>R$ {{ dado.VALOR|money }}</td>
                   <td>
                     {% if dado.FORMA == "A" %}<span class="badge bg-info text-dark">PIX</span>{% endif %}
                     {% if dado.FORMA == "B" %}<span class="badge bg-secondary">DINHEIRO</span>{% endif %}
@@ -168,7 +169,7 @@
           <div class="d-flex align-items-center gap-2 text-muted small fw-semibold text-uppercase mb-1">
             <i class="fa-solid fa-sack-dollar"></i> Saldo em dinheiro
           </div>
-          <div class="fs-4 fw-bold text-success">R$ {{ saldo }}</div>
+          <div class="fs-4 fw-bold text-success">R$ {{ saldo|money }}</div>
         </div>
       </div>
 
@@ -177,7 +178,7 @@
           <div class="d-flex align-items-center gap-2 text-muted small fw-semibold text-uppercase mb-1">
             <i class="fa-solid fa-arrow-trend-up"></i> Total de entradas
           </div>
-          <div class="fs-4 fw-bold text-primary">R$ {{ saldo_total }}</div>
+          <div class="fs-4 fw-bold text-primary">R$ {{ saldo_total|money }}</div>
         </div>
       </div>
 

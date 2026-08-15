@@ -21,7 +21,7 @@ from .utils import (criar_mensagem_parabens,realizar_entrada,
                     realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
                     get_10_days,get_30_days,criar_parcelas,
                     registrar_entrada_caixa,
-                    registrar_pagamento_parcela)
+                    registrar_pagamento_parcela,formatar_decimal)
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -38,11 +38,6 @@ from .forms import ReviewForm,FornecedorForm, TipoUnitarioForm, EstiloForm,TipoF
 
 logger = logging.getLogger('MyApp')
 
-def formatar_decimal(valor):
-    if valor is None:
-        return None
-    valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-    return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
 
 def get_aniversariantes_mes():
     cached_aniversariantes = cache.get('all_aniversariantes_mes')

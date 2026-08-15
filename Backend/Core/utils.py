@@ -483,6 +483,12 @@ def parse_decimal(value):
         return Decimal(value)
     except (InvalidOperation, ValueError, TypeError):
         return Decimal("0.00")
+    
+def formatar_decimal(valor):
+    if valor is None:
+        return None
+    valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
 
 from django.shortcuts import render
 from .models import CAIXA
@@ -572,7 +578,7 @@ def registrar_entrada_caixa(ordem):
         DESCRICAO=f'Entrada OS #{ordem.id} - {ordem.CLIENTE}',
         REFERENCIA=ordem,
         TIPO='E',
-        VALOR=float(entrada),
+        VALOR=entrada,
         FORMA=ordem.FORMA_PAG or 'B',
         ABERTO=True,
     )
@@ -580,32 +586,7 @@ def registrar_entrada_caixa(ordem):
     # Inicializa VALOR_PAGO com a entrada
     ordem.VALOR_PAGO = entrada
     ordem.save(update_fields=['VALOR_PAGO'])
-
-
-#def registrar_pagamento_parcela(parcela, forma_pagamento):
-#    if parcela.pago:
-#        raise ValueError('Esta parcela já foi paga.')
-#
-#    FORMAS_VALIDAS = {'A', 'B', 'C', 'D', 'E', 'F'}
-#    if forma_pagamento not in FORMAS_VALIDAS:
-#        raise ValueError('Forma de pagamento inválida.')
-#
-#    caixa = CAIXA.objects.create(
-#        DESCRICAO=f'Parcela {parcela.numero} - OS #{parcela.ordem.id} - {parcela.ordem.CLIENTE}',
-#        REFERENCIA=parcela.ordem,
-#        TIPO='E',
-#        VALOR=float(parcela.valor),
-#        FORMA=forma_pagamento,
-#        ABERTO=True,
-#    )
-#
-#    parcela.pago = True
-#    parcela.data_pagamento = date.today()
-#    parcela.forma_pagamento = forma_pagamento
-#    parcela.caixa = caixa
-#    parcela.save(update_fields=['pago', 'data_pagamento', 'forma_pagamento', 'caixa'])
-#    # O signal post_save do ParcelaOrdem já atualiza VALOR_PAGO automaticamente
-
+    return True
 
 def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
     """Registra o pagamento integral de uma parcela.
@@ -647,3 +628,4 @@ def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
     parcela.refresh_from_db()
     parcela.caixa = caixa
     parcela.save(update_fields=['caixa'])
+    return True

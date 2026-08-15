@@ -132,7 +132,7 @@ class CAIXA(models.Model):
     DESCRICAO = models.CharField(max_length=255, blank=True)
     REFERENCIA = models.ForeignKey(ORDEN, blank=True ,on_delete=models.SET_NULL,null=True)
     TIPO = models.CharField(max_length=1, choices=CHOICES_TIPO, default="E")
-    VALOR = models.FloatField()
+    VALOR = models.DecimalField(max_digits=10, decimal_places=2)
     FORMA = models.CharField(max_length=1, choices=CHOICES_PAGAMENTO, default="B")
     FECHADO = models.BooleanField(default=False)
     ABERTO =  models.BooleanField(default=False)
