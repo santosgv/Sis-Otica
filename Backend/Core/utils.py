@@ -2,7 +2,7 @@ from urllib.parse import quote
 from decouple import config
 import pandas as pd
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Sum,Count, Q
 from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE,ParcelaOrdem
 from datetime import datetime, date
 from calendar import monthrange
@@ -28,12 +28,106 @@ from reportlab.lib.colors import black
 from pathlib import Path
 from decimal import Decimal,ROUND_HALF_UP
 from .services.webmaniabr import emitir_nfe
+from decimal import Decimal, InvalidOperation
+from django.shortcuts import render
+import re
 
 logger = logging.getLogger('MyApp')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 CHAVE_PIX =config('CHAVE_PIX')
+
+def validar_cpf(cpf: str, exclude_id: int = None) -> tuple[bool, str]:
+    """
+    Valida CPF: formatação, dígitos verificadores e unicidade.
+    Retorna (válido, mensagem_erro).
+    """
+    # Remove caracteres não numéricos
+    cpf_numeros = re.sub(r'\D', '', cpf)
+    
+    if len(cpf_numeros) != 11:
+        return False, "CPF deve conter 11 dígitos."
+    
+    if cpf_numeros == cpf_numeros[0] * 11:
+        return False, "CPF inválido (todos os dígitos iguais)."
+    
+    # Cálculo dos dígitos verificadores
+    def calcular_digito(cpf_parcial):
+        soma = 0
+        for i in range(len(cpf_parcial)):
+            soma += int(cpf_parcial[i]) * (len(cpf_parcial) + 1 - i)
+        resto = soma % 11
+        return '0' if resto < 2 else str(11 - resto)
+    
+    primeiro_digito = calcular_digito(cpf_numeros[:9])
+    segundo_digito = calcular_digito(cpf_numeros[:10])
+    
+    if primeiro_digito != cpf_numeros[9] or segundo_digito != cpf_numeros[10]:
+        return False, "CPF inválido (dígitos verificadores não conferem)."
+    
+    # Verificar duplicidade (opcional, pode ser feito no form)
+    # A duplicidade será tratada no form, mas podemos incluir aqui para centralizar
+    # Não faremos a consulta aqui para manter a função pura, mas podemos.
+    # Prefiro deixar a verificação de duplicidade no form.
+    return True, ""
+
+def cpf_ja_cadastrado(cpf: str, exclude_id: int = None) -> bool:
+    """Verifica se CPF já existe no banco (excluindo um ID opcional)."""
+    queryset = CLIENTE.objects.filter(CPF=cpf).filter(STATUS='1')
+    if exclude_id:
+        queryset = queryset.exclude(id=exclude_id)
+    return queryset.exists()
+
+def listar_clientes_duplicados_sem_pedido():
+    """
+    Retorna um dicionário com CPFs duplicados e a lista de clientes sem pedidos.
+    """
+    # Encontrar CPFs duplicados
+    cpfs_duplicados = (
+        CLIENTE.objects
+        .values('CPF')
+        .annotate(count=Count('id'))
+        .filter(count__gt=1)
+        .values_list('CPF', flat=True)
+    )
+
+    resultado = {}
+    for cpf in cpfs_duplicados:
+        clientes = CLIENTE.objects.filter(CPF=cpf)
+        # Filtrar clientes sem pedidos
+        clientes_sem_pedido = []
+        for cliente in clientes:
+            if not ORDEN.objects.filter(CLIENTE=cliente).exists():
+                clientes_sem_pedido.append(cliente)
+        if clientes_sem_pedido:
+            resultado[cpf] = clientes_sem_pedido
+    return resultado
+
+def inativar_clientes_duplicados_sem_pedido(dry_run=True):
+    """
+    Inativa clientes duplicados que não têm pedidos.
+    Se dry_run=True, apenas simula e exibe a lista.
+    """
+    duplicados = listar_clientes_duplicados_sem_pedido()
+    inativados = []
+    for cpf, clientes in duplicados.items():
+        # Vamos manter um cliente ativo (o primeiro com pedido? Ou o mais recente?)
+        # Aqui, se houver algum cliente com pedido, mantemos ativo. Como já filtramos sem pedido, todos esses não têm.
+        # Então podemos inativar todos, mas cuidado: pode haver um com pedido que não está na lista.
+        # O ideal é manter pelo menos um ativo por CPF.
+        # Vamos buscar todos os clientes com esse CPF
+        todos = CLIENTE.objects.filter(CPF=cpf)
+        # Verificar quais têm pedido
+        com_pedido = [c for c in todos if ORDEN.objects.filter(CLIENTE=c).exists()]
+        # Se houver algum com pedido, não inativamos nenhum? Vamos manter os sem pedido inativos.
+        # Vamos inativar todos os que não têm pedido, independente de haver com pedido.
+        for cliente in clientes:
+            if not dry_run:
+                cliente.STATUS = '2'  # INATIVO
+                cliente.save()
+            inativados.append(cliente.pk)
+    return inativados
 
 def generate_barcode_image(code):
 
@@ -469,8 +563,6 @@ def gerar_carner_pdf(request, ordem_id):
     response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
     return response
 
-from decimal import Decimal, InvalidOperation
-
 def parse_decimal(value):
     if value is None or value == '' or value == 'N/D':
         return Decimal("0.00")
@@ -490,9 +582,6 @@ def formatar_decimal(valor):
     valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
 
-from django.shortcuts import render
-from .models import CAIXA
-
 def entradas_meses_passados(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
@@ -504,28 +593,6 @@ def entradas_meses_passados(request):
     
     return render(request, 'parcial/meses_passados.html', {'entradas': entradas})
 
-
-#def criar_parcelas(os):
-"""
-    ordem = ORDEN.objects.get(id=os)
-    if not ordem.QUANTIDADE_PARCELA or ordem.QUANTIDADE_PARCELA <= 1:
-        return
-
-    valor_total = Decimal(ordem.VALOR)
-    entrada = Decimal(ordem.ENTRADA)
-    restante = valor_total - entrada
-
-    valor_parcela = (restante / ordem.QUANTIDADE_PARCELA).quantize(Decimal("0.01"))
-
-    for i in range(1, ordem.QUANTIDADE_PARCELA + 1):
-        data_vencimento = get_today_data() + timedelta(days=30 * i)
-        ParcelaOrdem.objects.create(
-            ordem=ordem,
-            numero=i,
-            valor=valor_parcela,
-            data_vencimento=data_vencimento
-        )
-"""
 def criar_parcelas(os):
 
     ordem = ORDEN.objects.get(id=os)

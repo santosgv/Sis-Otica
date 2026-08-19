@@ -11,7 +11,7 @@ def main():
     dbservicoes = SERVICO.objects.all()
     start_date = date(1990,6,1)
     end_date = date(2024, 6, 29)
-    for _ in range(50):
+    for _ in range(15):
        pessoa=CLIENTE.objects.create(
            NOME=fake.name(),
            LOGRADOURO=fake.street_address(),

@@ -55,7 +55,7 @@ def search_caixa(request):
 
 def search_cliente(request):
     search = request.GET.get('search_cliente')
-    clientes = CLIENTE.objects.filter(NOME__icontains=search)
+    clientes = CLIENTE.objects.filter(NOME__icontains=search).filter(STATUS='1').all()
     return render(request,'parcial/cliente_parcial.html',{'clientes':clientes})
 
 def all_estoque(request):

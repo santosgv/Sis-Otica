@@ -21,7 +21,8 @@ from .utils import (criar_mensagem_parabens,realizar_entrada,
                     realizar_saida,get_today_data,primeiro_dia_mes,ultimo_dia_mes,dados_caixa,
                     get_10_days,get_30_days,criar_parcelas,
                     registrar_entrada_caixa,
-                    registrar_pagamento_parcela,formatar_decimal)
+                    registrar_pagamento_parcela,formatar_decimal,validar_cpf, cpf_ja_cadastrado
+                    )
 from django.utils.timezone import now,timedelta
 from django.utils import timezone
 from django.db.models import Sum,Count,IntegerField,Case, When,Value,F,ExpressionWrapper, DecimalField
@@ -127,6 +128,11 @@ def cadastro_cliente(request):
         CPF = request.POST.get('CPF')
         DATA_NASCIMENTO = request.POST.get('DATA_NASCIMENTO')
         EMAIL = request.POST.get('EMAIL')
+
+        valido, msg = validar_cpf(CPF)
+        if not valido:
+            messages.add_message(request, constants.ERROR, msg)
+            return redirect('/clientes')
              
     with transaction.atomic():
         cliente =CLIENTE(NOME=NOME,
@@ -139,6 +145,13 @@ def cadastro_cliente(request):
         CPF=CPF,
         DATA_NASCIMENTO=DATA_NASCIMENTO,
         EMAIL=EMAIL)
+
+
+        if cpf_ja_cadastrado(CPF, exclude_id=cliente.pk if cliente.pk else None):
+                    messages.add_message(request, constants.ERROR, "Este CPF já está cadastrado.")
+                    return redirect('/clientes')
+                    
+
         cliente.save()
         messages.add_message(request, constants.SUCCESS, 'Cadastrado com sucesso')
         return redirect('/clientes')
@@ -193,11 +206,11 @@ def Edita_cliente(request,id):
 @transaction.atomic
 @login_required(login_url='/auth/logar/')
 def excluir_cliente(request,id):
-    with transaction.atomic():
-        excluir = CLIENTE.objects.get(id=id)
-        excluir.STATUS ='2'
-        excluir.save()
-        return redirect('/clientes')
+        with transaction.atomic():
+                excluir = CLIENTE.objects.get(id=id)
+                excluir.STATUS ='2'
+                excluir.save()
+                return redirect('/clientes')
 
 @login_required(login_url='/auth/logar/')
 def Lista_Os(request):
@@ -1175,7 +1188,7 @@ def vendas_lentes(request):
     })
 
 def dados_clientes(request):
-    total_clientes = CLIENTE.objects.all().aggregate(total_clientes=Count('id'))['total_clientes']
+    total_clientes = CLIENTE.objects.filter(STATUS='1').aggregate(total_clientes=Count('id'))['total_clientes']
     return JsonResponse({'total_clientes':total_clientes})
 
 def receber(request):
