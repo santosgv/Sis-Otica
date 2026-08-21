@@ -1,231 +1,475 @@
-
-
 {% load static %}
-
-{% block 'body'%}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SGO - Sistema Gerencial de Óticas</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap 5 + ícones -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #BB3452;
+      --primary-dark: #9b2a44;
+      --secondary: #1a1a2e;
+      --light-bg: #f8f9fc;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #1e1e2f;
+    }
+    .btn-primary-custom {
+      background: var(--primary);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(187, 52, 82, 0.3);
+      color: #fff;
+    }
+    .btn-outline-custom {
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-outline-custom:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .section-subtitle {
+      color: #6c757d;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+    }
+    .navbar-custom {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+    }
+    .hero {
+      background: linear-gradient(135deg, #f8f9fc 0%, #e9edf5 100%);
+      padding: 80px 0 60px;
+    }
+    .hero h1 {
+      font-weight: 800;
+      font-size: 3.2rem;
+      line-height: 1.2;
+    }
+    .hero .highlight {
+      color: var(--primary);
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      height: 100%;
+      border: 1px solid rgba(187,52,82,0.05);
+    }
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 45px rgba(187,52,82,0.12);
+      border-color: var(--primary);
+    }
+    .feature-icon {
+      font-size: 2.8rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    .pricing-card {
+      border-radius: 24px;
+      padding: 2rem;
+      background: #fff;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+      border: 1px solid #eef0f4;
+      height: 100%;
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+    .pricing-card.popular {
+      border: 2px solid var(--primary);
+      position: relative;
+    }
+    .pricing-card.popular::before {
+      content: "MAIS POPULAR";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 18px;
+      border-radius: 50px;
+      letter-spacing: 1px;
+    }
+    .pricing-card .price {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    .pricing-card .price small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #6c757d;
+    }
+    .testimonial-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+      border: 1px solid #f0f0f0;
+    }
+    .testimonial-card i {
+      color: #ffc107;
+    }
+    .faq-item {
+      border-bottom: 1px solid #e9ecef;
+      padding: 1.2rem 0;
+    }
+    .faq-item h5 {
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .faq-item p {
+      margin-top: 0.5rem;
+      color: #495057;
+    }
+    .bg-soft-primary {
+      background: #fdf2f5;
+    }
+    .footer {
+      background: var(--secondary);
+      color: #ced4da;
+      padding: 40px 0 20px;
+    }
+    .footer a {
+      color: #adb5bd;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.2rem; }
+      .section-title { font-size: 2rem; }
+    }
+  </style>
 </head>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#BB3452">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="#">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#pricing">Preços</a>
-      </li>
-    </ul>
-  </div>
-</nav>
 <body>
 
-<!-- Header Section -->
-<section class="text-center py-5" style="background-color: #F5F5F5;">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
   <div class="container">
-    <h1 class="display-4"><img src="{% static 'home/img/LOGO-NOVA-PRETA .png' %}" height="150px" alt="logo"></h1>
-    <p class="lead"><b>A solução completa para a gestão eficiente da sua ótica</b></p>
-    <a href="https://wa.me/5531984178315?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20o%20Sistema%20SGO" target="_blank" class="btn btn-danger btn-lg">Saiba Mais</a>
+    <a class="navbar-brand fw-bold" href="#" style="color: var(--primary);">
+      <img src="{% static 'home/img/LOGO-NOVA-PRETA .png' %}" height="60" width="60" alt="SGO" class="d-inline-block align-top me-2">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+            aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="{% url 'Core:home' %}">Plataforma</a></li>
+        <li class="nav-item"><a class="nav-link" href="#features">Funcionalidades</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimonials">Depoimentos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+        <li class="nav-item ms-lg-3">
+          <a href="https://wa.me/5531984178315?text=Olá%20gostaria%20de%20saber%20mais%20sobre%20o%20Sistema%20SGO" 
+             target="_blank" class="btn btn-primary-custom btn-sm px-4">Fale Conosco</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding-top: 120px;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill mb-3">
+          <i class="fas fa-rocket me-2"></i> Lançamento 2024
+        </span>
+        <h1 class="display-4 fw-bold">
+          Gestão completa para<br>
+          <span class="highlight">sua ótica</span> em um só lugar
+        </h1>
+        <p class="lead text-muted mt-3">
+          CRM, OS, estoque, caixa, relatórios e muito mais. Multi-tenant, seguro e fácil de usar.
+          Experimente <strong>7 dias grátis</strong>.
+        </p>
+        <div class="mt-4 d-flex flex-wrap gap-3">
+          <a href="#pricing" class="btn btn-primary-custom btn-lg">
+            <i class="fas fa-calendar-check me-2"></i> Teste Grátis
+          </a>
+          <a href="#features" class="btn btn-outline-custom btn-lg">
+            <i class="fas fa-play-circle me-2"></i> Ver Funcionalidades
+          </a>
+        </div>
+        <div class="mt-4 d-flex align-items-center text-muted small">
+          <i class="fas fa-check-circle text-success me-2"></i> Sem cartão de crédito
+          <span class="mx-2">•</span>
+          <i class="fas fa-check-circle text-success me-2"></i> Cancelamento a qualquer momento
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="{% static 'home/img/LOGO-NOVA-PRETA .png' %}" alt="Dashboard SGO" 
+             class="img-fluid" style="max-height: 400px; width: auto;">
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Video Section -->
-<section class="py-5" style="background-color:#BB3452 ;">
+<!-- FUNCIONALIDADES -->
+<section id="features" class="py-5 bg-white">
   <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">Tudo o que sua ótica precisa</h2>
+      <p class="section-subtitle">Gerencie clientes, pedidos, estoque e finanças com uma interface intuitiva e moderna.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-users"></i></div>
+          <h5>CRM Completo</h5>
+          <p class="text-muted">Cadastro com CPF, histórico de compras, fotos, aniversário e interações. Fidelize seus clientes.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h5>Ordens de Serviço</h5>
+          <p class="text-muted">Controle de OS com status (laboratório, loja, entregue), previsão, lentes, armação e valores.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-boxes"></i></div>
+          <h5>Estoque Inteligente</h5>
+          <p class="text-muted">Produtos, fornecedores, tipos, estilos, controle de entrada/saída e alerta de quantidade mínima.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-cash-register"></i></div>
+          <h5>Caixa e Financeiro</h5>
+          <p class="text-muted">Parcelamentos, múltiplas formas de pagamento, controle de entrada e comissão de vendedores.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+          <h5>Relatórios Avançados</h5>
+          <p class="text-muted">Gráficos de vendas, produtos mais vendidos, faturamento, comissões e performance da loja.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="fas fa-building"></i></div>
+          <h5>Multi-tenant</h5>
+          <p class="text-muted">Suporte a múltiplas lojas/empresas com dados isolados e segurança total. Escalável para franquias.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS / NÚMEROS -->
+<section class="py-5 bg-soft-primary">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3 col-6 mb-4">
+        <h2 class="fw-bold text-primary">1.200+</h2>
+        <p class="text-muted">Clientes atendidos</p>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <h2 class="fw-bold text-primary">98%</h2>
+        <p class="text-muted">Satisfação</p>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <h2 class="fw-bold text-primary">15+</h2>
+        <p class="text-muted">Funcionalidades</p>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <h2 class="fw-bold text-primary">100%</h2>
+        <p class="text-muted">Segurança de dados</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- DEPOIMENTOS -->
+<section id="testimonials" class="py-5 bg-soft-primary">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">O que nossos clientes dizem</h2>
+      <p class="section-subtitle">Mais de 200 óticas confiam no SGO para gerenciar seus negócios.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="mb-2">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p>"O SGO transformou nossa gestão. O controle de OS e estoque é incrível. Recomendo!"</p>
+          <div class="d-flex align-items-center mt-3">
+            <img src="https://ui-avatars.com/api/?name=Ana+Silva&background=BB3452&color=fff&size=40" class="rounded-circle me-2" alt="Ana">
+            <div><strong>Ana Silva</strong><br><span class="text-muted small">Ótica Visão Clara</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="mb-2">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p>"Suporte excelente e relatórios que nos ajudam a tomar decisões. Melhor investimento."</p>
+          <div class="d-flex align-items-center mt-3">
+            <img src="https://ui-avatars.com/api/?name=Carlos+Mendes&background=BB3452&color=fff&size=40" class="rounded-circle me-2" alt="Carlos">
+            <div><strong>Carlos Mendes</strong><br><span class="text-muted small">Ótica Central</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="mb-2">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p>"A funcionalidade multi-tenant permitiu abrir nossa segunda loja sem complicações."</p>
+          <div class="d-flex align-items-center mt-3">
+            <img src="https://ui-avatars.com/api/?name=Mariana+Oliveira&background=BB3452&color=fff&size=40" class="rounded-circle me-2" alt="Mariana">
+            <div><strong>Mariana Oliveira</strong><br><span class="text-muted small">Óticas Oliveira</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">Perguntas Frequentes</h2>
+      <p class="section-subtitle">Tire suas dúvidas sobre o SGO.</p>
+    </div>
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div class="embed-responsive embed-responsive-16by9">
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/irBvkKv_Aww?si=sOFsKZ0CLd90LDJ9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <div class="faq-item">
+          <h5><i class="fas fa-chevron-right text-primary me-2"></i> Preciso de cartão de crédito para testar?</h5>
+          <p>Não. Oferecemos 7 dias grátis sem necessidade de cartão. Apenas preencha o formulário e começe a usar.</p>
+        </div>
+        <div class="faq-item">
+          <h5><i class="fas fa-chevron-right text-primary me-2"></i> O sistema é multi-tenant?</h5>
+          <p>Sim! O SGO suporta múltiplas lojas/empresas com dados completamente isolados, ideal para franquias ou grupos.</p>
+        </div>
+        <div class="faq-item">
+          <h5><i class="fas fa-chevron-right text-primary me-2"></i> Posso cancelar a qualquer momento?</h5>
+          <p>Sim. Você pode cancelar sua assinatura a qualquer momento, sem multa ou burocracia.</p>
+        </div>
+        <div class="faq-item">
+          <h5><i class="fas fa-chevron-right text-primary me-2"></i> O sistema tem integração com WhatsApp?</h5>
+          <p>Sim! O SGO possui integração com Evolution API para enviar notificações automáticas aos clientes.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- CTA FINAL -->
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;">
+  <div class="container text-center">
+    <h2 class="fw-bold">Pronto para transformar sua ótica?</h2>
+    <p class="lead mb-4">Junte-se a mais de 200 clientes e comece a gerenciar seu negócio com eficiência.</p>
+    <a href="https://wa.me/5531993839825?text=Olá%20gostaria%20de%20saber%20mais%20sobre%20o%20Sistema%20SGO" 
+       target="_blank" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold" style="color: var(--primary);">
+      <i class="fab fa-whatsapp me-2"></i> Fale com um especialista
+    </a>
+  </div>
+</section>
 
-<!-- Pricing Section -->
-
-<section id="pricing" class="py-5 bg-light">
-<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-      <h1 class="display-4">EXPERIMENTE SEM COMPROMISSO POR 7 DIAS</h1>
-      <div class="container mt-5">
-        <div class="row text-center">
-            <div class="col-md-3 col-sm-6 mb-4">
-              <img width="48" height="48" src="https://img.icons8.com/material-rounded/48/ffda1c/private-folder.png" alt="private-folder"/>
-                <p>Dados pessoais sigilosos não são compartilhados</p>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-              <img width="48" height="48" src="https://img.icons8.com/ios-filled/50/ffda1c/card-security.png" alt="card-security"/>
-                <p>Dados financeiros guardados não são compartilhados</p>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-              <img width="48" height="48" src="https://img.icons8.com/ios-filled/50/ffda1c/shield.png" alt="shield"/>
-                <p>100% confiável compre com segurança</p>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-              <img width="48" height="48" src="https://img.icons8.com/glyph-neue/50/ffda1c/time-machine.png" alt="time-machine"/>
-                <p>Entrega garantida no prazo e política de devolução</p>
-            </div>
-        </div>
-    </div>
-
-      <p class="lead"><img src="{% static 'home/img/Selo10_7Dias_0.75x.png' %}" alt="selo" srcset="" height="20%" width="20%"></p>
-    </div>
+<!-- FOOTER -->
+<footer class="footer">
   <div class="container">
-    <div class="card-deck mb-3 text-center">
-      <div class="card mb-4 box-shadow pricing-card">
-        <div class="card-header bg-success text-white">
-          <h4 class="my-0 font-weight-normal">1 Semana Grâtis</h4>
-        </div>
-        <div class="card-body">
-          <h1 class="card-title pricing-card-title">R$0 <small class="text-muted">/ Mês</small></h1>
-          <ul class="list-unstyled mt-3 mb-4">
-            <li>Gestão CRM</li>
-            <li>Controle de Estoque</li>
-            <li>Controle de Caixa</li>
-            <li>Acesso Mobile</li>
-            <li>Relatórios Avançados</li>
-            <li>Atualizações Automáticas</li>
-            <li>Gerenciamento de Comissões</li>
-            <li>Hospedagem em Servidores Dedicados</li>
-          </ul>
-          <a type="button" href="https://wa.me/5531984178315?text=Ol%C3%A1%20gostaria%20de%20assinar%20o%20plano%201%20Semana%20Gr%C3%A2tis" target="_blank" class="btn btn-lg btn-block btn-outline-success">Teste Agora</a>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="text-white">SGO Sistemas</h5>
+        <p class="small">Sistema Gerencial de Óticas – soluções completas para gestão de óticas e consultórios.</p>
+        <div class="mt-3">
+          <a href="https://www.instagram.com/sgosistemas/" class="me-3"><i class="fab fa-instagram"></i></a>
+          <!-- <a href="#" class="me-3"><i class="fab fa-facebook"></i></a> -->
+          <!-- <a href="#"><i class="fab fa-youtube"></i></a> -->
         </div>
       </div>
-      <div class="card mb-4 box-shadow pricing-card">
-        <div class="card-header bg-primary text-white">
-          <h4 class="my-0 font-weight-normal">Plano Profissional</h4>
-        </div>
-        <div class="card-body">
-          <h1 class="card-title pricing-card-title">R$100 <small class="text-muted">/ Mês</small></h1>
-          <ul class="list-unstyled mt-3 mb-4">
-            <li>Gestão CRM</li>
-            <li>Controle de Estoque</li>
-            <li>Controle de Caixa</li>
-            <li>Acesso Mobile</li>
-            <li>Relatórios Avançados</li>
-            <li>Atualizações Automáticas</li>
-            <li>Gerenciamento de Comissões</li>
-            <li>Hospedagem em Servidores Dedicados</li>
-          </ul>
-          <a href="https://wa.me/5531984178315?text=Ol%C3%A1%20gostaria%20de%20assinar%20o%20Plano%20Profissional" target="_blank" type="button" class="btn btn-lg btn-block btn-primary">Assine Agora</a>
-        </div>
+      <div class="col-md-2">
+        <h6 class="text-white">Links</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#features">Funcionalidades</a></li>
+          <li><a href="#testimonials">Depoimentos</a></li>
+        </ul>
       </div>
-      <div class="card mb-4 box-shadow pricing-card">
-        <div class="card-header bg-danger text-white">
-          <h4 class="my-0 font-weight-normal">Plano Empresarial</h4>
-        </div>
-        <div class="card-body">
-          <h1 class="card-title pricing-card-title">R$989,00 <small class="text-muted">/ Anual</small></h1>
-          <ul class="list-unstyled mt-3 mb-4">
-            <li>Gestão CRM</li>
-            <li>Controle de Estoque</li>
-            <li>Controle de Caixa</li>
-            <li>Acesso Mobile</li>
-            <li>Relatórios Avançados</li>
-            <li>Atualizações Automáticas</li>
-            <li>Gerenciamento de Comissões</li>
-            <li>Hospedagem em Servidores Dedicados</li>
-            <li>Treinamento Inicial Personalizado</li>
-            <li>Suporte Prioritário</li>
-          </ul>
-          <a href="https://wa.me/5531984178315?text=Ol%C3%A1%20gostaria%20de%20assinar%20o%20Plano%20Empresarial" target="_blank" type="button" class="btn btn-lg btn-block btn-danger">Assine Agora</a>
+      <div class="col-md-3">
+        <h6 class="text-white">Contato</h6>
+        <ul class="list-unstyled small">
+          <li><i class="fas fa-phone me-2"></i> (31) 99383-9825</li>
+          <li><i class="fas fa-envelope me-2"></i> sgosofwere@gmail.com</li>
+          <li><i class="fas fa-map-marker-alt me-2"></i> Belo Horizonte - MG</li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="text-white">Segurança</h6>
+        <div class="d-flex gap-3">
+          <img src="{% static 'Unidades/assets/ssl-certificate.png' %}" alt="SSL" width="40">
+          <img src="{% static 'Unidades/assets/lock-2.png' %}" alt="Lock" width="40">
         </div>
       </div>
     </div>
-
-</section>
-<a href="https://wa.me/5555319841783?text=Ola%20gostaria%20de%20saber%20mais%20sobre%20o%20Sistema" target="_blank" style="position:fixed;bottom:20px;right:30px;">
-  <svg enable-background="new 0 0 512 512" width="50" height="50" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M256.064,0h-0.128l0,0C114.784,0,0,114.816,0,256c0,56,18.048,107.904,48.736,150.048l-31.904,95.104  l98.4-31.456C155.712,496.512,204,512,256.064,512C397.216,512,512,397.152,512,256S397.216,0,256.064,0z" fill="#4CAF50"></path><path d="m405.02 361.5c-6.176 17.44-30.688 31.904-50.24 36.128-13.376 2.848-30.848 5.12-89.664-19.264-75.232-31.168-123.68-107.62-127.46-112.58-3.616-4.96-30.4-40.48-30.4-77.216s18.656-54.624 26.176-62.304c6.176-6.304 16.384-9.184 26.176-9.184 3.168 0 6.016 0.16 8.576 0.288 7.52 0.32 11.296 0.768 16.256 12.64 6.176 14.88 21.216 51.616 23.008 55.392 1.824 3.776 3.648 8.896 1.088 13.856-2.4 5.12-4.512 7.392-8.288 11.744s-7.36 7.68-11.136 12.352c-3.456 4.064-7.36 8.416-3.008 15.936 4.352 7.36 19.392 31.904 41.536 51.616 28.576 25.44 51.744 33.568 60.032 37.024 6.176 2.56 13.536 1.952 18.048-2.848 5.728-6.176 12.8-16.416 20-26.496 5.12-7.232 11.584-8.128 18.368-5.568 6.912 2.4 43.488 20.48 51.008 24.224 7.52 3.776 12.48 5.568 14.304 8.736 1.792 3.168 1.792 18.048-4.384 35.52z" fill="#FAFAFA"></path></svg>
-</a>
-<footer class="bg-body-tertiary text-center text-lg-start">
-  <!-- Copyright -->
-  <div class="text-center p-3" style="background-color:#BB3452; color: #fff;">
-    © 2024 Copyright:
-    <a class="text-white" href="https://sgosistemas.com.br/">sgosistemas.com.br</a>
+    <hr class="border-secondary mt-4">
+    <div class="text-center small">
+      © 2024 SGO Sistemas. Todos os direitos reservados.
+    </div>
   </div>
-  <!-- Copyright -->
 </footer>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<style>
-  
-  .pricing-card:hover {
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  }
-  .pricing-card .card-header {
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  .pricing-card .card-body {
-    padding: 2rem;
-  }
-  .pricing-card .card-footer {
-    padding: 1rem 2rem;
-    background-color: #F5F5F5;
-  }
-  .lead {
-    font:bold;
-  }
-
-  .contact-form{
-  background: #fff;
-  width: 70%;
-}
-.contact-form .form-control{
-  border-radius:1rem;
-}
-.contact-image{
-  text-align: center;
-}
-.contact-image img{
-  margin-top: -3%;
- 
-}
-.contact-form form{
-  padding: 14%;
-}
-.contact-form form .row{
-  margin-bottom: -7%;
-}
-.contact-form h3{
-  margin-bottom: 8%;
-  margin-top: -10%;
-  text-align: center;
-  color: #BB3452;
-}
-.contact-form .btnContact {
-  width: 50%;
-  border: none;
-  border-radius: 1rem;
-  padding: 1.5%;
-  background: #BB3452;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-}
-.btnContactSubmit
-{
-  width: 50%;
-  border-radius: 1rem;
-  padding: 1.5%;
-  color: #fff;
-  background-color: #0062cc;
-  border: none;
-  cursor: pointer;
-}
-</style>
+<!-- Scripts Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Interação simples para FAQ (opcional) -->
+<script>
+  document.querySelectorAll('.faq-item h5').forEach(header => {
+    header.addEventListener('click', function() {
+      const p = this.nextElementSibling;
+      p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    });
+  });
+</script>
 </body>
 </html>
-
-  {% endblock %}
