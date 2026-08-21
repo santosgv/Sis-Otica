@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load filters %}
 {% load compress %}
 {% load static %}
 
@@ -28,14 +27,12 @@ Relatorios
   <a class="btn btn-dark d-inline-flex align-items-center gap-2" href="{% url 'Core:relatorio_mes_anterior' %}">
     <i class="fa-solid fa-calendar-days"></i> Vendedores Mês Anteriores
   </a>
-  
   <a class="btn btn-success d-inline-flex align-items-center gap-2" href="{% url 'Core:export_clientes' %}">
     <i class="fa-solid fa-file-export"></i> Exportar Clientes
   </a>
   <a class="btn btn-info d-inline-flex align-items-center gap-2" href="{% url 'Core:export_os' %}">
     <i class="fa-solid fa-file-export"></i> Exportar OS
   </a>
-
   <a class="btn btn-warning d-inline-flex align-items-center gap-2" href="{% url 'Core:ordens_pendentes' %}">
     <i class="fa-solid fa-clock"></i> OS Pendente de Pagamento
   </a>
@@ -49,12 +46,9 @@ Relatorios
         <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary flex-shrink-0" style="width:48px; height:48px;">
           <i class="fa-solid fa-star fa-lg"></i>
         </span>
-        <div>
-          <h5 class="card-title mb-1">Funcionário do Mês</h5>
-          <p class="card-text mb-0">
-            <span id="vendedor" class="fw-semibold"></span>
-            <span id="qtd" class="text-muted ms-2"></span>
-          </p>
+        <div class="flex-grow-1">
+          <h5 class="card-title mb-2">Maiores Vendedores (mês)</h5>
+          <ul id="vendedor" class="mb-0 ps-0"></ul>
         </div>
       </div>
     </div>
@@ -66,11 +60,9 @@ Relatorios
         <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 text-info flex-shrink-0" style="width:48px; height:48px;">
           <i class="fa-solid fa-eye fa-lg"></i>
         </span>
-        <div>
-          <h5 class="card-title mb-1">Lentes</h5>
-          <p class="card-text mb-0">
-            <span id="lentes" class="fw-semibold"></span>
-          </p>
+        <div class="flex-grow-1">
+          <h5 class="card-title mb-2">Lentes mais vendidas (mês)</h5>
+          <ul id="lentes" class="mb-0 ps-0"></ul>
         </div>
       </div>
     </div>
@@ -142,6 +134,19 @@ Relatorios
   </div>
 </div>
 
+<!--
+  Dados injetados diretamente no HTML pelo Django (json_script).
+  O JS lê esses blocos via getElementById(...).textContent — sem fetch, sem CORS.
+  json_script já escapa o conteúdo com segurança contra XSS.
+-->
+{{ dados_vendedores|json_script:"dados-vendedores" }}
+{{ dados_vendas_12m|json_script:"dados-vendas-12m" }}
+{{ dados_fluxo_12m|json_script:"dados-fluxo-12m" }}
+{{ dados_os_aberto|json_script:"dados-os-aberto" }}
+{{ dados_clientes|json_script:"dados-clientes" }}
+{{ dados_receber|json_script:"dados-receber" }}
+{{ dados_lentes|json_script:"dados-lentes" }}
+
 {% else %}
 <div class="card border-0 shadow-sm">
   <div class="card-body text-center text-muted py-5">
@@ -154,20 +159,29 @@ Relatorios
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{% static 'Relatorio/js/relatorios.js' %}"></script>
 
+{% if user.FUNCAO == "G" %}
 <script>
-    window.onload = function(e){
-      renderiza_total_vendas_12_meses('{% url "Core:vendas_ultimos_12_meses" %}')
-      renderiza_vendedor('{% url "Core:maiores_vendedores_30_dias" %}')
-      renderiza_fluxo_12_meses('{% url "Core:transacoes_mensais" %}')
-      obter_os_em_aberto('{% url "Core:obter_os_em_aberto" %}');
-      obter_clientes('{% url "Core:dados_clientes" %}');
-      recebe_hoje('{% url "Core:receber" %}');
-      renderiza_lentes('{% url "Core:vendas_lentes" %}');
-}
+  function lerDados(id) {
+    const el = document.getElementById(id);
+    return el ? JSON.parse(el.textContent) : null;
+  }
+
+  window.onload = function (e) {
+    renderiza_total_vendas_12_meses(lerDados('dados-vendas-12m'));
+    renderiza_vendedor(lerDados('dados-vendedores'));
+    renderiza_fluxo_12_meses(lerDados('dados-fluxo-12m'));
+    obter_os_em_aberto(lerDados('dados-os-aberto'));
+    obter_clientes(lerDados('dados-clientes'));
+    recebe_hoje(lerDados('dados-receber'));
+    renderiza_lentes(lerDados('dados-lentes'));
+  }
 </script>
+{% endif %}
+
 <style>
   ul {
     list-style-type: none;
-    padding: 0;}
+    padding: 0;
+  }
 </style>
 {% endblock %}

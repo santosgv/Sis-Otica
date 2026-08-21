@@ -1,269 +1,260 @@
-function gera_cor(qtd=1){
-    var bg_color = []
-    var border_color = []
-    for(let i = 0; i < qtd; i++){
-        let r = Math.random() * 255;
-        let g = Math.random() * 255;
-        let b = Math.random() * 255;
-        bg_color.push(`rgba(${r}, ${g}, ${b}, ${0.2})`)
-        border_color.push(`rgba(${r}, ${g}, ${b}, ${1})`)
-    }
-    
-    return [bg_color, border_color];
-    
+/**
+ * relatorios.js
+ *
+ * Cada função RECEBE o objeto/lista de dados já pronto (em vez de uma URL e fazer fetch).
+ * Isso elimina a necessidade de requisição AJAX e, portanto, o problema de CORS.
+ *
+ * Status de confirmação do formato de dados (baseado no código real das views que você enviou):
+ *  - renderiza_total_vendas_12_meses  → CONFIRMADO (vendas_ultimos_12_meses)
+ *  - renderiza_vendedor               → CONFIRMADO (maiores_vendedores_30_dias)
+ *  - renderiza_fluxo_12_meses         → CONFIRMADO (transacoes_mensais)
+ *  - obter_os_em_aberto               → CONFIRMADO (obter_os_em_aberto)
+ *  - renderiza_lentes                 → CONFIRMADO (vendas_lentes_dados)
+ *  - obter_clientes                   → CONFIRMADO (dados_clientes)
+ *  - recebe_hoje                      → CONFIRMADO (receber)
+ */
+
+let chartVendas12m;
+let chartFluxoMensal;
+
+/**
+ * Total de vendas nos últimos 12 meses (gráfico de barra).
+ * Formato real da view `vendas_ultimos_12_meses`: lista direta, já ordenada por mês:
+ * [{ mes_venda: "Janeiro/2025", total_vendas: 12345.67 }, ...]
+ * OBS: 'total_vendas' aqui é o VALOR somado (Sum('VALOR')), não a quantidade de pedidos.
+ * Se a intenção for mostrar contagem de vendas (não R$), a view precisa anotar Count('id')
+ * também — me avise que ajusto.
+ */
+function renderiza_total_vendas_12_meses(data) {
+  if (!data || data.length === 0) return;
+
+  const labels = data.map(item => item.mes_venda);
+  const valores = data.map(item => item.total_vendas);
+
+  const canvas = document.getElementById('vendas_12m').getContext('2d');
+
+  if (chartVendas12m) {
+    chartVendas12m.destroy();
+  }
+
+  chartVendas12m = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Vendas (R$)',
+          data: valores,
+          backgroundColor: '#c85a72',
+          borderRadius: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Total de Vendas (12 meses)',
+          font: { size: 16 },
+        },
+        legend: { display: false },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 }
 
-function renderiza_total_vendas_12_meses(url){
 
+function renderiza_vendedor(data) {
+  const vendedorEl = document.getElementById('vendedor');
+  if (!vendedorEl) return;
 
-    fetch(url)
-    .then(response => response.json())  // Converte a resposta em JSON
-    .then(data => {
-      // Extrai as informações relevantes do objeto JSON para gerar o gráfico
-      const labels = data.data.map(item => item.mes_venda);
-      const values = data.data.map(item => item.total_vendas);
-      const canvas = document.getElementById('vendas_12m').getContext('2d');
-      var cores_vendas_12m = gera_cor(qtd=13)
+  vendedorEl.innerHTML = '';
 
-      // Configura o gráfico
-      const chart = new Chart(canvas, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: "Total",
-              data: values,
-              backgroundColor: cores_vendas_12m[0],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
-        },
-      });
-    })
-    .catch(error => console.error(error));
+  const lista = (data && data.maiores_vendedores_30_dias) || [];
 
+  if (lista.length === 0) {
+    vendedorEl.innerHTML = '<li class="text-muted small">Sem dados no período.</li>';
+    return;
+  }
 
-}
+  const maiorPedidos = Math.max(...lista.map(item => item.total_pedidos));
 
+  lista.forEach((vendedor, index) => {
+    const percentual = maiorPedidos > 0 ? (vendedor.total_pedidos / maiorPedidos) * 100 : 0;
 
-function renderiza_vendedor(url) {
-  fetch(url, {
-    method: 'get',
-  })
-  .then(function(result) {
-    return result.json();
-  })
-  .then(function(data) {
-    const vendedores = data.maiores_vendedores_30_dias;
-    const totalVendasPeriodo = data.total_vendas_periodo;
-    const ticketMedioTotal = data.ticket_medio_total;
-
-    const vendedorContainer = document.getElementById('vendedor');
-    vendedorContainer.innerHTML = ''; // limpa o container antes de renderizar
-
-    // Cria um elemento para mostrar o resumo geral
-    const resumoElement = document.createElement('div');
-    resumoElement.innerHTML = `
-      <h3>Resumo do Período</h3>
-      <p><strong>Total de Vendas:</strong> R$ ${totalVendasPeriodo}</p>
-      <p><strong>Ticket Médio Geral:</strong> R$ ${ticketMedioTotal}</p>
-      <hr>
+    const li = document.createElement('li');
+    li.className = 'mb-2';
+    li.style.listStyle = 'none';
+    li.innerHTML = `
+      <div class="d-flex justify-content-between small mb-1">
+        <span class="fw-semibold">${index + 1}º ${vendedor.VENDEDOR__first_name || '—'}</span>
+        <span class="text-muted">${vendedor.total_pedidos} pedidos · R$ ${vendedor.total_valor_vendas}</span>
+      </div>
+      <div class="progress mb-1" style="height: 6px;">
+        <div class="progress-bar bg-primary" role="progressbar" style="width: ${percentual}%;"></div>
+      </div>
+      <div class="text-muted" style="font-size: 0.75rem;">
+        Ticket médio: R$ ${vendedor.ticket_medio}
+      </div>
     `;
-    vendedorContainer.appendChild(resumoElement);
-
-    // Itera pelos vendedores e adiciona ao DOM
-    vendedores.forEach(function(vendedor) {
-      const vendedorNome = vendedor['VENDEDOR__first_name'];
-      const totalPedidos = vendedor['total_pedidos'];
-      const totalvendas = vendedor['total_valor_vendas'];
-      const tkmedio = vendedor['ticket_medio'];
-
-      const vendedorElement = document.createElement('div');
-      vendedorElement.innerHTML = `
-        <p>
-          <strong>${vendedorNome}</strong>: ${totalPedidos} pedidos |
-          R$ ${totalvendas} em vendas |
-          Ticket médio: R$ ${tkmedio}
-        </p>
-      `;
-
-      vendedorContainer.appendChild(vendedorElement);
-    });
+    vendedorEl.appendChild(li);
   });
 }
 
+/**
+ * Fluxo de caixa mensal (entradas x saídas).
+ * Formato real da view `transacoes_mensais`: lista direta (sem wrapper), 'mes' já vem
+ * como nome em português (ex: "Julho"), não como número:
+ * [{ ano: 2025, mes: "Julho", entrada: { total, quantidade }, saida: { total, quantidade } }, ...]
+ * Observação: o dicionário original é montado a partir de um dict indexado por (ano, mes),
+ * então a ordem de iteração não é necessariamente cronológica — ordenamos aqui no JS.
+ */
+function renderiza_fluxo_12_meses(data) {
+  if (!data || data.length === 0) return;
 
-function renderiza_fluxo_12_meses(url) {
-  fetch(url)
-    .then(response => response.json())  // Converte a resposta em JSON
-    .then(data => {
-      // Extrai as informações relevantes do objeto JSON para gerar o gráfico
+  const ordemMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-      const labels = data.data.map(item => `${item.mes}/${item.ano}`);
-      const saidas = data.data.map(item => item.saida.total);
-      const entradas = data.data.map(item => item.entrada.total);
-      const canvas = document.getElementById('fluxo_mensal').getContext('2d');
+  const dadosOrdenados = [...data].sort((a, b) => {
+    if (a.ano !== b.ano) return a.ano - b.ano;
+    return ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes);
+  });
 
-      // Configura o gráfico
-      const chart = new Chart(canvas, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: "Saída",
-              data: saidas,
-              backgroundColor: "red",
-            },
-            {
-              label: "Entrada",
-              data: entradas,
-              backgroundColor: "green",
-            },
-          ],
+  const labels = dadosOrdenados.map(item => `${item.mes}/${item.ano}`);
+  const saidas = dadosOrdenados.map(item => item.saida.total);
+  const entradas = dadosOrdenados.map(item => item.entrada.total);
+
+  const canvas = document.getElementById('fluxo_mensal').getContext('2d');
+
+  if (chartFluxoMensal) {
+    chartFluxoMensal.destroy();
+  }
+
+  chartFluxoMensal = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Saída',
+          data: saidas,
+          backgroundColor: 'red',
         },
-        options: {
-          title:{
-            display:true,
-            fontSize:20,
-            text:"Fluxo de Caixa Mensal nos ultimos 12 Meses:"
-          },
-          responsive: true,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
+        {
+          label: 'Entrada',
+          data: entradas,
+          backgroundColor: 'green',
         },
-      });
-    })
-    .catch(error => console.error(error));
-}
-
-function obter_os_em_aberto(url) {
-  fetch(url, {
-    method: 'get',
-  }).then(function(result) {
-    return result.json()
-  }).then(function(data) {
-    const totalVendas = data.data[0].total_vendas;
-    const totalValor = data.data[0].total_valor;
-
-    const totalVendasContainer = document.getElementById('total_vendas');
-    const totalValorContainer = document.getElementById('total_valor');
-
-    totalVendasContainer.textContent = `Total de Vendas: ${totalVendas}`;
-    totalValorContainer.textContent = `Total de Valor: R$ ${totalValor}`;
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Fluxo de Caixa Mensal',
+          font: { size: 16 },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
   });
 }
 
-function renderiza_minhas_vendas(url) {
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const vendedores = data.minhas_vendas_mes;
-      const vendedorContainer = document.getElementById('eu');
-      const pm = document.getElementById('pm');
+/**
+ * Ordens de serviço em aberto no mês — preenche #total_vendas e #total_valor.
+ * Formato real da view `obter_os_em_aberto`: LISTA com 0 ou 1 item (o filtro já restringe
+ * ao mês atual, então não há múltiplos meses aqui, diferente de vendas_ultimos_12_meses):
+ * [{ total_vendas: N, total_valor: "1.234,56" }]
+ */
+function obter_os_em_aberto(data) {
+  const totalVendasEl = document.getElementById('total_vendas');
+  const totalValorEl = document.getElementById('total_valor');
 
-      vendedores.forEach(vendedor => {
-        const vendedorNome = vendedor['VENDEDOR__first_name'];
-        const totalPedidos = vendedor['total_pedidos'];
-        const totalVendas = vendedor['total_valor_vendas'];
-        const ticketmedio = vendedor['ticket_medio'];
+  if (!data || data.length === 0) {
+    totalVendasEl.textContent = '0';
+    totalValorEl.textContent = 'R$ 0,00';
+    return;
+  }
 
-        // Crie um elemento HTML para cada vendedor
-        const vendedorElement = document.createElement('div');
-        vendedorElement.innerHTML = `${vendedorNome}: ${totalPedidos} Pedidos R$ ${totalVendas},00 em Vendas`;
-        pm.innerHTML=`Preço Medio: R$${ticketmedio},00`;
-        // Adicione o elemento à div de vendedores
-        vendedorContainer.appendChild(vendedorElement);
-        pm.appendChild(ticketmedio);
-      });
-    })
-    .catch(error => {
-      console.error('Erro ao obter dados de vendas:', error);
-    });
+  const item = data[0];
+  totalVendasEl.textContent = item.total_vendas ?? '—';
+  totalValorEl.textContent = item.total_valor ? `R$ ${item.total_valor}` : 'R$ 0,00';
 }
 
+/**
+ * Total de clientes cadastrados (status ativo) — preenche #clientes.
+ * Formato real da view `dados_clientes`: um NÚMERO cru (int), não um objeto:
+ * ex: 342
+ */
+function obter_clientes(data) {
+  const clientesEl = document.getElementById('clientes');
+  if (!clientesEl) return;
 
-function obter_clientes(url) {
-  fetch(url, {
-    method: 'get',
-  }).then(function(result) {
-    return result.json()
-  }).then(function(data) {
-    const totalclientes = data.total_clientes;
+  clientesEl.textContent = (data ?? 0).toLocaleString('pt-BR');
+}
 
-    const totalclientesContainer = document.getElementById('clientes');
+/**
+ * Valor a receber hoje — preenche #receber.
+ * Formato real da view `receber`: um NÚMERO cru (Decimal), sem formatar_decimal() aplicado.
+ * Como Decimal não é serializável nativamente em JSON, o DjangoJSONEncoder (usado por
+ * json_script) converte para STRING sem formatação (ex: "1234.5" — ponto, sem milhar).
+ * Por isso formatamos a moeda aqui no JS.
+ */
+function recebe_hoje(data) {
+  const receberEl = document.getElementById('receber');
+  if (!receberEl) return;
 
-    totalclientesContainer.textContent = `Ativos: ${totalclientes}`;
+  const valor = parseFloat(data ?? 0);
 
+  receberEl.textContent = valor.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
   });
 }
 
+/**
+ * Vendas de lentes — preenche a lista #lentes.
+ * Formato real da view: [{ LENTES: "MULTI FOTO", total: 492 }, ...] (top 5, já ordenado desc).
+ */
+function renderiza_lentes(data) {
+  const lentesEl = document.getElementById('lentes');
+  if (!lentesEl) return;
 
-function recebe_hoje(url) {
-  fetch(url, {
-    method: 'get',
-  }).then(function(result) {
-    return result.json()
-  }).then(function(data) {
-    const totalvendahoje = data.total_vendido_hoje;
+  lentesEl.innerHTML = '';
 
-    const receberdiv = document.getElementById('receber');
+  if (!data || data.length === 0) {
+    lentesEl.innerHTML = '<li class="text-muted small">Sem dados no período.</li>';
+    return;
+  }
 
-    receberdiv.textContent = `R$ ${totalvendahoje},00`;
+  const maiorTotal = Math.max(...data.map(item => item.total));
 
+  data.forEach(item => {
+    const percentual = maiorTotal > 0 ? (item.total / maiorTotal) * 100 : 0;
+
+    const li = document.createElement('li');
+    li.className = 'mb-2';
+    li.style.listStyle = 'none';
+    li.innerHTML = `
+      <div class="d-flex justify-content-between small mb-1">
+        <span class="fw-semibold">${item.LENTES}</span>
+        <span class="text-muted">${item.total}</span>
+      </div>
+      <div class="progress" style="height: 6px;">
+        <div class="progress-bar bg-info" role="progressbar" style="width: ${percentual}%;"></div>
+      </div>
+    `;
+    lentesEl.appendChild(li);
   });
-}
-
-
-function renderiza_lentes(url) {
-  fetch(url, { method: 'get' })
-    .then(result => result.json())
-    .then(data => {
-      const lentes = data.vendas_lentes; // vem do JsonResponse do Django
-
-      const lentesContainer = document.getElementById('lentes');
-      lentesContainer.innerHTML = ''; // limpa antes de renderizar
-
-      // título
-      const tituloElement = document.createElement('h3');
-      tituloElement.textContent = 'Top 5 Lentes Mais Vendidas do Mês';
-      lentesContainer.appendChild(tituloElement);
-
-      if (!lentes || lentes.length === 0) {
-        lentesContainer.innerHTML += '<p>Nenhuma venda encontrada.</p>';
-        return;
-      }
-
-      // cria lista
-      const listaElement = document.createElement('ul');
-      lentes.forEach(lente => {
-        const item = document.createElement('li');
-        item.innerHTML = `<strong>${lente.LENTES}</strong> — ${lente.total} vendas`;
-        listaElement.appendChild(item);
-      });
-
-      lentesContainer.appendChild(listaElement);
-    })
-    .catch(err => {
-      console.error('Erro ao buscar dados de lentes:', err);
-    });
 }

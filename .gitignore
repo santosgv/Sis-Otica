@@ -11,6 +11,7 @@ tmp/
 CACHE/
 # C extensions
 *.so
+*.sqlite3
 
 # Distribution / packaging
 .Python

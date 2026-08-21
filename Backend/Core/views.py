@@ -291,8 +291,6 @@ def Cadastrar_os(request,id_cliente):
                 entrada = entrada_raw
                 QUANTIDADE_PARCELA = request.POST.get('QUANTIDADE_PARCELA')
 
-                #print(f'Valor: {valor}, Entrada: {entrada}, Quantidade de Parcelas: {QUANTIDADE_PARCELA}')
-
                 if ARMACAO != None:
                     realizar_saida(ARMACAO,1,f'Venda Por OS')
                 else:
@@ -712,7 +710,6 @@ def Caixa(request):
                                                       'saldo':saldo_total_dinheiro,
                                                       'saldo_total':entradas_total})
         except Exception as msg:
-            #print(msg)
             logger.critical(msg)
     return render(request,'Caixa/caixa.html')
 
@@ -878,7 +875,7 @@ def cadastro_caixa(request):
 
         return redirect('/Caixa')
 
-def vendas_ultimos_12_meses(request):
+def vendas_ultimos_12_meses():
     hoje = get_today_data()
     data_limite = hoje - timedelta(days=390)
 
@@ -903,16 +900,15 @@ def vendas_ultimos_12_meses(request):
         'total_vendas': venda['total_vendas']
     } for venda in vendas]
 
-    return JsonResponse({'data': data_vendas})
+    return data_vendas
 
-def maiores_vendedores_30_dias(request):
-    # Base do queryset filtrando os pedidos válidos no período
+def maiores_vendedores_30_dias():
+
     queryset_base = ORDEN.objects.filter(
         DATA_SOLICITACAO__gte=primeiro_dia_mes(),
         DATA_SOLICITACAO__lte=ultimo_dia_mes()
     ).exclude(STATUS='C')
 
-    # Cálculo de totais globais
     totais = queryset_base.aggregate(
         total_vendas=Sum('VALOR'),
         total_pedidos=Count('id')
@@ -923,8 +919,7 @@ def maiores_vendedores_30_dias(request):
         if totais['total_pedidos'] else 0
     )
 
-    # Maiores vendedores com total e ticket médio
-    vendedores_queryset = queryset_base.values('VENDEDOR__first_name') \
+    vendedores_queryset = queryset_base.values('VENDEDOR_id', 'VENDEDOR__first_name') \
         .annotate(total_pedidos=Count('id')) \
         .annotate(total_valor_vendas=Sum('VALOR')) \
         .annotate(ticket_medio=ExpressionWrapper(
@@ -933,22 +928,20 @@ def maiores_vendedores_30_dias(request):
         )) \
         .order_by('-total_pedidos')[:5]
 
-    # Formatação para o JSON
     vendedores_formatados = []
     for vendedor in vendedores_queryset:
-        vendedor_formatado = {
+        vendedores_formatados.append({
             'VENDEDOR__first_name': vendedor['VENDEDOR__first_name'],
             'total_pedidos': vendedor['total_pedidos'],
             'total_valor_vendas': formatar_decimal(vendedor['total_valor_vendas']),
             'ticket_medio': formatar_decimal(vendedor['ticket_medio'])
-        }
-        vendedores_formatados.append(vendedor_formatado)
+        })
 
-    return JsonResponse({
+    return {
         'maiores_vendedores_30_dias': vendedores_formatados,
         'total_vendas_periodo': formatar_decimal(totais['total_vendas']),
         'ticket_medio_total': formatar_decimal(ticket_medio_geral)
-    })
+    }
 
 def maiores_vendedores_meses(request):
     data_inicio = request.GET.get('data_inicio')
@@ -997,7 +990,7 @@ def maiores_vendedores_meses(request):
         'ticket_medio_total': formatar_decimal(ticket_medio_geral)
     })
 
-def transacoes_mensais(request):
+def transacoes_mensais():
     # Realiza uma agregação dos valores das transações por mês e tipo
     transacoes_mensais = CAIXA.objects.annotate(
         ano=ExtractYear('DATA'),
@@ -1052,8 +1045,7 @@ def transacoes_mensais(request):
         for (ano, mes), dados in dados_mensais.items()
     ]
 
-    # Retorna os dados como JsonResponse
-    return JsonResponse({'data': dados_formatados}, safe=False)
+    return dados_formatados
 
 @login_required(login_url='/auth/logar/')
 def caixa_mes_anterior(request):
@@ -1111,7 +1103,7 @@ def obter_valores_registros_meses_anteriores(request):
             resultados.append(resultado)
         return JsonResponse({'data': resultados})
     
-def obter_os_em_aberto(request):    
+def obter_os_em_aberto():    
     
     vendas = (
         ORDEN.objects
@@ -1129,47 +1121,10 @@ def obter_os_em_aberto(request):
         'total_vendas': venda['total_vendas'],
         'total_valor': formatar_decimal(venda['total_valor']),  # Inclua o valor total das vendas no resultado
     } for venda in vendas]
-
-    return JsonResponse({'data':data_vendas})
-
-@login_required(login_url='/auth/logar/')
-def relatorios(request):
-    return render(request,'Relatorio/relatorios.html')
-
-@login_required(login_url='/auth/logar/')
-def relatorio_mes_anterior(request):
-    return render(request, 'Relatorio/relatorios_mes_html')
-
-def dados_minhas_vendas(request):
-    id_user = request.user
-    vendedor = ORDEN.objects.filter(
-        DATA_SOLICITACAO__gte=primeiro_dia_mes(),
-        DATA_SOLICITACAO__lte=ultimo_dia_mes(),
-        VENDEDOR=USUARIO.objects.get(id=id_user.id)
-    ).exclude(STATUS='C') \
-    .values('VENDEDOR__first_name') \
-    .annotate(total_pedidos=Count('id')) \
-    .annotate(total_valor_vendas=Sum('VALOR')) \
-    .annotate(ticket_medio=ExpressionWrapper(
-        F('total_valor_vendas') / F('total_pedidos'),
-        output_field=DecimalField(max_digits=10, decimal_places=2)
-    )) \
-    .order_by('-total_pedidos')[:1]
-
-    vendedores_formatados = []
-    for _ in vendedor:
-        vendedor_formatado = {
-            'VENDEDOR__first_name': _['VENDEDOR__first_name'],
-            'total_pedidos': _['total_pedidos'],
-            'total_valor_vendas': formatar_decimal(_['total_valor_vendas']),
-            'ticket_medio': formatar_decimal(_['ticket_medio'])
-        }
-        vendedores_formatados.append(vendedor_formatado)
-
-    return JsonResponse({'minhas_vendas_mes':vendedores_formatados})
-
-def vendas_lentes(request):
-    lentes_mais_vendidas = (
+    return data_vendas
+ 
+def vendas_lentes_dados():
+        lentes_mais_vendidas = (
         ORDEN.objects
         .filter(
             DATA_SOLICITACAO__gte=primeiro_dia_mes(),
@@ -1181,27 +1136,82 @@ def vendas_lentes(request):
         .values('LENTES')
         .annotate(total=Count('LENTES'))
         .order_by('-total')[:5]
+        )
+
+        vendas_lentes= list(lentes_mais_vendidas)
+        return vendas_lentes
+
+
+@login_required(login_url='/auth/logar/')
+def relatorios(request):
+
+    context = {
+        'dados_vendedores': maiores_vendedores_30_dias(),
+        'dados_vendas_12m': vendas_ultimos_12_meses(),
+        'dados_fluxo_12m': transacoes_mensais(),
+        'dados_os_aberto': obter_os_em_aberto(),
+        'dados_clientes': dados_clientes(),
+        'dados_receber': receber(),
+        'dados_lentes': vendas_lentes_dados(),
+    }
+    return render(request,'Relatorio/relatorios.html',context)
+
+@login_required(login_url='/auth/logar/')
+def relatorio_mes_anterior(request):
+    return render(request, 'Relatorio/relatorios_mes_html')
+
+def dados_minhas_vendas(request):
+    usuario = request.user
+
+    queryset = ORDEN.objects.filter(
+        DATA_SOLICITACAO__gte=primeiro_dia_mes(),
+        DATA_SOLICITACAO__lte=ultimo_dia_mes(),
+        VENDEDOR=usuario
+    ).exclude(STATUS='C')
+
+    totais = queryset.aggregate(
+        total_vendas=Sum('VALOR'),
+        total_pedidos=Count('id')
     )
 
-    return JsonResponse({
-        'vendas_lentes': list(lentes_mais_vendidas)
-    })
+    total_pedidos = totais['total_pedidos'] or 0
+    total_valor_vendas = totais['total_vendas'] or 0
 
-def dados_clientes(request):
+    ticket_medio = (
+        total_valor_vendas / total_pedidos
+        if total_pedidos else 0
+    )
+
+    vendedor_formatado = {
+        'VENDEDOR__first_name': usuario.first_name,
+        'total_pedidos': total_pedidos,
+        'total_valor_vendas': formatar_decimal(total_valor_vendas),
+        'ticket_medio': formatar_decimal(ticket_medio)
+    }
+
+    return {
+        'maiores_vendedores_30_dias': [vendedor_formatado],
+        'total_vendas_periodo': formatar_decimal(total_valor_vendas),
+        'ticket_medio_total': formatar_decimal(ticket_medio)
+    }
+
+def dados_clientes():
     total_clientes = CLIENTE.objects.filter(STATUS='1').aggregate(total_clientes=Count('id'))['total_clientes']
-    return JsonResponse({'total_clientes':total_clientes})
+    return total_clientes
 
-def receber(request):
+def receber():
     total_vendido = ORDEN.objects.filter(DATA_SOLICITACAO=get_today_data()).exclude(STATUS='C').aggregate(total=Sum('VALOR'))['total']
 
     if total_vendido is None:
         total_vendido = 0
-    
-    return JsonResponse({'total_vendido_hoje': total_vendido})
+    return total_vendido
 
 @login_required(login_url='/auth/logar/')
 def minhas_vendas(request):
-    return render(request,'minhas_vendas.html')
+    context = {
+        'dados_vendedores': dados_minhas_vendas(request)
+    }
+    return render(request,'minhas_vendas.html', context)
 
 @login_required(login_url='/auth/logar/')
 def estoque(request):

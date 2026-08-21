@@ -1,3 +1,4 @@
+from __future__ import annotations
 from urllib.parse import quote
 from decouple import config
 import pandas as pd
