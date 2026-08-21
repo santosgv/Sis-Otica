@@ -9,12 +9,9 @@ from django.db.models import Value
 
 def search(request):
     search = request.GET.get('search')
-    clientes = CLIENTE.objects.filter(NOME__icontains=search)
-    ordens_de_servico_por_cliente = {}
-    if clientes.exists():
-        for cliente in clientes:
-            ordens_de_servico = ORDEN.objects.filter(CLIENTE=cliente)
-            ordens_de_servico_por_cliente[cliente] = ordens_de_servico
+    ordens_de_servico = ORDEN.objects.filter(
+            CLIENTE__NOME__icontains=search
+        ).select_related('CLIENTE', 'VENDEDOR')
 
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
@@ -25,16 +22,14 @@ def search_by_id(request):
 
 def search_by_city(request):
     search = request.GET.get('search_by_city')
-    cidades = CLIENTE.objects.filter(CIDADE__icontains=search)
-    ordens_de_servico_por_cidade = {}
-    for cidade in cidades:
-        ordens_de_servico = ORDEN.objects.filter(CLIENTE=cidade)
-        ordens_de_servico_por_cidade[cidade] = ordens_de_servico
-    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico_por_cidade})
+    ordens_de_servico = ORDEN.objects.filter(
+        CLIENTE__CIDADE__icontains=search
+    ).select_related('CLIENTE', 'VENDEDOR')
+    
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
 def search_by_lentes(request):
     search = request.GET.get('search_by_lentes')
-    print(search)
     oss = ORDEN.objects.filter(LENTES__icontains=search)
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
 

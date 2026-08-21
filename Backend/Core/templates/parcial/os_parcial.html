@@ -7,63 +7,59 @@
 {% endblock %}
 
 {% if Ordem_servicos %}
-
-      <h4>Resultado</h4>
-      <table id="myTable" class="table table-hover">
-          <tr class="thead">
-              <th scope="col">ID</th>
-              <th scope="col">SERVIÇO</th>
-              <th scope="col">CLIENTE</th>
-              <th scope="col">VENDEDOR</th>
-              <th scope="col">LENTES</th>
-              <th scope="col">DATA PEDIDO</th>
-              <th scope="col">STATUS</th>
-              <th scope="col">N° Contato</th>
-              <th scope="col">PREVISÂO ENTREGA</th>
-              <th scope="col">AÇAO</th>
-            </tr>
-            {% for Os in Ordem_servicos %}
-            <tbody>
-              <tr>
-                <th hidden id="id" name="id">{{Os.id}}</th>
-                <th scope="row">{{Os.id}}</th>
-                <td >{{Os.SERVICO|slice:":10"}}</td>
-                <td>{{Os.CLIENTE|slice:":10"}}</td>
-                <td>{{Os.VENDEDOR.first_name|slice:":10"}}</td>
-                <td>{{Os.LENTES|slice:":10"}}</td>
-                <td>{{Os.DATA_SOLICITACAO|date:"D d M Y"}}</td>
-                <td>
-                  {% if Os.STATUS == "A" %}
-                  <span class="badge rounded-pill bg-secondary">SOLICITADO</span>
-                  {% endif %}
-
-                  {% if Os.STATUS == "E" %}
-                  <span class="badge rounded-pill bg-success">ENTREGUE</span>
-                   {% endif %}
-
-                   {% if Os.STATUS == "C" %}
-                   <span class="badge rounded-pill bg-danger">CANCELADO</span>
-                   {% endif %}
-                   {% if Os.STATUS == "L" %}
-                   <span class="badge rounded-pill bg-primary">LABORATÓRIO</span>
-                   {% endif %}
-                   {% if Os.STATUS == "J" %}
-                   <span class="badge rounded-pill bg-warning">LOJA</span>
-                   {% endif %}
-                   {% if Os.STATUS == "F" %}
-                   <span class="badge rounded-pill bg-dark">FINALIZADO</span>
-                   {% endif %}
-                </td>
-                <td>{{Os.CLIENTE.TELEFONE}}<a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><img width="25" height="25" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1"/></a></td>
-                <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
-                <td><a href="{% url 'Core:Visualizar_os' Os.id  %}">Visualizar</td>
-              </tr>
-            </tbody>
-            {% endfor%}
-      </table>
-      <hr>
-    </div>
-
+<h4 class="mb-3">Resultado</h4>
+<div class="table-responsive">
+  <table id="myTable" class="table table-hover align-middle bg-white shadow-sm">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">SERVIÇO</th>
+        <th scope="col">CLIENTE</th>
+        <th scope="col">VENDEDOR</th>
+        <th scope="col">LENTES</th>
+        <th scope="col">DATA PEDIDO</th>
+        <th scope="col">STATUS</th>
+        <th scope="col">N° Contato</th>
+        <th scope="col">PREVISÃO ENTREGA</th>
+        <th scope="col">AÇÃO</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for Os in Ordem_servicos %}
+      <tr data-os-id="{{Os.id}}">
+        <th scope="row">{{unidade}}{{Os.id}}</th>
+        <td>{{Os.SERVICO|slice:":10"}}</td>
+        <td>{{Os.CLIENTE|slice:":10"}}</td>
+        <td>{{Os.VENDEDOR.first_name|slice:":10"}}</td>
+        <td>{{Os.LENTES|slice:":10"}}</td>
+        <td>{{Os.DATA_SOLICITACAO|date:"D d M Y"}}</td>
+        <td>
+          {% if Os.STATUS == "A" %}<span class="badge rounded-pill bg-secondary">SOLICITADO</span>{% endif %}
+          {% if Os.STATUS == "E" %}<span class="badge rounded-pill bg-success">ENTREGUE</span>{% endif %}
+          {% if Os.STATUS == "C" %}<span class="badge rounded-pill bg-danger">CANCELADO</span>{% endif %}
+          {% if Os.STATUS == "L" %}<span class="badge rounded-pill bg-primary">LABORATÓRIO</span>{% endif %}
+          {% if Os.STATUS == "J" %}<span class="badge rounded-pill bg-warning text-dark">LOJA</span>{% endif %}
+          {% if Os.STATUS == "F" %}<span class="badge rounded-pill bg-dark">LOJA</span>{% endif %}
+        </td>
+        <td>
+          {{Os.CLIENTE.TELEFONE}}
+          <!-- <a href="https://wa.me/55{{Os.CLIENTE.TELEFONE|remove_formatacao_telefone}}?text=Olá! {{Os.CLIENTE.NOME}}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp text-success"></i></a> -->
+        </td>
+        <td>{{Os.PREVISAO_ENTREGA|date:"D d M Y"}}</td>
+        <td>
+          <a href="{% url 'Core:Visualizar_os' Os.id %}" class="btn btn-link" title="Visualizar">
+            <i class="fa-regular fa-eye"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<hr>
 {% else %}
-<span style="color: red; font-weight: bold;">Sem Resultado</span>
+<div class="alert alert-danger d-flex align-items-center gap-2 mt-3">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  Sem Resultado
+</div>
 {% endif %}

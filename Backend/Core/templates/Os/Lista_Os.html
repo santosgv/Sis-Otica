@@ -46,6 +46,15 @@
                    hx-indicator=".htmx-indicator" 
                    style="width: 120px;">
 
+            <!-- Busca por Cidade -->
+            <input class="form-control" type="search" 
+                   name="search_by_city" placeholder="Cidade" 
+                   hx-get="search_by_city/" 
+                   hx-trigger="input changed delay:500ms, search" 
+                   hx-target="#search-results" 
+                   hx-indicator=".htmx-indicator" 
+                   style="width: 150px;">
+
             <!-- Busca por Lentes -->
             <input class="form-control" type="search" 
                    name="search_by_lentes" placeholder="Lentes" 

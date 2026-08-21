@@ -1141,7 +1141,6 @@ def vendas_lentes_dados():
         vendas_lentes= list(lentes_mais_vendidas)
         return vendas_lentes
 
-
 @login_required(login_url='/auth/logar/')
 def relatorios(request):
 
