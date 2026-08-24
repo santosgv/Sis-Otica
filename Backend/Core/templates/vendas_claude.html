@@ -1,0 +1,742 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGO — Sistema de Gestão para Óticas</title>
+<meta name="description" content="O sistema completo para óticas: CRM de clientes, estoque, caixa, ordens de serviço e relatórios avançados. Multiloja. Teste grátis por 7 dias.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============ TOKENS ============ */
+  :root{
+    --ink:#14161F;
+    --surface:#1B1E2A;
+    --surface-2:#242939;
+    --line: rgba(246,243,237,0.10);
+    --magenta:#C13860;
+    --magenta-soft: rgba(193,56,96,0.16);
+    --cyan:#5FD4C6;
+    --cyan-soft: rgba(95,212,198,0.14);
+    --paper:#F6F3ED;
+    --paper-dim: #C9C6D8;
+    --graphite:#8890A6;
+    --display: 'Fraunces', serif;
+    --body: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --radius: 14px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+  section{ padding: 96px 24px; }
+  .wrap{ max-width:1180px; margin:0 auto; }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background:var(--cyan);
+  }
+  h1,h2,h3{ font-family:var(--display); font-weight:600; letter-spacing:-0.01em; }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px;
+    border-radius:999px;
+    font-family:var(--body);
+    font-weight:600;
+    font-size:0.95rem;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-primary{ background:var(--magenta); color:var(--paper); box-shadow:0 8px 24px -8px rgba(193,56,96,.6); }
+  .btn-primary:hover{ box-shadow:0 12px 28px -6px rgba(193,56,96,.75); }
+  .btn-ghost{ background:transparent; color:var(--paper); border-color:var(--line); }
+  .btn-ghost:hover{ border-color:var(--cyan); color:var(--cyan); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(20,22,31,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1180px; margin:0 auto; padding:18px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    font-family:var(--display); font-weight:700; font-size:1.35rem;
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .brand span{ color:var(--cyan); font-style:italic; font-weight:500; font-size:1rem; }
+  .nav-links{ display:flex; gap:32px; font-size:0.92rem; color:var(--paper-dim); }
+  .nav-links a:hover{ color:var(--paper); }
+  .nav-cta{ display:flex; gap:14px; align-items:center; }
+  @media (max-width:860px){ .nav-links{ display:none; } }
+
+  /* ============ HERO ============ */
+  .hero{
+    padding-top:88px;
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:56px;
+    align-items:center;
+  }
+  @media (max-width:980px){ .hero{ grid-template-columns:1fr; } }
+
+  .hero h1{
+    font-size:clamp(2.4rem, 5vw, 3.6rem);
+    line-height:1.08;
+    color:var(--paper);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--cyan);
+    display:inline-block;
+    filter: blur(9px);
+    opacity:0;
+    animation: focus-in 1.1s ease-out 0.5s forwards;
+  }
+  @keyframes focus-in{
+    to{ filter:blur(0); opacity:1; }
+  }
+  .hero p.lead{
+    margin-top:22px;
+    max-width:46ch;
+    color:var(--paper-dim);
+    font-size:1.08rem;
+  }
+  .hero-cta{ display:flex; gap:14px; margin-top:34px; flex-wrap:wrap; }
+  .hero-note{
+    margin-top:18px;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--graphite);
+    letter-spacing:.02em;
+  }
+
+  /* dashboard mockup card */
+  .mock{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+  .mock-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .mock-dots{ display:flex; gap:6px; }
+  .mock-dots span{ width:8px; height:8px; border-radius:50%; background:var(--line); }
+  .mock-label{ font-family:var(--mono); font-size:0.7rem; color:var(--graphite); letter-spacing:.08em; }
+  .mock-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .mock-card{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+  }
+  .mock-card .k{ font-family:var(--mono); font-size:0.68rem; color:var(--graphite); text-transform:uppercase; letter-spacing:.06em; }
+  .mock-card .v{ font-family:var(--mono); font-size:1.5rem; color:var(--paper); margin-top:6px; font-weight:600; }
+  .mock-card .v.up{ color:var(--cyan); }
+  .mock-bars{
+    display:flex; align-items:flex-end; gap:6px; height:70px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:12px;
+  }
+  .mock-bars i{ flex:1; background:linear-gradient(180deg, var(--cyan), var(--magenta)); border-radius:3px 3px 0 0; opacity:.85; }
+
+  /* ============ TRUST STRIP ============ */
+  .trust{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:var(--surface);
+  }
+  .trust .wrap{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:28px;
+    padding:40px 24px;
+  }
+  @media (max-width:760px){ .trust .wrap{ grid-template-columns:1fr 1fr; } }
+  .trust-item{ display:flex; gap:12px; align-items:flex-start; }
+  .trust-item svg{ flex-shrink:0; color:var(--cyan); }
+  .trust-item p{ font-size:0.86rem; color:var(--paper-dim); }
+
+  /* ============ PHOROPTER SELECTOR (signature) ============ */
+  .lab{ text-align:center; }
+  .lab h2{ font-size:clamp(1.9rem,3.4vw,2.6rem); max-width:18ch; margin:0 auto; color:var(--paper); }
+  .lab p.sub{ color:var(--paper-dim); max-width:52ch; margin:16px auto 0; }
+
+  .dial-wrap{
+    margin-top:64px;
+    display:grid;
+    grid-template-columns: 340px 1fr;
+    gap:56px;
+    align-items:center;
+    text-align:left;
+  }
+  @media (max-width:900px){ .dial-wrap{ grid-template-columns:1fr; justify-items:center; text-align:center; } }
+
+  .dial{
+    position:relative;
+    width:300px; height:300px;
+    border-radius:50%;
+    background: radial-gradient(circle at 50% 45%, var(--surface-2), var(--surface) 70%);
+    border:1px solid var(--line);
+    box-shadow: inset 0 0 40px rgba(0,0,0,.5), 0 30px 60px -25px rgba(0,0,0,.7);
+    flex-shrink:0;
+  }
+  .dial-hub{
+    position:absolute; inset:38%;
+    border-radius:50%;
+    background:var(--ink);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:0.62rem; color:var(--graphite);
+    text-align:center; padding:6px;
+    letter-spacing:.04em;
+  }
+  .needle{
+    position:absolute; left:50%; top:50%;
+    width:2px; height:118px;
+    background:linear-gradient(180deg, var(--magenta), transparent);
+    transform-origin:top center;
+    transform: translate(-50%, 0) rotate(0deg);
+    transition: transform .5s cubic-bezier(.2,.8,.2,1);
+    border-radius:2px;
+  }
+  .lens-btn{
+    position:absolute;
+    width:52px; height:52px;
+    border-radius:50%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--paper-dim);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:.2s ease;
+  }
+  .lens-btn svg{ width:20px; height:20px; }
+  .lens-btn:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .lens-btn.active{
+    background:var(--magenta-soft);
+    border-color:var(--magenta);
+    color:var(--paper);
+    box-shadow:0 0 0 4px rgba(193,56,96,.14);
+  }
+  /* positions around the circle */
+  .lens-btn:nth-child(1){ top:-4px; left:50%; transform:translate(-50%,0); }
+  .lens-btn:nth-child(2){ top:22%; right:-10px; }
+  .lens-btn:nth-child(3){ bottom:22%; right:-10px; }
+  .lens-btn:nth-child(4){ bottom:-4px; left:50%; transform:translate(-50%,0); }
+  .lens-btn:nth-child(5){ bottom:22%; left:-10px; }
+  .lens-btn:nth-child(6){ top:22%; left:-10px; }
+
+  .lens-panel{ min-height:210px; }
+  .lens-panel .tag{ font-family:var(--mono); font-size:0.72rem; color:var(--cyan); letter-spacing:.1em; text-transform:uppercase; }
+  .lens-panel h3{ font-size:1.7rem; margin-top:10px; color:var(--paper); }
+  .lens-panel p{ margin-top:14px; color:var(--paper-dim); max-width:52ch; }
+  .lens-panel ul{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+  .lens-panel li{ font-size:0.92rem; color:var(--paper-dim); display:flex; gap:10px; align-items:flex-start; }
+  .lens-panel li::before{ content:"—"; color:var(--magenta); flex-shrink:0; }
+  .lens-panel[hidden]{ display:none; }
+
+  /* ============ RECEITA / RESULTADOS ============ */
+  .receita-section{ background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .receita-grid{
+    margin-top:56px;
+    display:grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap:48px;
+    align-items:center;
+  }
+  @media (max-width:900px){ .receita-grid{ grid-template-columns:1fr; } }
+
+  .receita-card{
+    background:var(--ink);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    font-family:var(--mono);
+  }
+  .receita-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:14px; margin-bottom:14px;
+  }
+  .receita-head .title{ font-family:var(--display); font-style:italic; font-size:1.1rem; color:var(--paper); }
+  .receita-head .date{ font-size:0.7rem; color:var(--graphite); }
+  .receita-row{
+    display:grid; grid-template-columns: 90px 1fr auto; gap:12px;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .receita-row:last-child{ border-bottom:none; }
+  .receita-row .field{ font-size:0.72rem; color:var(--cyan); }
+  .receita-row .desc{ font-size:0.82rem; color:var(--paper-dim); }
+  .receita-row .val{ font-size:1rem; color:var(--paper); font-weight:600; }
+  .receita-row .val.pos{ color:var(--cyan); }
+
+  .receita-copy .eyebrow{ margin-bottom:14px; }
+  .receita-copy h2{ font-size:clamp(1.8rem,3vw,2.3rem); color:var(--paper); }
+  .receita-copy p{ margin-top:18px; color:var(--paper-dim); max-width:50ch; }
+
+  /* ============ DEMO / VIDEO ============ */
+  .demo-frame{
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:1px solid var(--line);
+    aspect-ratio:16/9;
+    background:var(--surface);
+  }
+  .demo-frame iframe{ width:100%; height:100%; border:0; }
+
+  /* ============ TESTIMONIAL ============ */
+  .testimonial{ text-align:center; }
+  .testimonial blockquote{
+    font-family:var(--display);
+    font-style:italic;
+    font-size:clamp(1.4rem,2.6vw,1.9rem);
+    max-width:34ch;
+    margin:0 auto;
+    color:var(--paper);
+    line-height:1.4;
+  }
+  .testimonial cite{
+    display:block; margin-top:24px;
+    font-family:var(--body); font-style:normal; font-size:0.88rem; color:var(--graphite);
+  }
+
+  /* ============ PRICING ============ */
+  .pricing-grid{
+    margin-top:56px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+  }
+  @media (max-width:980px){ .pricing-grid{ grid-template-columns:1fr; max-width:420px; margin-inline:auto; } }
+  .plan{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    display:flex; flex-direction:column;
+  }
+  .plan.featured{
+    border-color:var(--magenta);
+    background:linear-gradient(180deg, var(--magenta-soft), var(--surface) 45%);
+    position:relative;
+  }
+  .plan.featured::before{
+    content:"MAIS ESCOLHIDO";
+    position:absolute; top:-12px; left:28px;
+    background:var(--magenta); color:var(--paper);
+    font-family:var(--mono); font-size:0.62rem; letter-spacing:.1em;
+    padding:5px 10px; border-radius:999px;
+  }
+  .plan .name{ font-family:var(--mono); font-size:0.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--cyan); }
+  .plan .price{ font-family:var(--display); font-size:2.4rem; color:var(--paper); margin-top:12px; }
+  .plan .price small{ font-family:var(--body); font-size:0.9rem; color:var(--graphite); font-weight:400; }
+  .plan ul{ margin-top:24px; flex-grow:1; display:flex; flex-direction:column; gap:12px; }
+  .plan li{ font-size:0.9rem; color:var(--paper-dim); display:flex; gap:10px; align-items:flex-start; }
+  .plan li::before{ content:"✓"; color:var(--cyan); flex-shrink:0; font-weight:700; }
+  .plan .btn{ margin-top:28px; width:100%; justify-content:center; }
+
+  .multitenant-banner{
+    margin-top:28px;
+    border:1px dashed var(--cyan);
+    border-radius:var(--radius);
+    padding:22px 26px;
+    display:flex; justify-content:space-between; align-items:center; gap:20px;
+    flex-wrap:wrap;
+    background:var(--cyan-soft);
+  }
+  .multitenant-banner strong{ color:var(--paper); font-family:var(--display); font-weight:600; }
+  .multitenant-banner p{ color:var(--paper-dim); font-size:0.9rem; margin-top:4px; max-width:48ch; }
+
+  /* ============ FINAL CTA ============ */
+  .final-cta{ text-align:center; }
+  .final-cta h2{ font-size:clamp(2rem,4vw,3rem); max-width:20ch; margin:0 auto; }
+  .final-cta .hero-cta{ justify-content:center; margin-top:30px; }
+
+  /* ============ WHATSAPP FLOAT ============ */
+  .wa-float{
+    position:fixed; bottom:22px; right:22px; z-index:60;
+    width:56px; height:56px; border-radius:50%;
+    background:#25D366;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 24px -8px rgba(0,0,0,.6);
+    transition:transform .2s ease;
+  }
+  .wa-float:hover{ transform:scale(1.08); }
+
+  /* ============ FOOTER ============ */
+  footer{
+    border-top:1px solid var(--line);
+    padding:40px 24px;
+    text-align:center;
+  }
+  footer p{ font-size:0.82rem; color:var(--graphite); }
+  footer a{ color:var(--paper-dim); }
+  footer a:hover{ color:var(--cyan); }
+
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="nav">
+    <div class="brand">SGO<span>ótica</span></div>
+    <nav class="nav-links">
+      <a href="#laboratorio">Recursos</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#planos">Planos</a>
+      <a href="#demo">Demonstração</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://wa.me/5531993839825?text=Ol%C3%A1%2C%20quero%20testar%20o%20SGO%20por%207%20dias" target="_blank" class="btn btn-primary">Testar 7 dias grátis</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero wrap">
+  <div>
+    <p class="eyebrow">Sistema de gestão para óticas</p>
+    <h1>Da bagunça no balcão<br>a uma operação em <em>foco</em>.</h1>
+    <p class="lead">CRM de clientes, ordens de serviço, estoque, caixa e relatórios avançados — tudo no mesmo sistema, pensado para o dia a dia real de uma ótica.</p>
+    <div class="hero-cta">
+      <a href="https://wa.me/5531993839825?text=Ol%C3%A1%2C%20quero%20testar%20o%20SGO%20por%207%20dias" target="_blank" class="btn btn-primary">Começar teste grátis</a>
+      <a href="#demo" class="btn btn-ghost">Ver o sistema em uso</a>
+    </div>
+    <p class="hero-note">7 dias grátis · sem cartão · suporte via WhatsApp</p>
+  </div>
+
+  <div class="mock" aria-hidden="true">
+    <div class="mock-top">
+      <span class="mock-label">PAINEL · MÊS ATUAL</span>
+      <div class="mock-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="mock-grid">
+      <div class="mock-card">
+        <div class="k">OS em aberto</div>
+        <div class="v">184</div>
+      </div>
+      <div class="mock-card">
+        <div class="k">Ticket médio</div>
+        <div class="v up">R$ 412</div>
+      </div>
+    </div>
+    <div class="mock-bars">
+      <i style="height:40%"></i><i style="height:65%"></i><i style="height:52%"></i>
+      <i style="height:80%"></i><i style="height:70%"></i><i style="height:95%"></i>
+      <i style="height:60%"></i>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST STRIP ============ -->
+<div class="trust">
+  <div class="wrap">
+    <div class="trust-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg>
+      <p>Dados de clientes e da loja protegidos e nunca compartilhados</p>
+    </div>
+    <div class="trust-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg>
+      <p>Financeiro e caixa com controle de acesso por função</p>
+    </div>
+    <div class="trust-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg>
+      <p>Implantação acompanhada, sem deixar sua rotina parar</p>
+    </div>
+    <div class="trust-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <p>Suporte humano, sem robô e sem fila de ticket</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LABORATÓRIO (seletor tipo forópter) ============ -->
+<section id="laboratorio" class="lab wrap">
+  <p class="eyebrow" style="justify-content:center;">Um sistema, seis módulos</p>
+  <h2>Escolha uma lente e veja o que o SGO enxerga pela sua ótica</h2>
+  <p class="sub">Cada módulo do SGO resolve uma dor específica do dia a dia. Clique para testar cada um.</p>
+
+  <div class="dial-wrap">
+    <div class="dial" role="group" aria-label="Seletor de módulos do sistema">
+      <!-- 
+      <div class="needle" id="needle"></div>
+      <div class="dial-hub">GIRE<br>PARA<br>FOCAR</div>
+      -->
+      <button class="lens-btn active" data-panel="crm" aria-label="CRM de clientes" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      </button>
+      <button class="lens-btn" data-panel="estoque" aria-label="Controle de estoque" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
+      </button>
+      <button class="lens-btn" data-panel="caixa" aria-label="Controle de caixa" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="14.5" r="1.3"/></svg>
+      </button>
+      <button class="lens-btn" data-panel="os" aria-label="Ordens de serviço e kanban" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="6" height="16" rx="1"/><rect x="10.5" y="4" width="6" height="10" rx="1"/><rect x="18" y="4" width="3" height="7" rx="1"/></svg>
+      </button>
+      <button class="lens-btn" data-panel="relatorios" aria-label="Relatórios avançados" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>
+      </button>
+      <button class="lens-btn" data-panel="multiloja" aria-label="Gestão multiloja" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="10" width="6" height="10"/><rect x="15" y="10" width="6" height="10"/><rect x="9" y="4" width="6" height="16"/></svg>
+      </button>
+    </div>
+
+    <div>
+      <div class="lens-panel" data-panel="crm">
+        <p class="tag">Módulo 01 · CRM</p>
+        <h3>Todo cliente, com histórico completo</h3>
+        <p>Cadastro, contato e aniversário em um só lugar — com lembrete automático pra você não perder a data de parabenizar (e vender).</p>
+        <ul>
+          <li>Busca de clientes por nome, cidade ou telefone</li>
+          <li>Aniversariantes do mês com envio direto pelo WhatsApp</li>
+          <li>Histórico de receitas e ordens de serviço por cliente</li>
+        </ul>
+      </div>
+      <div class="lens-panel" data-panel="estoque" hidden>
+        <p class="tag">Módulo 02 · Estoque</p>
+        <h3>Armações e lentes sob controle</h3>
+        <p>Cadastro por fornecedor, tipo e estilo, com conferência de entrada de nota fiscal e alerta de quantidade mínima.</p>
+        <ul>
+          <li>Entrada de produtos com leitura de código e etiqueta</li>
+          <li>Filtro por fornecedor, tipo, estilo e conferência</li>
+          <li>Relatório de estoque conferido, exportável</li>
+        </ul>
+      </div>
+      <div class="lens-panel" data-panel="caixa" hidden>
+        <p class="tag">Módulo 03 · Caixa</p>
+        <h3>Abertura, fechamento e conferência sem planilha</h3>
+        <p>Cada forma de pagamento registrada por venda, com saldo em tempo real e histórico de meses anteriores.</p>
+        <ul>
+          <li>Abertura e fechamento de caixa diário</li>
+          <li>Entradas e saídas vinculadas à ordem de serviço</li>
+          <li>Fluxo de caixa mensal comparando entradas e saídas</li>
+        </ul>
+      </div>
+      <div class="lens-panel" data-panel="os" hidden>
+        <p class="tag">Módulo 04 · Ordens de serviço</p>
+        <h3>Da receita à entrega, sem perder o fio</h3>
+        <p>Cada armação, lente e receita organizada por pedido — com status visual da loja até o laboratório.</p>
+        <ul>
+          <li>Cadastro completo de receita (OD/OE) e medidas de laboratório</li>
+          <li>Acompanhamento por status: solicitado, laboratório, loja, entregue</li>
+          <li>Emissão de XML, carnê e impressão da O.S.</li>
+        </ul>
+      </div>
+      <div class="lens-panel" data-panel="relatorios" hidden>
+        <p class="tag">Módulo 05 · Relatórios</p>
+        <h3>Números que respondem antes de você perguntar</h3>
+        <p>Vendas dos últimos 12 meses, maiores vendedores, ticket médio e o que está pendente de pagamento — sempre atualizado.</p>
+        <ul>
+          <li>Ranking de vendedores com ticket médio individual</li>
+          <li>Vendas e fluxo de caixa dos últimos 12 meses</li>
+          <li>Exportação de clientes e ordens de serviço</li>
+        </ul>
+      </div>
+      <div class="lens-panel" data-panel="multiloja" hidden>
+        <p class="tag">Módulo 06 · Multiloja</p>
+        <h3>Uma rede, um painel</h3>
+        <p>Se você tem mais de uma unidade, acompanha o desempenho de cada loja separadamente — sem precisar logar em contas diferentes.</p>
+        <ul>
+          <li>Estoque, caixa e vendas isolados por unidade</li>
+          <li>Comparativo de desempenho entre lojas</li>
+          <li>Um único acesso de gerência para toda a rede</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RECEITA DE RESULTADOS ============ -->
+<section id="resultados" class="receita-section">
+  <div class="wrap receita-grid">
+    <div class="receita-copy">
+      <p class="eyebrow">O que muda na prática</p>
+      <h2>A receita que a maioria das óticas sai com depois de 90 dias</h2>
+      <p>Números de referência de óticas que centralizaram a operação no SGO — do balcão ao financeiro.</p>
+    </div>
+    <div class="receita-card">
+      <div class="receita-head">
+        <span class="title">Boletim SGO</span>
+        <span class="date">90 dias de uso</span>
+      </div>
+      <div class="receita-row">
+        <span class="field">TA</span>
+        <span class="desc">Tempo administrativo por O.S.</span>
+        <span class="val pos">−58%</span>
+      </div>
+      <div class="receita-row">
+        <span class="field">TM</span>
+        <span class="desc">Ticket médio por venda</span>
+        <span class="val pos">+31%</span>
+      </div>
+      <div class="receita-row">
+        <span class="field">IN</span>
+        <span class="desc">Inadimplência em carnês</span>
+        <span class="val pos">−44%</span>
+      </div>
+      <div class="receita-row">
+        <span class="field">RE</span>
+        <span class="desc">Retorno de aniversariantes contatados</span>
+        <span class="val pos">+22%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section id="demo" class="wrap">
+  <div class="lab" style="margin-bottom:48px;">
+    <p class="eyebrow" style="justify-content:center;">Veja funcionando</p>
+    <h2>3 minutos pra entender o sistema inteiro</h2>
+  </div>
+  <div class="demo-frame">
+    <iframe src="https://www.youtube.com/embed/irBvkKv_Aww?si=sOFsKZ0CLd90LDJ9" title="Demonstração do SGO" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="testimonial wrap">
+  <blockquote>"Parei de descobrir no fim do mês que tinha carnê atrasado. Hoje eu vejo isso na tela antes mesmo de o cliente ligar."</blockquote>
+  <cite>— Proprietária de ótica, cliente SGO há 8 meses</cite>
+</section>
+
+<!-- ============ PLANOS ============ -->
+<section id="planos" class="wrap">
+  <div class="lab" style="margin-bottom:0;">
+    <p class="eyebrow" style="justify-content:center;">Planos</p>
+    <h2>Comece grátis. Cresça sem trocar de sistema.</h2>
+    <p class="sub">Sem contrato de fidelidade. Cancele quando quiser.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="plan">
+      <span class="name">7 dias grátis</span>
+      <div class="price">R$0 <small>/ período de teste</small></div>
+      <ul>
+        <li>CRM de clientes completo</li>
+        <li>Controle de estoque</li>
+        <li>Controle de caixa</li>
+        <li>Ordens de serviço e kanban</li>
+        <li>Suporte via WhatsApp</li>
+      </ul>
+      <a href="https://wa.me/5531993839825?text=Ol%C3%A1%20gostaria%20de%20testar%20o%20SGO%20gratuitamente" target="_blank" class="btn btn-ghost">Testar agora</a>
+    </div>
+
+    <div class="plan featured">
+      <span class="name">Profissional</span>
+      <div class="price">R$100 <small>/ mês</small></div>
+      <ul>
+        <li>Tudo do plano gratuito</li>
+        <li>Relatórios avançados</li>
+        <li>Gerenciamento de comissões</li>
+        <li>Acesso mobile</li>
+        <li>Atualizações automáticas</li>
+        <li>Hospedagem em servidor dedicado</li>
+      </ul>
+      <a href="https://wa.me/5531993839825?text=Ol%C3%A1%20gostaria%20de%20assinar%20o%20Plano%20Profissional" target="_blank" class="btn btn-primary">Assinar agora</a>
+    </div>
+
+    <div class="plan">
+      <span class="name">Empresarial</span>
+      <div class="price">R$989 <small>/ ano</small></div>
+      <ul>
+        <li>Tudo do plano Profissional</li>
+        <li>Treinamento inicial personalizado</li>
+        <li>Suporte prioritário</li>
+        <li>Economia frente ao plano mensal</li>
+      </ul>
+      <a href="https://wa.me/5531993839825?text=Ol%C3%A1%20gostaria%20de%20assinar%20o%20Plano%20Empresarial" target="_blank" class="btn btn-ghost">Assinar agora</a>
+    </div>
+  </div>
+
+  <div class="multitenant-banner">
+    <div>
+      <strong>Rede de óticas?</strong>
+      <p>Estamos lançando o SGO Multiloja: gerencie todas as suas unidades a partir de um único acesso. Fale com a gente pra entrar na lista de prioridade.</p>
+    </div>
+    <a href="https://wa.me/5531993839825?text=Ol%C3%A1%2C%20tenho%20mais%20de%20uma%20unidade%20e%20quero%20saber%20sobre%20o%20SGO%20Multiloja" target="_blank" class="btn btn-ghost">Quero saber mais</a>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section class="final-cta wrap">
+  <h2>Sua ótica já tem todos os dados. Só falta um lugar pra ver com clareza.</h2>
+  <div class="hero-cta">
+    <a href="https://wa.me/5531993839825?text=Ol%C3%A1%2C%20quero%20testar%20o%20SGO%20por%207%20dias" target="_blank" class="btn btn-primary">Começar teste grátis de 7 dias</a>
+  </div>
+</section>
+
+<!-- ============ WHATSAPP FLOAT ============ -->
+<a href="https://wa.me/5531993839825?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20SGO" target="_blank" class="wa-float" aria-label="Falar no WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.3A8.9 8.9 0 0 0 12.02 3.5 8.9 8.9 0 0 0 4.6 17.4L3.5 21l3.7-1.1a8.9 8.9 0 0 0 4.8 1.4h.02a8.9 8.9 0 0 0 6.3-15.1zM12 19.9a7.4 7.4 0 0 1-3.8-1l-.27-.16-2.4.7.7-2.3-.18-.28a7.4 7.4 0 1 1 13.8-3.8A7.4 7.4 0 0 1 12 19.9zm4.06-5.5c-.22-.11-1.31-.65-1.51-.72-.2-.08-.35-.11-.5.11-.14.22-.57.72-.7.87-.13.14-.26.16-.48.05-.22-.11-.94-.35-1.79-1.11-.66-.6-1.1-1.33-1.24-1.55-.13-.22-.01-.34.1-.45.1-.1.22-.26.33-.4.11-.13.14-.22.22-.37.07-.14.04-.27-.02-.38-.07-.11-.5-1.2-.68-1.65-.18-.43-.36-.37-.5-.38h-.43c-.14 0-.38.05-.58.27-.2.22-.76.74-.76 1.8s.78 2.09.89 2.24c.11.14 1.53 2.34 3.71 3.28.52.22.92.36 1.24.46.52.16.99.14 1.36.09.42-.06 1.31-.53 1.49-1.05.18-.51.18-.95.13-1.05-.05-.1-.2-.16-.42-.27z"/></svg>
+</a>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <p>© 2024–2026 SGO — Sistema Gerencial de Óticas. <a href="https://sgosistemas.com.br/">sgosistemas.com.br</a></p>
+</footer>
+
+<script>
+  (function(){
+    var buttons = document.querySelectorAll('.lens-btn');
+    var panels = document.querySelectorAll('.lens-panel');
+    var needle = document.getElementById('needle');
+    var angles = { crm:0, estoque:60, caixa:120, os:180, relatorios:240, multiloja:300 };
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var target = btn.getAttribute('data-panel');
+
+        buttons.forEach(function(b){
+          var isActive = b === btn;
+          b.classList.toggle('active', isActive);
+          b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        panels.forEach(function(p){
+          p.hidden = p.getAttribute('data-panel') !== target;
+        });
+
+        needle.style.transform = 'translate(-50%,0) rotate(' + angles[target] + 'deg)';
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

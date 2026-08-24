@@ -1366,7 +1366,7 @@ def saidas_estoque(request):
     return render(request,'Estoque/saidas_estoque.html',{'movimentacoes':movimentacoes})
 
 def vendas(request):
-    return render(request,'vendas.html')
+    return render(request,'vendas_claude.html')
 
 class FornecedorListView(ListView):
     model = Fornecedor
