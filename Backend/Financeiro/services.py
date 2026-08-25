@@ -14,8 +14,8 @@ from simple_history.utils import bulk_create_with_history
 from Core.models import ParcelaOrdem
 
 from .models import (
-    ContaFinanceira, ContaPagar, MovimentoFinanceiro, PagamentoParcelaContaPagar,
-    ParcelaContaPagar, RecebimentoParcela,
+    CategoriaFinanceira, ContaFinanceira, ContaPagar, MovimentoFinanceiro,
+    PagamentoParcelaContaPagar, ParcelaContaPagar, RecebimentoParcela,
 )
 
 
@@ -38,6 +38,52 @@ def conta_padrao_caixa() -> ContaFinanceira:
         defaults={'tipo': 'caixa'},
     )
     return conta
+
+
+def categoria_vendas_os() -> CategoriaFinanceira:
+    """Retorna (criando se necessário) a categoria de receita padrão usada
+    para todo dinheiro que entra a partir de uma OS — tanto a entrada
+    quanto as parcelas pagas. Um único padrão para os dois pontos de
+    integração com o Core, para que os relatórios por categoria não
+    fragmentem a mesma origem de receita em rótulos diferentes.
+    """
+    categoria, _ = CategoriaFinanceira.objects.get_or_create(
+        nome='Vendas de OS',
+        tipo='receita',
+    )
+    return categoria
+
+
+def registrar_entrada(ordem, conta, usuario, valor=None):
+    """Registra a entrada (sinal) de uma OS como um MovimentoFinanceiro real,
+    vinculado à OS via `ordem` — diferente de `_registrar_movimento_caixa`,
+    que não aceita esse vínculo. Sem o `ordem` preenchido, o estorno
+    automático no cancelamento da OS (`Financeiro.signals`) não teria como
+    encontrar esse movimento para reverter.
+
+    `valor` pode ser passado explicitamente (ex: já parseado pelo chamador)
+    ou, se omitido, é lido de `ordem.ENTRADA` (CharField no Core, parseado
+    aqui). Retorna `None` sem criar nada se o valor for zero ou vazio —
+    mesma regra que `Core.utils.registrar_entrada_caixa` já aplica.
+    """
+    if valor is None:
+        valor = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
+    else:
+        valor = Decimal(str(valor))
+
+    if valor <= 0:
+        return None
+
+    return MovimentoFinanceiro.objects.create(
+        conta=conta,
+        tipo='entrada',
+        valor=valor,
+        data=now().date(),
+        categoria=categoria_vendas_os(),
+        descricao=f'Entrada OS #{ordem.id} - {ordem.CLIENTE}',
+        ordem=ordem,
+        criado_por=usuario,
+    )
 
 
 def saldo_aberto_parcela(parcela: ParcelaOrdem) -> Decimal:

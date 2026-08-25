@@ -637,7 +637,7 @@ def criar_parcelas(os):
 
     ParcelaOrdem.objects.bulk_create(parcelas)
 
-def registrar_entrada_caixa(ordem):
+def registrar_entrada_caixa(ordem, usuario=None):
     entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
     if entrada <= 0:
         return
@@ -650,6 +650,13 @@ def registrar_entrada_caixa(ordem):
         FORMA=ordem.FORMA_PAG or 'B',
         ABERTO=True,
     )
+
+    # Fonte da verdade no Financeiro (categoria 'Vendas de OS', vinculado à
+    # OS via `ordem` — necessário para o estorno automático no cancelamento
+    # conseguir localizar esse movimento).
+    if usuario is not None:
+        from Financeiro.services import conta_padrao_caixa, registrar_entrada
+        registrar_entrada(ordem, conta_padrao_caixa(), usuario, valor=entrada)
 
     # Inicializa VALOR_PAGO com a entrada
     ordem.VALOR_PAGO = entrada
@@ -666,7 +673,7 @@ def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
     ainda lê de `Core.CAIXA` — isso será eliminado na Fase 8, quando a tela de
     Caixa passar a ler de `Financeiro.MovimentoFinanceiro`.
     """
-    from Financeiro.services import conta_padrao_caixa, receber_parcela
+    from Financeiro.services import categoria_vendas_os, conta_padrao_caixa, receber_parcela
 
     if parcela.pago:
         raise ValueError('Esta parcela já foi paga.')
@@ -682,6 +689,7 @@ def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
         conta_padrao_caixa(),
         usuario,
         forma_pagamento=forma_pagamento,
+        categoria=categoria_vendas_os(),
     )
 
     # Bridge legado: mantém Core.CAIXA populado para a tela de Caixa atual

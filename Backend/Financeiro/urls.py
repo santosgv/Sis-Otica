@@ -1,10 +1,18 @@
 from django.urls import path
 from . import views
+from .views import (
+    ContaListView, ContaCreateView, ContaUpdateView, ContaDeleteView
+)
 
 app_name = 'Financeiro'
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
+
+    path('contas/', ContaListView.as_view(), name='conta_list'),
+    path('contas/nova/', ContaCreateView.as_view(), name='conta_create'),
+    path('contas/<int:pk>/editar/', ContaUpdateView.as_view(), name='conta_update'),
+    path('contas/<int:pk>/excluir/', ContaDeleteView.as_view(), name='conta_delete'),
 
     path('contas-a-receber/', views.contas_a_receber, name='contas_a_receber'),
     path('contas-a-receber/<int:parcela_id>/receber/', views.receber_parcela_view,

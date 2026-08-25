@@ -64,10 +64,10 @@
                         <i class="fa-solid fa-cash-register fa-fw"></i> Caixa
                     </a>
                     <!-- 
+                        -->
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'Financeiro:dashboard' %}active{% endif %}" href="{% url 'Financeiro:dashboard' %}">
                         <i class="fa-solid fa-cash-register fa-fw"></i>Caixa <span class="badge text-bg-warning">TESTE</span>
                     </a>
-                    -->
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'minhas_vendas' %}active{% endif %}" href="{% url 'Core:minhas_vendas' %}">
                         <i class="fa-solid fa-bag-shopping"></i> Minhas Vendas
                     </a>

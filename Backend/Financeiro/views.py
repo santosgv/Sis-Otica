@@ -5,9 +5,10 @@ from django.contrib import messages as django_messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
-
+from .forms import ContaFinanceiraForm
 from Core.models import ParcelaOrdem
-
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView
 from .models import ContaFinanceira, ContaPagar, FechamentoCaixa, ParcelaContaPagar
 from .services import (
     CaixaJaAbertoError,
@@ -42,6 +43,28 @@ def _parse_valor(valor_str):
         return Decimal(limpo)
     except InvalidOperation:
         raise ValueError(f'Valor inválido: {valor_str}')
+
+class ContaListView(ListView):
+    model = ContaFinanceira
+    template_name = 'Financeiro/conta_list.html'
+    context_object_name = 'contas'
+
+class ContaCreateView(CreateView):
+    model = ContaFinanceira
+    form_class = ContaFinanceiraForm
+    template_name = 'Financeiro/cria_conta_financeira.html'
+    success_url = reverse_lazy('Financeiro:conta_list')
+
+class ContaUpdateView(UpdateView):
+    model = ContaFinanceira
+    form_class = ContaFinanceiraForm
+    template_name = 'Financeiro/cria_conta_financeira.html'
+    success_url = reverse_lazy('Financeiro:conta_list')
+
+class ContaDeleteView(DeleteView):
+    model = ContaFinanceira
+    success_url = reverse_lazy('Financeiro:conta_list')
+    template_name = 'Financeiro/conta_confirm_delete.html'
 
 
 @login_required(login_url='/auth/logar/')
