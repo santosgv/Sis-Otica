@@ -145,14 +145,19 @@
   <div class="card-body p-0">
     <table class="table table-sm mb-0">
       <thead class="thead-light">
-        <tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="text-end">Valor</th><th>Status</th></tr>
+        <tr><th>Data</th><th>Conta</th><th>Tipo</th><th>Descrição</th><th class="text-end">Valor</th><th>Status</th></tr>
       </thead>
       <tbody>
         {% for m in movimentos_recentes %}
         <tr>
           <td>{{ m.data|date:"d/m/Y" }}</td>
+          <td>{{ m.conta.nome }}</td>
           <td>{{ m.get_tipo_display }}</td>
-          <td>{{ m.descricao }}</td>
+          {% if m.ordem %}
+            <td>Ordem de Serviço #<a href="{% url 'Core:Visualizar_os' m.ordem.id %}">{{ m.ordem.id }}</a></td>
+          {% else %}
+            <td>{{ m.descricao }}</td>
+          {% endif %}
           <td class="text-end">R$ {{ m.valor|floatformat:2 }}</td>
           <td>
             {% if m.status == 'estornado' %}<span class="badge bg-secondary">Estornado</span>

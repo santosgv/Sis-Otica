@@ -9,7 +9,7 @@ from .forms import ContaFinanceiraForm
 from Core.models import ParcelaOrdem
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView
-from .models import ContaFinanceira, ContaPagar, FechamentoCaixa, ParcelaContaPagar
+from .models import ContaFinanceira, ContaPagar, FechamentoCaixa, MovimentoFinanceiro, ParcelaContaPagar
 from .services import (
     CaixaJaAbertoError,
     CaixaJaFechadoError,
@@ -182,17 +182,18 @@ def caixa(request):
             'saldo_atual': saldo_atual_conta(c),
             'fechamento_aberto': fechamento_aberto,
         })
-
+ 
     movimentos_recentes = (
-        contas.first().movimentos.select_related('categoria', 'ordem').order_by(
-            '-data', '-id'
-        )[:20] if contas.exists() else []
+        MovimentoFinanceiro.objects
+        .filter(conta__in=contas)
+        .select_related('conta', 'categoria', 'ordem')
+        .order_by('-data', '-id')[:30]
     )
 
+ 
     return render(request, 'Financeiro/caixa.html', {
         'linhas': linhas, 'movimentos_recentes': movimentos_recentes,
     })
-
 
 @login_required(login_url='/auth/logar/')
 def abrir_caixa_view(request):

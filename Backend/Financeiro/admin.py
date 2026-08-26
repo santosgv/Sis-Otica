@@ -1,9 +1,14 @@
 from django.contrib import admin
 from .models import (
     ContaFinanceira, CategoriaFinanceira, CentroCusto,
-    ContaPagar, ParcelaContaPagar, FechamentoCaixa,
+    ContaPagar, ParcelaContaPagar, FechamentoCaixa,MovimentoFinanceiro
 )
 
+@admin.register(MovimentoFinanceiro)
+class MovimentoFinanceiroAdmin(admin.ModelAdmin):
+    list_display = ('descricao', 'conta', 'categoria', 'valor', 'data')
+    list_filter = ('conta', 'categoria', 'data')
+    search_fields = ('descricao',)
 
 @admin.register(ContaFinanceira)
 class ContaFinanceiraAdmin(admin.ModelAdmin):

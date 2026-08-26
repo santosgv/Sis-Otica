@@ -657,6 +657,7 @@ def registrar_entrada_caixa(ordem, usuario=None):
     if usuario is not None:
         from Financeiro.services import conta_padrao_caixa, registrar_entrada
         registrar_entrada(ordem, conta_padrao_caixa(), usuario, valor=entrada)
+        print(f"Entrada registrada no Financeiro para OS #{ordem.id} pelo usuário {usuario.username}.")
 
     # Inicializa VALOR_PAGO com a entrada
     ordem.VALOR_PAGO = entrada
