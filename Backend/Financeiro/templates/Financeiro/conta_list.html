@@ -47,7 +47,6 @@
                             <td>{% if conta.ativa %}<span class="badge bg-success">Ativa</span>{% else %}<span class="badge bg-secondary">Inativa</span>{% endif %}</td>
                             <td>
                                 <a href="{% url 'Financeiro:conta_update' conta.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
-                                <a href="{% url 'Financeiro:conta_delete' conta.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i></a>
                             </td>
                         </tr>
                         {% empty %}

@@ -61,10 +61,6 @@ class ContaUpdateView(UpdateView):
     template_name = 'Financeiro/cria_conta_financeira.html'
     success_url = reverse_lazy('Financeiro:conta_list')
 
-class ContaDeleteView(DeleteView):
-    model = ContaFinanceira
-    success_url = reverse_lazy('Financeiro:conta_list')
-    template_name = 'Financeiro/conta_confirm_delete.html'
 
 
 @login_required(login_url='/auth/logar/')
