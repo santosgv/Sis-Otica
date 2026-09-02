@@ -9,8 +9,7 @@ from datetime import datetime, date
 from calendar import monthrange
 import datetime
 from django.http import FileResponse,HttpResponse,JsonResponse
-import io
-import os
+import io, os, tempfile
 from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
 from django.shortcuts import get_object_or_404, redirect
@@ -204,6 +203,67 @@ def create_pdf(request, codigo, quantidade):
 
     # Retorna o PDF gerado
     return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
+
+
+
+def generate_batch_labels(request):
+    """
+    Recebe uma lista de IDs de produtos via POST e gera um único PDF
+    com uma etiqueta para cada produto (ou mais, se definir quantidade).
+    """
+    if request.method == 'POST':
+        produto_ids = request.POST.getlist('produto_ids')  # lista de IDs
+        if not produto_ids:
+            print("Nenhum produto selecionado.")
+            return redirect('Core:estoque')  # ajuste a URL
+
+        # Busca os produtos
+        produtos = Produto.objects.filter(id__in=produto_ids)
+
+        # Configurações do PDF
+        etiqueta_width = 90 * mm
+        etiqueta_height = 12 * mm
+        buffer = io.BytesIO()
+        c = canvas.Canvas(buffer, pagesize=(etiqueta_width, etiqueta_height))
+
+        # Para cada produto, gera suas etiquetas (aqui, 1 por produto)
+        for produto in produtos:
+            codigo = produto.codigo
+            # Gera imagem do código de barras (salva temporariamente)
+            barcode_image = generate_barcode_image(codigo)
+            # Usa tempfile para evitar conflitos
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                barcode_image.save(tmp.name, "PNG")
+                tmp_path = tmp.name
+
+            # Desenha a etiqueta
+            # Branco no início
+            c.setFillColor("white")
+            c.rect(0, 0, 30 * mm, etiqueta_height, stroke=0, fill=1)
+            # Código de barras no centro
+            c.drawImage(tmp_path, 35 * mm, -1 * mm, width=30 * mm, height=11 * mm)
+            # Informações de preço e nome
+            c.setFillColor("black")
+            c.setFont("Helvetica", 7)
+            c.drawString(2 * mm, 8 * mm, f"{produto.nome[:15]}")
+            c.drawString(2 * mm, 4 * mm, f"R$ {produto.preco_venda:.2f}")
+            # Código de barras à direita (opcional)
+            c.drawImage(tmp_path, 60 * mm, -1 * mm, width=30 * mm, height=11 * mm)
+
+            # Nova página para a próxima etiqueta
+            c.showPage()
+
+            # Remove o arquivo temporário
+            os.unlink(tmp_path)
+
+        c.save()
+        buffer.seek(0)
+
+        # Retorna o PDF
+        return FileResponse(buffer, as_attachment=True, filename='etiquetas_lote.pdf')
+
+    # Se não for POST, redireciona para a lista
+    return redirect('Core:estoque')
 
 def criar_mensagem_parabens(cliente):
     nome_cliente = cliente

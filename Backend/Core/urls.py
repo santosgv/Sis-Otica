@@ -1,7 +1,8 @@
 
 from django.urls import path
 from . import htmx_views
-from .utils import Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido,gerar_carner_pdf,entradas_meses_passados
+from .utils import (Imprimir_os,export_clientes,export_os,create_pdf,gerar_relatorio_estoque_conferido,gerar_carner_pdf,
+                    entradas_meses_passados,generate_batch_labels)
 from Core import views
 from django.contrib.auth import views as auth_views
 from django_ratelimit.decorators import ratelimit
@@ -86,6 +87,7 @@ urlpatterns = [
     path('realizar_saida_view/<int:id>',views.realizar_saida_view , name='realizar_saida'),
     path('editar_produto/<int:id>',views.editar_produto,name='editar_produto'),
     path('create_pdf/<str:codigo>/<int:quantidade>/', create_pdf, name='create_pdf'),
+    path('gerar-etiquetas-lote/', generate_batch_labels, name='gerar_etiquetas_lote'),
     path('entradas_estoque/', views.entradas_estoque,name='entradas_estoque'),
     path('saidas_estoque/', views.saidas_estoque,name='saidas_estoque'),
     path('movimentacao/',views.movimentacao,name='movimentacao'),

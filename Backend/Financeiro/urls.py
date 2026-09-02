@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import (
-    ContaListView, ContaCreateView, ContaUpdateView, ContaDeleteView
+    ContaListView, ContaCreateView, ContaUpdateView
 )
 
 app_name = 'Financeiro'

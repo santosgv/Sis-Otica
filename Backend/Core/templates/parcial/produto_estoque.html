@@ -63,9 +63,12 @@
 
 {% if Produtos %}
 <div class="table-responsive">
+  <form method="post" action="{% url 'Core:gerar_etiquetas_lote' %}" id="form-etiquetas">
+    {% csrf_token %}
   <table id="myTable" class="table table-hover align-middle bg-white shadow-sm">
     <thead class="table-light">
       <tr>
+        <th><input type="checkbox" id="selecionar-todos"></th>
         <th scope="col" class="text-center">Conferido</th>
         <th scope="col">Código</th>
         <th scope="col">Nome</th>
@@ -84,6 +87,7 @@
     <tbody>
       {% for produto in Produtos %}
       <tr data-produto-id="{{produto.id}}">
+        <td><input type="checkbox" name="produto_ids" value="{{ produto.id }}" class="selecionar-produto"></td>
         <td class="text-center">
           {% if produto.conferido == False %}
           <i class="fa-solid fa-circle-xmark text-danger fs-5" title="Não conferido"></i>
@@ -120,10 +124,33 @@
       {% endfor %}
     </tbody>
   </table>
+      <button type="submit" class="btn btn-primary" id="gerar-etiquetas">
+        <i class="fas fa-tags"></i> Gerar etiquetas em lote
+    </button>
+  </form>
 </div>
+
+
+
 {% else %}
 <div class="alert alert-danger d-flex align-items-center gap-2 mt-3">
   <i class="fa-solid fa-triangle-exclamation"></i>
   Sem Produtos Cadastrados
 </div>
 {% endif %}
+
+<script>
+    document.getElementById('selecionar-todos').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.selecionar-produto');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // Validação: obrigar a selecionar pelo menos um
+    document.getElementById('form-etiquetas').addEventListener('submit', function(e) {
+        const selecionados = document.querySelectorAll('.selecionar-produto:checked');
+        if (selecionados.length === 0) {
+            e.preventDefault();
+            alert('Selecione pelo menos um produto.');
+        }
+    });
+</script>
