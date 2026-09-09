@@ -346,6 +346,11 @@ def Imprimir_os(request, id_os):
         # CABEÇALHO (topo da via do cliente)
         # Bloco à direita é estreito — usa fonte menor pra não estourar a margem
         # ---------------------------------------------------------------
+        PDF.setFont('Courier', 6)
+        PDF.drawString(157,755.5, str(config('ENDERECO')))
+        PDF.drawString(150,740.5, str(config('TELEFONE')))
+        PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
+        PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
         PDF.setFont('Courier', 9)
         PDF.drawString(515.9, 771.4, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
         PDF.drawString(535.9, 751.8, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
@@ -403,7 +408,7 @@ def Imprimir_os(request, id_os):
         PDF.drawString(285.6, 380.5, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
         PDF.drawString(410.4, 380.5, str(PRINT_OS.VENDEDOR.first_name)[:12])
         PDF.drawString(530.8, 380.5, str(PRINT_OS.LABORATORIO)[:12])
-        PDF.setFont('Courier-Bold', 11)
+        PDF.setFont('Courier-Bold', 9)
 
         PDF.drawString(65.7, 353.9, str(PRINT_OS.CLIENTE.NOME[:23]))
         PDF.drawString(275.9, 353.9, str(PRINT_OS.SERVICO))
