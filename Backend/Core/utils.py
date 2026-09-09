@@ -326,71 +326,123 @@ def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False,ABERTO=True).order_by('-id')
     return dado
 
-def Imprimir_os(request,id_os):
+def Imprimir_os(request, id_os):
     try:
-        PRINT_OS =ORDEN.objects.get(id=id_os)
-        
+        PRINT_OS = ORDEN.objects.get(id=id_os)
+
         buffer = io.BytesIO()
-        PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Courier', 12)
-        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
+        PDF = canvas.Canvas(buffer, pagesize=letter)
+        PDF.setFont('Courier', 11)
+        PDF.drawImage(
+            os.path.join(settings.BASE_DIR, 'templates', 'IMPRESAO_OS_vermelho.png'),
+            0, 0, width=letter[0], height=letter[1]
+        )
+        logo_path = os.path.join(settings.BASE_DIR,  'templates','static', 'home', 'img', 'LOGO-NOVA-PRETA .png')
+        if os.path.exists(logo_path):
+            PDF.drawImage(logo_path, 10, 700, width=80, height=80, mask='auto')
 
-        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
-        PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(325,778,str(settings.UNIDADE)+str(PRINT_OS.id))
-        PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
-        PDF.drawString(88,665,str(PRINT_OS.SERVICO))
-        PDF.drawString(385,665,str(PRINT_OS.LABORATORIO))
-        PDF.drawString(88,637,str(PRINT_OS.LENTES))
-        PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
-        if PRINT_OS.FORMA_PAG == 'A':
-            PDF.drawString(109,539,'PIX')
-        elif PRINT_OS.FORMA_PAG == 'B':
-            PDF.drawString(109,539,'DINHEIRO')
-        elif PRINT_OS.FORMA_PAG == 'C':
-            PDF.drawString(109,539,'DEBITO')
-        elif PRINT_OS.FORMA_PAG == 'D':
-            PDF.drawString(109,539,'CREDITO')
-        elif PRINT_OS.FORMA_PAG == 'E':
-            PDF.drawString(109,539,'CARNER')
-        elif PRINT_OS.FORMA_PAG == 'F':
-            PDF.drawString(109,539,'PERMUTA')
-        
-        PDF.drawString(240,539,str(PRINT_OS.VALOR))
-        PDF.drawString(385,539,str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(520,539,str(PRINT_OS.VALOR_PAGO))
-        # parte laboratorio
-        PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
-        PDF.drawString(395,454,str(settings.NOME))
-        PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
-        PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,385,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
-        PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str(PRINT_OS.LABORATORIO))
-        PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
-        PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
-        PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
-        PDF.drawString(301,282,str(PRINT_OS.OE_CIL))
-        PDF.drawString(472,312,str(PRINT_OS.OD_EIXO))
-        PDF.drawString(472,282,str(PRINT_OS.OE_EIXO))
-        PDF.drawString(64,248,str(PRINT_OS.AD))
-        PDF.drawString(78,215,str(PRINT_OS.LENTES))
-        PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO[:69]))
 
-        PDF.drawString(60,116,str(PRINT_OS.DNP))
-        PDF.drawString(270,116,str(PRINT_OS.P))
-        PDF.drawString(430,116,str(PRINT_OS.DPA))
-        PDF.drawString(66,96,str(PRINT_OS.DIAG))
-        PDF.drawString(270,96,str(PRINT_OS.V))
-        PDF.drawString(415,96,str(PRINT_OS.H))
-        PDF.drawString(60,80,str(PRINT_OS.ALT))
-        PDF.drawString(432,78,str(PRINT_OS.ARM))
-        PDF.drawString(94,60,str(PRINT_OS.MONTAGEM))
+        # ---------------------------------------------------------------
+        # CABEÇALHO (topo da via do cliente)
+        # Bloco à direita é estreito — usa fonte menor pra não estourar a margem
+        # ---------------------------------------------------------------
+        PDF.setFont('Courier', 9)
+        PDF.drawString(515.9, 771.4, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
+        PDF.drawString(535.9, 751.8, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
+        PDF.drawString(493.1, 731.2, str(PRINT_OS.VENDEDOR.first_name)[:12])
+        PDF.drawString(510.0, 711.0, str(PRINT_OS.LABORATORIO)[:12])
+        PDF.setFont('Courier', 9)
+        PDF.drawString(340.7, 695.2, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        # ---------------------------------------------------------------
+        # DADOS DO CLIENTE
+        # ---------------------------------------------------------------
+        PDF.drawString(68.7, 646.1, str(PRINT_OS.CLIENTE.NOME[:23]))
+        PDF.drawString(478.1, 646.1, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        # ---------------------------------------------------------------
+        # DADOS DO SERVIÇO
+        # ---------------------------------------------------------------
+        PDF.drawString(85.5, 592.5, str(PRINT_OS.SERVICO))
+        PDF.drawString(85.6, 572.9, str(PRINT_OS.LENTES))
+        PDF.drawString(85.5, 552.2, str(PRINT_OS.ARMACAO))
+
+        # observação: quebra em até 3 linhas (mesmo char-limit por linha da via anterior)
+        observacao = str(PRINT_OS.OBSERVACAO or '')
+        obs_linhas = [observacao[i:i + 42] for i in range(0, len(observacao), 42)][:3]
+        obs_coords = [(80.3, 531.6), (59.8, 509.4), (59.8, 494.0)]
+        for linha, (x, y) in zip(obs_linhas, obs_coords):
+            PDF.drawString(x, y, linha)
+
+        # ---------------------------------------------------------------
+        # FINANCEIRO
+        # ---------------------------------------------------------------
+        forma_pagamento = {
+            'A': 'PIX',
+            'B': 'DINHEIRO',
+            'C': 'DEBITO',
+            'D': 'CREDITO',
+            'E': 'CARNER',
+            'F': 'PERMUTA',
+        }.get(PRINT_OS.FORMA_PAG, '')
+        PDF.drawString(480.1, 591.9, forma_pagamento)
+
+        PDF.drawString(499.0, 567.7, str(PRINT_OS.VALOR))
+        PDF.drawString(364.6, 518.7, str(PRINT_OS.QUANTIDADE_PARCELA))
+        PDF.drawString(466.2, 518.7, str(PRINT_OS.VALOR_PAGO))
+
+        # =================================================================
+        # VIA DO LABORATÓRIO
+        # =================================================================
+        PDF.setFont('Courier-Bold', 11)
+
+        PDF.drawString(400.5, 400.5, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        PDF.setFont('Courier-Bold', 9)
+        PDF.drawString(110.5, 380.5, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
+        PDF.drawString(285.6, 380.5, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
+        PDF.drawString(410.4, 380.5, str(PRINT_OS.VENDEDOR.first_name)[:12])
+        PDF.drawString(530.8, 380.5, str(PRINT_OS.LABORATORIO)[:12])
+        PDF.setFont('Courier-Bold', 11)
+
+        PDF.drawString(65.7, 353.9, str(PRINT_OS.CLIENTE.NOME[:23]))
+        PDF.drawString(275.9, 353.9, str(PRINT_OS.SERVICO))
+        PDF.drawString(448.2, 353.9, str(PRINT_OS.LENTES))
+
+        # ---------------------------------------------------------------
+        # RECEITA (tabela OD/OE)
+        # ---------------------------------------------------------------
+        PDF.drawString(50.8, 300.2, str(PRINT_OS.OD_ESF))
+        PDF.drawString(155.4, 300.2, str(PRINT_OS.OD_CIL))
+        PDF.drawString(233.0, 300.2, str(PRINT_OS.OD_EIXO))
+        PDF.drawString(334.6, 300.2, str(PRINT_OS.OE_ESF))
+        PDF.drawString(436.2, 300.2, str(PRINT_OS.OE_CIL))
+        PDF.drawString(531.8, 300.2, str(PRINT_OS.OE_EIXO))
+
+        PDF.drawString(59.8, 275.0, str(PRINT_OS.AD))
+
+        PDF.drawString(125.5, 257.3, str(PRINT_OS.ARMACAO))
+
+        obs_lab_linhas = [observacao[i:i + 55] for i in range(0, len(observacao), 55)][:2]
+        obs_lab_y = [236.7, 217.6]
+        for linha, y in zip(obs_lab_linhas, obs_lab_y):
+            PDF.drawString(143.4, y, linha)
+
+        # ---------------------------------------------------------------
+        # DADOS TÉCNICOS
+        # ---------------------------------------------------------------
+        PDF.drawString(53.8, 165.1, str(PRINT_OS.DNP))
+        PDF.drawString(224.1, 165.1, str(PRINT_OS.P))
+        PDF.drawString(433.3, 165.1, str(PRINT_OS.DPA))
+
+        PDF.drawString(59.8, 145.0, str(PRINT_OS.DIAG))
+        PDF.drawString(224.1, 145.0, str(PRINT_OS.V))
+        PDF.drawString(431.5, 145.0, str(PRINT_OS.H))
+
+        PDF.drawString(56.8, 129.9, str(PRINT_OS.ALT))
+        PDF.drawString(433.3, 129.9, str(PRINT_OS.ARM))
+
+        PDF.drawString(98.6, 110.5, str(PRINT_OS.MONTAGEM))
 
         PDF.showPage()
         PDF.save()

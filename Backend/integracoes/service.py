@@ -168,8 +168,6 @@ def _telefone(orden) -> str:
         )
     return tel
 
-
-
 def notificar_os_criada(instance_name: str, ordem) -> dict:
     valor_formatado = f"R$ {ordem.VALOR:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
@@ -196,8 +194,7 @@ def notificar_os_criada(instance_name: str, ordem) -> dict:
         f"🤝 Agradecemos pela confiança!\n"
         f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão"
     )
-    print(msg)
-    #return enviar_texto(instance_name, _telefone(ordem), msg)
+    return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_os_entregue(instance_name: str, ordem) -> dict:
     msg = (
@@ -212,8 +209,7 @@ def notificar_os_entregue(instance_name: str, ordem) -> dict:
         f"*Cuide bem da sua visão!* 👁️\n"
         f"*Ótica {settings.UNIDADE}*"
     )
-    print(msg)
-    #return enviar_texto(instance_name, _telefone(ordem), msg)
+    return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
     status_legenda = {
@@ -231,8 +227,7 @@ def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
             f"Fique atento! Em breve enviaremos mais novidades.\n"
             f"😊 Equipe Ótica {settings.UNIDADE}"
         )
-        print(msg)
-        #return enviar_texto(instance_name, _telefone(ordem), msg)
+        return enviar_texto(instance_name, _telefone(ordem), msg)
     if descricao == 'pronto para retirada':
         msg = (
         f"🎉 *Pedido Pronto para Retirada!*\n\n"
@@ -245,8 +240,8 @@ def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
         f"• Apresente este número de pedido\n\n"
         f"😊 Estamos ansiosos para vê-lo!\n"
         f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão")
-        print(msg)
-        #return enviar_texto(instance_name, _telefone(ordem), msg)
+        
+        return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_cancelamento(instance_name: str, ordem) -> dict:
     msg = (
@@ -262,8 +257,7 @@ def notificar_cancelamento(instance_name: str, ordem) -> dict:
         f"😊 Equipe Ótica {settings.UNIDADE}"
 
     )
-    print(msg)
-    #return enviar_texto(instance_name, _telefone(ordem), msg)
+    return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def mensagem_lembrete_anual(instance_name: str, ordem)-> dict:
     msg = (
@@ -276,5 +270,5 @@ def mensagem_lembrete_anual(instance_name: str, ordem)-> dict:
         f"*Sua visão merece o melhor!* 😉\n"
         f"*Ótica {settings.UNIDADE}*"
     )
-    print(msg)
-    #return enviar_texto(instance_name, _telefone(ordem), msg)
+
+    return enviar_texto(instance_name, _telefone(ordem), msg)
