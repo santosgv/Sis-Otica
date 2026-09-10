@@ -347,7 +347,8 @@ def Imprimir_os(request, id_os):
         # Bloco à direita é estreito — usa fonte menor pra não estourar a margem
         # ---------------------------------------------------------------
         PDF.setFont('Courier', 6)
-        PDF.drawString(157,755.5, str(config('ENDERECO')))
+        PDF.drawString(150,755.5, str(config('ENDERECO')))
+        PDF.setFont('Courier', 9)
         PDF.drawString(150,740.5, str(config('TELEFONE')))
         PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
         PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
