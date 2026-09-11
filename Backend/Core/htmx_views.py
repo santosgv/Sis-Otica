@@ -9,18 +9,28 @@ from django.db.models import Value
 
 def search(request):
     search = request.GET.get('search')
-    clientes = CLIENTE.objects.filter(NOME__icontains=search)
-    ordens_de_servico_por_cliente = {}
-    if clientes.exists():
-        for cliente in clientes:
-            ordens_de_servico = ORDEN.objects.filter(CLIENTE=cliente)
-            ordens_de_servico_por_cliente[cliente] = ordens_de_servico
+    ordens_de_servico = ORDEN.objects.filter(
+            CLIENTE__NOME__icontains=search
+        ).select_related('CLIENTE', 'VENDEDOR')
 
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
 
 def search_by_id(request):
     search = request.GET.get('search_by_id')
     oss = ORDEN.objects.filter(id__icontains=search)
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
+
+def search_by_city(request):
+    search = request.GET.get('search_by_city')
+    ordens_de_servico = ORDEN.objects.filter(
+        CLIENTE__CIDADE__icontains=search
+    ).select_related('CLIENTE', 'VENDEDOR')
+    
+    return render(request,'parcial/os_parcial.html',{'Ordem_servicos':ordens_de_servico})
+
+def search_by_lentes(request):
+    search = request.GET.get('search_by_lentes')
+    oss = ORDEN.objects.filter(LENTES__icontains=search)
     return render(request,'parcial/os_parcial.html',{'Ordem_servicos':oss})
 
 def search_products(request):
@@ -40,7 +50,7 @@ def search_caixa(request):
 
 def search_cliente(request):
     search = request.GET.get('search_cliente')
-    clientes = CLIENTE.objects.filter(NOME__icontains=search)
+    clientes = CLIENTE.objects.filter(NOME__icontains=search).filter(STATUS='1').all()
     return render(request,'parcial/cliente_parcial.html',{'clientes':clientes})
 
 def all_estoque(request):

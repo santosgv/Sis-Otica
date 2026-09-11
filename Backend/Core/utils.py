@@ -1,15 +1,15 @@
+from __future__ import annotations
 from urllib.parse import quote
 from decouple import config
 import pandas as pd
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Sum,Count, Q
 from Core.models import SaidaEstoque, EntradaEstoque, MovimentoEstoque,Produto,CAIXA,ORDEN,CLIENTE,ParcelaOrdem
 from datetime import datetime, date
 from calendar import monthrange
 import datetime
 from django.http import FileResponse,HttpResponse,JsonResponse
-import io
-import os
+import io, os, tempfile
 from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
 from django.shortcuts import get_object_or_404, redirect
@@ -29,20 +29,106 @@ from reportlab.lib.colors import black
 from pathlib import Path
 from decimal import Decimal,ROUND_HALF_UP
 from .services.webmaniabr import emitir_nfe
-
-logger = logging.getLogger('MyApp')
-
-def get_tenant(request):
-    TenantModel = get_tenant_model()
-    tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
-    return tenant
-
+from decimal import Decimal, InvalidOperation
+from django.shortcuts import render
+import re
 
 logger = logging.getLogger('MyApp')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 CHAVE_PIX =config('CHAVE_PIX')
+
+def validar_cpf(cpf: str, exclude_id: int = None) -> tuple[bool, str]:
+    """
+    Valida CPF: formatação, dígitos verificadores e unicidade.
+    Retorna (válido, mensagem_erro).
+    """
+    # Remove caracteres não numéricos
+    cpf_numeros = re.sub(r'\D', '', cpf)
+    
+    if len(cpf_numeros) != 11:
+        return False, "CPF deve conter 11 dígitos."
+    
+    if cpf_numeros == cpf_numeros[0] * 11:
+        return False, "CPF inválido (todos os dígitos iguais)."
+    
+    # Cálculo dos dígitos verificadores
+    def calcular_digito(cpf_parcial):
+        soma = 0
+        for i in range(len(cpf_parcial)):
+            soma += int(cpf_parcial[i]) * (len(cpf_parcial) + 1 - i)
+        resto = soma % 11
+        return '0' if resto < 2 else str(11 - resto)
+    
+    primeiro_digito = calcular_digito(cpf_numeros[:9])
+    segundo_digito = calcular_digito(cpf_numeros[:10])
+    
+    if primeiro_digito != cpf_numeros[9] or segundo_digito != cpf_numeros[10]:
+        return False, "CPF inválido (dígitos verificadores não conferem)."
+    
+    # Verificar duplicidade (opcional, pode ser feito no form)
+    # A duplicidade será tratada no form, mas podemos incluir aqui para centralizar
+    # Não faremos a consulta aqui para manter a função pura, mas podemos.
+    # Prefiro deixar a verificação de duplicidade no form.
+    return True, ""
+
+def cpf_ja_cadastrado(cpf: str, exclude_id: int = None) -> bool:
+    """Verifica se CPF já existe no banco (excluindo um ID opcional)."""
+    queryset = CLIENTE.objects.filter(CPF=cpf).filter(STATUS='1')
+    if exclude_id:
+        queryset = queryset.exclude(id=exclude_id)
+    return queryset.exists()
+
+def listar_clientes_duplicados_sem_pedido():
+    """
+    Retorna um dicionário com CPFs duplicados e a lista de clientes sem pedidos.
+    """
+    # Encontrar CPFs duplicados
+    cpfs_duplicados = (
+        CLIENTE.objects
+        .values('CPF')
+        .annotate(count=Count('id'))
+        .filter(count__gt=1)
+        .values_list('CPF', flat=True)
+    )
+
+    resultado = {}
+    for cpf in cpfs_duplicados:
+        clientes = CLIENTE.objects.filter(CPF=cpf)
+        # Filtrar clientes sem pedidos
+        clientes_sem_pedido = []
+        for cliente in clientes:
+            if not ORDEN.objects.filter(CLIENTE=cliente).exists():
+                clientes_sem_pedido.append(cliente)
+        if clientes_sem_pedido:
+            resultado[cpf] = clientes_sem_pedido
+    return resultado
+
+def inativar_clientes_duplicados_sem_pedido(dry_run=True):
+    """
+    Inativa clientes duplicados que não têm pedidos.
+    Se dry_run=True, apenas simula e exibe a lista.
+    """
+    duplicados = listar_clientes_duplicados_sem_pedido()
+    inativados = []
+    for cpf, clientes in duplicados.items():
+        # Vamos manter um cliente ativo (o primeiro com pedido? Ou o mais recente?)
+        # Aqui, se houver algum cliente com pedido, mantemos ativo. Como já filtramos sem pedido, todos esses não têm.
+        # Então podemos inativar todos, mas cuidado: pode haver um com pedido que não está na lista.
+        # O ideal é manter pelo menos um ativo por CPF.
+        # Vamos buscar todos os clientes com esse CPF
+        todos = CLIENTE.objects.filter(CPF=cpf)
+        # Verificar quais têm pedido
+        com_pedido = [c for c in todos if ORDEN.objects.filter(CLIENTE=c).exists()]
+        # Se houver algum com pedido, não inativamos nenhum? Vamos manter os sem pedido inativos.
+        # Vamos inativar todos os que não têm pedido, independente de haver com pedido.
+        for cliente in clientes:
+            if not dry_run:
+                cliente.STATUS = '2'  # INATIVO
+                cliente.save()
+            inativados.append(cliente.pk)
+    return inativados
 
 def generate_barcode_image(code):
 
@@ -119,7 +205,68 @@ def create_pdf(request, codigo, quantidade):
     # Retorna o PDF gerado
     return FileResponse(buffer, as_attachment=True, filename=f'etiquetas_{codigo}.pdf')
 
-def criar_mensagem_parabens(request,cliente):
+
+
+def generate_batch_labels(request):
+    """
+    Recebe uma lista de IDs de produtos via POST e gera um único PDF
+    com uma etiqueta para cada produto (ou mais, se definir quantidade).
+    """
+    if request.method == 'POST':
+        produto_ids = request.POST.getlist('produto_ids')  # lista de IDs
+        if not produto_ids:
+            print("Nenhum produto selecionado.")
+            return redirect('Core:estoque')  # ajuste a URL
+
+        # Busca os produtos
+        produtos = Produto.objects.filter(id__in=produto_ids)
+
+        # Configurações do PDF
+        etiqueta_width = 90 * mm
+        etiqueta_height = 12 * mm
+        buffer = io.BytesIO()
+        c = canvas.Canvas(buffer, pagesize=(etiqueta_width, etiqueta_height))
+
+        # Para cada produto, gera suas etiquetas (aqui, 1 por produto)
+        for produto in produtos:
+            codigo = produto.codigo
+            # Gera imagem do código de barras (salva temporariamente)
+            barcode_image = generate_barcode_image(codigo)
+            # Usa tempfile para evitar conflitos
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                barcode_image.save(tmp.name, "PNG")
+                tmp_path = tmp.name
+
+            # Desenha a etiqueta
+            # Branco no início
+            c.setFillColor("white")
+            c.rect(0, 0, 30 * mm, etiqueta_height, stroke=0, fill=1)
+            # Código de barras no centro
+            c.drawImage(tmp_path, 35 * mm, -1 * mm, width=30 * mm, height=11 * mm)
+            # Informações de preço e nome
+            c.setFillColor("black")
+            c.setFont("Helvetica", 7)
+            c.drawString(2 * mm, 8 * mm, f"{produto.nome[:15]}")
+            c.drawString(2 * mm, 4 * mm, f"R$ {produto.preco_venda:.2f}")
+            # Código de barras à direita (opcional)
+            c.drawImage(tmp_path, 60 * mm, -1 * mm, width=30 * mm, height=11 * mm)
+
+            # Nova página para a próxima etiqueta
+            c.showPage()
+
+            # Remove o arquivo temporário
+            os.unlink(tmp_path)
+
+        c.save()
+        buffer.seek(0)
+
+        # Retorna o PDF
+        return FileResponse(buffer, as_attachment=True, filename='etiquetas_lote.pdf')
+
+    # Se não for POST, redireciona para a lista
+    return redirect('Core:estoque')
+
+def criar_mensagem_parabens(cliente):
     nome_cliente = cliente
     mensagem = (
         f"*Parabéns pelo seu aniversário,{nome_cliente}!*\n\n"
@@ -180,74 +327,129 @@ def dados_caixa():
     dado = CAIXA.objects.filter(DATA__gte=primeiro_dia_mes(),DATA__lte=ultimo_dia_mes(),FECHADO=False,ABERTO=True).order_by('-id')
     return dado
 
-def Imprimir_os(request,id_os):
+def Imprimir_os(request, id_os):
     try:
-        PRINT_OS =ORDEN.objects.get(id=id_os)
-        
+        PRINT_OS = ORDEN.objects.get(id=id_os)
+
         buffer = io.BytesIO()
-        PDF = canvas.Canvas(buffer,pagesize=letter)
-        PDF.setFont('Courier', 12)
-        PDF.drawImage(os.path.join(settings.BASE_DIR, 'templates','OS_exemplo_page.jpg'),0, 0, width=letter[0], height=letter[1])
+        PDF = canvas.Canvas(buffer, pagesize=letter)
+        PDF.setFont('Courier', 11)
+        PDF.drawImage(
+            os.path.join(settings.BASE_DIR, 'templates', 'IMPRESAO_OS_vermelho.png'),
+            0, 0, width=letter[0], height=letter[1]
+        )
+        logo_path = os.path.join(settings.BASE_DIR,  'templates','static', 'home', 'img', 'LOGO-NOVA-PRETA .png')
+        if os.path.exists(logo_path):
+            PDF.drawImage(logo_path, 10, 700, width=80, height=80, mask='auto')
 
-        PDF.drawString(136,744,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
-        PDF.drawString(325,744,(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(325,778,str(get_tenant(request).unidade)+str(PRINT_OS.id))
-        PDF.drawString(88,724,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,724,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
-        PDF.drawString(88,665,str(PRINT_OS.SERVICO))
-        PDF.drawString(385,665,str(PRINT_OS.LABORATORIO))
-        PDF.drawString(88,637,str(PRINT_OS.LENTES))
-        PDF.drawString(88,620,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,592,str(PRINT_OS.OBSERVACAO[:69]))
-        if PRINT_OS.FORMA_PAG == 'A':
-            PDF.drawString(109,539,'PIX')
-        elif PRINT_OS.FORMA_PAG == 'B':
-            PDF.drawString(109,539,'DINHEIRO')
-        elif PRINT_OS.FORMA_PAG == 'C':
-            PDF.drawString(109,539,'DEBITO')
-        elif PRINT_OS.FORMA_PAG == 'D':
-            PDF.drawString(109,539,'CREDITO')
-        elif PRINT_OS.FORMA_PAG == 'E':
-            PDF.drawString(109,539,'CARNER')
-        elif PRINT_OS.FORMA_PAG == 'F':
-            PDF.drawString(109,539,'PERMUTA')
-        
-        PDF.drawString(240,539,str(PRINT_OS.VALOR))
-        PDF.drawString(385,539,str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(520,539,str(PRINT_OS.VALOR_PAGO))
-        # parte laboratorio
-        PDF.setFont('Courier-Bold', 12)
-        PDF.drawString(325,454,str(settings.UNIDADE)+str(PRINT_OS.id))
-        PDF.drawString(395,454,str(settings.NOME))
-        PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
-        PDF.drawString(325,454,str(get_tenant(request).unidade)+str(PRINT_OS.id))
-        PDF.drawString(395,454,str(get_tenant(request)))
-        PDF.drawString(136,405,str(PRINT_OS.DATA_SOLICITACAO.strftime('%d-%m-%Y')))
-        PDF.drawString(325,405,str(PRINT_OS.VENDEDOR.first_name))
-        PDF.drawString(88,385,str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(385,385,str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
-        PDF.drawString(88,361,str(PRINT_OS.SERVICO))
-        PDF.drawString(338,361,str(PRINT_OS.LABORATORIO))
-        PDF.drawString(88,312,str(PRINT_OS.OD_ESF))
-        PDF.drawString(88,282,str(PRINT_OS.OE_ESF))
-        PDF.drawString(301,312,str(PRINT_OS.OD_CIL))
-        PDF.drawString(301,282,str(PRINT_OS.OE_CIL))
-        PDF.drawString(472,312,str(PRINT_OS.OD_EIXO))
-        PDF.drawString(472,282,str(PRINT_OS.OE_EIXO))
-        PDF.drawString(64,248,str(PRINT_OS.AD))
-        PDF.drawString(78,215,str(PRINT_OS.LENTES))
-        PDF.drawString(78,197,str(PRINT_OS.ARMACAO))
-        PDF.drawString(109,178,str(PRINT_OS.OBSERVACAO[:69]))
 
-        PDF.drawString(60,116,str(PRINT_OS.DNP))
-        PDF.drawString(270,116,str(PRINT_OS.P))
-        PDF.drawString(430,116,str(PRINT_OS.DPA))
-        PDF.drawString(66,96,str(PRINT_OS.DIAG))
-        PDF.drawString(270,96,str(PRINT_OS.V))
-        PDF.drawString(415,96,str(PRINT_OS.H))
-        PDF.drawString(60,80,str(PRINT_OS.ALT))
-        PDF.drawString(432,78,str(PRINT_OS.ARM))
-        PDF.drawString(94,60,str(PRINT_OS.MONTAGEM))
+        # ---------------------------------------------------------------
+        # CABEÇALHO (topo da via do cliente)
+        # Bloco à direita é estreito — usa fonte menor pra não estourar a margem
+        # ---------------------------------------------------------------
+        PDF.setFont('Courier', 6)
+        PDF.drawString(150,755.5, str(config('ENDERECO')))
+        PDF.setFont('Courier', 9)
+        PDF.drawString(150,740.5, str(config('TELEFONE')))
+        PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
+        PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
+        PDF.setFont('Courier', 9)
+        PDF.drawString(515.9, 771.4, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
+        PDF.drawString(535.9, 751.8, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
+        PDF.drawString(493.1, 731.2, str(PRINT_OS.VENDEDOR.first_name)[:12])
+        PDF.drawString(510.0, 711.0, str(PRINT_OS.LABORATORIO)[:12])
+        PDF.setFont('Courier', 9)
+        PDF.drawString(340.7, 695.2, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        # ---------------------------------------------------------------
+        # DADOS DO CLIENTE
+        # ---------------------------------------------------------------
+        PDF.drawString(68.7, 646.1, str(PRINT_OS.CLIENTE.NOME[:23]))
+        PDF.drawString(478.1, 646.1, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        # ---------------------------------------------------------------
+        # DADOS DO SERVIÇO
+        # ---------------------------------------------------------------
+        PDF.drawString(85.5, 592.5, str(PRINT_OS.SERVICO))
+        PDF.drawString(85.6, 572.9, str(PRINT_OS.LENTES))
+        PDF.drawString(85.5, 552.2, str(PRINT_OS.ARMACAO))
+
+        # observação: quebra em até 3 linhas (mesmo char-limit por linha da via anterior)
+        observacao = str(PRINT_OS.OBSERVACAO or '')
+        obs_linhas = [observacao[i:i + 42] for i in range(0, len(observacao), 42)][:3]
+        obs_coords = [(80.3, 531.6), (59.8, 509.4), (59.8, 494.0)]
+        for linha, (x, y) in zip(obs_linhas, obs_coords):
+            PDF.drawString(x, y, linha)
+
+        # ---------------------------------------------------------------
+        # FINANCEIRO
+        # ---------------------------------------------------------------
+        forma_pagamento = {
+            'A': 'PIX',
+            'B': 'DINHEIRO',
+            'C': 'DEBITO',
+            'D': 'CREDITO',
+            'E': 'CARNER',
+            'F': 'PERMUTA',
+        }.get(PRINT_OS.FORMA_PAG, '')
+        PDF.drawString(480.1, 591.9, forma_pagamento)
+
+        PDF.drawString(499.0, 567.7, str(PRINT_OS.VALOR))
+        PDF.drawString(364.6, 518.7, str(PRINT_OS.QUANTIDADE_PARCELA))
+        PDF.drawString(466.2, 518.7, str(PRINT_OS.VALOR_PAGO))
+
+        # =================================================================
+        # VIA DO LABORATÓRIO
+        # =================================================================
+        PDF.setFont('Courier-Bold', 11)
+
+        PDF.drawString(400.5, 400.5, str(settings.UNIDADE) + str(PRINT_OS.id))
+
+        PDF.setFont('Courier-Bold', 9)
+        PDF.drawString(110.5, 380.5, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
+        PDF.drawString(285.6, 380.5, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
+        PDF.drawString(410.4, 380.5, str(PRINT_OS.VENDEDOR.first_name)[:12])
+        PDF.drawString(530.8, 380.5, str(PRINT_OS.LABORATORIO)[:12])
+        PDF.setFont('Courier-Bold', 9)
+
+        PDF.drawString(65.7, 353.9, str(PRINT_OS.CLIENTE.NOME[:23]))
+        PDF.drawString(275.9, 353.9, str(PRINT_OS.SERVICO))
+        PDF.drawString(448.2, 353.9, str(PRINT_OS.LENTES))
+
+        # ---------------------------------------------------------------
+        # RECEITA (tabela OD/OE)
+        # ---------------------------------------------------------------
+        PDF.drawString(50.8, 300.2, str(PRINT_OS.OD_ESF))
+        PDF.drawString(155.4, 300.2, str(PRINT_OS.OD_CIL))
+        PDF.drawString(233.0, 300.2, str(PRINT_OS.OD_EIXO))
+        PDF.drawString(334.6, 300.2, str(PRINT_OS.OE_ESF))
+        PDF.drawString(436.2, 300.2, str(PRINT_OS.OE_CIL))
+        PDF.drawString(531.8, 300.2, str(PRINT_OS.OE_EIXO))
+
+        PDF.drawString(59.8, 275.0, str(PRINT_OS.AD))
+
+        PDF.drawString(125.5, 257.3, str(PRINT_OS.ARMACAO))
+
+        obs_lab_linhas = [observacao[i:i + 55] for i in range(0, len(observacao), 55)][:2]
+        obs_lab_y = [236.7, 217.6]
+        for linha, y in zip(obs_lab_linhas, obs_lab_y):
+            PDF.drawString(143.4, y, linha)
+
+        # ---------------------------------------------------------------
+        # DADOS TÉCNICOS
+        # ---------------------------------------------------------------
+        PDF.drawString(53.8, 165.1, str(PRINT_OS.DNP))
+        PDF.drawString(224.1, 165.1, str(PRINT_OS.P))
+        PDF.drawString(433.3, 165.1, str(PRINT_OS.DPA))
+
+        PDF.drawString(59.8, 145.0, str(PRINT_OS.DIAG))
+        PDF.drawString(224.1, 145.0, str(PRINT_OS.V))
+        PDF.drawString(431.5, 145.0, str(PRINT_OS.H))
+
+        PDF.drawString(56.8, 129.9, str(PRINT_OS.ALT))
+        PDF.drawString(433.3, 129.9, str(PRINT_OS.ARM))
+
+        PDF.drawString(98.6, 110.5, str(PRINT_OS.MONTAGEM))
 
         PDF.showPage()
         PDF.save()
@@ -481,8 +683,6 @@ def gerar_carner_pdf(request, ordem_id):
     response['Content-Disposition'] = f'attachment; filename="carner_{ordem.id}.pdf"'
     return response
 
-from decimal import Decimal, InvalidOperation
-
 def parse_decimal(value):
     if value is None or value == '' or value == 'N/D':
         return Decimal("0.00")
@@ -495,9 +695,12 @@ def parse_decimal(value):
         return Decimal(value)
     except (InvalidOperation, ValueError, TypeError):
         return Decimal("0.00")
-
-from django.shortcuts import render
-from .models import CAIXA
+    
+def formatar_decimal(valor):
+    if valor is None:
+        return None
+    valor_decimal = Decimal(valor).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    return f"{valor_decimal:,.2f}".replace(",", "v").replace(".", ",").replace("v", ".")
 
 def entradas_meses_passados(request):
     data_inicio = request.GET.get('data_inicio')
@@ -510,28 +713,6 @@ def entradas_meses_passados(request):
     
     return render(request, 'parcial/meses_passados.html', {'entradas': entradas})
 
-
-#def criar_parcelas(os):
-"""
-    ordem = ORDEN.objects.get(id=os)
-    if not ordem.QUANTIDADE_PARCELA or ordem.QUANTIDADE_PARCELA <= 1:
-        return
-
-    valor_total = Decimal(ordem.VALOR)
-    entrada = Decimal(ordem.ENTRADA)
-    restante = valor_total - entrada
-
-    valor_parcela = (restante / ordem.QUANTIDADE_PARCELA).quantize(Decimal("0.01"))
-
-    for i in range(1, ordem.QUANTIDADE_PARCELA + 1):
-        data_vencimento = get_today_data() + timedelta(days=30 * i)
-        ParcelaOrdem.objects.create(
-            ordem=ordem,
-            numero=i,
-            valor=valor_parcela,
-            data_vencimento=data_vencimento
-        )
-"""
 def criar_parcelas(os):
 
     ordem = ORDEN.objects.get(id=os)
@@ -575,7 +756,7 @@ def criar_parcelas(os):
 
     ParcelaOrdem.objects.bulk_create(parcelas)
 
-def registrar_entrada_caixa(ordem):
+def registrar_entrada_caixa(ordem, usuario=None):
     entrada = Decimal(str(ordem.ENTRADA)) if ordem.ENTRADA else Decimal('0')
     if entrada <= 0:
         return
@@ -584,17 +765,36 @@ def registrar_entrada_caixa(ordem):
         DESCRICAO=f'Entrada OS #{ordem.id} - {ordem.CLIENTE}',
         REFERENCIA=ordem,
         TIPO='E',
-        VALOR=float(entrada),
+        VALOR=entrada,
         FORMA=ordem.FORMA_PAG or 'B',
         ABERTO=True,
     )
 
+    # Fonte da verdade no Financeiro (categoria 'Vendas de OS', vinculado à
+    # OS via `ordem` — necessário para o estorno automático no cancelamento
+    # conseguir localizar esse movimento).
+    if usuario is not None:
+        from Financeiro.services import conta_padrao_caixa, registrar_entrada
+        registrar_entrada(ordem, conta_padrao_caixa(), usuario, valor=entrada)
+        print(f"Entrada registrada no Financeiro para OS #{ordem.id} pelo usuário {usuario.username}.")
+
     # Inicializa VALOR_PAGO com a entrada
     ordem.VALOR_PAGO = entrada
     ordem.save(update_fields=['VALOR_PAGO'])
+    return True
 
+def registrar_pagamento_parcela(parcela, forma_pagamento, usuario):
+    """Registra o pagamento integral de uma parcela.
 
-def registrar_pagamento_parcela(parcela, forma_pagamento):
+    A partir da Fase 6, a fonte da verdade da baixa (validação de excedente,
+    lock de concorrência, histórico) é o Service Layer do app `Financeiro`
+    (`Financeiro.services.receber_parcela`). O registro em `Core.CAIXA` é
+    mantido em paralelo apenas como ponte para a tela de Caixa existente, que
+    ainda lê de `Core.CAIXA` — isso será eliminado na Fase 8, quando a tela de
+    Caixa passar a ler de `Financeiro.MovimentoFinanceiro`.
+    """
+    from Financeiro.services import categoria_vendas_os, conta_padrao_caixa, receber_parcela
+
     if parcela.pago:
         raise ValueError('Esta parcela já foi paga.')
 
@@ -602,6 +802,17 @@ def registrar_pagamento_parcela(parcela, forma_pagamento):
     if forma_pagamento not in FORMAS_VALIDAS:
         raise ValueError('Forma de pagamento inválida.')
 
+    # Fonte da verdade: Financeiro (valida excedente, usa select_for_update)
+    receber_parcela(
+        parcela.id,
+        parcela.valor,
+        conta_padrao_caixa(),
+        usuario,
+        forma_pagamento=forma_pagamento,
+        categoria=categoria_vendas_os(),
+    )
+
+    # Bridge legado: mantém Core.CAIXA populado para a tela de Caixa atual
     caixa = CAIXA.objects.create(
         DESCRICAO=f'Parcela {parcela.numero} - OS #{parcela.ordem.id} - {parcela.ordem.CLIENTE}',
         REFERENCIA=parcela.ordem,
@@ -610,10 +821,7 @@ def registrar_pagamento_parcela(parcela, forma_pagamento):
         FORMA=forma_pagamento,
         ABERTO=True,
     )
-
-    parcela.pago = True
-    parcela.data_pagamento = date.today()
-    parcela.forma_pagamento = forma_pagamento
+    parcela.refresh_from_db()
     parcela.caixa = caixa
-    parcela.save(update_fields=['pago', 'data_pagamento', 'forma_pagamento', 'caixa'])
-    # O signal post_save do ParcelaOrdem já atualiza VALOR_PAGO automaticamente
+    parcela.save(update_fields=['caixa'])
+    return True

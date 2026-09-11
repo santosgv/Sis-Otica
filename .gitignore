@@ -5,13 +5,14 @@ __pycache__/
 
 #django
 media/
-static/
+/static/
 migrations/
 tmp/
 CACHE/
 certificado/
 # C extensions
 *.so
+*.sqlite3
 
 # Distribution / packaging
 .Python

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block 'title' %}Contas a Receber{% endblock %}
+
+{% block 'body' %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white p-2 rounded-2">
+    <li class="breadcrumb-item"><a href="{% url 'Core:home' %}">Página Principal</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'Financeiro:dashboard' %}">Financeiro</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Contas a Receber</li>
+  </ol>
+</nav>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0"><div class="card-body">
+      <div class="text-muted small">Em Aberto</div>
+      <div class="fs-5 fw-bold">R$ {{ resumo.em_aberto.valor|floatformat:2 }} <span class="text-muted small">({{ resumo.em_aberto.quantidade }})</span></div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 border-danger"><div class="card-body">
+      <div class="text-muted small">Vencidas</div>
+      <div class="fs-5 fw-bold text-danger">R$ {{ resumo.vencidas.valor|floatformat:2 }} <span class="text-muted small">({{ resumo.vencidas.quantidade }})</span></div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0"><div class="card-body">
+      <div class="text-muted small">A Vencer</div>
+      <div class="fs-5 fw-bold">R$ {{ resumo.a_vencer.valor|floatformat:2 }} <span class="text-muted small">({{ resumo.a_vencer.quantidade }})</span></div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0"><div class="card-body">
+      <div class="text-muted small">Pagas</div>
+      <div class="fs-5 fw-bold text-success">R$ {{ resumo.pagas.valor|floatformat:2 }} <span class="text-muted small">({{ resumo.pagas.quantidade }})</span></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped mb-0">
+        <thead class="thead-light">
+          <tr>
+            <th>Vencimento</th>
+            <th>OS</th>
+            <th>Cliente</th>
+            <th>Parcela</th>
+            <th class="text-end">Valor</th>
+            <th style="width: 260px;">Receber</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for parcela in parcelas %}
+          <tr class="{% if parcela.data_vencimento < hoje %}table-danger{% endif %}">
+            <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+            <td>#{{ parcela.ordem_id }}</td>
+            <td>{{ parcela.ordem.CLIENTE.NOME }}</td>
+            <td>{{ parcela.numero }}/{{ parcela.ordem.QUANTIDADE_PARCELA }}</td>
+            <td class="text-end">R$ {{ parcela.valor|floatformat:2 }}</td>
+            <td>
+              <form method="post" action="{% url 'Financeiro:receber_parcela' parcela.id %}" class="d-flex gap-1">
+                {% csrf_token %}
+                <input type="text" name="VALOR" class="form-control form-control-sm" placeholder="Valor" value="{{ parcela.valor|floatformat:2 }}" required>
+                <button type="submit" class="btn btn-sm btn-success" title="Receber">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma parcela em aberto.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

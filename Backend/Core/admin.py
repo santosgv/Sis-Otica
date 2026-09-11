@@ -8,7 +8,6 @@ from Core.models import (Review,LABORATORIO,CLIENTE,ORDEN,CAIXA,SERVICO,Forneced
 
 admin.site.register(CAIXA)
 admin.site.register(LABORATORIO)
-admin.site.register(CLIENTE)
 admin.site.register(SERVICO)
 admin.site.register(ORDEN)
 admin.site.register(ParcelaOrdem)
@@ -24,6 +23,10 @@ admin.site.register(SaidaEstoque)
 admin.site.register(AlertaEstoque)
 admin.site.register(Estilo)
 admin.site.register(Tipo)
+
+@admin.register(CLIENTE)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ('NOME', 'CPF', 'STATUS','pk')
 
 
 @admin.register(MovimentoEstoque)
