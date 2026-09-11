@@ -49,6 +49,8 @@ SHARED_APPS = [
 TENANT_APPS = [
      'Core',
      'Autenticacao',
+     'integracoes',
+     'Financeiro',
      'compressor',
      "corsheaders",
      'simple_history',
