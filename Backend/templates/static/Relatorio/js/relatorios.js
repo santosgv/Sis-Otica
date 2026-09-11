@@ -204,41 +204,39 @@ function obter_clientes(data) {
   clientesEl.textContent = (data ?? 0).toLocaleString('pt-BR');
 }
 
+/**
+ * Valor a receber hoje — preenche #receber.
+ * Formato real da view `receber`: um NÚMERO cru (Decimal), sem formatar_decimal() aplicado.
+ * Como Decimal não é serializável nativamente em JSON, o DjangoJSONEncoder (usado por
+ * json_script) converte para STRING sem formatação (ex: "1234.5" — ponto, sem milhar).
+ * Por isso formatamos a moeda aqui no JS.
+ */
+function recebe_hoje(data) {
+  const receberEl = document.getElementById('receber');
+  if (!receberEl) return;
 
-function recebe_hoje(url) {
-  fetch(url, {
-    method: 'get',
-  }).then(function(result) {
-    return result.json()
-  }).then(function(data) {
-    const totalvendahoje = data.total_vendido_hoje;
+  const valor = parseFloat(data ?? 0);
 
-    const receberdiv = document.getElementById('receber');
-
-    receberdiv.textContent = `R$ ${totalvendahoje},00`;
-
+  receberEl.textContent = valor.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
   });
 }
 
+/**
+ * Vendas de lentes — preenche a lista #lentes.
+ * Formato real da view: [{ LENTES: "MULTI FOTO", total: 492 }, ...] (top 5, já ordenado desc).
+ */
+function renderiza_lentes(data) {
+  const lentesEl = document.getElementById('lentes');
+  if (!lentesEl) return;
 
-function renderiza_lentes(url) {
-  fetch(url, { method: 'get' })
-    .then(result => result.json())
-    .then(data => {
-      const lentes = data.vendas_lentes; // vem do JsonResponse do Django
+  lentesEl.innerHTML = '';
 
-      const lentesContainer = document.getElementById('lentes');
-      lentesContainer.innerHTML = ''; // limpa antes de renderizar
-
-      // título
-      const tituloElement = document.createElement('h3');
-      tituloElement.textContent = 'Top 5 Lentes Mais Vendidas do Mês';
-      lentesContainer.appendChild(tituloElement);
-
-      if (!lentes || lentes.length === 0) {
-        lentesContainer.innerHTML += '<p>Nenhuma venda encontrada.</p>';
-        return;
-      }
+  if (!data || data.length === 0) {
+    lentesEl.innerHTML = '<li class="text-muted small">Sem dados no período.</li>';
+    return;
+  }
 
   const maiorTotal = Math.max(...data.map(item => item.total));
 
