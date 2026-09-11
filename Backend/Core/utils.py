@@ -403,7 +403,7 @@ def Imprimir_os(request, id_os):
 
         PDF.drawString(499.0, 567.7, str(PRINT_OS.VALOR))
         PDF.drawString(364.6, 518.7, str(PRINT_OS.QUANTIDADE_PARCELA))
-        PDF.drawString(466.2, 518.7, str(PRINT_OS.VALOR_PAGO))
+        PDF.drawString(466.2, 518.7, str(PRINT_OS.parcelas.order_by('numero').first().valor if PRINT_OS.parcelas.exists() else ''))
 
         # =================================================================
         # VIA DO LABORATÓRIO
