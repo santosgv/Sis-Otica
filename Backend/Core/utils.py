@@ -35,6 +35,12 @@ import re
 
 logger = logging.getLogger('MyApp')
 
+def get_tenant(request):
+    from django_tenants.utils import get_tenant_model
+    TenantModel = get_tenant_model()
+    tenant = TenantModel.objects.get(schema_name=request.tenant.schema_name)
+    return tenant
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 CHAVE_PIX =config('CHAVE_PIX')
@@ -348,10 +354,11 @@ def Imprimir_os(request, id_os):
         # Bloco à direita é estreito — usa fonte menor pra não estourar a margem
         # ---------------------------------------------------------------
         PDF.setFont('Courier', 6)
-        PDF.drawString(150,755.5, str(config('ENDERECO')))
+        PDF.drawString(150,755.5, str(get_tenant(request).endereco))
         PDF.setFont('Courier', 9)
-        PDF.drawString(150,740.5, str(config('TELEFONE')))
-        PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
+        PDF.drawString(150,740.5, str(get_tenant(request).telefone))
+        PDF.drawString(145,711.5, str(get_tenant(request).email))
+        PDF.setFont('Courier', 6)
         PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
         PDF.setFont('Courier', 9)
         PDF.drawString(515.9, 771.4, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
@@ -359,13 +366,13 @@ def Imprimir_os(request, id_os):
         PDF.drawString(493.1, 731.2, str(PRINT_OS.VENDEDOR.first_name)[:12])
         PDF.drawString(510.0, 711.0, str(PRINT_OS.LABORATORIO)[:12])
         PDF.setFont('Courier', 9)
-        PDF.drawString(340.7, 695.2, str(settings.UNIDADE) + str(PRINT_OS.id))
+        PDF.drawString(340.7, 695.2, str(get_tenant(request).unidade) + str(PRINT_OS.id))
 
         # ---------------------------------------------------------------
         # DADOS DO CLIENTE
         # ---------------------------------------------------------------
         PDF.drawString(68.7, 646.1, str(PRINT_OS.CLIENTE.NOME[:23]))
-        PDF.drawString(478.1, 646.1, str(settings.UNIDADE) + str(PRINT_OS.id))
+        PDF.drawString(478.1, 646.1, str(get_tenant(request).unidade) + str(PRINT_OS.id))
 
         # ---------------------------------------------------------------
         # DADOS DO SERVIÇO
@@ -403,7 +410,7 @@ def Imprimir_os(request, id_os):
         # =================================================================
         PDF.setFont('Courier-Bold', 11)
 
-        PDF.drawString(400.5, 400.5, str(settings.UNIDADE) + str(PRINT_OS.id))
+        PDF.drawString(400.5, 400.5, str(get_tenant(request).unidade) + str(PRINT_OS.id))
 
         PDF.setFont('Courier-Bold', 9)
         PDF.drawString(110.5, 380.5, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))

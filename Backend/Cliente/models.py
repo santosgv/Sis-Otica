@@ -20,6 +20,8 @@ class Cliente(TenantMixin):
     descricao = models.TextField(blank=True)
     email = models.EmailField(null=True)
     unidade= models.CharField(max_length=6)
+    endereco= models.CharField(max_length=255, null=True)
+    telefone= models.CharField(max_length=20, null=True)
     consumer_key= models.CharField(max_length=255, null=True)
     consumer_secret= models.CharField(max_length=255, null=True)
     access_token= models.CharField(max_length=255, null=True)
