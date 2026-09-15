@@ -348,10 +348,10 @@ def Imprimir_os(request, id_os):
         # ---------------------------------------------------------------
         PDF.setFont('Courier', 6)
         PDF.drawString(150,755.5, str(config('ENDERECO')))
-        PDF.setFont('Courier', 6)
+        PDF.setFont('Courier', 5)
         PDF.drawString(150,740.5, str(config('TELEFONE')))
-        #PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
-        #PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
+        PDF.drawString(145,711.5, str(config('EMAIL_HOST_USER')))
+        PDF.drawString(140,700.5, str(request.build_absolute_uri('/vendas')))
         PDF.setFont('Courier', 9)
         PDF.drawString(515.9, 771.4, str(PRINT_OS.DATA_SOLICITACAO.strftime('%d/%m/%Y')))
         PDF.drawString(535.9, 751.8, str(PRINT_OS.PREVISAO_ENTREGA.strftime('%d/%m/%Y')))
