@@ -1,6 +1,9 @@
 version: '3'
 
 services:
+  # ============================================
+  # STACK DE MONITORAMENTO (ELK)
+  # ============================================
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
     container_name: elasticsearch
@@ -39,38 +42,72 @@ services:
       - kibana
     networks:
       - elastic
-    
+
   heartbeat:
-      image: docker.elastic.co/beats/heartbeat:7.13.0
-      container_name: heartbeat
-      volumes:
+    image: docker.elastic.co/beats/heartbeat:7.13.0
+    container_name: heartbeat
+    volumes:
       - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
-      environment:
+    environment:
       - setup.kibana.host=kibana:5601
-      networks:
-      - elastic
-  apm:
-      image: docker.elastic.co/apm/apm-server-oss:7.13.0
-      container_name: apm
-      volumes:
-      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
-      ports:
-      - "8200:8200"
-      restart: on-failure
-      networks:
+    networks:
       - elastic
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    environment:
-      POSTGRES_DB: Otica
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+  apm:
+    image: docker.elastic.co/apm/apm-server-oss:7.13.0
+    container_name: apm
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
     ports:
-      - "5432:5432"
+      - "8200:8200"
+    restart: on-failure
+    networks:
+      - elastic
+
+  # ============================================
+  # EVOLUTION API (WhatsApp)
+  # ============================================
+  evolution-api:
+    image: atendai/evolution-api:v1.8.2
+    container_name: evolution_api
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.evolution
+    depends_on:
+      - evolution-postgres
+      - evolution-redis
+    volumes:
+      - evolution_instances:/evolution/instances
+      - evolution_store:/evolution/store
+    networks:
+      - elastic
+
+  # Banco de dados dedicado da Evolution API
+  evolution-postgres:
+    image: postgres:14-alpine
+    container_name: evolution_postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${EVOLUTION_POSTGRES_USER:-evolution}
+      - POSTGRES_PASSWORD=${EVOLUTION_POSTGRES_PASSWORD:-evolution_secret}
+      - POSTGRES_DB=${EVOLUTION_POSTGRES_DB:-evolution_db}
+    volumes:
+      - evolution_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Porta 5433 para não conflitar com o postgres do projeto
+    networks:
+      - elastic
+
+  # Redis para cache da Evolution API
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: evolution_redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - evolution_redis_data:/data
     networks:
       - elastic
 
@@ -83,4 +120,14 @@ volumes:
     driver: local
 
   pgdata:
+    driver: local
+
+  # Volumes da Evolution API
+  evolution_postgres_data:
+    driver: local
+  evolution_redis_data:
+    driver: local
+  evolution_instances:
+    driver: local
+  evolution_store:
     driver: local
