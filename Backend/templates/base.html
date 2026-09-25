@@ -74,10 +74,10 @@
                         <i class="fa-solid fa-file-invoice-dollar fa-fw"></i> Folha de Pagamento
                     </a>
                     <!--
+                        -->
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'whatsapp_config' %}active{% endif %}" href="{% url 'notificacoes:whatsapp_config' %}">
                         <i class="fa-brands fa-whatsapp fa-fw"></i> Integrar WhatsApp <span class="badge text-bg-warning">TESTE</span>
                     </a>
-                    -->
                     {% if user.FUNCAO == "G" %}
                     <a class="list-group-item list-group-item-action border-0 px-3 py-2 d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'colaborador_list' %}active{% endif %}" href="{% url 'colaborador_list' %}">
                         <i class="fa-solid fa-money-check-dollar fa-fw"></i> Realizar Pagamento
