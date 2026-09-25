@@ -2,6 +2,7 @@ import json
 import logging
 import requests
 from django.conf import settings
+from datetime import datetime, date
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +175,7 @@ def notificar_os_criada(instance_name: str, ordem) -> dict:
     lentes = ordem.LENTES if ordem.LENTES != 'N/D' else 'não informado'
     montagem = ordem.MONTAGEM if ordem.MONTAGEM != 'N/D' else 'não informado'
     armacao = ordem.ARMACAO if ordem.ARMACAO != 'N/D' else 'não informado'
-
+    formata_data = ordem.PREVISAO_ENTREGA.strftime('%d/%m/%Y') if hasattr(ordem.PREVISAO_ENTREGA, 'strftime') else (datetime.strptime(str(ordem.PREVISAO_ENTREGA)[:10], '%Y-%m-%d').strftime('%d/%m/%Y') if ordem.PREVISAO_ENTREGA and str(ordem.PREVISAO_ENTREGA) != 'None' else 'não informado')
     msg = (
         f"✅ *Compra Confirmada!*\n\n"
         f"Olá, {ordem.CLIENTE.NOME}! Seu pedido foi recebido com sucesso.\n"
@@ -183,7 +184,7 @@ def notificar_os_criada(instance_name: str, ordem) -> dict:
         f"🔹 *Lentes:* {lentes}\n"
         f"🔹 *Montagem:* {montagem}\n"
         f"🔹 *Armação:* {armacao}\n\n"
-        f"📅 *Previsão de Entrega:* {ordem.PREVISAO_ENTREGA.strftime('%d/%m/%Y')}\n"
+        f"📅 *Previsão de Entrega:* {formata_data}\n"
         f"💰 *Valor Total:* {valor_formatado}\n"
         f"💳 *Forma de Pagamento:* {ordem.get_FORMA_PAG_display()}\n\n"
         f"📌 *Próximos passos:*\n"
@@ -194,6 +195,7 @@ def notificar_os_criada(instance_name: str, ordem) -> dict:
         f"🤝 Agradecemos pela confiança!\n"
         f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão"
     )
+    
     return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_os_entregue(instance_name: str, ordem) -> dict:
@@ -240,7 +242,7 @@ def notificar_troca_status(instance_name: str, ordem, status_novo) -> dict:
         f"• Apresente este número de pedido\n\n"
         f"😊 Estamos ansiosos para vê-lo!\n"
         f"*Ótica {settings.UNIDADE}* – Cuidando da sua visão")
-        
+
         return enviar_texto(instance_name, _telefone(ordem), msg)
 
 def notificar_cancelamento(instance_name: str, ordem) -> dict:
