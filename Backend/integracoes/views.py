@@ -158,7 +158,7 @@ class WhatsAppStatusView(LoginRequiredMixin, View):
                 config.save(update_fields=['numero_vinculado'])
 
             conectado = state == 'open'
-            print(f"WhatsAppStatusView: estado={state}, conectado={conectado}, numero={config.numero_vinculado}, instancia ={config.instance_name}")
+        
             return JsonResponse({
                 'estado':    state,
                 'conectado': conectado,
