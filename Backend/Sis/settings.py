@@ -155,7 +155,7 @@ TENANT_COLOR_ADMIN_APPS = True
 ELASTIC_APM = {
     'SERVICE_NAME': 'Sis-Otica',  # Nome do seu serviço
     'SECRET_TOKEN': 'qweqW',               # Token secreto, se configurado
-    'SERVER_URL': 'http://localhost:8200',
+    'SERVER_URL': 'http://179.236.224.13:8200',
     'ENVIRONMENT': 'production'
     }
 
@@ -278,8 +278,8 @@ USE_TZ = True
 INTERNAL_IPS = [
     "localhost",
     "127.0.0.1",
-    'http://vps51524.publiccloud.com.br/',
-    'vps51524.publiccloud.com.br',
+    '179.236.224.13',
+    'sgosistemas.com.br',
     
 ]
 
@@ -352,8 +352,8 @@ else:
         "http://127.0.0.1:5173/",
         "http://localhost:5173/",
         "http://localhost:5173",
-        "85.209.93.169",
-        "sgosistemas.com.br",
+        "179.236.224.13",
+        "*.sgosistemas.com.br",
     ]
 
 
