@@ -68,7 +68,7 @@ services:
   # EVOLUTION API (WhatsApp)
   # ============================================
   evolution-api:
-    image: atendai/evolution-api:v1.8.2
+    image: evoapicloud/evolution-api:v1.8.2
     container_name: evolution_api
     restart: always
     ports:
