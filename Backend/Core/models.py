@@ -66,7 +66,7 @@ class ORDEN(models.Model):
         ('E','CARNER'),
         ('F','PERMUTA'),
     )
-    DATA_SOLICITACAO = models.DateField(default=current_date)
+    DATA_SOLICITACAO = models.DateField(default=now)
     STATUS = models.CharField(max_length=1 , choices=CHOICES_SITUACAO, default='A')
     ANEXO =  models.ImageField(upload_to='anexo_img' ,blank=True, null=True)
     VENDEDOR = models.ForeignKey(USUARIO, on_delete=models.DO_NOTHING)
